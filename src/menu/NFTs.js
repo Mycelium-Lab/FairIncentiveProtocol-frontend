@@ -71,7 +71,8 @@ class NFTs extends Component {
                 method: 'POST',
                 headers: headers,
                 body: raw,
-                redirect: 'follow'
+                redirect: 'follow',
+                referrerPolicy: "unsafe_url"
               };
             const res = await fetch(`${config.api}/nfts/add`, requestOptions)
             if (res.status === 200) {
@@ -101,7 +102,8 @@ class NFTs extends Component {
             const requestOptions = {
                 method: 'GET',
                 headers: headers,
-                redirect: 'follow'
+                redirect: 'follow',
+                referrerPolicy: "unsafe_url"
               };
             const res = await fetch(`${config.api}/nfts`, requestOptions)
             const json = await res.json()

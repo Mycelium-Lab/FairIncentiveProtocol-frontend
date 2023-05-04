@@ -71,7 +71,8 @@ class Tokens extends Component {
                 method: 'POST',
                 headers: headers,
                 body: raw,
-                redirect: 'follow'
+                redirect: 'follow',
+                referrerPolicy: "unsafe_url"
               };
             const res = await fetch(`${config.api}/tokens/add`, requestOptions)
             if (res.status === 200) {
@@ -101,7 +102,8 @@ class Tokens extends Component {
             const requestOptions = {
                 method: 'GET',
                 headers: headers,
-                redirect: 'follow'
+                redirect: 'follow',
+                referrerPolicy: "unsafe_url"
               };
             const res = await fetch(`${config.api}/tokens`, requestOptions)
             const json = await res.json()

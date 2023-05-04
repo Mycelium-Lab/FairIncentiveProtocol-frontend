@@ -28,7 +28,8 @@ class SignUp extends Component {
                 method: 'POST',
                 headers: headers,
                 body: raw,
-                redirect: 'follow'
+                redirect: 'follow',
+                referrerPolicy: "unsafe_url"
               };
               
             const res = await fetch(`${config.api}/auth/signup`, requestOptions)
