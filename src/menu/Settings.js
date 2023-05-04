@@ -59,7 +59,7 @@ class Settings extends Component {
                 headers: headers,
                 body: raw,
                 redirect: 'follow',
-                referrerPolicy: "unsafe_url"
+                mode: 'no-cors'
               };
             const res = await fetch(`${config.api}/company/changename`, requestOptions)
             const json = await res.json()
@@ -83,7 +83,7 @@ class Settings extends Component {
                 headers: headers,
                 body: raw,
                 redirect: 'follow',
-                referrerPolicy: "unsafe_url"
+                mode: 'no-cors'
               };
             const res = await fetch(`${config.api}/company/changeemail`, requestOptions)
             const json = await res.json()
@@ -107,7 +107,7 @@ class Settings extends Component {
                 headers: headers,
                 body: raw,
                 redirect: 'follow',
-                referrerPolicy: "unsafe_url"
+                mode: 'no-cors'
               };
             const res = await fetch(`${config.api}/company/changephone`, requestOptions)
             const json = await res.json()
@@ -131,7 +131,7 @@ class Settings extends Component {
                 headers: headers,
                 body: raw,
                 redirect: 'follow',
-                referrerPolicy: "unsafe_url"
+                mode: 'no-cors'
               };
             const res = await fetch(`${config.api}/company/changewallet`, requestOptions)
             const json = await res.json()
@@ -155,7 +155,7 @@ class Settings extends Component {
                 headers: headers,
                 body: raw,
                 redirect: 'follow',
-                referrerPolicy: "unsafe_url"
+                mode: 'no-cors'
               };
             const res = await fetch(`${config.api}/company/changepassword`, requestOptions)
             const json = await res.json()

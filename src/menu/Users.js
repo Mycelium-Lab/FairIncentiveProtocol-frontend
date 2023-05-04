@@ -69,7 +69,7 @@ class Users extends Component {
                 headers: headers,
                 body: raw,
                 redirect: 'follow',
-                referrerPolicy: "unsafe_url"
+                mode: 'no-cors'
               };
             const res = await fetch(`${config.api}/users/add`, requestOptions)
             const json = await res.json()
@@ -103,7 +103,7 @@ class Users extends Component {
                 method: 'GET',
                 headers: headers,
                 redirect: 'follow',
-                referrerPolicy: "unsafe_url"
+                mode: 'no-cors'
               };
             const res = await fetch(`${config.api}/users`, requestOptions)
             const json = await res.json()
@@ -129,7 +129,7 @@ class Users extends Component {
                 headers: headers,
                 body: raw,
                 redirect: 'follow',
-                referrerPolicy: "unsafe_url"
+                mode: 'no-cors'
               };
             const res = await fetch(`${config.api}/users/delete`, requestOptions)
             if (res.status === 200) {

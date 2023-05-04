@@ -29,7 +29,7 @@ class SignUp extends Component {
                 headers: headers,
                 body: raw,
                 redirect: 'follow',
-                referrerPolicy: "unsafe_url"
+                mode: 'no-cors'
               };
               
             const res = await fetch(`${config.api}/auth/signup`, requestOptions)

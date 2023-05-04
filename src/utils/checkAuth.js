@@ -5,7 +5,7 @@ export async function checkAuth() {
     try {
         const res = await fetch(`${config.api}/company`, {
           headers: {Authorization: getBearerHeader()},
-          referrerPolicy: "unsafe_url"
+          mode: 'no-cors'
         })
         if (res.status === 200) return await res.json()
         else return false

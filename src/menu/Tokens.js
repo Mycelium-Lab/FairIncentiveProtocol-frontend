@@ -72,7 +72,7 @@ class Tokens extends Component {
                 headers: headers,
                 body: raw,
                 redirect: 'follow',
-                referrerPolicy: "unsafe_url"
+                mode: 'no-cors'
               };
             const res = await fetch(`${config.api}/tokens/add`, requestOptions)
             if (res.status === 200) {
@@ -103,7 +103,7 @@ class Tokens extends Component {
                 method: 'GET',
                 headers: headers,
                 redirect: 'follow',
-                referrerPolicy: "unsafe_url"
+                mode: 'no-cors'
               };
             const res = await fetch(`${config.api}/tokens`, requestOptions)
             const json = await res.json()

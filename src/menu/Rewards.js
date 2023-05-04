@@ -47,7 +47,7 @@ class Rewards extends Component {
                 method: 'GET',
                 headers: headers,
                 redirect: 'follow',
-                referrerPolicy: "unsafe_url"
+                mode: 'no-cors'
               };
             const res = await fetch(`${config.api}/tokens`, requestOptions)
             const json = await res.json()
@@ -70,7 +70,7 @@ class Rewards extends Component {
                 method: 'GET',
                 headers: headers,
                 redirect: 'follow',
-                referrerPolicy: "unsafe_url"
+                mode: 'no-cors'
               };
             const res = await fetch(`${config.api}/nfts`, requestOptions)
             const json = await res.json()
@@ -93,7 +93,7 @@ class Rewards extends Component {
                 method: 'GET',
                 headers: headers,
                 redirect: 'follow',
-                referrerPolicy: "unsafe_url"
+                mode: 'no-cors'
               };
             const res = await fetch(`${config.api}/users`, requestOptions)
             const json = await res.json()
