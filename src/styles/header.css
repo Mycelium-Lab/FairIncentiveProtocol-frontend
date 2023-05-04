@@ -1,12 +1,14 @@
 header {
     display: flex;
     background: #707070;
+    color: white;
     justify-content: space-between;
     align-items: center;
     font-size: large;
 }
 
 .header-left {
+    margin-left: 10px;
 }
 
 .header-right {
@@ -14,6 +16,6 @@ header {
     align-items: center;
 }
 
-.header-right {
+.header-right div {
     margin-right: 10px;
 }

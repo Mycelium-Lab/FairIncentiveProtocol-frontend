@@ -23,19 +23,12 @@ const switcher = {
 
 class MainScreen extends Component {
 
-    constructor() {
-        super()
+    constructor(props) {
+        super(props)
         this.state = {
             switcher: switcher.dashboard,
-            auth: {} 
+            auth: props.auth
         }
-    }
-
-    async componentDidMount() {
-        const auth = await checkAuth()
-        this.setState({
-            auth
-        })
     }
 
     onSwitch(value) {
@@ -53,8 +46,21 @@ class MainScreen extends Component {
         if (this.state.switcher === switcher.settings) return <Settings auth={this.state.auth}/>
     }
 
+    logout() {
+        console.log('here')
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i];
+            const eqPos = cookie.indexOf("=");
+            const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+            document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+        }
+        window.location.reload()
+    }
+
     onSwitch = this.onSwitch.bind(this)
     renderInfo = this.renderInfo.bind(this)
+    logout = this.logout.bind(this)
 
     render() {
         return (
@@ -68,7 +74,10 @@ class MainScreen extends Component {
                             <i className="fa fa-bell"></i>
                         </div>
                         <div>
-                            About
+                            {this.state.auth.name}
+                        </div>
+                        <div>
+                            <button onClick={this.logout} className="btn btn-danger"><i className="fa fa-sign-out fa-2x"></i></button>
                         </div>
                     </div>
                 </header>

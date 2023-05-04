@@ -20,20 +20,21 @@ class App extends Component {
   constructor(){
     super()
     this.state = {
-      switcher: switcher.signin
+      switcher: switcher.signin,
+      auth: null
     }
   }
 
   async componentDidMount() {
     const checker = await checkAuth()
-    if (checker) this.setState({switcher: switcher.signed})
+    if (checker) this.setState({switcher: switcher.signed, auth: checker})
   }
 
   switch(event) {
     this.setState({
       switcher: this.state.switcher === switcher.signup ? switcher.signin : switcher.signup
     })
-    event.target.textContent = this.state.switcher
+    event.target.textContent = this.state.switcher.toUpperCase()
   }
 
   switch = this.switch.bind(this)
@@ -41,7 +42,7 @@ class App extends Component {
   getWindow() {
     if (this.state.switcher === switcher.signin) return <SignIn/>
     if (this.state.switcher === switcher.signup) return <SignUp/>
-    return <MainScreen/>
+    return <MainScreen auth={this.state.auth}/>
   }
 
   render() {
@@ -53,7 +54,9 @@ class App extends Component {
         {
           this.state.switcher !== switcher.signed
           ?
-          <button onClick={this.switch} className='ghost-round' value={switcher.signup}>{switcher.signup}</button>
+          <div className='switch-button'>
+            <button onClick={this.switch} className='btn btn-secondary' value={switcher.signup}>{switcher.signup.toUpperCase()}</button>
+          </div>
           :
           null
         }

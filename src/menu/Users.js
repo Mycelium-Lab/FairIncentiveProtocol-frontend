@@ -8,11 +8,11 @@ class Users extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            add_firstname: null,
-            add_lastname: null,
-            add_patronymic: null,
-            add_email: null,
-            add_wallet: null,
+            add_firstname: '',
+            add_lastname: '',
+            add_patronymic: '',
+            add_email: '',
+            add_wallet: '',
             users: []
         }
     }
@@ -163,7 +163,7 @@ class Users extends Component {
                         <input onChange={this.onChangeEmail} value={this.state.add_email} type="email" className="form-control" placeholder="Email" aria-describedby="basic-addon1"/>
                         <input onChange={this.onChangeWallet} value={this.state.add_wallet} type="text" className="form-control" placeholder="Wallet" aria-describedby="basic-addon1"/>
                     </div>
-                    <button onClick={this.addUser} type="button" className="btn btn-success">Add</button>
+                    <button onClick={this.addUser} type="button" className="btn btn-primary">Add</button>
                 </div>
                 <div>
                     <ul className="list-group list-group-flush">
@@ -194,7 +194,7 @@ class Users extends Component {
                                         {v.email}
                                     </li>
                                     <li className="list-group-item">
-                                        {createLongStrView(v.wallet)}
+                                        {v.wallet}
                                     </li>
                                     <li>
                                         <button onClick={async () => await this.deleteUser(v.id)} type="button" className="btn btn-danger">Delete</button>
