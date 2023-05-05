@@ -22,9 +22,8 @@ class SignIn extends Component {
                 method: 'POST',
                 headers: headers,
                 body: raw,
-                redirect: 'follow',
-                mode: 'no-cors'
-              };
+                redirect: 'follow'
+            };
               
             const res = await fetch(`${config.api}/auth/signin`, requestOptions)
             const json = await res.json()

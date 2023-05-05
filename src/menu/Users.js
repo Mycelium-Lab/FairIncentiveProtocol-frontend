@@ -68,8 +68,7 @@ class Users extends Component {
                 method: 'POST',
                 headers: headers,
                 body: raw,
-                redirect: 'follow',
-                mode: 'no-cors'
+                redirect: 'follow'
               };
             const res = await fetch(`${config.api}/users/add`, requestOptions)
             const json = await res.json()
@@ -102,8 +101,7 @@ class Users extends Component {
             const requestOptions = {
                 method: 'GET',
                 headers: headers,
-                redirect: 'follow',
-                mode: 'no-cors'
+                redirect: 'follow'
               };
             const res = await fetch(`${config.api}/users`, requestOptions)
             const json = await res.json()
@@ -128,8 +126,7 @@ class Users extends Component {
                 method: 'POST',
                 headers: headers,
                 body: raw,
-                redirect: 'follow',
-                mode: 'no-cors'
+                redirect: 'follow'
               };
             const res = await fetch(`${config.api}/users/delete`, requestOptions)
             if (res.status === 200) {

@@ -58,8 +58,7 @@ class Settings extends Component {
                 method: 'POST',
                 headers: headers,
                 body: raw,
-                redirect: 'follow',
-                mode: 'no-cors'
+                redirect: 'follow'
               };
             const res = await fetch(`${config.api}/company/changename`, requestOptions)
             const json = await res.json()
@@ -82,8 +81,7 @@ class Settings extends Component {
                 method: 'POST',
                 headers: headers,
                 body: raw,
-                redirect: 'follow',
-                mode: 'no-cors'
+                redirect: 'follow'
               };
             const res = await fetch(`${config.api}/company/changeemail`, requestOptions)
             const json = await res.json()
@@ -106,8 +104,7 @@ class Settings extends Component {
                 method: 'POST',
                 headers: headers,
                 body: raw,
-                redirect: 'follow',
-                mode: 'no-cors'
+                redirect: 'follow'
               };
             const res = await fetch(`${config.api}/company/changephone`, requestOptions)
             const json = await res.json()
@@ -130,8 +127,7 @@ class Settings extends Component {
                 method: 'POST',
                 headers: headers,
                 body: raw,
-                redirect: 'follow',
-                mode: 'no-cors'
+                redirect: 'follow'
               };
             const res = await fetch(`${config.api}/company/changewallet`, requestOptions)
             const json = await res.json()
@@ -154,8 +150,7 @@ class Settings extends Component {
                 method: 'POST',
                 headers: headers,
                 body: raw,
-                redirect: 'follow',
-                mode: 'no-cors'
+                redirect: 'follow'
               };
             const res = await fetch(`${config.api}/company/changepassword`, requestOptions)
             const json = await res.json()
