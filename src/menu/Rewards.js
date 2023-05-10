@@ -193,8 +193,49 @@ class Rewards extends Component {
                 redirect: 'follow'
               };
             const res = await fetch(`${config.api}/rewards/add/token`, requestOptions)
-            if (res.status === 200) alert('Done') 
-            else alert('Something went wrong')
+            const json = await res.json()
+            if (res.status === 200) {
+                const tokenRewards = this.state.tokenRewards
+                tokenRewards.push(json.createdTokenReward)
+                this.setState({
+                    tokenRewards,
+                    show: false,
+                    amount: null,
+                    name: null,
+                    description: null
+                })
+            } else alert('Something went wrong')
+        } catch (error) {
+            alert(error)
+        }
+    }
+
+    async deleteReward(id) {
+        try {
+            const headers = new Headers();
+            headers.append("Content-Type", "application/json");
+            headers.append("Authorization", getBearerHeader())
+
+            const raw = JSON.stringify(
+                {
+                    id
+                }
+            );
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                body: raw,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/rewards/delete/token`, requestOptions)
+            const json = await res.json()
+            if (res.status !== 200) alert('Something went wrong')
+            else {
+                const tokenRewards = this.state.tokenRewards.filter(v => v.id != id)
+                this.setState({
+                    tokenRewards
+                })
+            }
         } catch (error) {
             alert(error)
         }
@@ -263,6 +304,7 @@ class Rewards extends Component {
     handleClose = this.handleClose.bind(this)
     handleShow = this.handleShow.bind(this)
     rewardToken = this.rewardToken.bind(this)
+    deleteReward = this.deleteReward.bind(this)
 
     render() {
         return (
@@ -277,34 +319,37 @@ class Rewards extends Component {
                         <div class="mb-3">
                             <label class="form-label">Name</label>
                             <div class="input-group">
-                                <input type="text" onChange={this.changeName} class="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                <input type="text" placeholder="My first reward" onChange={this.changeName} class="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
-                            <div class="form-text" id="basic-addon4">Specify the name of your reward. User will see this</div>
+                            <div class="form-text" id="basic-addon4">Specify the name of your reward. <b>User will see this</b></div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Description</label>
                             <div class="input-group">
-                                <textarea type="text" onChange={this.changeDescription} class="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
+                                <textarea placeholder="Reward description" type="text" onChange={this.changeDescription} class="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
                             </div>
-                            <div class="form-text" id="basic-addon4">User will see this. Markdown syntax is supported.</div>
+                            <div class="form-text" id="basic-addon4"><b>User will see this.</b> <a href="https://www.markdownguide.org/cheat-sheet/" target="blank">Markdown</a> syntax is supported.</div>
                         </div>
                         <label class="form-label">Choose a reward mode:</label>
-                        <div class="form-check">
-                            <input 
-                                class="form-check-input" value={types.token} type="radio" name="flexRadioDefault" id="flexRadioDefault1" 
-                                onChange={this.changeType} checked={this.state.chosen_type === types.token ? true : false}/>
-                            <label class="form-check-label" for="flexRadioDefault1">
-                                Tokens
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input 
-                                class="form-check-input" value={types.nft} type="radio" name="flexRadioDefault" id="flexRadioDefault2" 
-                                onChange={this.changeType} checked={this.state.chosen_type === types.nft ? true : false}
-                            />
-                            <label class="form-check-label" for="flexRadioDefault2">
-                                NFTs
-                            </label>
+                        <div className="choose-reward-node">
+                            <div class="form-check">
+                                <input 
+                                    class="form-check-input" value={types.token} type="radio" name="flexRadioDefault" id="flexRadioDefault1" 
+                                    onChange={this.changeType} checked={this.state.chosen_type === types.token ? true : false}/>
+                                <label class="form-check-label" for="flexRadioDefault1">
+                                    Tokens
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input 
+                                    class="form-check-input" value={types.nft} type="radio" name="flexRadioDefault" id="flexRadioDefault2" 
+                                    onChange={this.changeType} checked={this.state.chosen_type === types.nft ? true : false}
+                                    disabled
+                                />
+                                <label class="form-check-label" for="flexRadioDefault2">
+                                    NFTs
+                                </label>
+                            </div>
                         </div>
                         <label class="form-label">Select {this.state.chosen_type === types.token ? 'token' : 'NFT collection'}:</label>
                         <div className="input-group mb-3">
@@ -380,6 +425,7 @@ class Rewards extends Component {
                                     <button className="btn btn-dark">Edit</button>
                                     <button className="btn btn-dark">Stat</button>
                                     <button className="btn btn-dark" onClick={() => this.handleShowReward(v.name)}>Reward</button>
+                                    <button className="btn btn-danger" onClick={() => this.deleteReward(v.id)}>Delete</button>
                                 </li>
                             </ul>
                             )
