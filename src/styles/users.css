@@ -1,3 +1,9 @@
 .list-group-flush {
     padding-top: 10px;
 }
+
+.user-custom-params {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}

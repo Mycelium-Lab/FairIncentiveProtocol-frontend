@@ -3,19 +3,25 @@ import Modal from 'react-bootstrap/Modal';
 import { getBearerHeader } from "../utils/getBearerHeader";
 import { config } from "../utils/config";
 import { createLongStrView } from "../utils/longStrView";
+import '../styles/users.css'
+
+let propertiesElementsLength = 0
 
 class Users extends Component {
 
     constructor(props) {
         super(props)
         this.state = {
-            add_firstname: '',
-            add_lastname: '',
-            add_patronymic: '',
+            add_externalID: '',
             add_email: '',
             add_wallet: '',
+            add_notes: null,
             showAdd: false,
-            users: []
+            users: [],
+            propertiesElements: [],
+            statsElements: [],
+            properties: [],
+            stats: []
         }
     }
 
@@ -23,21 +29,15 @@ class Users extends Component {
         await this.getUsers()
     }
 
-    onChangeFirstname(event) {
+    onChangeExternalID(event) {
         this.setState({
-            add_firstname: event.target.value
+            add_externalID: event.target.value
         })
     }
 
-    onChangeLastname(event) {
+    onChangeNotes(event) {
         this.setState({
-            add_lastname: event.target.value
-        })
-    }
-
-    onChangePatronymic(event) {
-        this.setState({
-            add_patronymic: event.target.value
+            add_notes: event.target.value
         })
     }
 
@@ -60,11 +60,12 @@ class Users extends Component {
             headers.append("Authorization", getBearerHeader())
 
             const raw = JSON.stringify({
-                "firstname": this.state.add_firstname,
-                "lastname": this.state.add_lastname,
-                "patronymic": this.state.add_patronymic,
+                "external_id": this.state.add_externalID,
                 "email": this.state.add_email,
-                "wallet": this.state.add_wallet
+                "wallet": this.state.add_wallet,
+                "notes": this.state.add_notes,
+                "properties": this.state.properties,
+                "stats": this.state.stats
             });
             const requestOptions = {
                 method: 'POST',
@@ -78,14 +79,13 @@ class Users extends Component {
                 const _users = this.state.users
                 _users.push({
                     id: json.id,
-                    firstname: this.state.add_firstname,
-                    lastname: this.state.add_lastname,
-                    patronymic: this.state.add_patronymic,
+                    external_id: this.state.add_externalID,
                     email: this.state.add_email,
                     wallet: this.state.add_wallet
                 })
                 this.setState({
-                    users: _users
+                    users: _users,
+                    showAdd: false
                 })
             } else {
                 alert('Something went wrong')
@@ -144,12 +144,36 @@ class Users extends Component {
         }
     }
 
+    deletePropertyInput = (index) => {
+        console.log(index)
+        let propertiesElements = this.state.propertiesElements
+        console.log(propertiesElements)
+        propertiesElements = propertiesElements.filter(v => v.id != index);
+        console.log(propertiesElements)
+        this.setState({propertiesElements})
+    }
+
+    addPropertyInput = () => {
+        const propertiesElements = this.state.propertiesElements
+        propertiesElements.push(
+            {
+                id: propertiesElementsLength,
+                element: 
+                <div className="user-custom-params">
+                    <input type="text" class="form-control" placeholder="Property name"/>
+                    <input type="text" class="form-control" placeholder="Property value"/>
+                    <button type="button" className="btn btn-dark" onClick={() => this.deletePropertyInput(propertiesElementsLength)}>-</button>
+                </div>
+            }
+        )
+        this.setState({propertiesElements})
+    }
+
     handleShowAdd = () => this.setState({showAdd: true})
     handleCloseAdd = () => this.setState({showAdd: false})
 
-    onChangeFirstname = this.onChangeFirstname.bind(this)
-    onChangeLastname = this.onChangeLastname.bind(this)
-    onChangePatronymic = this.onChangePatronymic.bind(this)
+    onChangeExternalID = this.onChangeExternalID.bind(this)
+    onChangeNotes = this.onChangeNotes.bind(this)
     onChangeEmail = this.onChangeEmail.bind(this)
     onChangeWallet = this.onChangeWallet.bind(this)
     addUser = this.addUser.bind(this)
@@ -157,6 +181,8 @@ class Users extends Component {
     deleteUser = this.deleteUser.bind(this)
     handleShowAdd = this.handleShowAdd.bind(this)
     handleCloseAdd = this.handleCloseAdd.bind(this)
+    addPropertyInput = this.addPropertyInput.bind(this)
+    deletePropertyInput = this.deletePropertyInput.bind(this)
 
     render() {
         return (
@@ -170,7 +196,7 @@ class Users extends Component {
                         <div class="mb-3">
                             <label class="form-label">Username or external ID:</label>
                             <div class="input-group">
-                                <input type="text" placeholder="Username" onChange={this.onChangeFirstname} class="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                <input type="text" placeholder="Username" onChange={this.onChangeExternalID} class="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
                             <div class="form-text" id="basic-addon4">Specify the user ID for API calls or it will be generated automatically</div>
                         </div>
@@ -184,20 +210,35 @@ class Users extends Component {
                         <div class="mb-3">
                             <label class="form-label">Notes:</label>
                             <div class="input-group">
-                                <textarea placeholder="User notes available to system administrators and 
+                                <textarea onChange={this.onChangeNotes} placeholder="User notes available to system administrators and 
 moderators" type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
                             </div>
                             <div class="form-text" id="basic-addon4">The user does not see this text. <a href="https://www.markdownguide.org/cheat-sheet/" target="blank">Markdown</a> syntax is supported.</div>
                         </div>
                         <div class="mb-3">
+                            <label class="form-label">Properties: <button type="button" className="btn btn-dark" onClick={this.addPropertyInput} disabled>+</button></label>
+                            <div id="user-properties">
+                                {
+                                    this.state.propertiesElements.map(v => v.element)
+                                }
+                            </div>
+                            <div class="form-text" id="basic-addon4">Textual parameters of user</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Stats: <button type="button" className="btn btn-dark" disabled>+</button></label>
+                            <div id="user-stats">
+                            </div>
+                            <div class="form-text" id="basic-addon4">Numerical parameters of user</div>
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label">Email:</label>
                             <div class="input-group">
-                                <input placeholder="example@gmail.com" type="email" class="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                <input onChange={this.onChangeEmail} value={this.state.add_email}  placeholder="example@gmail.com" type="email" class="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
                         </div>
                     </Modal.Body>
                     <Modal.Footer>
-                    <button className="btn btn-dark" onClick={this.rewardToken}>
+                    <button className="btn btn-dark" onClick={this.addUser}>
                         Create
                     </button>
                     <button className="btn btn-light" onClick={this.handleCloseAdd}>
@@ -206,13 +247,6 @@ moderators" type="text" class="form-control" id="basic-url" aria-describedby="ba
                     </Modal.Footer>
                 </Modal>
                 <div>
-                    <div className="input-group mb-3">
-                        <input onChange={this.onChangeFirstname} value={this.state.add_firstname} type="text" className="form-control" placeholder="Firstname" aria-describedby="basic-addon1"/>
-                        <input onChange={this.onChangeLastname} value={this.state.add_lastname} type="text" className="form-control" placeholder="Lastname" aria-describedby="basic-addon1"/>
-                        <input onChange={this.onChangePatronymic} value={this.state.add_patronymic} type="text" className="form-control" placeholder="Pantronimyc" aria-describedby="basic-addon1"/>
-                        <input onChange={this.onChangeEmail} value={this.state.add_email} type="email" className="form-control" placeholder="Email" aria-describedby="basic-addon1"/>
-                        <input onChange={this.onChangeWallet} value={this.state.add_wallet} type="text" className="form-control" placeholder="Wallet" aria-describedby="basic-addon1"/>
-                    </div>
                     <button onClick={this.handleShowAdd} type="button" className="btn btn-dark">Add new user</button>
                 </div>
                 <div>
@@ -222,7 +256,7 @@ moderators" type="text" class="form-control" id="basic-url" aria-describedby="ba
                                 ID
                             </li>
                             <li className="list-group-item">
-                                Firstname
+                                ExternalID
                             </li>
                             <li className="list-group-item">
                                 Email
@@ -238,13 +272,13 @@ moderators" type="text" class="form-control" id="basic-url" aria-describedby="ba
                                         {createLongStrView(v.id)}
                                     </li>
                                     <li className="list-group-item">
-                                        {v.firstname}
+                                        {v.external_id}
                                     </li>
                                     <li className="list-group-item">
                                         {v.email}
                                     </li>
                                     <li className="list-group-item">
-                                        {v.wallet}
+                                        {createLongStrView(v.wallet)}
                                     </li>
                                     <li>
                                         <button type="button" className="btn btn-dark">Edit</button>
