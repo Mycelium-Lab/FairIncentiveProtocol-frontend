@@ -6,3 +6,9 @@
 .choose-reward-node .form-check {
     margin-right: 60px;
 }
+
+.rewards-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

@@ -81,7 +81,8 @@ class Users extends Component {
                     id: json.id,
                     external_id: this.state.add_externalID,
                     email: this.state.add_email,
-                    wallet: this.state.add_wallet
+                    wallet: this.state.add_wallet,
+                    notes: this.state.add_notes
                 })
                 this.setState({
                     users: _users,
@@ -107,6 +108,7 @@ class Users extends Component {
               };
             const res = await fetch(`${config.api}/users`, requestOptions)
             const json = await res.json()
+            console.log(json.users)
             this.setState({
                 users: json.users
             })
@@ -187,7 +189,10 @@ class Users extends Component {
     render() {
         return (
             <div>
-                <h3>Users</h3>
+                <div className="users-header">
+                    <h3>Users</h3>
+                    <button onClick={this.handleShowAdd} type="button" className="btn btn-dark">Add new user</button>
+                </div>
                 <Modal show={this.state.showAdd} onHide={this.handleCloseAdd} centered>
                     <Modal.Header closeButton>
                     <Modal.Title>Add new user</Modal.Title>
@@ -247,9 +252,6 @@ moderators" type="text" class="form-control" id="basic-url" aria-describedby="ba
                     </Modal.Footer>
                 </Modal>
                 <div>
-                    <button onClick={this.handleShowAdd} type="button" className="btn btn-dark">Add new user</button>
-                </div>
-                <div>
                     <ul className="list-group list-group-flush">
                         <ul className="list-group list-group-horizontal">
                             <li className="list-group-item">
@@ -257,6 +259,9 @@ moderators" type="text" class="form-control" id="basic-url" aria-describedby="ba
                             </li>
                             <li className="list-group-item">
                                 ExternalID
+                            </li>
+                            <li className="list-group-item">
+                                Notes
                             </li>
                             <li className="list-group-item">
                                 Email
@@ -275,12 +280,17 @@ moderators" type="text" class="form-control" id="basic-url" aria-describedby="ba
                                         {v.external_id}
                                     </li>
                                     <li className="list-group-item">
+                                        {v.notes}
+                                    </li>
+                                    <li className="list-group-item">
                                         {v.email}
                                     </li>
                                     <li className="list-group-item">
                                         {createLongStrView(v.wallet)}
                                     </li>
                                     <li>
+                                        <button type="button" className="btn btn-dark">Stat</button>
+                                        <button type="button" className="btn btn-dark">To reward</button>
                                         <button type="button" className="btn btn-dark">Edit</button>
                                         <button onClick={async () => await this.deleteUser(v.id)} type="button" className="btn btn-danger">Delete</button>
                                     </li>

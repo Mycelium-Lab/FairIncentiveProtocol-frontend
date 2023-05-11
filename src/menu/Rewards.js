@@ -309,8 +309,10 @@ class Rewards extends Component {
     render() {
         return (
             <div>
-                <h3>Rewards</h3>
-                <button type="button" className="btn btn-dark" onClick={this.handleShow}>Create new reward</button>
+                <div className="rewards-header">
+                    <h3>Rewards</h3>
+                    <button type="button" className="btn btn-dark" onClick={this.handleShow}>Create new reward</button>
+                </div>
                 <Modal show={this.state.show} onHide={this.handleClose} centered>
                     <Modal.Header closeButton>
                     <Modal.Title>Create new reward</Modal.Title>
