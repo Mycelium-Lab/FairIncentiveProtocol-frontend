@@ -11,10 +11,12 @@ import Users from "./menu/Users";
 import NFTs from "./menu/NFTs";
 import Settings from "./menu/Settings";
 import { checkAuth } from "./utils/checkAuth";
+import RewardEvents from "./menu/RewardEvents";
 
 const switcher = {
     dashboard: 'dashboard',
     rewards: 'rewards',
+    reward_events: 'reward_events',
     users: 'users',
     tokens: 'tokens',
     nft: 'nft',
@@ -40,6 +42,7 @@ class MainScreen extends Component {
     renderInfo() {
         if (this.state.switcher === switcher.dashboard) return <Dashboard/>
         if (this.state.switcher === switcher.rewards) return <Rewards/>
+        if (this.state.switcher === switcher.reward_events) return <RewardEvents/>
         if (this.state.switcher === switcher.tokens) return <Tokens/>
         if (this.state.switcher === switcher.users) return <Users/>
         if (this.state.switcher === switcher.nft) return <NFTs/>
@@ -97,6 +100,15 @@ class MainScreen extends Component {
                                     <i className="fa fa-plus fa-2x"></i>
                                     <span className="nav-text">
                                         Rewards
+                                    </span>
+                                </a>
+                                
+                            </li>
+                            <li onClick={() => this.onSwitch(switcher.reward_events)}>
+                                <a href="#">
+                                    <i className="fa fa-star fa-2x"></i>
+                                    <span className="nav-text">
+                                        Reward events
                                     </span>
                                 </a>
                                 

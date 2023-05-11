@@ -31,11 +31,13 @@ class Rewards extends Component {
             showReward: false,
             name: null,
             description: null,
+            comment: null,
             tokenRewards: [],
             tokens: [],
             nfts: [],
             users: [],
-            reward_name: null
+            reward_name: null,
+            reward_id: null
         }
     }
 
@@ -45,7 +47,7 @@ class Rewards extends Component {
         await    this.getNFTs()
         await    this.getUsers()
         await    this.getTokenRewards()
-        
+
     }
 
     async getTokens() {
@@ -104,10 +106,10 @@ class Rewards extends Component {
               };
             const res = await fetch(`${config.api}/users`, requestOptions)
             const json = await res.json()
-            const users = json.users.map(v => <option value={v.address}>{v.firstname}</option>)
+            const users = json.users.map(v => <option value={v.id}>{v.external_id}</option>)
             this.setState({
                 users,
-                chosen_user: json.users.length > 0 ? json.users[0].wallet : null
+                chosen_user: json.users.length > 0 ? json.users[0].id : null
             })
         } catch (error) {
             alert(error)
@@ -196,6 +198,7 @@ class Rewards extends Component {
             const json = await res.json()
             if (res.status === 200) {
                 const tokenRewards = this.state.tokenRewards
+                json.createdTokenReward.count = 0
                 tokenRewards.push(json.createdTokenReward)
                 this.setState({
                     tokenRewards,
@@ -236,6 +239,41 @@ class Rewards extends Component {
                     tokenRewards
                 })
             }
+        } catch (error) {
+            alert(error)
+        }
+    }
+
+    async rewardWithToken() {
+        try {
+            const headers = new Headers();
+            headers.append("Content-Type", "application/json");
+            headers.append("Authorization", getBearerHeader())
+
+            const raw = JSON.stringify(
+                {
+                    reward_id: this.state.reward_id,
+                    user_id: this.state.chosen_user,
+                    comment: this.state.comment
+                }
+            );
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                body: raw,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/rewards/reward/token`, requestOptions)
+            const json = await res.json()
+            if (json.rewarded) {
+                let tokenRewards = this.state.tokenRewards
+                tokenRewards.forEach(v => {if (v.id == this.state.reward_id) v.count = parseInt(v.count) + 1})
+                alert('Done')
+                this.setState({
+                    showReward: false
+                })
+            }
+            else alert('Something went wrong')
         } catch (error) {
             alert(error)
         }
@@ -283,10 +321,16 @@ class Rewards extends Component {
         })
     }
 
+    changeComment(event) {
+        this.setState({
+            comment: event.target.value
+        })
+    }
+
     handleClose = () => this.setState({show: false});
     handleShow = () => this.setState({show: true});
     handleCloseReward = () => this.setState({showReward: false})
-    handleShowReward = (reward_name) => this.setState({showReward: true, reward_name})
+    handleShowReward = (reward_name, reward_id) => this.setState({showReward: true, reward_name, reward_id})
 
     connect = this.connect.bind(this)
     changeType = this.changeType.bind(this)
@@ -305,6 +349,8 @@ class Rewards extends Component {
     handleShow = this.handleShow.bind(this)
     rewardToken = this.rewardToken.bind(this)
     deleteReward = this.deleteReward.bind(this)
+    changeComment = this.changeComment.bind(this)
+    rewardWithToken = this.rewardWithToken.bind(this)
 
     render() {
         return (
@@ -393,46 +439,47 @@ class Rewards extends Component {
                     </Modal.Footer>
                 </Modal>
                 <div>
-                    <ul className="list-group list-group-flush">
-                        <ul className="list-group list-group-horizontal">
-                            <li className="list-group-item">
-                                Name
-                            </li>
-                            <li className="list-group-item">
-                                Description
-                            </li>
-                            <li className="list-group-item">
-                                Address
-                            </li>
-                            <li className="list-group-item">
-                                Amount
-                            </li>
-                        </ul>
+                <table className="table table-bordered border-dark">
+                    <thead>
+                        <tr className="table-secondary" >
+                        <th className="table-secondary" scope="col">Status</th>
+                        <th className="table-secondary" scope="col">Name</th>
+                        <th className="table-secondary" scope="col">Reward</th>
+                        <th className="table-secondary" scope="col">Description</th>
+                        <th className="table-secondary" scope="col">Rewarded</th>
+                        <th className="table-secondary" scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                         {
                             this.state.tokenRewards.map(v =>
-                            <ul className="list-group list-group-horizontal">
-                                <li className="list-group-item">
+                            <tr className="table-secondary">
+                                <td className="table-secondary">
+                                    (soon)
+                                </td>
+                                <td className="table-secondary">
                                     {v.name}
-                                </li>
-                                <li className="list-group-item">
+                                </td>
+                                <td className="table-secondary">
+                                    {v.amount} {v.symbol}
+                                </td>
+                                <td className="table-secondary">
                                     {v.description}
-                                </li>
-                                <li className="list-group-item">
-                                    {v.address}
-                                </li>
-                                <li className="list-group-item">
-                                    {v.amount}
-                                </li>
-                                <li className="list-group-item">
-                                    <button className="btn btn-dark">Edit</button>
-                                    <button className="btn btn-dark">Stat</button>
-                                    <button className="btn btn-dark" onClick={() => this.handleShowReward(v.name)}>Reward</button>
+                                </td>
+                                <td className="table-secondary">
+                                    {v.count} times
+                                </td>
+                                <td className="table-secondary">
+                                    <button className="btn btn-dark" disabled>Edit</button>
+                                    <button className="btn btn-dark" disabled>Stat</button>
+                                    <button className="btn btn-dark" onClick={() => this.handleShowReward(v.name, v.id)}>Reward</button>
                                     <button className="btn btn-danger" onClick={() => this.deleteReward(v.id)}>Delete</button>
-                                </li>
-                            </ul>
+                                </td>
+                            </tr>
                             )
                         }
-                    </ul>
+                    </tbody>
+                </table>
                 </div>
                 <Modal show={this.state.showReward} onHide={this.handleCloseReward} centered>
                     <Modal.Header closeButton>
@@ -450,12 +497,12 @@ class Rewards extends Component {
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Comment:</label>
-                            <textarea class="form-control" placeholder="Reward comment(optional)" aria-label="With textarea"></textarea>
+                            <textarea onChange={this.changeComment} class="form-control" placeholder="Reward comment(optional)" aria-label="With textarea"></textarea>
                             <div class="form-text" id="basic-addon4">The user does not see this text. Markdown syntax is supported.</div>
                         </div>
                     </Modal.Body>
                     <Modal.Footer>
-                    <button className="btn btn-dark">
+                    <button className="btn btn-dark" onClick={this.rewardWithToken}>
                         Reward
                     </button>
                     <button className="btn btn-light" onClick={this.handleCloseReward}>

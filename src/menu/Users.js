@@ -252,52 +252,47 @@ moderators" type="text" class="form-control" id="basic-url" aria-describedby="ba
                     </Modal.Footer>
                 </Modal>
                 <div>
-                    <ul className="list-group list-group-flush">
-                        <ul className="list-group list-group-horizontal">
-                            <li className="list-group-item">
-                                ID
-                            </li>
-                            <li className="list-group-item">
-                                ExternalID
-                            </li>
-                            <li className="list-group-item">
-                                Notes
-                            </li>
-                            <li className="list-group-item">
-                                Email
-                            </li>
-                            <li className="list-group-item">
-                                Wallet
-                            </li>
-                        </ul>
-                        {
-                            this.state.users.map(v => {
-                                return <ul className="list-group list-group-horizontal">
-                                    <li className="list-group-item">
+                    <table className="table table-bordered border-dark">
+                        <thead>
+                            <tr className="table-secondary" >
+                            <th className="table-secondary" scope="col">ID</th>
+                            <th className="table-secondary" scope="col">Name</th>
+                            <th className="table-secondary" scope="col">Wallet</th>
+                            <th className="table-secondary" scope="col">Tokens</th>
+                            <th className="table-secondary" scope="col">Rewards</th>
+                            <th className="table-secondary" scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                this.state.users.map(v =>
+                                <tr className="table-secondary">
+                                    <td className="table-secondary">
                                         {createLongStrView(v.id)}
-                                    </li>
-                                    <li className="list-group-item">
+                                    </td>
+                                    <td className="table-secondary">
                                         {v.external_id}
-                                    </li>
-                                    <li className="list-group-item">
-                                        {v.notes}
-                                    </li>
-                                    <li className="list-group-item">
-                                        {v.email}
-                                    </li>
-                                    <li className="list-group-item">
+                                    </td>
+                                    <td className="table-secondary">
                                         {createLongStrView(v.wallet)}
-                                    </li>
-                                    <li>
-                                        <button type="button" className="btn btn-dark">Stat</button>
-                                        <button type="button" className="btn btn-dark">To reward</button>
-                                        <button type="button" className="btn btn-dark">Edit</button>
+                                    </td>
+                                    <td className="table-secondary">
+                                        (soon)
+                                    </td>
+                                    <td className="table-secondary">
+                                        (soon)
+                                    </td>
+                                    <td className="table-secondary">
+                                        <button type="button" className="btn btn-dark" disabled>Stat</button>
+                                        <button type="button" className="btn btn-dark" disabled>To reward</button>
+                                        <button type="button" className="btn btn-dark" disabled>Edit</button>
                                         <button onClick={async () => await this.deleteUser(v.id)} type="button" className="btn btn-danger">Delete</button>
-                                    </li>
-                                </ul>
-                            })
-                        }
-                    </ul>
+                                    </td>
+                                </tr>
+                                )
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
         )
