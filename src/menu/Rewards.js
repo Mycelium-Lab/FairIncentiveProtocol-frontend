@@ -138,7 +138,7 @@ class Rewards extends Component {
 
     async connect() {
         try {
-            const provider = new ethers.BrowserProvider(window.ethereum)
+            const provider = new ethers.providers.Web3Provider(window.ethereum)
             await provider.send("eth_requestAccounts", [])
             const signer = await provider.getSigner()
             const chainid = (await provider.getNetwork()).chainId
@@ -158,7 +158,7 @@ class Rewards extends Component {
             if (this.state.chosen_type === types.token) {
                 const tokenContract = new ethers.Contract(this.state.chosen_token, ERC20Mintable.abi, this.state.signer)
                 tokenContract
-                    .mint(this.state.chosen_user, ethers.parseEther(this.state.amount))
+                    .mint(this.state.chosen_user, ethers.utils.parseEther(this.state.amount))
                     .then(async (tx) => await tx.wait())
                     .then(() => alert('Done'))
             } else {
@@ -355,7 +355,7 @@ class Rewards extends Component {
     render() {
         return (
             <div>
-                <div className="rewards-header">
+                <div className="title-header">
                     <h3>Rewards</h3>
                     <button type="button" className="btn btn-dark" onClick={this.handleShow}>Create new reward</button>
                 </div>

@@ -4,6 +4,7 @@ import { createLongStrView } from "../utils/longStrView";
 import ERC20Mintable from "../contracts/erc20/ERC20Mintable.json";
 import { getBearerHeader } from "../utils/getBearerHeader";
 import { config } from "../utils/config";
+import Modal from 'react-bootstrap/Modal';
 
 class Tokens extends Component {
 
@@ -16,6 +17,7 @@ class Tokens extends Component {
             chainid: null,
             signer: null,
             address: null,
+            showCreate: false,
             tokens: []
         }
     }
@@ -38,7 +40,7 @@ class Tokens extends Component {
 
     async connect() {
         try {
-            const provider = new ethers.BrowserProvider(window.ethereum)
+            const provider = new ethers.providers.Web3Provider(window.ethereum)
             await provider.send("eth_requestAccounts", [])
             const signer = await provider.getSigner()
             const chainid = (await provider.getNetwork()).chainId
@@ -127,46 +129,97 @@ class Tokens extends Component {
         }
     }
 
+    handleCloseCreate = () => this.setState({showCreate: false})
+    handleShowCreate = () => this.setState({showCreate: true})
+
     onChangeName = this.onChangeName.bind(this)
     onChangeSymbol = this.onChangeSymbol.bind(this)
     connect = this.connect.bind(this)
     createToken = this.createToken.bind(this)
     getTokens = this.getTokens.bind(this)
     getTokenSupply = this.getTokenSupply.bind(this)
+    handleShowCreate = this.handleShowCreate.bind(this)
+    handleCloseCreate = this.handleCloseCreate.bind(this)
 
     render() {
         return (
             <div>
-                <h3>Tokens</h3>
-                <button onClick={this.connect} type="button" className="btn btn-success">{this.state.address ? createLongStrView(this.state.address) : 'Connect'}</button>
-                <div className="input-group mb-3">
-                        <input onChange={this.onChangeName} type="text" className="form-control" placeholder="Name" aria-describedby="basic-addon1"/>
-                        <input onChange={this.onChangeSymbol} type="text" className="form-control" placeholder="Symbol" aria-describedby="basic-addon1"/>
+                <div className="title-header">
+                    <h3>Tokens</h3>
+                    <button onClick={this.handleShowCreate} type="button" className="btn btn-dark">Create new token</button>
                 </div>
-                <button onClick={this.createToken} type="button" className="btn btn-primary">Create new token</button>
+                <Modal show={this.state.showCreate} onHide={this.handleCloseCreate} centered>
+                    <Modal.Header closeButton>
+                    <Modal.Title>Creating new token</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <button onClick={this.connect} type="button" className="btn btn-dark">{this.state.address ? createLongStrView(this.state.address) : 'Connect'}</button>
+                        <div class="mb-3">
+                            <label class="form-label">Name</label>
+                            <div class="input-group">
+                                <input type="text" placeholder="e.g. Bitcoin" onChange={this.onChangeName} class="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Symbol</label>
+                            <div class="input-group">
+                                <input type="text" placeholder="e.g. BTC" onChange={this.onChangeSymbol} class="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                            </div>
+                        </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                    <button className="btn btn-dark" onClick={this.createToken}>
+                        Create
+                    </button>
+                    <button className="btn btn-light" onClick={this.handleCloseCreate}>
+                        Cancel
+                    </button>
+                    </Modal.Footer>
+                </Modal>
                 <div>
-                    <ul className="list-group list-group-flush">
-                        <ul className="list-group list-group-horizontal">
-                            <li className="list-group-item">
-                                Symbol
-                            </li>
-                            <li className="list-group-item">
-                                Address
-                            </li>
-                        </ul>
-                        {
-                            this.state.tokens.map(v => {
-                                return <ul className="list-group list-group-horizontal">
-                                    <li className="list-group-item">
-                                        {v.symbol}
-                                    </li>
-                                    <li className="list-group-item">
-                                        {v.address}
-                                    </li>
-                                </ul>
-                            })
-                        }
-                    </ul>
+                    <table className="table table-bordered border-dark">
+                        <thead>
+                            <tr className="table-secondary" >
+                            <th className="table-secondary" scope="col">Token</th>
+                            <th className="table-secondary" scope="col">Balance</th>
+                            <th className="table-secondary" scope="col">Price</th>
+                            <th className="table-secondary" scope="col">Supply</th>
+                            <th className="table-secondary" scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                this.state.tokens.map(v =>
+                                    <tr className="table-secondary">
+                                        <td className="table-secondary">
+                                            <div>
+                                                {v.symbol}
+                                            </div>
+                                            <div>
+                                                {v.name}
+                                            </div>
+                                        </td>
+                                        <td className="table-secondary">
+                                            (soon)
+                                        </td>
+                                        <td className="table-secondary">
+                                            (soon)
+                                        </td>
+                                        <td className="table-secondary">
+                                            (soon)
+                                        </td>
+                                        <td className="table-secondary">
+                                            <button className="btn btn-dark" disabled>Mint</button>
+                                            <button className="btn btn-dark" disabled>Roles control</button>
+                                            <button className="btn btn-dark" disabled>Pause</button>
+                                            <button className="btn btn-dark" disabled>Blacklist</button>
+                                            <button className="btn btn-dark" disabled>Token info</button>
+                                        </td>
+                                    </tr>
+                                )
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
         )

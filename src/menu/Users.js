@@ -189,7 +189,7 @@ class Users extends Component {
     render() {
         return (
             <div>
-                <div className="users-header">
+                <div className="title-header">
                     <h3>Users</h3>
                     <button onClick={this.handleShowAdd} type="button" className="btn btn-dark">Add new user</button>
                 </div>

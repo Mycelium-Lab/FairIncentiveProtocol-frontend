@@ -8,10 +8,11 @@ import Dashboard from "./menu/Dashboard";
 import Rewards from "./menu/Rewards";
 import Tokens from "./menu/Tokens";
 import Users from "./menu/Users";
-import NFTs from "./menu/NFTs";
+import NFTCollections from "./menu/NFTCollections";
 import Settings from "./menu/Settings";
 import { checkAuth } from "./utils/checkAuth";
 import RewardEvents from "./menu/RewardEvents";
+import NFTs from "./menu/NFTs";
 
 const switcher = {
     dashboard: 'dashboard',
@@ -19,6 +20,7 @@ const switcher = {
     reward_events: 'reward_events',
     users: 'users',
     tokens: 'tokens',
+    nftcollection: 'nftcollection',
     nft: 'nft',
     settings: 'settings'
 }
@@ -45,6 +47,7 @@ class MainScreen extends Component {
         if (this.state.switcher === switcher.reward_events) return <RewardEvents/>
         if (this.state.switcher === switcher.tokens) return <Tokens/>
         if (this.state.switcher === switcher.users) return <Users/>
+        if (this.state.switcher === switcher.nftcollection) return <NFTCollections/>
         if (this.state.switcher === switcher.nft) return <NFTs/>
         if (this.state.switcher === switcher.settings) return <Settings auth={this.state.auth}/>
     }
@@ -130,6 +133,14 @@ class MainScreen extends Component {
                                     </span>
                                 </a>
                             
+                            </li>
+                            <li onClick={() => this.onSwitch(switcher.nftcollection)}>
+                                <a href="#">
+                                    <i className="fa fa-picture-o fa-2x"></i>
+                                    <span className="nav-text">
+                                        NFT Collections
+                                    </span>
+                                </a>
                             </li>
                             <li onClick={() => this.onSwitch(switcher.nft)}>
                                 <a href="#">
