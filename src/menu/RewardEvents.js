@@ -14,7 +14,6 @@ class RewardEvents extends Component {
 
     async componentDidMount() {
         await this.getRewardTokenEvents()
-        console.log(this.state.rewardTokenEvents)
     }
 
     async getRewardTokenEvents() {

@@ -268,6 +268,7 @@ class NFTCollections extends Component {
                         <thead>
                             <tr className="table-secondary" >
                             <th className="table-secondary" scope="col">Name</th>
+                            <th className="table-secondary" scope="col">Symbol</th>
                             <th className="table-secondary" scope="col">NFT items</th>
                             <th className="table-secondary" scope="col">Info</th>
                             <th className="table-secondary" scope="col">Actions</th>
@@ -279,6 +280,9 @@ class NFTCollections extends Component {
                                     <tr className="table-secondary">
                                         <td className="table-secondary">
                                             {v.name}
+                                        </td>
+                                        <td className="table-secondary">
+                                            {v.symbol}
                                         </td>
                                         <td className="table-secondary">
                                             (soon)

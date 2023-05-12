@@ -34,7 +34,7 @@ class Rewards extends Component {
             comment: null,
             tokenRewards: [],
             tokens: [],
-            nfts: [],
+            nftCollections: [],
             users: [],
             reward_name: null,
             reward_id: null
@@ -68,7 +68,7 @@ class Rewards extends Component {
                 chosen_token: json.tokens.length > 0 ? json.tokens[0].address : null
             })
         } catch (error) {
-            alert(error)
+            console.log(error)
         }
     }
 
@@ -82,15 +82,15 @@ class Rewards extends Component {
                 headers: headers,
                 redirect: 'follow'
               };
-            const res = await fetch(`${config.api}/nfts`, requestOptions)
+            const res = await fetch(`${config.api}/nfts/collections`, requestOptions)
             const json = await res.json()
-            const nfts = json.nfts.map(v => <option value={v.address}>{v.symbol}</option>)
+            const nftCollections = json.nftCollections.map(v => <option value={v.address}>{v.symbol}</option>)
             this.setState({
-                nfts,
-                chosen_nft: json.nfts.length > 0 ? json.nfts[0].address : null
+                nftCollections,
+                chosen_nft: json.nftCollections.length > 0 ? json.nftCollections[0].address : null
             })
         } catch (error) {
-            alert(error)
+            console.log(error)
         }
     }
 
@@ -112,7 +112,7 @@ class Rewards extends Component {
                 chosen_user: json.users.length > 0 ? json.users[0].id : null
             })
         } catch (error) {
-            alert(error)
+            console.log(error)
         }
     }
 
@@ -132,7 +132,7 @@ class Rewards extends Component {
                 tokenRewards: json.tokenRewards
             })
         } catch (error) {
-            alert(error)
+            console.log(error)
         }
     }
 
@@ -149,7 +149,7 @@ class Rewards extends Component {
                 chainid
             })
         } catch (error) {
-            alert(error)
+            console.log(error)
         }
     }
 
@@ -169,7 +169,7 @@ class Rewards extends Component {
                     .then(() => alert('Done'))
             }
         } catch (error) {
-            alert(error)
+            console.log(error)
         }
     }
 
@@ -209,7 +209,7 @@ class Rewards extends Component {
                 })
             } else alert('Something went wrong')
         } catch (error) {
-            alert(error)
+            console.log(error)
         }
     }
 
@@ -240,7 +240,7 @@ class Rewards extends Component {
                 })
             }
         } catch (error) {
-            alert(error)
+            console.log(error)
         }
     }
 
@@ -275,7 +275,7 @@ class Rewards extends Component {
             }
             else alert('Something went wrong')
         } catch (error) {
-            alert(error)
+            console.log(error)
         }
     }
 
@@ -392,7 +392,6 @@ class Rewards extends Component {
                                 <input 
                                     class="form-check-input" value={types.nft} type="radio" name="flexRadioDefault" id="flexRadioDefault2" 
                                     onChange={this.changeType} checked={this.state.chosen_type === types.nft ? true : false}
-                                    disabled
                                 />
                                 <label class="form-check-label" for="flexRadioDefault2">
                                     NFTs
@@ -407,7 +406,7 @@ class Rewards extends Component {
                                     ?
                                     this.state.tokens
                                     :
-                                    this.state.nfts
+                                    this.state.nftCollections
                                 }
                             </select>
                         </div>
@@ -526,7 +525,7 @@ class Rewards extends Component {
                                 ?
                                 this.state.tokens
                                 :
-                                this.state.nfts
+                                this.state.nftCollections
                             }
                         </select>
                         <label htmlFor="floatingSelectDisabled">Choose {this.state.chosen_type}</label>
