@@ -207,16 +207,16 @@ class NFTCollections extends Component {
                     </Modal.Header>
                     <Modal.Body>
                         <button onClick={this.connect} type="button" className="btn btn-dark">{this.state.address ? createLongStrView(this.state.address) : 'Connect'}</button>
-                        <div class="mb-3">
-                            <label class="form-label">Name</label>
-                            <div class="input-group">
-                                <input type="text" placeholder="Example: Treasures of the sea" onChange={this.onChangeName} class="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                        <div className="mb-3">
+                            <label className="form-label">Name</label>
+                            <div className="input-group">
+                                <input type="text" placeholder="Example: Treasures of the sea" onChange={this.onChangeName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Symbol</label>
-                            <div class="input-group">
-                                <input type="text" placeholder="Example: TOS" onChange={this.onChangeSymbol} class="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                        <div className="mb-3">
+                            <label className="form-label">Symbol</label>
+                            <div className="input-group">
+                                <input type="text" placeholder="Example: TOS" onChange={this.onChangeSymbol} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
                         </div>
                     </Modal.Body>
@@ -234,24 +234,24 @@ class NFTCollections extends Component {
                     <Modal.Title>Add NFT</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                    <div class="mb-3">
-                        <label class="form-label">Name</label>
-                        <div class="input-group">
-                            <input type="text" onChange={this.onChangeAddNFTName} class="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                    <div className="mb-3">
+                        <label className="form-label">Name</label>
+                        <div className="input-group">
+                            <input type="text" onChange={this.onChangeAddNFTName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                         </div>
-                        <div class="form-text" id="basic-addon4">Mostly for you</div>
+                        <div className="form-text" id="basic-addon4">Mostly for you</div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Description (optional)</label>
-                        <div class="input-group">
-                            <textarea type="text" onChange={this.onChangeAddNFTDescription} class="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
+                    <div className="mb-3">
+                        <label className="form-label">Description (optional)</label>
+                        <div className="input-group">
+                            <textarea type="text" onChange={this.onChangeAddNFTDescription} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
                         </div>
-                        <div class="form-text" id="basic-addon4">Mostly for you</div>
+                        <div className="form-text" id="basic-addon4">Mostly for you</div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Maximum amount (optional)</label>
-                        <div class="input-group">
-                            <input type="number" onChange={this.onChangeAddNFTAmount} class="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                    <div className="mb-3">
+                        <label className="form-label">Maximum amount (optional)</label>
+                        <div className="input-group">
+                            <input type="number" onChange={this.onChangeAddNFTAmount} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                         </div>
                     </div>
                     </Modal.Body>

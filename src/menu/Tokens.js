@@ -155,16 +155,16 @@ class Tokens extends Component {
                     </Modal.Header>
                     <Modal.Body>
                         <button onClick={this.connect} type="button" className="btn btn-dark">{this.state.address ? createLongStrView(this.state.address) : 'Connect'}</button>
-                        <div class="mb-3">
-                            <label class="form-label">Name</label>
-                            <div class="input-group">
-                                <input type="text" placeholder="e.g. Bitcoin" onChange={this.onChangeName} class="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                        <div className="mb-3">
+                            <label className="form-label">Name</label>
+                            <div className="input-group">
+                                <input type="text" placeholder="e.g. Bitcoin" onChange={this.onChangeName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Symbol</label>
-                            <div class="input-group">
-                                <input type="text" placeholder="e.g. BTC" onChange={this.onChangeSymbol} class="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                        <div className="mb-3">
+                            <label className="form-label">Symbol</label>
+                            <div className="input-group">
+                                <input type="text" placeholder="e.g. BTC" onChange={this.onChangeSymbol} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
                         </div>
                     </Modal.Body>

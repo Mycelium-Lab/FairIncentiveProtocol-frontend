@@ -535,41 +535,41 @@ class Rewards extends Component {
                     <Modal.Title>Create new reward</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <div class="mb-3">
-                            <label class="form-label">Name</label>
-                            <div class="input-group">
-                                <input type="text" placeholder="My first reward" onChange={this.changeName} class="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                        <div className="mb-3">
+                            <label className="form-label">Name</label>
+                            <div className="input-group">
+                                <input type="text" placeholder="My first reward" onChange={this.changeName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
-                            <div class="form-text" id="basic-addon4">Specify the name of your reward. <b>User will see this</b></div>
+                            <div className="form-text" id="basic-addon4">Specify the name of your reward. <b>User will see this</b></div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Description</label>
-                            <div class="input-group">
-                                <textarea placeholder="Reward description" type="text" onChange={this.changeDescription} class="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
+                        <div className="mb-3">
+                            <label className="form-label">Description</label>
+                            <div className="input-group">
+                                <textarea placeholder="Reward description" type="text" onChange={this.changeDescription} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
                             </div>
-                            <div class="form-text" id="basic-addon4"><b>User will see this.</b> <a href="https://www.markdownguide.org/cheat-sheet/" target="blank">Markdown</a> syntax is supported.</div>
+                            <div className="form-text" id="basic-addon4"><b>User will see this.</b> <a href="https://www.markdownguide.org/cheat-sheet/" target="blank">Markdown</a> syntax is supported.</div>
                         </div>
-                        <label class="form-label">Choose a reward mode:</label>
+                        <label className="form-label">Choose a reward mode:</label>
                         <div className="choose-reward-node">
-                            <div class="form-check">
+                            <div className="form-check">
                                 <input 
-                                    class="form-check-input" value={types.token} type="radio" name="flexRadioDefault" id="flexRadioDefault1" 
+                                    className="form-check-input" value={types.token} type="radio" name="flexRadioDefault" id="flexRadioDefault1" 
                                     onChange={this.changeType} checked={this.state.chosen_type === types.token ? true : false}/>
-                                <label class="form-check-label" for="flexRadioDefault1">
+                                <label className="form-check-label" for="flexRadioDefault1">
                                     Tokens
                                 </label>
                             </div>
-                            <div class="form-check">
+                            <div className="form-check">
                                 <input 
-                                    class="form-check-input" value={types.nft} type="radio" name="flexRadioDefault" id="flexRadioDefault2" 
+                                    className="form-check-input" value={types.nft} type="radio" name="flexRadioDefault" id="flexRadioDefault2" 
                                     onChange={this.changeType} checked={this.state.chosen_type === types.nft ? true : false}
                                 />
-                                <label class="form-check-label" for="flexRadioDefault2">
+                                <label className="form-check-label" for="flexRadioDefault2">
                                     NFTs
                                 </label>
                             </div>
                         </div>
-                        <label class="form-label">Select {this.state.chosen_type === types.token ? 'token' : 'NFT collection'}:</label>
+                        <label className="form-label">Select {this.state.chosen_type === types.token ? 'token' : 'NFT collection'}:</label>
                         <div className="input-group mb-3">
                             <select onChange={this.state.chosen_type === types.token ? this.changeToken : this.changeNFTCollection} disabled={this.state.chosen_type ? false : true} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
                                 {
@@ -585,14 +585,14 @@ class Rewards extends Component {
                             this.state.chosen_type === types.token
                             ?
                             <div>
-                                <label class="form-label">Amount</label>
-                                <div class="input-group mb-3">
-                                    <input type="number" class="form-control" onChange={this.changeAmount} aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default"/>
+                                <label className="form-label">Amount</label>
+                                <div className="input-group mb-3">
+                                    <input type="number" className="form-control" onChange={this.changeAmount} aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default"/>
                                 </div>
                             </div>
                             :
                             <div>
-                                <label class="form-label">NFT</label>
+                                <label className="form-label">NFT</label>
                                 <select onChange={this.changeChosenNFT} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
                                     {
                                         this.state.current_nfts 
@@ -690,19 +690,19 @@ class Rewards extends Component {
                     <Modal.Title>Rewarding {this.state.reward_name}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <div class="mb-3">
-                            <label class="form-label">Select user</label>
+                        <div className="mb-3">
+                            <label className="form-label">Select user</label>
                             <select onChange={this.changeUser} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
                                 {
                                     this.state.users
                                 }
                             </select>
-                            <div class="form-text" id="basic-addon4">Select the user you would like to reward</div>
+                            <div className="form-text" id="basic-addon4">Select the user you would like to reward</div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Comment:</label>
-                            <textarea onChange={this.changeComment} class="form-control" placeholder="Reward comment(optional)" aria-label="With textarea"></textarea>
-                            <div class="form-text" id="basic-addon4">The user does not see this text. <a href="https://www.markdownguide.org/cheat-sheet/" target="blank">Markdown</a> syntax is supported.</div>
+                        <div className="mb-3">
+                            <label className="form-label">Comment:</label>
+                            <textarea onChange={this.changeComment} className="form-control" placeholder="Reward comment(optional)" aria-label="With textarea"></textarea>
+                            <div className="form-text" id="basic-addon4">The user does not see this text. <a href="https://www.markdownguide.org/cheat-sheet/" target="blank">Markdown</a> syntax is supported.</div>
                         </div>
                     </Modal.Body>
                     <Modal.Footer>
