@@ -108,7 +108,6 @@ class Users extends Component {
               };
             const res = await fetch(`${config.api}/users`, requestOptions)
             const json = await res.json()
-            console.log(json.users)
             this.setState({
                 users: json.users
             })

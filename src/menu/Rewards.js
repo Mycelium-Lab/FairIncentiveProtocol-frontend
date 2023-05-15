@@ -281,7 +281,20 @@ class Rewards extends Component {
                 redirect: 'follow'
               };
             const res = await fetch(`${config.api}/rewards/add/nft`, requestOptions)
-            if (res.status === 200) alert('Done')
+            const json = await res.json()
+            if (res.status === 200) {
+                const nftRewards = this.state.nftRewards
+                json.createdNFTReward.count = 0
+                nftRewards.push(json.createdNFTReward)
+                this.setState({
+                    nftRewards,
+                    show: false,
+                    amount: null,
+                    name: null,
+                    description: null
+                })
+                alert('Done')
+            }
             else alert('Something went wrong')
         } catch (error) {
             alert(error)
@@ -319,6 +332,37 @@ class Rewards extends Component {
         }
     }
 
+    async deleteNFTReward(id) {
+        try {
+            const headers = new Headers();
+            headers.append("Content-Type", "application/json");
+            headers.append("Authorization", getBearerHeader())
+
+            const raw = JSON.stringify(
+                {
+                    id
+                }
+            );
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                body: raw,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/rewards/delete/nfts`, requestOptions)
+            const json = await res.json()
+            if (res.status !== 200) alert('Something went wrong')
+            else {
+                const nftRewards = this.state.nftRewards.filter(v => v.id != id)
+                this.setState({
+                    nftRewards
+                })
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     async rewardWithToken() {
         try {
             const headers = new Headers();
@@ -343,6 +387,40 @@ class Rewards extends Component {
             if (json.rewarded) {
                 let tokenRewards = this.state.tokenRewards
                 tokenRewards.forEach(v => {if (v.id == this.state.reward_id) v.count = parseInt(v.count) + 1})
+                alert('Done')
+                this.setState({
+                    showReward: false
+                })
+            }
+            else alert('Something went wrong')
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async rewardWithNFT() {
+        try {
+            const headers = new Headers();
+            headers.append("Content-Type", "application/json");
+            headers.append("Authorization", getBearerHeader())
+            const raw = JSON.stringify(
+                {
+                    reward_id: this.state.reward_id,
+                    user_id: this.state.chosen_user,
+                    comment: this.state.comment
+                }
+            );
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                body: raw,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/rewards/reward/nft`, requestOptions)
+            const json = await res.json()
+            if (json.rewarded) {
+                let nftRewards = this.state.nftRewards
+                nftRewards.forEach(v => {if (v.id == this.state.reward_id) v.count = parseInt(v.count) + 1})
                 alert('Done')
                 this.setState({
                     showReward: false
@@ -419,6 +497,7 @@ class Rewards extends Component {
     changeType = this.changeType.bind(this)
     getTokens = this.getTokens.bind(this)
     createNFTReward = this.createNFTReward.bind(this)
+    rewardWithNFT = this.rewardWithNFT.bind(this)
     getNFTCollections = this.getNFTCollections.bind(this)
     getNFTs = this.getNFTs.bind(this)
     getUsers = this.getUsers.bind(this)
@@ -434,6 +513,7 @@ class Rewards extends Component {
     handleShow = this.handleShow.bind(this)
     rewardToken = this.rewardToken.bind(this)
     deleteReward = this.deleteReward.bind(this)
+    deleteNFTReward = this.deleteNFTReward.bind(this)
     changeComment = this.changeComment.bind(this)
     rewardWithToken = this.rewardWithToken.bind(this)
     changeChosenNFT = this.changeChosenNFT.bind(this)
@@ -596,8 +676,8 @@ class Rewards extends Component {
                                     <td className="table-secondary">
                                         <button className="btn btn-dark" disabled>Edit</button>
                                         <button className="btn btn-dark" disabled>Stat</button>
-                                        <button className="btn btn-dark">Reward</button>
-                                        <button className="btn btn-danger">Delete</button>
+                                        <button className="btn btn-dark" onClick={() => this.handleShowReward(v.name, v.id)} >Reward</button>
+                                        <button className="btn btn-danger" onClick={() => this.deleteNFTReward(v.id)}>Delete</button>
                                     </td>
                                 </tr>
                                 )
@@ -626,7 +706,7 @@ class Rewards extends Component {
                         </div>
                     </Modal.Body>
                     <Modal.Footer>
-                    <button className="btn btn-dark" onClick={this.rewardWithToken}>
+                    <button className="btn btn-dark" onClick={this.state.switcher === types.token ? this.rewardWithToken : this.rewardWithNFT}>
                         Reward
                     </button>
                     <button className="btn btn-light" onClick={this.handleCloseReward}>

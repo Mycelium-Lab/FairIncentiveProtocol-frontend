@@ -66,11 +66,12 @@ class NFTCollections extends Component {
             const provider = new ethers.providers.Web3Provider(window.ethereum)
             await provider.send("eth_requestAccounts", [])
             const signer = await provider.getSigner()
+            const address = await signer.getAddress()
             const chainid = (await provider.getNetwork()).chainId
             this.setState({
                 provider,
                 signer,
-                address: signer.address,
+                address,
                 chainid
             })
         } catch (error) {
@@ -82,7 +83,7 @@ class NFTCollections extends Component {
         try {
             const NFT = new ethers.ContractFactory(ERC721Mintable.abi, ERC721Mintable.bytecode, this.state.signer)
             const contract = await NFT.deploy(this.state.name, this.state.symbol, config.signerAddress);
-            const contractAdddress = await contract.getAddress()
+            const contractAdddress = contract.address
             const headers = new Headers();
             headers.append("Content-Type", "application/json");
             headers.append("Authorization", getBearerHeader())
@@ -98,7 +99,7 @@ class NFTCollections extends Component {
                 body: raw,
                 redirect: 'follow'
               };
-            const res = await fetch(`${config.api}/nftCollections/add/collection`, requestOptions)
+            const res = await fetch(`${config.api}/nfts/add/collection`, requestOptions)
             if (res.status === 200) {
                 alert('Added to database. Please to use wait for tx to complete.')
                 const _nfts = this.state.nftCollections

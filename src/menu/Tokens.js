@@ -43,11 +43,12 @@ class Tokens extends Component {
             const provider = new ethers.providers.Web3Provider(window.ethereum)
             await provider.send("eth_requestAccounts", [])
             const signer = await provider.getSigner()
+            const address = await signer.getAddress()
             const chainid = (await provider.getNetwork()).chainId
             this.setState({
                 provider,
                 signer,
-                address: signer.address,
+                address,
                 chainid
             })
         } catch (error) {
@@ -59,7 +60,7 @@ class Tokens extends Component {
         try {
             const Token = new ContractFactory(ERC20Mintable.abi, ERC20Mintable.bytecode, this.state.signer)
             const contract = await Token.deploy(this.state.name, this.state.symbol);
-            const contractAdddress = await contract.getAddress()
+            const contractAdddress = contract.address
             const headers = new Headers();
             headers.append("Content-Type", "application/json");
             headers.append("Authorization", getBearerHeader())
