@@ -702,7 +702,7 @@ class Rewards extends Component {
                         <div class="mb-3">
                             <label class="form-label">Comment:</label>
                             <textarea onChange={this.changeComment} class="form-control" placeholder="Reward comment(optional)" aria-label="With textarea"></textarea>
-                            <div class="form-text" id="basic-addon4">The user does not see this text. Markdown syntax is supported.</div>
+                            <div class="form-text" id="basic-addon4">The user does not see this text. <a href="https://www.markdownguide.org/cheat-sheet/" target="blank">Markdown</a> syntax is supported.</div>
                         </div>
                     </Modal.Body>
                     <Modal.Footer>
