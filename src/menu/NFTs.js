@@ -28,11 +28,16 @@ class NFTs extends Component {
             const res = await fetch(`${config.api}/nfts/nfts`, requestOptions)
             const json = await res.json()
             const nfts = []
-            for (let i = 0; i < json.nfts.length; i++) {
-                nfts[i] = json.nfts[i]
-                const _res = await (await fetch(json.nfts[i].image)).json() 
-                const jsonImage = _res.image
-                nfts[i].real_image = jsonImage
+            const keys = Object.keys(json.nfts)
+            for (let i = 0; i < keys.length; i++) {
+                for (let j = 0; j < json.nfts[keys[i]].length; j++) {
+                    let nft = {}
+                    nft = json.nfts[keys[i]][j]
+                    const _res = await (await fetch(json.nfts[keys[i]][j].image)).json() 
+                    const jsonImage = _res.image
+                    nft.real_image = jsonImage
+                    nfts.push(nft)
+                } 
             }
             this.setState({
                 nfts

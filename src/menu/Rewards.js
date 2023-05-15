@@ -19,7 +19,9 @@ class Rewards extends Component {
         super()
         this.state = {
             chosen_type: types.token,
+            switcher: types.token,
             chosen_token: null,
+            chosen_nft_collection: null,
             chosen_nft: null,
             chosen_user: null,
             provider: null,
@@ -33,8 +35,11 @@ class Rewards extends Component {
             description: null,
             comment: null,
             tokenRewards: [],
+            nftRewards: [],
             tokens: [],
             nftCollections: [],
+            nfts: {},
+            current_nfts: [],
             users: [],
             reward_name: null,
             reward_id: null
@@ -43,11 +48,12 @@ class Rewards extends Component {
 
     async componentDidMount() {
         
-        await    this.getTokens()
-        await    this.getNFTs()
-        await    this.getUsers()
-        await    this.getTokenRewards()
-
+        await this.getTokens()
+        await this.getUsers()
+        await this.getTokenRewards()
+        await this.getNFTRewards()
+        
+        this.getNFTCollections().then(async () => await this.getNFTs())
     }
 
     async getTokens() {
@@ -72,7 +78,7 @@ class Rewards extends Component {
         }
     }
 
-    async getNFTs() {
+    async getNFTCollections() {
         try {
             const headers = new Headers();
             headers.append("Authorization", getBearerHeader())
@@ -87,7 +93,31 @@ class Rewards extends Component {
             const nftCollections = json.nftCollections.map(v => <option value={v.address}>{v.symbol}</option>)
             this.setState({
                 nftCollections,
-                chosen_nft: json.nftCollections.length > 0 ? json.nftCollections[0].address : null
+                chosen_nft_collection: json.nftCollections.length > 0 ? json.nftCollections[0].address : null
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async getNFTs() {
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/nfts/nfts`, requestOptions)
+            const json = await res.json()
+            const current_nfts = this.state.chosen_nft_collection ? json.nfts[this.state.chosen_nft_collection] : []
+            const chosen_nft = current_nfts[0] ? current_nfts[0].nft_id : null
+            this.setState({
+                nfts: json.nfts,
+                current_nfts,
+                chosen_nft
             })
         } catch (error) {
             console.log(error)
@@ -136,6 +166,26 @@ class Rewards extends Component {
         }
     }
 
+    async getNFTRewards() {
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/rewards/get/nfts`, requestOptions)
+            const json = await res.json()
+            this.setState({
+                nftRewards: json.nftRewards
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     async connect() {
         try {
             const provider = new ethers.providers.Web3Provider(window.ethereum)
@@ -152,7 +202,7 @@ class Rewards extends Component {
             console.log(error)
         }
     }
-
+    
     async mint() {
         try {
             if (this.state.chosen_type === types.token) {
@@ -162,7 +212,7 @@ class Rewards extends Component {
                     .then(async (tx) => await tx.wait())
                     .then(() => alert('Done'))
             } else {
-                const nftContract = new ethers.Contract(this.state.chosen_nft, ERC721Mintable.abi, this.state.signer)
+                const nftContract = new ethers.Contract(this.state.chosen_nft_collection, ERC721Mintable.abi, this.state.signer)
                 nftContract
                     .safeMint(this.state.chosen_user)
                     .then(async (tx) => await tx.wait())
@@ -210,6 +260,31 @@ class Rewards extends Component {
             } else alert('Something went wrong')
         } catch (error) {
             console.log(error)
+        }
+    }
+    
+    async createNFTReward() {
+        try {
+            const { chosen_nft, name, description } = this.state
+            const headers = new Headers();
+            headers.append("Content-Type", "application/json");
+            headers.append("Authorization", getBearerHeader())
+            const raw = JSON.stringify({
+                "nft_id": chosen_nft,
+                "name": name,
+                "description": description
+            });
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                body: raw,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/rewards/add/nft`, requestOptions)
+            if (res.status === 200) alert('Done')
+            else alert('Something went wrong')
+        } catch (error) {
+            alert(error)
         }
     }
 
@@ -291,9 +366,11 @@ class Rewards extends Component {
         })
     }
 
-    changeNFT(event) {
+    changeNFTCollection(event) {
         this.setState({
-            chosen_nft: event.target.value
+            chosen_nft_collection: event.target.value,
+            current_nfts: this.state.nfts[event.target.value],
+            chosen_nft: this.state.nfts[event.target.value][0] ? this.state.nfts[event.target.value][0].nft_id : null 
         })
     }
 
@@ -321,6 +398,12 @@ class Rewards extends Component {
         })
     }
 
+    changeChosenNFT(event) {
+        this.setState({
+            chosen_nft: event.target.value
+        })
+    }
+
     changeComment(event) {
         this.setState({
             comment: event.target.value
@@ -335,11 +418,13 @@ class Rewards extends Component {
     connect = this.connect.bind(this)
     changeType = this.changeType.bind(this)
     getTokens = this.getTokens.bind(this)
+    createNFTReward = this.createNFTReward.bind(this)
+    getNFTCollections = this.getNFTCollections.bind(this)
     getNFTs = this.getNFTs.bind(this)
     getUsers = this.getUsers.bind(this)
     getTokenRewards = this.getTokenRewards.bind(this)
     changeToken = this.changeToken.bind(this)
-    changeNFT = this.changeNFT.bind(this)
+    changeNFTCollection = this.changeNFTCollection.bind(this)
     changeUser = this.changeUser.bind(this)
     changeAmount = this.changeAmount.bind(this)
     changeName = this.changeName.bind(this)
@@ -351,6 +436,8 @@ class Rewards extends Component {
     deleteReward = this.deleteReward.bind(this)
     changeComment = this.changeComment.bind(this)
     rewardWithToken = this.rewardWithToken.bind(this)
+    changeChosenNFT = this.changeChosenNFT.bind(this)
+    getNFTRewards = this.getNFTRewards.bind(this)
 
     render() {
         return (
@@ -358,6 +445,10 @@ class Rewards extends Component {
                 <div className="title-header">
                     <h3>Rewards</h3>
                     <button type="button" className="btn btn-dark" onClick={this.handleShow}>Create new reward</button>
+                </div>
+                <div>
+                    <button type="button" className={this.state.switcher === types.token ? "btn btn-dark" : "btn btn-light"} onClick={() => this.setState({switcher: types.token})}>Token rewards</button>
+                    <button type="button" className={this.state.switcher === types.nft ? "btn btn-dark" : "btn btn-light"} onClick={() => this.setState({switcher: types.nft})}>NFT rewards</button>
                 </div>
                 <Modal show={this.state.show} onHide={this.handleClose} centered>
                     <Modal.Header closeButton>
@@ -400,7 +491,7 @@ class Rewards extends Component {
                         </div>
                         <label class="form-label">Select {this.state.chosen_type === types.token ? 'token' : 'NFT collection'}:</label>
                         <div className="input-group mb-3">
-                            <select onChange={this.state.chosen_type === types.token ? this.changeToken : this.changeNFT} disabled={this.state.chosen_type ? false : true} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                            <select onChange={this.state.chosen_type === types.token ? this.changeToken : this.changeNFTCollection} disabled={this.state.chosen_type ? false : true} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
                                 {
                                     this.state.chosen_type === types.token
                                     ?
@@ -421,15 +512,21 @@ class Rewards extends Component {
                             </div>
                             :
                             <div>
-                                <label class="form-label">Token ID</label>
-                                <div class="input-group mb-3">
-                                    <input type="number" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default"/>
-                                </div>
+                                <label class="form-label">NFT</label>
+                                <select onChange={this.changeChosenNFT} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                    {
+                                        this.state.current_nfts 
+                                        ?
+                                        this.state.current_nfts.map(v => <option value={v.nft_id}>{v.nft_name}</option>)
+                                        :
+                                        null
+                                    }
+                                </select>
                             </div>
                         }
                     </Modal.Body>
                     <Modal.Footer>
-                    <button className="btn btn-dark" onClick={this.rewardToken}>
+                    <button className="btn btn-dark" onClick={this.state.chosen_type === types.token ? this.rewardToken : this.createNFTReward}>
                         Create
                     </button>
                     <button className="btn btn-light" onClick={this.handleClose}>
@@ -451,31 +548,59 @@ class Rewards extends Component {
                     </thead>
                     <tbody>
                         {
+                            this.state.switcher === types.token
+                            ?
                             this.state.tokenRewards.map(v =>
-                            <tr className="table-secondary">
-                                <td className="table-secondary">
-                                    (soon)
-                                </td>
-                                <td className="table-secondary">
-                                    {v.name}
-                                </td>
-                                <td className="table-secondary">
-                                    {v.amount} {v.symbol}
-                                </td>
-                                <td className="table-secondary">
-                                    {v.description}
-                                </td>
-                                <td className="table-secondary">
-                                    {v.count} times
-                                </td>
-                                <td className="table-secondary">
-                                    <button className="btn btn-dark" disabled>Edit</button>
-                                    <button className="btn btn-dark" disabled>Stat</button>
-                                    <button className="btn btn-dark" onClick={() => this.handleShowReward(v.name, v.id)}>Reward</button>
-                                    <button className="btn btn-danger" onClick={() => this.deleteReward(v.id)}>Delete</button>
-                                </td>
-                            </tr>
-                            )
+                                <tr className="table-secondary">
+                                    <td className="table-secondary">
+                                        (soon)
+                                    </td>
+                                    <td className="table-secondary">
+                                        {v.name}
+                                    </td>
+                                    <td className="table-secondary">
+                                        {v.amount} {v.symbol}
+                                    </td>
+                                    <td className="table-secondary">
+                                        {v.description}
+                                    </td>
+                                    <td className="table-secondary">
+                                        {v.count} times
+                                    </td>
+                                    <td className="table-secondary">
+                                        <button className="btn btn-dark" disabled>Edit</button>
+                                        <button className="btn btn-dark" disabled>Stat</button>
+                                        <button className="btn btn-dark" onClick={() => this.handleShowReward(v.name, v.id)}>Reward</button>
+                                        <button className="btn btn-danger" onClick={() => this.deleteReward(v.id)}>Delete</button>
+                                    </td>
+                                </tr>
+                                )
+                            :
+                            this.state.nftRewards.map(v =>
+                                <tr className="table-secondary">
+                                    <td className="table-secondary">
+                                        (soon)
+                                    </td>
+                                    <td className="table-secondary">
+                                        {v.name}
+                                    </td>
+                                    <td className="table-secondary">
+                                        {v.nft_name} from {v.symbol} collection
+                                    </td>
+                                    <td className="table-secondary">
+                                        {v.description}
+                                    </td>
+                                    <td className="table-secondary">
+                                        {v.count} times
+                                    </td>
+                                    <td className="table-secondary">
+                                        <button className="btn btn-dark" disabled>Edit</button>
+                                        <button className="btn btn-dark" disabled>Stat</button>
+                                        <button className="btn btn-dark">Reward</button>
+                                        <button className="btn btn-danger">Delete</button>
+                                    </td>
+                                </tr>
+                                )
                         }
                     </tbody>
                 </table>
@@ -519,7 +644,7 @@ class Rewards extends Component {
                         <label htmlFor="floatingSelect">Choose type</label>
                     </div>
                     <div className="form-floating">
-                        <select onChange={this.state.chosen_type === types.token ? this.changeToken : this.changeNFT} disabled={this.state.chosen_type ? false : true} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                        <select onChange={this.state.chosen_type === types.token ? this.changeToken : this.changeNFTCollection} disabled={this.state.chosen_type ? false : true} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
                             {
                                 this.state.chosen_type === types.token
                                 ?
