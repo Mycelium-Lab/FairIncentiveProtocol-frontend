@@ -147,6 +147,7 @@ class RewardEvents extends Component {
                                     {v.event_comment}
                                 </td>
                                 <td className="table-secondary">
+                                    <a href={`/claimnft?id=${v.event_id}&user_id=${v.user_id}`} target="_blank">Claim Link</a>
                                     <button className="btn btn-dark" disabled>Revoke</button>
                                 </td>
                             </tr>
