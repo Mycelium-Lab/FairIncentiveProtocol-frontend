@@ -27,7 +27,8 @@ class NFTClaimPage extends Component {
             signer: null,
             address: null,
             chainid: null,
-            contract: null
+            contract: null,
+            tokenID: null
         }
     }
 
@@ -95,7 +96,13 @@ class NFTClaimPage extends Component {
     async claim() {
         try {
             const { contract, r, v, s, nft_jsonImage } = this.state
-            await contract.safeMintSigner(r, v, s, nft_jsonImage)
+            const tx = await contract.safeMintSigner(r, v, s, nft_jsonImage)
+            const res = await tx.wait()
+            const tokenID = res.events.find(v => v.event === 'SafeMintSigner').args.ID
+            this.setState({
+                tokenID: tokenID.toString()
+            })
+            alert('Done')
         } catch (error) {
             console.log(error)
         }
@@ -126,6 +133,15 @@ class NFTClaimPage extends Component {
                     }
                     <div>
                         <button type="button" className="btn btn-dark" onClick={this.claim}>Claim</button>
+                    </div>
+                    <div>
+                        {
+                            this.state.tokenID
+                            ?
+                            `Add this address ${this.state.collection_address} with this tokenID ${this.state.tokenID} to Metamask`
+                            :
+                            null
+                        }
                     </div>
                 </div>
             </div>
