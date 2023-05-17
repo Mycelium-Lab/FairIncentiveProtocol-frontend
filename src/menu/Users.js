@@ -6,6 +6,7 @@ import { createLongStrView } from "../utils/longStrView";
 import '../styles/users.css'
 
 let propertiesElementsLength = 0
+let statsElementsLength = 0
 
 const types = {
     token: 'token',
@@ -74,43 +75,58 @@ class Users extends Component {
 
     async addUser() {
         try {
-            console.log(this.state.propertiesElements)
-            // const headers = new Headers();
-            // headers.append("Content-Type", "application/json");
-            // headers.append("Authorization", getBearerHeader())
+            let propertiesElements = this.state.propertiesElements
+            let statsElements = this.state.statsElements
+            propertiesElements = propertiesElements.filter(v => v.work).map(v => {
+                return {
+                    name: v.name,
+                    value: v.value
+                }
+            })
+            statsElements = statsElements.filter(v => v.work).map(v => {
+                return {
+                    name: v.name,
+                    value: v.value
+                }
+            })
+            const headers = new Headers();
+            headers.append("Content-Type", "application/json");
+            headers.append("Authorization", getBearerHeader())
 
-            // const raw = JSON.stringify({
-            //     "external_id": this.state.add_externalID,
-            //     "email": this.state.add_email,
-            //     "wallet": this.state.add_wallet,
-            //     "notes": this.state.add_notes,
-            //     "properties": this.state.properties,
-            //     "stats": this.state.stats
-            // });
-            // const requestOptions = {
-            //     method: 'POST',
-            //     headers: headers,
-            //     body: raw,
-            //     redirect: 'follow'
-            //   };
-            // const res = await fetch(`${config.api}/users/add`, requestOptions)
-            // const json = await res.json()
-            // if (res.status === 200) {
-            //     const _users = this.state.users
-            //     _users.push({
-            //         id: json.id,
-            //         external_id: this.state.add_externalID,
-            //         email: this.state.add_email,
-            //         wallet: this.state.add_wallet,
-            //         notes: this.state.add_notes
-            //     })
-            //     this.setState({
-            //         users: _users,
-            //         showAdd: false
-            //     })
-            // } else {
-            //     alert('Something went wrong')
-            // }
+            const raw = JSON.stringify({
+                "external_id": this.state.add_externalID,
+                "email": this.state.add_email,
+                "wallet": this.state.add_wallet,
+                "notes": this.state.add_notes,
+                "properties": propertiesElements,
+                "stats": statsElements
+            });
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                body: raw,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/users/add`, requestOptions)
+            const json = await res.json()
+            if (res.status === 200) {
+                const _users = this.state.users
+                _users.push({
+                    id: json.id,
+                    external_id: this.state.add_externalID,
+                    email: this.state.add_email,
+                    wallet: this.state.add_wallet,
+                    notes: this.state.add_notes,
+                    propertiesElements: [],
+                    statsElements: []
+                })
+                this.setState({
+                    users: _users,
+                    showAdd: false
+                })
+            } else {
+                alert('Something went wrong')
+            }
         } catch (error) {
             alert(error)
         }
@@ -235,9 +251,12 @@ class Users extends Component {
     }
 
     deletePropertyInput = (index) => {
+        console.log(index)
         let propertiesElements = this.state.propertiesElements
-        propertiesElements = propertiesElements.filter(v => v.id != index);
-        this.setState({propertiesElements})
+        propertiesElements.forEach(v => {if (v.id === index) v.work = false})
+        this.setState({
+            propertiesElements
+        })
     }
 
     addPropertyInput = () => {
@@ -248,39 +267,88 @@ class Users extends Component {
                 id,
                 element: 
                 <div className="user-custom-params">
-                    <input type="text" id={`property-name-${id}`} onChange={this.changePropertyName} className="form-control" placeholder="Property name"/>
-                    <input type="text" id={`property-value-${id}`} onChange={this.changePropertyValue} className="form-control" placeholder="Property value"/>
+                    <input type="text" id={`property-name-${id}`} onChange={(event) => this.changePropertyName(id, event.target.value)} className="form-control" placeholder="Property name"/>
+                    <input type="text" id={`property-value-${id}`} onChange={(event) => this.changePropertyValue(id, event.target.value)} className="form-control" placeholder="Property value"/>
                     <button type="button" className="btn btn-dark" onClick={() => this.deletePropertyInput(id)}>-</button>
                 </div>,
                 name: undefined,
-                value: undefined
+                value: undefined,
+                work: true
             }
         )
         propertiesElementsLength += 1
         this.setState({propertiesElements})
     }
 
-    changePropertyName(event) {
+    changePropertyName(id, value) {
         let propertiesElements = this.state.propertiesElements
-        const idFull = event.target.id.split('-')
-        const id = parseInt(idFull[idFull.length - 1])
         propertiesElements.forEach(v => {
-            if (v.id === id) v.name = event.target.value
+            if (v.id === id) v.name = value
+        })
+        document.getElementById(`property-name-${id}`).value = value
+        this.setState({
+            propertiesElements
+        })
+    }
+
+    changePropertyValue(id, value) {
+        let propertiesElements = this.state.propertiesElements
+        propertiesElements.forEach(v => {
+            if (v.id === id) v.value = value
         }) 
         this.setState({
             propertiesElements
         })
     }
 
-    changePropertyValue(event) {
-        let propertiesElements = this.state.propertiesElements
+    deleteStatInput = (index) => {
+        let statsElements = this.state.statsElements
+        statsElements.forEach(v => { if (v.id === index) v.work = false});
+        this.setState({statsElements})
+    }
+
+    addStatInput = () => {
+        const statsElements = this.state.statsElements
+        const id = statsElementsLength
+        statsElements.push(
+            {
+                id,
+                element: 
+                <div className="user-custom-params">
+                    <input type="text" id={`stat-name-${id}`} onChange={this.changeStatName} className="form-control" placeholder="Stat name"/>
+                    <input type="number" id={`stat-value-${id}`} onChange={this.changeStatValue} className="form-control" placeholder="Stat value"/>
+                    <button type="button" className="btn btn-dark" onClick={() => this.deleteStatInput(id)}>-</button>
+                </div>,
+                name: undefined,
+                value: undefined,
+                work: true
+            }
+        )
+        statsElementsLength += 1
+        this.setState({statsElements})
+    }
+
+    changeStatName(event) {
+        let statsElements = this.state.statsElements
         const idFull = event.target.id.split('-')
         const id = parseInt(idFull[idFull.length - 1])
-        propertiesElements.forEach(v => {
+        statsElements.forEach(v => {
+            if (v.id === id) v.name = event.target.value
+        }) 
+        this.setState({
+            statsElements
+        })
+    }
+
+    changeStatValue(event) {
+        let statsElements = this.state.statsElements
+        const idFull = event.target.id.split('-')
+        const id = parseInt(idFull[idFull.length - 1])
+        statsElements.forEach(v => {
             if (v.id === id) v.value = event.target.value
         }) 
         this.setState({
-            propertiesElements
+            statsElements
         })
     }
 
@@ -331,6 +399,10 @@ class Users extends Component {
     reward = this.reward.bind(this)
     changePropertyName = this.changePropertyName.bind(this)
     changePropertyValue = this.changePropertyValue.bind(this)
+    deleteStatInput = this.deleteStatInput.bind(this)
+    addStatInput = this.addStatInput.bind(this)
+    changeStatName = this.changeStatName.bind(this)
+    changeStatValue = this.changeStatValue.bind(this)
 
     render() {
         return (
@@ -372,16 +444,23 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                             </label>
                             <div id="user-properties">
                                 {
-                                    this.state.propertiesElements.map(v => v.element)
+                                    this.state.propertiesElements ?
+                                    this.state.propertiesElements.map(v => v.work ? v.element : null) :
+                                    null
                                 }
                             </div>
                             <div className="form-text" id="basic-addon4">Textual parameters of user</div>
                         </div>
                         <div className="mb-3">
                             <label className="form-label">Stats: 
-                            <button type="button" className="btn btn-dark" disabled>+</button>
+                            <button type="button" className="btn btn-dark" onClick={this.addStatInput}>+</button>
                             </label>
                             <div id="user-stats">
+                                {
+                                    this.state.statsElements ?
+                                    this.state.statsElements.map(v => v.work ? v.element : null) :
+                                    null
+                                }
                             </div>
                             <div className="form-text" id="basic-addon4">Numerical parameters of user</div>
                         </div>
