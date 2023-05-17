@@ -74,42 +74,43 @@ class Users extends Component {
 
     async addUser() {
         try {
-            const headers = new Headers();
-            headers.append("Content-Type", "application/json");
-            headers.append("Authorization", getBearerHeader())
+            console.log(this.state.propertiesElements)
+            // const headers = new Headers();
+            // headers.append("Content-Type", "application/json");
+            // headers.append("Authorization", getBearerHeader())
 
-            const raw = JSON.stringify({
-                "external_id": this.state.add_externalID,
-                "email": this.state.add_email,
-                "wallet": this.state.add_wallet,
-                "notes": this.state.add_notes,
-                "properties": this.state.properties,
-                "stats": this.state.stats
-            });
-            const requestOptions = {
-                method: 'POST',
-                headers: headers,
-                body: raw,
-                redirect: 'follow'
-              };
-            const res = await fetch(`${config.api}/users/add`, requestOptions)
-            const json = await res.json()
-            if (res.status === 200) {
-                const _users = this.state.users
-                _users.push({
-                    id: json.id,
-                    external_id: this.state.add_externalID,
-                    email: this.state.add_email,
-                    wallet: this.state.add_wallet,
-                    notes: this.state.add_notes
-                })
-                this.setState({
-                    users: _users,
-                    showAdd: false
-                })
-            } else {
-                alert('Something went wrong')
-            }
+            // const raw = JSON.stringify({
+            //     "external_id": this.state.add_externalID,
+            //     "email": this.state.add_email,
+            //     "wallet": this.state.add_wallet,
+            //     "notes": this.state.add_notes,
+            //     "properties": this.state.properties,
+            //     "stats": this.state.stats
+            // });
+            // const requestOptions = {
+            //     method: 'POST',
+            //     headers: headers,
+            //     body: raw,
+            //     redirect: 'follow'
+            //   };
+            // const res = await fetch(`${config.api}/users/add`, requestOptions)
+            // const json = await res.json()
+            // if (res.status === 200) {
+            //     const _users = this.state.users
+            //     _users.push({
+            //         id: json.id,
+            //         external_id: this.state.add_externalID,
+            //         email: this.state.add_email,
+            //         wallet: this.state.add_wallet,
+            //         notes: this.state.add_notes
+            //     })
+            //     this.setState({
+            //         users: _users,
+            //         showAdd: false
+            //     })
+            // } else {
+            //     alert('Something went wrong')
+            // }
         } catch (error) {
             alert(error)
         }
@@ -234,28 +235,53 @@ class Users extends Component {
     }
 
     deletePropertyInput = (index) => {
-        console.log(index)
         let propertiesElements = this.state.propertiesElements
-        console.log(propertiesElements)
         propertiesElements = propertiesElements.filter(v => v.id != index);
-        console.log(propertiesElements)
         this.setState({propertiesElements})
     }
 
     addPropertyInput = () => {
         const propertiesElements = this.state.propertiesElements
+        const id = propertiesElementsLength
         propertiesElements.push(
             {
-                id: propertiesElementsLength,
+                id,
                 element: 
                 <div className="user-custom-params">
-                    <input type="text" className="form-control" placeholder="Property name"/>
-                    <input type="text" className="form-control" placeholder="Property value"/>
-                    <button type="button" className="btn btn-dark" onClick={() => this.deletePropertyInput(propertiesElementsLength)}>-</button>
-                </div>
+                    <input type="text" id={`property-name-${id}`} onChange={this.changePropertyName} className="form-control" placeholder="Property name"/>
+                    <input type="text" id={`property-value-${id}`} onChange={this.changePropertyValue} className="form-control" placeholder="Property value"/>
+                    <button type="button" className="btn btn-dark" onClick={() => this.deletePropertyInput(id)}>-</button>
+                </div>,
+                name: undefined,
+                value: undefined
             }
         )
+        propertiesElementsLength += 1
         this.setState({propertiesElements})
+    }
+
+    changePropertyName(event) {
+        let propertiesElements = this.state.propertiesElements
+        const idFull = event.target.id.split('-')
+        const id = parseInt(idFull[idFull.length - 1])
+        propertiesElements.forEach(v => {
+            if (v.id === id) v.name = event.target.value
+        }) 
+        this.setState({
+            propertiesElements
+        })
+    }
+
+    changePropertyValue(event) {
+        let propertiesElements = this.state.propertiesElements
+        const idFull = event.target.id.split('-')
+        const id = parseInt(idFull[idFull.length - 1])
+        propertiesElements.forEach(v => {
+            if (v.id === id) v.value = event.target.value
+        }) 
+        this.setState({
+            propertiesElements
+        })
     }
 
     handleShowAdd = () => this.setState({showAdd: true})
@@ -303,6 +329,8 @@ class Users extends Component {
     changeRewardNFT = this.changeRewardNFT.bind(this)
     changeComment = this.changeComment.bind(this)
     reward = this.reward.bind(this)
+    changePropertyName = this.changePropertyName.bind(this)
+    changePropertyValue = this.changePropertyValue.bind(this)
 
     render() {
         return (
@@ -339,7 +367,9 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                             <div className="form-text" id="basic-addon4">The user does not see this text. <a href="https://www.markdownguide.org/cheat-sheet/" target="blank">Markdown</a> syntax is supported.</div>
                         </div>
                         <div className="mb-3">
-                            <label className="form-label">Properties: <button type="button" className="btn btn-dark" onClick={this.addPropertyInput} disabled>+</button></label>
+                            <label className="form-label">Properties: 
+                            <button type="button" className="btn btn-dark" onClick={this.addPropertyInput}>+</button>
+                            </label>
                             <div id="user-properties">
                                 {
                                     this.state.propertiesElements.map(v => v.element)
@@ -348,7 +378,9 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                             <div className="form-text" id="basic-addon4">Textual parameters of user</div>
                         </div>
                         <div className="mb-3">
-                            <label className="form-label">Stats: <button type="button" className="btn btn-dark" disabled>+</button></label>
+                            <label className="form-label">Stats: 
+                            <button type="button" className="btn btn-dark" disabled>+</button>
+                            </label>
                             <div id="user-stats">
                             </div>
                             <div className="form-text" id="basic-addon4">Numerical parameters of user</div>

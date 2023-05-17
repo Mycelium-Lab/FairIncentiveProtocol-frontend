@@ -2,6 +2,7 @@ import { Component } from "react";
 import { config } from "../utils/config";
 import { getBearerHeader } from "../utils/getBearerHeader";
 import { createLongStrView } from "../utils/longStrView";
+import '../styles/rewardEvents.css'
 
 const types = {
     token: 'token',
@@ -216,7 +217,7 @@ class RewardEvents extends Component {
                                     {v.event_comment}
                                 </td>
                                 <td className="table-secondary">
-                                    <a href={`/claimnft?id=${v.event_id}&user_id=${v.user_id}`} target="_blank">Claim Link</a>
+                                    <a className="claim-link" href={`/claimnft?id=${v.event_id}&user_id=${v.user_id}`} target="_blank">Claim Link</a>
                                     {
                                         v.status === 'Accrued'
                                         ?
