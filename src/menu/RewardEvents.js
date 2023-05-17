@@ -41,7 +41,7 @@ class RewardEvents extends Component {
                 rewardTokenEvents: rewardEvents
             })
         } catch (error) {
-            alert(error)
+            console.log(error)
         }
     }
 
@@ -62,9 +62,72 @@ class RewardEvents extends Component {
                 rewardNFTEvents: rewardEvents
             })
         } catch (error) {
-            alert(error)
+            console.log(error)
         }
     }
+
+    async deleteTokenRewardEvent(id) {
+        try {
+            const headers = new Headers();
+            headers.append("Content-Type", "application/json");
+            headers.append("Authorization", getBearerHeader())
+            const raw = JSON.stringify(
+                {
+                    id: id,
+                }
+            );
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                body: raw,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/rewards/delete/events/token`, requestOptions)
+            if (res.status === 200) {
+                let tokenEvents = this.state.rewardTokenEvents
+                tokenEvents = tokenEvents.filter(v => v.event_id !== id)
+                this.setState({
+                    rewardTokenEvents: tokenEvents
+                })
+            }
+            else alert('Something went wrong')
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async deleteNFTRewardEvent(id) {
+        try {
+            const headers = new Headers();
+            headers.append("Content-Type", "application/json");
+            headers.append("Authorization", getBearerHeader())
+            const raw = JSON.stringify(
+                {
+                    id: id,
+                }
+            );
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                body: raw,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/rewards/delete/events/nft`, requestOptions)
+            if (res.status === 200) {
+                let rewardNFTEvents = this.state.rewardNFTEvents
+                rewardNFTEvents = rewardNFTEvents.filter(v => v.event_id !== id)
+                this.setState({
+                    rewardNFTEvents
+                })
+            }
+            else alert('Something went wrong')
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    deleteTokenRewardEvent = this.deleteTokenRewardEvent.bind(this)
+    deleteNFTRewardEvent = this.deleteNFTRewardEvent.bind(this)
 
     render() {
         return (
@@ -116,7 +179,13 @@ class RewardEvents extends Component {
                                     {v.event_comment}
                                 </td>
                                 <td className="table-secondary">
-                                    <button className="btn btn-dark" disabled>Revoke</button>
+                                    {
+                                        v.status === 'Accrued'
+                                        ?
+                                        <button className="btn btn-dark" onClick={() => this.deleteTokenRewardEvent(v.event_id)}>Revoke</button>
+                                        :
+                                        null
+                                    }
                                 </td>
                             </tr>
                             )
@@ -148,7 +217,13 @@ class RewardEvents extends Component {
                                 </td>
                                 <td className="table-secondary">
                                     <a href={`/claimnft?id=${v.event_id}&user_id=${v.user_id}`} target="_blank">Claim Link</a>
-                                    <button className="btn btn-dark" disabled>Revoke</button>
+                                    {
+                                        v.status === 'Accrued'
+                                        ?
+                                        <button className="btn btn-dark" onClick={() => this.deleteNFTRewardEvent(v.event_id)}>Revoke</button>
+                                        :
+                                        null
+                                    }
                                 </td>
                             </tr>
                             )

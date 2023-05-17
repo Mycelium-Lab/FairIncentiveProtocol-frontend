@@ -268,7 +268,6 @@ class Users extends Component {
         })
     }
     changeRewardToken(event) {
-        console.log(event.target.value)
         this.setState({
             chosen_reward_token: event.target.value
         })
