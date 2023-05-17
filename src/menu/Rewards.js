@@ -47,7 +47,9 @@ class Rewards extends Component {
             reward_count: null,
             reward_description: null,
             reward_amount: null,
-            reward_type: null
+            reward_type: null,
+            reward_token: null,
+            reward_nft_id: null
         }
     }
 
@@ -73,9 +75,8 @@ class Rewards extends Component {
               };
             const res = await fetch(`${config.api}/tokens`, requestOptions)
             const json = await res.json()
-            const tokens = json.tokens.map(v => <option value={v.address}>{v.symbol}</option>)
             this.setState({
-                tokens,
+                tokens: json.tokens,
                 chosen_token: json.tokens.length > 0 ? json.tokens[0].address : null
             })
         } catch (error) {
@@ -95,9 +96,8 @@ class Rewards extends Component {
               };
             const res = await fetch(`${config.api}/nfts/collections`, requestOptions)
             const json = await res.json()
-            const nftCollections = json.nftCollections.map(v => <option value={v.address}>{v.symbol}</option>)
             this.setState({
-                nftCollections,
+                nftCollections: json.nftCollections,
                 chosen_nft_collection: json.nftCollections.length > 0 ? json.nftCollections[0].address : null
             })
         } catch (error) {
@@ -439,8 +439,46 @@ class Rewards extends Component {
 
     async saveEdit() {
         try {
-            const { reward_type, name, description, amount, chosen_token, chosen_nft_collection, chosen_nft } = this.state
-            console.log(reward_type, name, description, amount, chosen_token, chosen_nft_collection, chosen_nft)
+            const { reward_id, reward_type, reward_name, reward_description, reward_amount, reward_token, reward_nft_id } = this.state
+            const headers = new Headers();
+            headers.append("Content-Type", "application/json");
+            headers.append("Authorization", getBearerHeader())
+            let rawJSON = {}
+            if (reward_type === types.token) {
+                rawJSON = {
+                    id: reward_id,
+                    name: reward_name,
+                    description: reward_description,
+                    amount: reward_amount,
+                    address: reward_token
+                }
+            } else {
+                rawJSON = {
+                    id: reward_id,
+                    name: reward_name,
+                    description: reward_description,
+                    nft_id: reward_nft_id
+                    // address: reward_token
+                }
+            }
+            const raw = JSON.stringify(rawJSON);
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                body: raw,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/rewards/update/${reward_type === types.token ? 'token' : 'nft'}`, requestOptions)
+            const json = await res.json()
+            alert(res.status)
+            // if (json.rewarded) {
+            //     let nftRewards = this.state.nftRewards
+            //     nftRewards.forEach(v => {if (v.id == this.state.reward_id) v.count = parseInt(v.count) + 1})
+            //     alert('Done')
+            //     this.setState({
+            //         showReward: false
+            //     })
+            // }
         } catch (error) {
             console.log(error)
         }
@@ -502,11 +540,55 @@ class Rewards extends Component {
         })
     }
 
+    changeRewardName(event) {
+        this.setState({
+            reward_name: event.target.value
+        })
+    }
+
+    changeRewardDescription(event) {
+        this.setState({
+            reward_description: event.target.value
+        })
+    }
+
+    changeRewardAmount(event) {
+        this.setState({
+            reward_amount: event.target.value
+        })
+    }
+
+    changeRewardToken(event) {
+        let current_nfts = {}
+        if (this.state.reward_type === types.nft) {
+            current_nfts = {
+                current_nfts: this.state.nfts[event.target.value],
+                reward_nft_id: this.state.nfts[event.target.value][0].nft_id
+            }
+        } 
+        this.setState({
+            reward_token: event.target.value,
+            ...current_nfts
+        })
+    }
+
+    changeChosenRewardNFT(event) {
+        this.setState({
+            reward_nft_id: event.target.value
+        })
+    }
+
     handleClose = () => this.setState({show: false});
     handleShow = () => this.setState({show: true});
     handleCloseReward = () => this.setState({showReward: false})
     handleShowReward = (reward_name, reward_id) => this.setState({showReward: true, reward_name, reward_id})
-    handleShowEditReward = (reward_name, reward_id, reward_count, reward_description, reward_amount, reward_type) => {
+    handleShowEditReward = (reward_name, reward_id, reward_count, reward_description, reward_amount, reward_type, reward_token, reward_nft_id) => {
+        let current_nfts = {}
+        if (reward_type === types.nft) {
+            current_nfts = {
+                current_nfts: this.state.nfts[reward_token]
+            }
+        }
         this.setState(
             {   
                 showEditReward: true, 
@@ -515,7 +597,10 @@ class Rewards extends Component {
                 reward_count,
                 reward_description,
                 reward_amount,
-                reward_type
+                reward_type,
+                reward_token,
+                reward_nft_id,
+                ...current_nfts
             }
         )
     }
@@ -536,6 +621,11 @@ class Rewards extends Component {
     changeAmount = this.changeAmount.bind(this)
     changeName = this.changeName.bind(this)
     changeDescription = this.changeDescription.bind(this)
+    changeRewardName = this.changeRewardName.bind(this)
+    changeRewardDescription = this.changeRewardDescription.bind(this)
+    changeRewardAmount = this.changeRewardAmount.bind(this)
+    changeRewardToken = this.changeRewardToken.bind(this)
+    changeChosenRewardNFT = this.changeChosenRewardNFT.bind(this)
     mint = this.mint.bind(this)
     handleClose = this.handleClose.bind(this)
     handleShow = this.handleShow.bind(this)
@@ -606,9 +696,9 @@ class Rewards extends Component {
                                 {
                                     this.state.chosen_type === types.token
                                     ?
-                                    this.state.tokens
+                                    this.state.tokens.map(v => <option value={v.address}>{v.symbol}</option>)
                                     :
-                                    this.state.nftCollections
+                                    this.state.nftCollections.map(v => <option value={v.address}>{v.symbol}</option>)
                                 }
                             </select>
                         </div>
@@ -679,7 +769,7 @@ class Rewards extends Component {
                                         {v.count} times
                                     </td>
                                     <td className="table-secondary">
-                                        <button className="btn btn-dark" onClick={() => this.handleShowEditReward(v.name, v.id, v.count, v.description, v.amount, types.token)}>Edit</button>
+                                        <button className="btn btn-dark" onClick={() => this.handleShowEditReward(v.name, v.id, v.count, v.description, v.amount, types.token, v.address)}>Edit</button>
                                         <button className="btn btn-dark" disabled>Stat</button>
                                         <button className="btn btn-dark" onClick={() => this.handleShowReward(v.name, v.id)}>Reward</button>
                                         <button className="btn btn-danger" onClick={() => this.deleteReward(v.id)}>Delete</button>
@@ -705,7 +795,7 @@ class Rewards extends Component {
                                         {v.count} times
                                     </td>
                                     <td className="table-secondary">
-                                        <button className="btn btn-dark" onClick={() => this.handleShowEditReward(v.name, v.id, v.count, v.description, null, types.nft)}>Edit</button>
+                                        <button className="btn btn-dark" onClick={() => this.handleShowEditReward(v.name, v.id, v.count, v.description, null, types.nft, v.address, v.nft_id)}>Edit</button>
                                         <button className="btn btn-dark" disabled>Stat</button>
                                         <button className="btn btn-dark" onClick={() => this.handleShowReward(v.name, v.id)} >Reward</button>
                                         <button className="btn btn-danger" onClick={() => this.deleteNFTReward(v.id)}>Delete</button>
@@ -753,14 +843,14 @@ class Rewards extends Component {
                         <div className="mb-3">
                             <label className="form-label">Name</label>
                             <div className="input-group">
-                                <input type="text" value={!this.state.name ? this.state.reward_name : this.state.name} placeholder={this.state.reward_name} onChange={this.changeName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                <input type="text" value={this.state.reward_name} placeholder={this.state.reward_name} onChange={this.changeRewardName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
                             <div className="form-text" id="basic-addon4">Specify the name of your reward. <b>User will see this</b></div>
                         </div>
                         <div className="mb-3">
                             <label className="form-label">Description</label>
                             <div className="input-group">
-                                <textarea value={!this.state.description ? this.state.reward_description : this.state.description} placeholder={this.state.reward_description ? this.state.reward_description : 'Reward description'} type="text" onChange={this.changeDescription} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
+                                <textarea value={this.state.reward_description} placeholder={this.state.reward_description} type="text" onChange={this.changeRewardDescription} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
                             </div>
                             <div className="form-text" id="basic-addon4"><b>User will see this.</b> <a href="https://www.markdownguide.org/cheat-sheet/" target="blank">Markdown</a> syntax is supported.</div>
                         </div>
@@ -789,13 +879,23 @@ class Rewards extends Component {
                         </div>
                         <label style={this.state.reward_count != 0 ? {color: "grey"} : null} className="form-label">Select {this.state.chosen_type === types.token ? 'token' : 'NFT collection'}:</label>
                         <div className="input-group mb-3">
-                            <select style={this.state.reward_count != 0 ? {color: "grey"} : null} onChange={this.state.reward_type === types.token ? this.changeToken : this.changeNFTCollection} disabled={this.state.reward_count != 0 ? true : false} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                            <select style={this.state.reward_count != 0 ? {color: "grey"} : null} onChange={this.changeRewardToken} disabled={this.state.reward_count != 0 ? true : false} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
                                 {
                                     this.state.reward_type === types.token
                                     ?
-                                    this.state.tokens
+                                    this.state.tokens.map(v => {
+                                        if (v.address === this.state.reward_token) {
+                                            return <option value={v.address} selected>{v.symbol}</option>
+                                        }
+                                        return <option value={v.address}>{v.symbol}</option>
+                                    })
                                     :
-                                    this.state.nftCollections
+                                    this.state.nftCollections.map(v => {
+                                        if (v.address === this.state.reward_token) {
+                                            return <option value={v.address} selected>{v.symbol}</option>
+                                        }
+                                        return <option value={v.address}>{v.symbol}</option>
+                                    })
                                 }
                             </select>
                         </div>
@@ -803,19 +903,25 @@ class Rewards extends Component {
                             this.state.reward_type === types.token
                             ?
                             <div>
-                                <label className="form-label">Amount</label>
+                                <label style={this.state.reward_count != 0 ? {color: "grey"}: null} className="form-label">Amount</label>
                                 <div className="input-group mb-3">
-                                    <input type="number" value={this.state.reward_amount ? this.state.reward_amount : null} className="form-control" onChange={this.changeAmount} aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default"/>
+                                    <input style={this.state.reward_count != 0 ? {color: "grey"}: null } type="number" value={this.state.reward_amount} disabled={this.state.reward_count != 0 ? true : false} className="form-control" onChange={this.changeRewardAmount} aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default"/>
                                 </div>
                             </div>
                             :
                             <div>
                                 <label style={this.state.reward_count != 0 ? {color: "grey"} : null} className="form-label">NFT</label>
-                                <select disabled={this.state.reward_count != 0 ? true : false} onChange={this.changeChosenNFT} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                <select style={this.state.reward_count != 0 ? {color: "grey"} : null} disabled={this.state.reward_count != 0 ? true : false} onChange={this.changeChosenRewardNFT} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
                                     {
                                         this.state.current_nfts 
                                         ?
-                                        this.state.current_nfts.map(v => <option value={v.nft_id}>{v.nft_name}</option>)
+                                        this.state.current_nfts.map(v => {
+                                            if (v.nft_id === this.state.reward_nft_id) {
+                                                return <option value={v.nft_id} selected>{v.nft_name}</option>
+                                            }
+                                            return <option value={v.nft_id}>{v.nft_name}</option>
+                                        }
+                                        )
                                         :
                                         null
                                     }
