@@ -402,9 +402,9 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                                         (soon)
                                     </td>
                                     <td className="table-secondary">
+                                        <button type="button" className="btn btn-dark" disabled>Edit</button>
                                         <button type="button" className="btn btn-dark" disabled>Stat</button>
                                         <button type="button" className="btn btn-dark" onClick={() => this.handleShowToReward(v.external_id, v.id)}>To reward</button>
-                                        <button type="button" className="btn btn-dark" disabled>Edit</button>
                                         <button onClick={async () => await this.deleteUser(v.id)} type="button" className="btn btn-danger">Delete</button>
                                     </td>
                                 </tr>

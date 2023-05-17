@@ -49,7 +49,9 @@ class Rewards extends Component {
             reward_amount: null,
             reward_type: null,
             reward_token: null,
-            reward_nft_id: null
+            reward_nft_id: null,
+            reward_symbol: null,
+            reward_nft_name: null
         }
     }
 
@@ -439,7 +441,17 @@ class Rewards extends Component {
 
     async saveEdit() {
         try {
-            const { reward_id, reward_type, reward_name, reward_description, reward_amount, reward_token, reward_nft_id } = this.state
+            const { 
+                reward_id, 
+                reward_type, 
+                reward_name, 
+                reward_description, 
+                reward_amount, 
+                reward_token, 
+                reward_nft_id,
+                reward_symbol,
+                reward_nft_name
+            } = this.state
             const headers = new Headers();
             headers.append("Content-Type", "application/json");
             headers.append("Authorization", getBearerHeader())
@@ -470,7 +482,34 @@ class Rewards extends Component {
               };
             const res = await fetch(`${config.api}/rewards/update/${reward_type === types.token ? 'token' : 'nft'}`, requestOptions)
             const json = await res.json()
-            alert(res.status)
+            if(res.status === 200) {
+                if (reward_type === types.token) {
+                    let tokenRewards = this.state.tokenRewards
+                    tokenRewards.forEach(v => {
+                        if (v.id == reward_id) {
+                            v.name = reward_name
+                            v.description = reward_description
+                            v.amount = reward_amount
+                            v.symbol = reward_symbol
+                            v.address = reward_token
+                            v.nft_id = reward_nft_id
+                        }}
+                    )
+                    alert('Done')
+                } else {
+                    let nftRewards = this.state.nftRewards
+                    nftRewards.forEach(v => {
+                        if (v.id === reward_id) {
+                            v.name = reward_name
+                            v.description = reward_description
+                            v.symbol = reward_symbol
+                            v.address = reward_token
+                            v.nft_name = reward_nft_name 
+                        }
+                    })
+                    alert('Done')
+                }
+            }
             // if (json.rewarded) {
             //     let nftRewards = this.state.nftRewards
             //     nftRewards.forEach(v => {if (v.id == this.state.reward_id) v.count = parseInt(v.count) + 1})
@@ -563,18 +602,27 @@ class Rewards extends Component {
         if (this.state.reward_type === types.nft) {
             current_nfts = {
                 current_nfts: this.state.nfts[event.target.value],
-                reward_nft_id: this.state.nfts[event.target.value][0].nft_id
+                reward_nft_id: this.state.nfts[event.target.value][0].nft_id,
+                reward_nft_name: this.state.nfts[event.target.value][0].nft_name
             }
         } 
         this.setState({
             reward_token: event.target.value,
+            reward_symbol: 
+            this.state.reward_type === types.token
+            ?
+            this.state.tokens.find(v => v.address === event.target.value).symbol
+            :
+            this.state.nftCollections.find(v => v.address === event.target.value).symbol
+            ,
             ...current_nfts
         })
     }
 
     changeChosenRewardNFT(event) {
         this.setState({
-            reward_nft_id: event.target.value
+            reward_nft_id: event.target.value,
+            reward_nft_name: this.state.nfts[this.state.reward_token].find(v => v.nft_id === event.target.value).nft_name
         })
     }
 
@@ -582,7 +630,11 @@ class Rewards extends Component {
     handleShow = () => this.setState({show: true});
     handleCloseReward = () => this.setState({showReward: false})
     handleShowReward = (reward_name, reward_id) => this.setState({showReward: true, reward_name, reward_id})
-    handleShowEditReward = (reward_name, reward_id, reward_count, reward_description, reward_amount, reward_type, reward_token, reward_nft_id) => {
+    handleShowEditReward = (
+        reward_name, reward_id, reward_count, 
+        reward_description, reward_amount, reward_type, 
+        reward_token, reward_nft_id, reward_symbol,
+        reward_nft_name) => {
         let current_nfts = {}
         if (reward_type === types.nft) {
             current_nfts = {
@@ -600,6 +652,8 @@ class Rewards extends Component {
                 reward_type,
                 reward_token,
                 reward_nft_id,
+                reward_symbol,
+                reward_nft_name,
                 ...current_nfts
             }
         )
@@ -769,7 +823,7 @@ class Rewards extends Component {
                                         {v.count} times
                                     </td>
                                     <td className="table-secondary">
-                                        <button className="btn btn-dark" onClick={() => this.handleShowEditReward(v.name, v.id, v.count, v.description, v.amount, types.token, v.address)}>Edit</button>
+                                        <button className="btn btn-dark" onClick={() => this.handleShowEditReward(v.name, v.id, v.count, v.description, v.amount, types.token, v.address, undefined, v.symbol)}>Edit</button>
                                         <button className="btn btn-dark" disabled>Stat</button>
                                         <button className="btn btn-dark" onClick={() => this.handleShowReward(v.name, v.id)}>Reward</button>
                                         <button className="btn btn-danger" onClick={() => this.deleteReward(v.id)}>Delete</button>
@@ -795,7 +849,7 @@ class Rewards extends Component {
                                         {v.count} times
                                     </td>
                                     <td className="table-secondary">
-                                        <button className="btn btn-dark" onClick={() => this.handleShowEditReward(v.name, v.id, v.count, v.description, null, types.nft, v.address, v.nft_id)}>Edit</button>
+                                        <button className="btn btn-dark" onClick={() => this.handleShowEditReward(v.name, v.id, v.count, v.description, null, types.nft, v.address, v.nft_id, v.symbol, v.nft_name)}>Edit</button>
                                         <button className="btn btn-dark" disabled>Stat</button>
                                         <button className="btn btn-dark" onClick={() => this.handleShowReward(v.name, v.id)} >Reward</button>
                                         <button className="btn btn-danger" onClick={() => this.deleteNFTReward(v.id)}>Delete</button>
