@@ -284,7 +284,17 @@ class Users extends Component {
                 redirect: 'follow'
               };
             const res = await fetch(`${config.api}/users/update`, requestOptions)
-            alert(res.status)
+            if (res.status === 200) {
+                let users = this.state.users
+                users = users.map(v => {
+                    if (v.id === edit_user.id) {
+                        return edit_user
+                    }
+                    return v
+                })
+                this.setState({users, showEdit: false})
+                alert('Done')
+            } else alert('Something went wrong')
         } catch (error) {
             console.log(error)
         }
