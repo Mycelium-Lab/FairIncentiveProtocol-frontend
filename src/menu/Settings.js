@@ -7,10 +7,10 @@ class Settings extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            name: props.name,
-            email: props.email,
-            phone: props.phone,
-            wallet: props.wallet,
+            name: props.auth.name,
+            email: props.auth.email,
+            phone: props.auth.phone,
+            wallet: props.auth.wallet,
             password: ''
         }
     }
@@ -183,7 +183,7 @@ class Settings extends Component {
                                 Company name
                             </div>
                             <div className="input-group mb-3">
-                                <input onChange={this.onChangeName} type="text" className="form-control" placeholder={this.props.auth.name} aria-describedby="basic-addon1"/>
+                                <input onChange={this.onChangeName} type="text" className="form-control" placeholder={this.state.name} aria-describedby="basic-addon1"/>
                             </div>
                             <div>
                                 <button onClick={this.changeName} type="button" className="btn btn-dark">Change</button>
@@ -194,7 +194,7 @@ class Settings extends Component {
                                 Email
                             </div>
                             <div className="input-group mb-3">
-                                <input onChange={this.onChangeEmail} type="email" className="form-control" placeholder={this.props.auth.email} aria-label="Email" aria-describedby="basic-addon1"/>
+                                <input onChange={this.onChangeEmail} type="email" className="form-control" placeholder={this.state.email} aria-label="Email" aria-describedby="basic-addon1"/>
                             </div>
                             <div>
                                 <button onClick={this.changeEmail} type="button" className="btn btn-dark">Change</button>
@@ -205,7 +205,7 @@ class Settings extends Component {
                                 Phone
                             </div>
                             <div className="input-group mb-3">
-                                <input onChange={this.onChangePhone} type="text" className="form-control" placeholder={this.props.auth.phone} aria-describedby="basic-addon1"/>
+                                <input onChange={this.onChangePhone} type="text" className="form-control" placeholder={this.state.phone} aria-describedby="basic-addon1"/>
                             </div>
                             <div>
                                 <button onClick={this.changePhone} type="button" className="btn btn-dark">Change</button>
@@ -216,7 +216,7 @@ class Settings extends Component {
                                 Wallet
                             </div>
                             <div className="input-group mb-3">
-                                <input onChange={this.onChangeWallet} type="text" className="form-control" placeholder={this.props.auth.wallet} aria-describedby="basic-addon1"/>
+                                <input onChange={this.onChangeWallet} type="text" className="form-control" placeholder={this.state.wallet} aria-describedby="basic-addon1"/>
                             </div>
                             <div>
                                 <button onClick={this.changeWallet} type="button" className="btn btn-dark">Change</button>

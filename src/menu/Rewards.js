@@ -462,7 +462,7 @@ class Rewards extends Component {
                     name: reward_name,
                     description: reward_description,
                     amount: reward_amount,
-                    address: reward_token
+                    // address: reward_token
                 }
             } else {
                 rawJSON = {

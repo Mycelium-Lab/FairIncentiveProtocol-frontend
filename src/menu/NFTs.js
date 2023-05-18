@@ -39,6 +39,7 @@ class NFTs extends Component {
                     nfts.push(nft)
                 } 
             }
+            console.log(nfts)
             this.setState({
                 nfts
             })
@@ -47,7 +48,33 @@ class NFTs extends Component {
         }
     }
 
+    async deleteNFT(id) {
+        try {
+            const headers = new Headers();
+            headers.append("Content-Type", "application/json");
+            headers.append("Authorization", getBearerHeader())
+            const raw = JSON.stringify({
+                id
+            })
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                body: raw,
+                redirect: 'follow'
+            };
+            const res = await fetch(`${config.api}/nfts/delete/nft`, requestOptions)
+            if (res.status === 200) {
+                const nfts = this.state.nfts.filter(v => v.nft_id !== id)
+                this.setState({nfts})
+                alert('Done')
+            } else alert("Something went wrong")
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     getNFTs = this.getNFTs.bind(this)
+    deleteNFT = this.deleteNFT.bind(this)
 
     render() {
         return (
@@ -61,6 +88,7 @@ class NFTs extends Component {
                             <th className="table-secondary" scope="col">NFT description</th>
                             <th className="table-secondary" scope="col">Maximum amount</th>
                             <th className="table-secondary" scope="col">Image</th>
+                            <th className="table-secondary" scope="col">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -83,6 +111,15 @@ class NFTs extends Component {
                                             <td className="table-secondary">
                                                 <img width="300px" height="300px" src={v.real_image}/>
                                             </td>
+                                            {
+                                                parseInt(v.rewards_count) === 0
+                                                ?
+                                                <td className="table-secondary">
+                                                    <button className="btn btn-dark" onClick={() => this.deleteNFT(v.nft_id)}>Delete</button>
+                                                </td>
+                                                :
+                                                null
+                                            }
                                         </tr>
                                     )
                                 }) : null
