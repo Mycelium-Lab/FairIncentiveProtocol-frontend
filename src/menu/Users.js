@@ -7,6 +7,8 @@ import '../styles/users.css'
 
 let propertiesElementsLength = 0
 let statsElementsLength = 0
+let editPropertiesElementsLength = 0
+let editStatsElementsLength = 0
 
 const types = {
     token: 'token',
@@ -24,13 +26,16 @@ class Users extends Component {
             add_notes: null,
             showAdd: false,
             showToReward: false,
+            showEdit: false,
             chosen_user_external_id: null,
             chosen_user_id: null,
             users: [],
             propertiesElements: [],
             statsElements: [],
-            properties: [],
-            stats: [],
+            basic_edit_user: {},
+            edit_user: {},
+            editPropertiesElements: [],
+            editStatsElements: [],
             chosen_type: types.token,
             chosen_reward_token: null,
             chosen_reward_nft: null,
@@ -250,6 +255,41 @@ class Users extends Component {
         }
     }
 
+    async edit() {
+        try {
+            const { edit_user, editPropertiesElements, editStatsElements } = this.state
+            const properties = editPropertiesElements.filter(v => v.work).map(v => {
+                return {
+                    name: v.name, 
+                    value: v.value
+                }
+            })
+            const stats = editStatsElements.filter(v => v.work).map(v => {
+                return {
+                    name: v.name, 
+                    value: v.value
+                }
+            })
+            edit_user.properties = properties
+            edit_user.stats = stats
+            const headers = new Headers();
+            headers.append("Content-Type", "application/json");
+            headers.append("Authorization", getBearerHeader())
+
+            const raw = JSON.stringify(edit_user);
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                body: raw,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/users/update`, requestOptions)
+            alert(res.status)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     deletePropertyInput = (index) => {
         console.log(index)
         let propertiesElements = this.state.propertiesElements
@@ -356,6 +396,154 @@ class Users extends Component {
     handleCloseAdd = () => this.setState({showAdd: false})
     handleShowToReward = (external_id, id) => this.setState({chosen_user_id: id, chosen_user_external_id: external_id, showToReward: true})
     handleCloseToReward = () => this.setState({showToReward: false})
+    handleShowEdit = (user) => {
+        const propertiesElements = []
+        const statsElements = []
+        user.properties.forEach(v => {
+            const propertyId = editPropertiesElementsLength
+            propertiesElements.push(
+                {
+                    id: propertyId,
+                    element: 
+                    <div className="user-custom-params">
+                        <input type="text" id={`edit-property-name-${propertyId}`} onChange={(event) => this.changeEditPropertyName(propertyId, event.target.value)} value={v.name} className="form-control" placeholder="Property name"/>
+                        <input type="text" id={`edit-property-value-${propertyId}`} onChange={(event) => this.changeEditPropertyValue(propertyId, event.target.value)} value={v.value} className="form-control" placeholder="Property value"/>
+                        <button type="button" className="btn btn-dark" onClick={() => this.deleteEditPropertyInput(propertyId)}>-</button>
+                    </div>,
+                    name: v.name,
+                    value: v.value,
+                    work: true
+                }
+            )
+            editPropertiesElementsLength += 1
+        })
+        user.stats.forEach(v => {
+            const statId = editStatsElementsLength
+            statsElements.push(
+                {
+                    id: statId,
+                    element: 
+                    <div className="user-custom-params">
+                        <input type="text" id={`edit-stat-name-${statId}`} onChange={this.changeEditStatName} value={v.name} className="form-control" placeholder="Stat name"/>
+                        <input type="number" id={`edit-stat-value-${statId}`} onChange={this.changeEditStatValue} value={v.value} className="form-control" placeholder="Stat value"/>
+                        <button type="button" className="btn btn-dark" onClick={() => this.deleteEditStatInput(statId)}>-</button>
+                    </div>,
+                    name: v.name,
+                    value: v.value,
+                    work: true
+                }
+            )
+            editStatsElementsLength += 1
+        })
+        this.setState({
+            showEdit: true, 
+            edit_user: {...user}, 
+            basic_edit_user: {...user},
+            editPropertiesElements: propertiesElements,
+            editStatsElements: statsElements
+        })
+    }
+    handleCloseEdit = () => this.setState({showEdit: false, edit_user: {}, basic_edit_user: {}, editPropertiesElements: [], editStatsElements: []})
+    deleteEditPropertyInput = (index) => {
+        let propertiesElements = this.state.editPropertiesElements
+        propertiesElements.forEach(v => {if (v.id === index) v.work = false})
+        this.setState({
+            editPropertiesElements: propertiesElements
+        })
+    }
+
+    addEditPropertyInput = () => {
+        const propertiesElements = this.state.editPropertiesElements
+        const id = editPropertiesElementsLength
+        propertiesElements.push(
+            {
+                id,
+                element: 
+                <div className="user-custom-params">
+                    <input type="text" id={`edit-property-name-${id}`} onChange={(event) => this.changeEditPropertyName(id, event.target.value)} className="form-control" placeholder="Property name"/>
+                    <input type="text" id={`edit-property-value-${id}`} onChange={(event) => this.changeEditPropertyValue(id, event.target.value)} className="form-control" placeholder="Property value"/>
+                    <button type="button" className="btn btn-dark" onClick={() => this.deleteEditPropertyInput(id)}>-</button>
+                </div>,
+                name: undefined,
+                value: undefined,
+                work: true
+            }
+        )
+        editPropertiesElementsLength += 1
+        this.setState({editPropertiesElements: propertiesElements})
+    }
+
+    changeEditPropertyName(id, value) {
+        let propertiesElements = this.state.editPropertiesElements
+        propertiesElements.forEach(v => {
+            if (v.id === id) v.name = value
+        })
+        document.getElementById(`edit-property-name-${id}`).value = value
+        this.setState({
+            editPropertiesElements: propertiesElements
+        })
+    }
+
+    changeEditPropertyValue(id, value) {
+        let propertiesElements = this.state.editPropertiesElements
+        propertiesElements.forEach(v => {
+            if (v.id === id) v.value = value
+        }) 
+        this.setState({
+            editPropertiesElements: propertiesElements
+        })
+    }
+    deleteEditStatInput = (index) => {
+        let statsElements = this.state.editStatsElements
+        statsElements.forEach(v => { if (v.id === index) v.work = false});
+        this.setState({editStatsElements: statsElements})
+    }
+
+    addEditStatInput = () => {
+        const statsElements = this.state.editStatsElements
+        const id = editStatsElementsLength
+        statsElements.push(
+            {
+                id,
+                element: 
+                <div className="user-custom-params">
+                    <input type="text" id={`edit-stat-name-${id}`} onChange={this.changeEditStatName} className="form-control" placeholder="Stat name"/>
+                    <input type="number" id={`edit-stat-value-${id}`} onChange={this.changeEditStatValue} className="form-control" placeholder="Stat value"/>
+                    <button type="button" className="btn btn-dark" onClick={() => this.deleteEditStatInput(id)}>-</button>
+                </div>,
+                name: undefined,
+                value: undefined,
+                work: true
+            }
+        )
+        editStatsElementsLength += 1
+        this.setState({editStatsElementsLength: statsElements})
+    }
+
+    changeEditStatName(event) {
+        let statsElements = this.state.editStatsElements
+        const idFull = event.target.id.split('-')
+        const id = parseInt(idFull[idFull.length - 1])
+        statsElements.forEach(v => {
+            if (v.id === id) v.name = event.target.value
+        }) 
+        this.setState({
+            editStatsElements: statsElements
+        })
+    }
+
+    changeEditStatValue(event) {
+        let statsElements = this.state.editStatsElements
+        const idFull = event.target.id.split('-')
+        const id = parseInt(idFull[idFull.length - 1])
+        statsElements.forEach(v => {
+            if (v.id === id) v.value = event.target.value
+        }) 
+        this.setState({
+            editStatsElements: statsElements
+        })
+    }
+
     changeType(event) {
         this.setState({
             chosen_type: event.target.value
@@ -376,6 +564,34 @@ class Users extends Component {
             comment: event.target.value
         })
     }
+    changeEditExternalID(event) {
+        let edit_user = this.state.edit_user
+        edit_user.external_id = event.target.value
+        this.setState({
+            edit_user
+        })
+    }
+    changeEditWallet(event) {
+        let edit_user = this.state.edit_user
+        edit_user.wallet = event.target.value
+        this.setState({
+            edit_user
+        })
+    }
+    changeEditNotes(event) {
+        let edit_user = this.state.edit_user
+        edit_user.notes = event.target.value
+        this.setState({
+            edit_user
+        })
+    }
+    changeEditEmail(event) {
+        let edit_user = this.state.edit_user
+        edit_user.email = event.target.value
+        this.setState({
+            edit_user
+        })
+    }
     
     onChangeExternalID = this.onChangeExternalID.bind(this)
     onChangeNotes = this.onChangeNotes.bind(this)
@@ -388,6 +604,8 @@ class Users extends Component {
     handleCloseAdd = this.handleCloseAdd.bind(this)
     handleShowToReward = this.handleShowToReward.bind(this)
     handleCloseToReward = this.handleCloseToReward.bind(this)
+    handleShowEdit = this.handleShowEdit.bind(this)
+    handleCloseEdit = this.handleCloseEdit.bind(this)
     addPropertyInput = this.addPropertyInput.bind(this)
     deletePropertyInput = this.deletePropertyInput.bind(this)
     getTokenRewards = this.getTokenRewards.bind(this)
@@ -403,6 +621,19 @@ class Users extends Component {
     addStatInput = this.addStatInput.bind(this)
     changeStatName = this.changeStatName.bind(this)
     changeStatValue = this.changeStatValue.bind(this)
+    changeEditExternalID = this.changeEditExternalID.bind(this)
+    changeEditWallet = this.changeEditWallet.bind(this)
+    changeEditNotes = this.changeEditNotes.bind(this)
+    changeEditEmail = this.changeEditEmail.bind(this)
+    edit = this.edit.bind(this)
+    deleteEditPropertyInput = this.deleteEditPropertyInput.bind(this)
+    addEditPropertyInput = this.addEditPropertyInput.bind(this)
+    changeEditPropertyName = this.changeEditPropertyName.bind(this)
+    changeEditPropertyValue = this.changeEditPropertyValue.bind(this)
+    deleteEditStatInput = this.deleteEditStatInput.bind(this)
+    addEditStatInput = this.addEditStatInput.bind(this)
+    changeEditStatName = this.changeEditStatName.bind(this)
+    changeEditStatValue = this.changeEditStatValue.bind(this)
 
     render() {
         return (
@@ -512,7 +743,7 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                                         (soon)
                                     </td>
                                     <td className="table-secondary">
-                                        <button type="button" className="btn btn-dark" disabled>Edit</button>
+                                        <button type="button" className="btn btn-dark" onClick={() => this.handleShowEdit(v)}>Edit</button>
                                         <button type="button" className="btn btn-dark" disabled>Stat</button>
                                         <button type="button" className="btn btn-dark" onClick={() => this.handleShowToReward(v.external_id, v.id)}>To reward</button>
                                         <button onClick={async () => await this.deleteUser(v.id)} type="button" className="btn btn-danger">Delete</button>
@@ -571,6 +802,76 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                         Reward
                     </button>
                     <button className="btn btn-light" onClick={this.handleCloseToReward}>
+                        Cancel
+                    </button>
+                    </Modal.Footer>
+                </Modal>
+                <Modal show={this.state.showEdit} onHide={this.handleCloseEdit} centered>
+                    <Modal.Header closeButton>
+                        Edit {this.state.edit_user.external_id} (FAIR id: {createLongStrView(this.state.edit_user.id)})
+                    </Modal.Header>
+
+                    <Modal.Body>
+                        <div className="mb-3">
+                            <label className="form-label">Username or external ID:</label>
+                            <div className="input-group">
+                                <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                            </div>
+                            <div className="form-text" id="basic-addon4">Specify the user ID for API calls or it will be generated automatically</div>
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Wallet:</label>
+                            <div className="input-group">
+                                <input placeholder="0x0000000000000000000000000000000000000000" type="text" value={this.state.edit_user.wallet} onChange={this.changeEditWallet} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                            </div>
+                            <div className="form-text" id="basic-addon4">Specify ethereum wallet to receive rewards</div>
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Notes:</label>
+                            <div className="input-group">
+                                <textarea value={this.state.edit_user.notes} onChange={this.changeEditNotes} placeholder="User notes available to system administrators and 
+moderators" type="text" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
+                            </div>
+                            <div className="form-text" id="basic-addon4">The user does not see this text. <a href="https://www.markdownguide.org/cheat-sheet/" target="blank">Markdown</a> syntax is supported.</div>
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Properties: 
+                            <button type="button" className="btn btn-dark" onClick={this.addEditPropertyInput}>+</button>
+                            </label>
+                            <div id="user-properties">
+                                {
+                                    this.state.editPropertiesElements ?
+                                    this.state.editPropertiesElements.map(v => v.work ? v.element : null) :
+                                    null
+                                }
+                            </div>
+                            <div className="form-text" id="basic-addon4">Textual parameters of user</div>
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Stats: 
+                            <button type="button" className="btn btn-dark" onClick={this.addEditStatInput}>+</button>
+                            </label>
+                            <div id="user-stats">
+                                {
+                                    this.state.editStatsElements ?
+                                    this.state.editStatsElements.map(v => v.work ? v.element : null) :
+                                    null
+                                }
+                            </div>
+                            <div className="form-text" id="basic-addon4">Numerical parameters of user</div>
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Email:</label>
+                            <div className="input-group">
+                                <input onChange={this.changeEditEmail} value={this.state.edit_user.email}  placeholder="example@gmail.com" type="email" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                            </div>
+                        </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                    <button className="btn btn-dark" onClick={this.edit}>
+                        Edit
+                    </button>
+                    <button className="btn btn-light" onClick={this.handleCloseEdit}>
                         Cancel
                     </button>
                     </Modal.Footer>
