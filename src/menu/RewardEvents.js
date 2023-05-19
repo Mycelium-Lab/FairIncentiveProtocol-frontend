@@ -217,7 +217,7 @@ class RewardEvents extends Component {
                                     {v.event_comment}
                                 </td>
                                 <td className="table-secondary">
-                                    <a className="claim-link" href={`/claimnft?id=${v.event_id}&user_id=${v.user_id}`} target="_blank">Claim Link</a>
+                                    <a className="claim-link" href={`${config.api}/claim/nft?id=${v.event_id}&user_id=${v.user_id}`} target="_blank">Claim Link</a>
                                     {
                                         v.status === 'Accrued'
                                         ?

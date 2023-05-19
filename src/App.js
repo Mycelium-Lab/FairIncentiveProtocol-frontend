@@ -2,22 +2,65 @@ import logo from './logo.svg';
 import './App.css';
 import './styles/auth.css'
 import { Component } from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import MainPage from './MainPage';
-import NFTClaimPage from './NFTClaimPage';
+import SignUp from './auth/signup'; 
+import SignIn from './auth/signin';
+import { getCookie } from './utils/cookie';
+import { config } from './utils/config';
+import { checkAuth } from './utils/checkAuth';
+import MainScreen from './MainScreen';
+
+const switcher = {
+  signup: 'signup',
+  signin: 'signin',
+  signed: 'signed'
+}
 
 class App extends Component {
 
+  constructor(){
+    super()
+    this.state = {
+      switcher: switcher.signin,
+      auth: null
+    }
+  }
+
+  async componentDidMount() {
+    const checker = await checkAuth()
+    if (checker) this.setState({switcher: switcher.signed, auth: checker})
+  }
+
+  switch(event) {
+      this.setState({
+          switcher: this.state.switcher === switcher.signup ? switcher.signin : switcher.signup
+      })
+      event.target.textContent = this.state.switcher.toUpperCase()
+  }
+
+  switch = this.switch.bind(this)
+
+      getWindow() {
+      if (this.state.switcher === switcher.signin) return <SignIn/>
+      if (this.state.switcher === switcher.signup) return <SignUp/>
+      return <MainScreen auth={this.state.auth}/>
+  }
+
   render() {
     return (
-      <BrowserRouter>
-        <Routes>
-            <Route path='/' element={<MainPage/>}>
-            </Route>
-            <Route path='/claimnft' element={<NFTClaimPage/>}>
-            </Route>
-        </Routes>
-      </BrowserRouter>
+      <div className="App">
+            {
+                this.getWindow()
+            }
+            {
+                this.state.switcher !== switcher.signed
+                ?
+                <div className='switch-button'>
+                <button onClick={this.switch} className='btn btn-secondary' value={switcher.signup}>{switcher.signup.toUpperCase()}</button>
+                </div>
+                :
+                null
+            }
+      </div>
     );
   }
 }

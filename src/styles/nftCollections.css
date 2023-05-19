@@ -1,0 +1,17 @@
+.input-image {
+    display: block;
+    flex: 1;
+    height: 80px;
+    border: 2px solid #6C757D;
+}
+
+.input-image-button {
+    position: absolute;
+    margin: auto;
+    top: 35%;
+    right: 0;
+    bottom: 0%;
+    left: 0;
+    text-align: center;
+    border-radius: 3px;
+}

@@ -47,7 +47,7 @@ class MainScreen extends Component {
         if (this.state.switcher === switcher.reward_events) return <RewardEvents/>
         if (this.state.switcher === switcher.tokens) return <Tokens/>
         if (this.state.switcher === switcher.users) return <Users/>
-        if (this.state.switcher === switcher.nftcollection) return <NFTCollections/>
+        if (this.state.switcher === switcher.nftcollection) return <NFTCollections auth={this.state.auth}/>
         if (this.state.switcher === switcher.nft) return <NFTs/>
         if (this.state.switcher === switcher.settings) return <Settings auth={this.state.auth}/>
     }

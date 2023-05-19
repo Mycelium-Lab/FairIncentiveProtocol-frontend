@@ -539,7 +539,7 @@ class Rewards extends Component {
         this.setState({
             chosen_nft_collection: event.target.value,
             current_nfts: this.state.nfts[event.target.value],
-            chosen_nft: this.state.nfts[event.target.value][0] ? this.state.nfts[event.target.value][0].nft_id : null 
+            chosen_nft: this.state.nfts[event.target.value] ? this.state.nfts[event.target.value][0].nft_id : null 
         })
     }
 
@@ -602,8 +602,8 @@ class Rewards extends Component {
         if (this.state.reward_type === types.nft) {
             current_nfts = {
                 current_nfts: this.state.nfts[event.target.value],
-                reward_nft_id: this.state.nfts[event.target.value][0].nft_id,
-                reward_nft_name: this.state.nfts[event.target.value][0].nft_name
+                reward_nft_id: this.state.nfts[event.target.value] ? this.state.nfts[event.target.value][0].nft_id : null,
+                reward_nft_name: this.state.nfts[event.target.value] ? this.state.nfts[event.target.value][0].nft_name : null
             }
         } 
         this.setState({

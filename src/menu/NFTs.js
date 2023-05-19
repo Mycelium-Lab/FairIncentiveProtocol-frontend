@@ -39,7 +39,6 @@ class NFTs extends Component {
                     nfts.push(nft)
                 } 
             }
-            console.log(nfts)
             this.setState({
                 nfts
             })
