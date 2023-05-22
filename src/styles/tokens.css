@@ -1,0 +1,9 @@
+.checks-contracts-types {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+/* .checks-contracts-types .form-check {
+    margin-right: 50px;
+} */

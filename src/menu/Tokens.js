@@ -5,6 +5,8 @@ import ERC20Mintable from "../contracts/erc20/ERC20Mintable.json";
 import { getBearerHeader } from "../utils/getBearerHeader";
 import { config } from "../utils/config";
 import Modal from 'react-bootstrap/Modal';
+import { networks } from "../utils/networks";
+import '../styles/tokens.css'
 
 class Tokens extends Component {
 
@@ -18,7 +20,9 @@ class Tokens extends Component {
             signer: null,
             address: null,
             showCreate: false,
-            tokens: []
+            tokens: [],
+            network: networks[config.status === "test" ? '5' : '1'],
+
         }
     }
 
@@ -155,16 +159,96 @@ class Tokens extends Component {
                     </Modal.Header>
                     <Modal.Body>
                         <button onClick={this.connect} type="button" className="btn btn-dark">{this.state.address ? createLongStrView(this.state.address) : 'Connect'}</button>
+                        <h4>Specify the parameters of the new token</h4>
                         <div className="mb-3">
-                            <label className="form-label">Name</label>
+                            <label className="form-label">Token name *</label>
                             <div className="input-group">
                                 <input type="text" placeholder="e.g. Bitcoin" onChange={this.onChangeName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
+                            <div className="form-text" id="basic-addon4">Choose a name for your token</div>
                         </div>
                         <div className="mb-3">
-                            <label className="form-label">Symbol</label>
+                            <label className="form-label">Symbol *</label>
                             <div className="input-group">
                                 <input type="text" placeholder="e.g. BTC" onChange={this.onChangeSymbol} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                            </div>
+                            <div className="form-text" id="basic-addon4">Choose a symbol for your token</div>
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Supply type *</label>
+                            <div className="input-group">
+                                <select className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                    <option>Capped</option>
+                                    <option>Fixed</option>
+                                    <option>Unlimited</option>
+                                </select>
+                            </div>
+                            <div className="form-text" id="basic-addon4">Choose what emission limit your token will have</div>
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Initial supply</label>
+                            <div className="input-group">
+                                <input type="text" placeholder="e.g. BTC" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                            </div>
+                            <div className="form-text" id="basic-addon4">The number of coins minted during the creation of the contract</div>
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Maximum supply *</label>
+                            <input type="text" placeholder="1 000 000" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                            <div className="form-text" id="basic-addon4">The maximum number of coins ever minted</div>
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Blockchain</label>
+                            <div className="input-group">
+                                <select onChange={this.changeNetwork} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                    <option value={config.status === "test" ? '5' : '1'} selected={this.state.network.chainid === (config.status === "test" ? '5' : '1')}>{networks[config.status === "test" ? '5' : '1'].name}</option>
+                                    <option value={config.status === "test" ? '97' : '56'} selected={this.state.network.chainid === (config.status === "test" ? '97' : '56')}>{networks[config.status === "test" ? '97' : '56'].name}</option>
+                                    <option value={config.status === "test" ? '80001' : '137'} selected={this.state.network.chainid === (config.status === "test" ? '80001' : '137')}>{networks[config.status === "test" ? '80001' : '137'].name}</option>
+                                    <option value={config.status === "test" ? '420' : '10'} selected={this.state.network.chainid === (config.status === "test" ? '420' : '10')} disabled={config.status === "test" ? true : false} >{networks[config.status === "test" ? '420' : '10'].name}</option>
+                                    <option value={config.status === "test" ? '43113' : '43114'} selected={this.state.network.chainid === (config.status === "test" ? '43113' : '43114')}>{networks[config.status === "test" ? '43113' : '43114'].name}</option>
+                                    <option value={config.status === "test" ? '421613' : '42161'} selected={this.state.network.chainid === (config.status === "test" ? '421613' : '42161')}>{networks[config.status === "test" ? '421613' : '42161'].name}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Upload a picture of the token</label>
+                            <div className="input-group">
+                                <div className="input-image">
+                                    <div className="input-image-button">(soon)</div>
+                                </div>
+                            </div>
+                        </div>
+                        <h4>Advanced settings</h4>
+                        <div className="checks-contracts-types">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
+                                <label class="form-check-label" for="flexCheckDefault">
+                                    Pausable
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
+                                <label class="form-check-label" for="flexCheckDefault">
+                                    Burnable
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked"/>
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Blacklist
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked"/>
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Verified on Etherscan
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked"/>
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Revoverable
+                                </label>
                             </div>
                         </div>
                     </Modal.Body>
