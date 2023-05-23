@@ -1,7 +1,7 @@
 import { Component } from "react";
 import Modal from 'react-bootstrap/Modal';
 import '../styles/rewards.css'
-import { ethers } from "ethers";
+import { ethers, utils } from "ethers";
 import { createLongStrView } from "../utils/longStrView";
 import { getBearerHeader } from "../utils/getBearerHeader";
 import { config } from "../utils/config";
@@ -242,7 +242,7 @@ class Rewards extends Component {
                     name, 
                     description,
                     address: chosen_token,
-                    amount
+                    amount: utils.parseEther(amount).toString()
                 }
             );
             const requestOptions = {

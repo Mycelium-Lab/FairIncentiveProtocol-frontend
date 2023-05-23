@@ -4,6 +4,6 @@
     gap: 10px;
 }
 
-/* .checks-contracts-types .form-check {
-    margin-right: 50px;
-} */
+.mint-token-info-list li {
+    margin-bottom: 4px;
+}

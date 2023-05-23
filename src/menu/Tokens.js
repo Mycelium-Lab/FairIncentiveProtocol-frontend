@@ -9,6 +9,8 @@ import Modal from 'react-bootstrap/Modal';
 import { networks } from "../utils/networks";
 import '../styles/tokens.css'
 
+//TODO: Как-то добавлять провайдера и signer сразу
+
 const emissionTypes = [
     {
         name: 'Capped',
@@ -36,6 +38,12 @@ class Tokens extends Component {
             signer: null,
             address: null,
             showCreate: false,
+            showMint: false,
+            showPause: false,
+            isCurrentTokenPaused: null,
+            currentTokenSymbol: null,
+            currentTokenAddress: null,
+            mintTokenAmount: null,
             tokens: [],
             network: networks[config.status === "test" ? '5' : '1'],
             emissionType: emissionTypes[0].value,
@@ -110,6 +118,12 @@ class Tokens extends Component {
     onChangeRecoverable(value) {
         this.setState({
             recoverable: value
+        })
+    }
+
+    onChangeMintTokenAmount(event) {
+        this.setState({
+            mintTokenAmount: event.target.value
         })
     }
 
@@ -211,8 +225,8 @@ class Tokens extends Component {
                 name,
                 symbol,
                 emissionType,
-                maxSupply ? maxSupply : 0,
-                initialSupply ? initialSupply : 0,
+                maxSupply ? ethers.utils.parseEther(maxSupply).toString() : 0,
+                initialSupply ? ethers.utils.parseEther(initialSupply).toString() : 0,
                 pausable,
                 burnable,
                 blacklist,
@@ -229,8 +243,8 @@ class Tokens extends Component {
                 "symbol": symbol,
                 "chainid": chainid.toString(),
                 "supply_type": emissionType,
-                "max_supply": maxSupply,
-                "initial_supply": initialSupply,
+                "max_supply": maxSupply ? ethers.utils.parseEther(maxSupply).toString() : null,
+                "initial_supply": initialSupply ? ethers.utils.parseEther(initialSupply).toString() : null,
                 "pausable": pausable,
                 "burnable": burnable,
                 "blacklist": blacklist,
@@ -265,6 +279,53 @@ class Tokens extends Component {
         }
     }
 
+    async mint() {
+        try {
+            const {
+                currentTokenAddress,
+                mintTokenAmount
+            } = this.state
+            //TODO: учитывать сеть
+            const provider = new ethers.providers.Web3Provider(window.ethereum)
+            await provider.send("eth_requestAccounts", [])
+            const signer = await provider.getSigner()
+            const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
+            const token = Token.attach(currentTokenAddress)
+            const tx = await token.mint(ethers.utils.parseEther(mintTokenAmount))
+            tx.wait()
+                .then(() => alert('Done'))
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async pause() {
+        try {
+            const {
+                currentTokenAddress,
+                isCurrentTokenPaused
+            } = this.state
+            const provider = new ethers.providers.Web3Provider(window.ethereum)
+            await provider.send("eth_requestAccounts", [])
+            const signer = await provider.getSigner()
+            const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
+            const token = Token.attach(currentTokenAddress)
+            let tx;
+            if (!isCurrentTokenPaused) {
+                tx = await token.pause()
+            } else {
+                tx = await token.unpause()
+            }
+            tx.wait()
+                .then(() => {
+                    alert('Done')
+                    this.setState({isCurrentTokenPaused: isCurrentTokenPaused ? false : true})
+                })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     async getTokens() {
         try {
             const headers = new Headers();
@@ -279,7 +340,9 @@ class Tokens extends Component {
             const json = await res.json()
             const tokens = json.tokens
             tokens.forEach(async (v) => {
-                v.tokenSupply = await this.getTokenSupply(v.address)
+                const data = await this.getToken(v.address)
+                v.tokenSupply = data.tokenSupply
+                v.paused = data.paused
             })
             this.setState({
                 tokens: json.tokens
@@ -289,18 +352,39 @@ class Tokens extends Component {
         }
     }
 
-    async getTokenSupply(address) {
+    async getToken(address) {
         try {
-            const tokenContract = new ethers.Contract(address, ERC20Mintable.abi, this.state.signer)
-            const tokenSupply = await tokenContract.tokenSupply()
-            return tokenSupply.toString()
+            const provider = new ethers.providers.Web3Provider(window.ethereum)
+            await provider.send("eth_requestAccounts", [])
+            const signer = await provider.getSigner()
+            const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
+            const tokenContract = Token.attach(address)
+            const tokenSupply = 0
+            const paused = await tokenContract.paused()
+            return {
+                tokenSupply: tokenSupply.toString(),
+                paused
+            } 
         } catch (error) {
+            console.log(error)
             return '0'
         }
     }
 
     handleCloseCreate = () => this.setState({showCreate: false})
     handleShowCreate = () => this.setState({showCreate: true})
+    handleShowMint = (currentTokenSymbol, currentTokenAddress) => this.setState({showMint: true, currentTokenSymbol, currentTokenAddress})
+    handleCloseMint = () => this.setState({showMint: false})
+    handleShowPause = async (currentTokenSymbol, currentTokenAddress) => {
+        const provider = new ethers.providers.Web3Provider(window.ethereum)
+        await provider.send("eth_requestAccounts", [])
+        const signer = await provider.getSigner()
+        const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
+        const token = Token.attach(currentTokenAddress)
+        const paused = await token.paused()
+        this.setState({showPause: true, currentTokenSymbol, currentTokenAddress, isCurrentTokenPaused: paused})
+    }
+    handleClosePause = () => this.setState({showPause: false})
 
     onChangeName = this.onChangeName.bind(this)
     onChangeSymbol = this.onChangeSymbol.bind(this)
@@ -308,9 +392,13 @@ class Tokens extends Component {
     connect = this.connect.bind(this)
     createToken = this.createToken.bind(this)
     getTokens = this.getTokens.bind(this)
-    getTokenSupply = this.getTokenSupply.bind(this)
+    getToken = this.getToken.bind(this)
     handleShowCreate = this.handleShowCreate.bind(this)
     handleCloseCreate = this.handleCloseCreate.bind(this)
+    handleShowMint = this.handleShowMint.bind(this)
+    handleCloseMint = this.handleCloseMint.bind(this)
+    handleShowPause = this.handleShowPause.bind(this)
+    handleClosePause = this.handleClosePause.bind(this)
     onChangeInitialSupply = this.onChangeInitialSupply.bind(this)
     onChangeMaxSupply = this.onChangeMaxSupply.bind(this)
     onChangePausable = this.onChangePausable.bind(this)
@@ -319,6 +407,9 @@ class Tokens extends Component {
     onChangeVerified = this.onChangeVerified.bind(this)
     onChangeRecoverable = this.onChangeRecoverable.bind(this)
     changeNetwork = this.changeNetwork.bind(this)
+    onChangeMintTokenAmount = this.onChangeMintTokenAmount.bind(this)
+    mint = this.mint.bind(this)
+    pause = this.pause.bind(this)
 
     render() {
         return (
@@ -366,7 +457,7 @@ class Tokens extends Component {
                         <div className="mb-3">
                             <label className="form-label">Initial supply {this.state.emissionType === "1" ? "*" : null}</label>
                             <div className="input-group">
-                                <input onChange={this.onChangeInitialSupply} type="text" placeholder="1 000 000" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                <input onChange={this.onChangeInitialSupply} type="number" placeholder="1 000 000" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
                             <div className="form-text" id="basic-addon4">The number of coins minted during the creation of the contract</div>
                         </div>
@@ -458,8 +549,8 @@ class Tokens extends Component {
                         </thead>
                         <tbody>
                             {
-                                this.state.tokens.map(v =>
-                                    <tr className="table-secondary">
+                                this.state.tokens.map(v =>{
+                                    return <tr className="table-secondary">
                                         <td className="table-secondary">
                                             <div>
                                                 {v.symbol}
@@ -478,18 +569,59 @@ class Tokens extends Component {
                                             (soon)
                                         </td>
                                         <td className="table-secondary">
-                                            <button className="btn btn-dark" disabled>Mint</button>
+                                            <button className="btn btn-dark" onClick={() => this.handleShowMint(v.symbol, v.address)} disabled={v.supply_type === 1 ? true : false}>Mint</button>
                                             <button className="btn btn-dark" disabled>Roles control</button>
-                                            <button className="btn btn-dark" disabled>Pause</button>
-                                            <button className="btn btn-dark" disabled>Blacklist</button>
+                                            <button className="btn btn-dark" onClick={() => this.handleShowPause(v.symbol, v.address)} disabled={!v.pausable}>{v.paused ? "Unpause" : "Pause"}</button>
+                                            <button className="btn btn-dark" disabled={!v.blacklist}>Blacklist</button>
                                             <button className="btn btn-dark" disabled>Token info</button>
                                         </td>
                                     </tr>
-                                )
+                                })
                             }
                         </tbody>
                     </table>
                 </div>
+                <Modal show={this.state.showMint} onHide={this.handleCloseMint} centered>
+                    <Modal.Header closeButton>
+                            Mint new {this.state.currentTokenSymbol} tokens
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div>
+                            <ol className="mint-token-info-list">
+                                <li>
+                                    Contract balance: (soon) {this.state.currentTokenSymbol} 
+                                </li>
+                                <li>
+                                    Total supply: (soon) {this.state.currentTokenSymbol} 
+                                </li>
+                                <li>
+                                    Max supply: (soon) {this.state.currentTokenSymbol} 
+                                </li>
+                                <li>
+                                    Available to mint: (soon) {this.state.currentTokenSymbol} 
+                                </li>
+                            </ol>
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Amount to mint *</label>
+                            <div className="input-group">
+                                <input type="number" onChange={this.onChangeMintTokenAmount} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                            </div>
+                            <div className="form-text" id="basic-addon4">Enter the number of the ABC tokens you want to create</div>
+                        </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <button onClick={this.mint} type="button" className="btn btn-dark">Mint</button>
+                    </Modal.Footer>
+                </Modal>
+                <Modal show={this.state.showPause} onHide={this.handleClosePause} centered>
+                    <Modal.Header closeButton>
+                        {this.state.isCurrentTokenPaused ? "Unpause" : "Pause"} {this.state.currentTokenSymbol} token
+                    </Modal.Header>
+                    <Modal.Footer>
+                        <button type="button" className="btn btn-dark" onClick={this.pause}>{this.state.isCurrentTokenPaused ? "Unpause" : "Pause"}</button>
+                    </Modal.Footer>
+                </Modal>
             </div>
         )
     }
