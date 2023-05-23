@@ -2,11 +2,27 @@ import { Component } from "react";
 import { ethers, ContractFactory } from "ethers";
 import { createLongStrView } from "../utils/longStrView";
 import ERC20Mintable from "../contracts/erc20/ERC20Mintable.json";
+import ERC20Universal from "../contracts/erc20/ERC20Universal.json"
 import { getBearerHeader } from "../utils/getBearerHeader";
 import { config } from "../utils/config";
 import Modal from 'react-bootstrap/Modal';
 import { networks } from "../utils/networks";
 import '../styles/tokens.css'
+
+const emissionTypes = [
+    {
+        name: 'Capped',
+        value: "0"
+    },
+    {
+        name: 'Fixed',
+        value: "1"
+    },
+    {
+        name: 'Unlimited',
+        value: "2"
+    },
+]
 
 class Tokens extends Component {
 
@@ -22,7 +38,14 @@ class Tokens extends Component {
             showCreate: false,
             tokens: [],
             network: networks[config.status === "test" ? '5' : '1'],
-
+            emissionType: emissionTypes[0].value,
+            initialSupply: null,
+            maxSupply: null,
+            pausable: false,
+            burnable: false,
+            blacklist: false,
+            verified: false,
+            recoverable: false
         }
     }
 
@@ -42,13 +65,87 @@ class Tokens extends Component {
         })
     }
 
+    onChangeEmissionType(event) {
+        this.setState({
+            emissionType: event.target.value
+        })
+    }
+
+    onChangeInitialSupply(event) {
+        this.setState({
+            initialSupply: event.target.value
+        })
+    }
+
+    onChangeMaxSupply(event) {
+        this.setState({
+            maxSupply: event.target.value
+        })
+    }
+
+    onChangePausable(value) {
+        this.setState({
+            pausable: value
+        })
+    }
+
+    onChangeBurnable(value) {
+        this.setState({
+            burnable: value
+        })
+    }
+
+    onChangeBlacklist(value) {
+        this.setState({
+            blacklist: value
+        })
+    }
+
+    onChangeVerified(value) {
+        this.setState({
+            verified: value
+        })
+    }
+
+    onChangeRecoverable(value) {
+        this.setState({
+            recoverable: value
+        })
+    }
+
     async connect() {
         try {
+            const { network } = this.state
             const provider = new ethers.providers.Web3Provider(window.ethereum)
             await provider.send("eth_requestAccounts", [])
             const signer = await provider.getSigner()
             const address = await signer.getAddress()
             const chainid = (await provider.getNetwork()).chainId
+            if (chainid.toString() !== network.chainid) {
+                try {
+                    await window.ethereum.request({
+                      method: 'wallet_switchEthereumChain',
+                      params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
+                    })
+                    // .then(() => window.location.reload())
+                  } catch (err) {
+                    console.log(err)
+                    if (err.code === 4902) {
+                      await window.ethereum.request({
+                        method: 'wallet_addEthereumChain',
+                        params: [
+                          {
+                            chainName: network.name,
+                            chainId: ethers.utils.hexlify(parseInt(network.chainid)),
+                            nativeCurrency: { name: network.currency, decimals: 18, symbol: network.currency},
+                            rpcUrls: [network.rpc]
+                          }
+                        ]
+                      })
+                    //   .then(() => window.location.reload())
+                    }
+                  }
+            }
             this.setState({
                 provider,
                 signer,
@@ -56,23 +153,91 @@ class Tokens extends Component {
                 chainid
             })
         } catch (error) {
-            alert(error)
+            console.log(error)
         }
+    }
+
+    async changeNetwork(event) {
+        const network = networks[event.target.value]
+        if (this.state.address) {
+            try {
+                await window.ethereum.request({
+                  method: 'wallet_switchEthereumChain',
+                  params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
+                })
+                // .then(() => window.location.reload())
+              } catch (err) {
+                console.log(err)
+                if (err.code === 4902) {
+                  await window.ethereum.request({
+                    method: 'wallet_addEthereumChain',
+                    params: [
+                      {
+                        chainName: network.name,
+                        chainId: ethers.utils.hexValue(parseInt(network.chainid)),
+                        nativeCurrency: { name: network.currency_symbol, decimals: 18, symbol: network.currency_symbol},
+                        rpcUrls: [network.rpc]
+                      }
+                    ]
+                  })
+                //   .then(() => window.location.reload())
+                }
+              }
+        }
+        this.setState({
+            network
+        })
     }
 
     async createToken() {
         try {
-            const Token = new ContractFactory(ERC20Mintable.abi, ERC20Mintable.bytecode, this.state.signer)
-            const contract = await Token.deploy(this.state.name, this.state.symbol);
+            const {
+                name,
+                symbol,
+                emissionType,
+                initialSupply,
+                maxSupply,
+                burnable,
+                blacklist,
+                recoverable,
+                verified,
+                chainid,
+                pausable,
+                signer,
+                network
+            } = this.state
+            const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
+            const contract = await Token.deploy(
+                name,
+                symbol,
+                emissionType,
+                maxSupply ? maxSupply : 0,
+                initialSupply ? initialSupply : 0,
+                pausable,
+                burnable,
+                blacklist,
+                recoverable,
+                network.fpmanager
+            );
             const contractAdddress = contract.address
             const headers = new Headers();
             headers.append("Content-Type", "application/json");
             headers.append("Authorization", getBearerHeader())
             const raw = JSON.stringify({
                 "address": contractAdddress,
-                "name": this.state.name,
-                "symbol": this.state.symbol,
-                "chainid": this.state.chainid.toString()
+                "name": name,
+                "symbol": symbol,
+                "chainid": chainid.toString(),
+                "supply_type": emissionType,
+                "max_supply": maxSupply,
+                "initial_supply": initialSupply,
+                "pausable": pausable,
+                "burnable": burnable,
+                "blacklist": blacklist,
+                "recoverable": recoverable,
+                "verified": verified,
+                "fpmanager": network.fpmanager
+                // "image"
             });
             const requestOptions = {
                 method: 'POST',
@@ -139,12 +304,21 @@ class Tokens extends Component {
 
     onChangeName = this.onChangeName.bind(this)
     onChangeSymbol = this.onChangeSymbol.bind(this)
+    onChangeEmissionType = this.onChangeEmissionType.bind(this)
     connect = this.connect.bind(this)
     createToken = this.createToken.bind(this)
     getTokens = this.getTokens.bind(this)
     getTokenSupply = this.getTokenSupply.bind(this)
     handleShowCreate = this.handleShowCreate.bind(this)
     handleCloseCreate = this.handleCloseCreate.bind(this)
+    onChangeInitialSupply = this.onChangeInitialSupply.bind(this)
+    onChangeMaxSupply = this.onChangeMaxSupply.bind(this)
+    onChangePausable = this.onChangePausable.bind(this)
+    onChangeBurnable = this.onChangeBurnable.bind(this)
+    onChangeBlacklist = this.onChangeBlacklist.bind(this)
+    onChangeVerified = this.onChangeVerified.bind(this)
+    onChangeRecoverable = this.onChangeRecoverable.bind(this)
+    changeNetwork = this.changeNetwork.bind(this)
 
     render() {
         return (
@@ -177,26 +351,36 @@ class Tokens extends Component {
                         <div className="mb-3">
                             <label className="form-label">Supply type *</label>
                             <div className="input-group">
-                                <select className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                    <option>Capped</option>
-                                    <option>Fixed</option>
-                                    <option>Unlimited</option>
+                                <select onChange={this.onChangeEmissionType} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                    {
+                                        emissionTypes.map(v => {
+                                            return <option value={v.value} selected={this.state.emissionType === v.value}>
+                                                {v.name}
+                                            </option>
+                                        })
+                                    }
                                 </select>
                             </div>
                             <div className="form-text" id="basic-addon4">Choose what emission limit your token will have</div>
                         </div>
                         <div className="mb-3">
-                            <label className="form-label">Initial supply</label>
+                            <label className="form-label">Initial supply {this.state.emissionType === "1" ? "*" : null}</label>
                             <div className="input-group">
-                                <input type="text" placeholder="e.g. BTC" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                <input onChange={this.onChangeInitialSupply} type="text" placeholder="1 000 000" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
                             <div className="form-text" id="basic-addon4">The number of coins minted during the creation of the contract</div>
                         </div>
-                        <div className="mb-3">
-                            <label className="form-label">Maximum supply *</label>
-                            <input type="text" placeholder="1 000 000" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                            <div className="form-text" id="basic-addon4">The maximum number of coins ever minted</div>
-                        </div>
+                        {
+                            this.state.emissionType === "0" 
+                            ?
+                            <div className="mb-3">
+                                <label className="form-label">Maximum supply *</label>
+                                <input onChange={this.onChangeMaxSupply} type="text" placeholder="1 000 000" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                <div className="form-text" id="basic-addon4">The maximum number of coins ever minted</div>
+                            </div>
+                            :
+                            null
+                        }
                         <div className="mb-3">
                             <label className="form-label">Blockchain</label>
                             <div className="input-group">
@@ -221,33 +405,33 @@ class Tokens extends Component {
                         <h4>Advanced settings</h4>
                         <div className="checks-contracts-types">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
+                                <input onChange={() => this.onChangePausable(this.state.pausable ? false : true)} checked={this.state.pausable} class="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
                                 <label class="form-check-label" for="flexCheckDefault">
                                     Pausable
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
+                                <input onChange={() => this.onChangeBurnable(this.state.burnable ? false : true)} checked={this.state.burnable} class="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
                                 <label class="form-check-label" for="flexCheckDefault">
                                     Burnable
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked"/>
+                                <input onChange={() => this.onChangeBlacklist(this.state.blacklist ? false : true)} checked={this.state.blacklist} class="form-check-input" type="checkbox" value="" id="flexCheckChecked"/>
                                 <label class="form-check-label" for="flexCheckChecked">
                                     Blacklist
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked"/>
+                                <input onChange={() => this.onChangeVerified(this.state.verified ? false : true)} checked={this.state.verified} class="form-check-input" type="checkbox" value="" id="flexCheckChecked"/>
                                 <label class="form-check-label" for="flexCheckChecked">
                                     Verified on Etherscan
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked"/>
+                                <input onChange={() => this.onChangeRecoverable(this.state.recoverable ? false : true)} checked={this.state.recoverable} class="form-check-input" type="checkbox" value="" id="flexCheckChecked"/>
                                 <label class="form-check-label" for="flexCheckChecked">
-                                    Revoverable
+                                    Recoverable
                                 </label>
                             </div>
                         </div>
