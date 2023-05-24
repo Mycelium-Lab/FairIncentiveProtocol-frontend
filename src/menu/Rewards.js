@@ -464,8 +464,7 @@ class Rewards extends Component {
                     id: reward_id,
                     name: reward_name,
                     description: reward_description,
-                    amount: reward_amount,
-                    // address: reward_token
+                    amount: reward_amount.toString()
                 }
             } else {
                 rawJSON = {
@@ -473,7 +472,6 @@ class Rewards extends Component {
                     name: reward_name,
                     description: reward_description,
                     nft_id: reward_nft_id
-                    // address: reward_token
                 }
             }
             const raw = JSON.stringify(rawJSON);
@@ -484,7 +482,6 @@ class Rewards extends Component {
                 redirect: 'follow'
               };
             const res = await fetch(`${config.api}/rewards/update/${reward_type === types.token ? 'token' : 'nft'}`, requestOptions)
-            const json = await res.json()
             if(res.status === 200) {
                 if (reward_type === types.token) {
                     let tokenRewards = this.state.tokenRewards
@@ -513,14 +510,6 @@ class Rewards extends Component {
                     alert('Done')
                 }
             }
-            // if (json.rewarded) {
-            //     let nftRewards = this.state.nftRewards
-            //     nftRewards.forEach(v => {if (v.id == this.state.reward_id) v.count = parseInt(v.count) + 1})
-            //     alert('Done')
-            //     this.setState({
-            //         showReward: false
-            //     })
-            // }
         } catch (error) {
             console.log(error)
         }
@@ -596,7 +585,7 @@ class Rewards extends Component {
 
     changeRewardAmount(event) {
         this.setState({
-            reward_amount: event.target.value
+            reward_amount: ethers.utils.parseEther(event.target.value)
         })
     }
 
@@ -967,7 +956,7 @@ class Rewards extends Component {
                             <div>
                                 <label style={this.state.reward_count != 0 ? {color: "grey"}: null} className="form-label">Amount</label>
                                 <div className="input-group mb-3">
-                                    <input style={this.state.reward_count != 0 ? {color: "grey"}: null } type="number" value={this.state.reward_amount} disabled={this.state.reward_count != 0 ? true : false} className="form-control" onChange={this.changeRewardAmount} aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default"/>
+                                    <input style={this.state.reward_count != 0 ? {color: "grey"}: null } type="number" value={ethers.utils.formatEther(this.state.reward_amount)} disabled={this.state.reward_count != 0 ? true : false} className="form-control" onChange={this.changeRewardAmount} aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default"/>
                                 </div>
                             </div>
                             :

@@ -757,7 +757,16 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                                         (soon)
                                     </td>
                                     <td className="table-secondary">
-                                        (soon)
+                                        <div>
+                                            NFTs: {v.nft_rewards.map((reward, i, arr) => 
+                                                `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
+                                            )}
+                                        </div>
+                                        <div>
+                                            Tokens: {v.token_rewards.map((reward, i, arr) => 
+                                                `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
+                                            )}
+                                        </div>
                                     </td>
                                     <td className="table-secondary">
                                         <button type="button" className="btn btn-dark" onClick={() => this.handleShowEdit(v)}>Edit</button>
