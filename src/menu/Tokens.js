@@ -354,16 +354,16 @@ class Tokens extends Component {
 
     async getToken(address) {
         try {
-            const provider = new ethers.providers.Web3Provider(window.ethereum)
-            await provider.send("eth_requestAccounts", [])
-            const signer = await provider.getSigner()
-            const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
-            const tokenContract = Token.attach(address)
-            const tokenSupply = 0
-            const paused = await tokenContract.paused()
+            // const provider = new ethers.providers.Web3Provider(window.ethereum)
+            // await provider.send("eth_requestAccounts", [])
+            // const signer = await provider.getSigner()
+            // const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
+            // const tokenContract = Token.attach(address)
+            // const tokenSupply = 0
+            // const paused = await tokenContract.paused()
             return {
-                tokenSupply: tokenSupply.toString(),
-                paused
+                tokenSupply: '0',
+                paused: false
             } 
         } catch (error) {
             console.log(error)

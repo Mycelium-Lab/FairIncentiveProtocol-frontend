@@ -32,6 +32,7 @@ class Rewards extends Component {
             show: false,
             showReward: false,
             showEditReward: false,
+            showDelete: false,
             name: null,
             description: null,
             comment: null,
@@ -333,6 +334,7 @@ class Rewards extends Component {
                 this.setState({
                     tokenRewards
                 })
+                this.handleCloseDelete()
             }
         } catch (error) {
             console.log(error)
@@ -364,6 +366,7 @@ class Rewards extends Component {
                 this.setState({
                     nftRewards
                 })
+                this.handleCloseDelete()
             }
         } catch (error) {
             console.log(error)
@@ -660,6 +663,9 @@ class Rewards extends Component {
     }
     handleCloseEditReward = () => this.setState({showEditReward: false})
 
+    handleShowDelete = (reward_type, reward_id, reward_name) => this.setState({showDelete: true, reward_id, reward_name, reward_type})
+    handleCloseDelete = () => this.setState({showDelete: false, reward_name: null, reward_id: null, reward_type: null})
+
     connect = this.connect.bind(this)
     changeType = this.changeType.bind(this)
     getTokens = this.getTokens.bind(this)
@@ -692,6 +698,8 @@ class Rewards extends Component {
     getNFTRewards = this.getNFTRewards.bind(this)
     handleShowEditReward = this.handleShowEditReward.bind(this)
     handleCloseEditReward = this.handleCloseEditReward.bind(this)
+    handleShowDelete = this.handleShowDelete.bind(this)
+    handleCloseDelete = this.handleCloseDelete.bind(this)
     saveEdit = this.saveEdit.bind(this)
 
     render() {
@@ -814,7 +822,7 @@ class Rewards extends Component {
                                         {v.name}
                                     </td>
                                     <td className="table-secondary">
-                                        {v.amount} {v.symbol}
+                                        {ethers.utils.formatEther(v.amount)} {v.symbol}
                                     </td>
                                     <td className="table-secondary">
                                         {v.description}
@@ -826,7 +834,7 @@ class Rewards extends Component {
                                         <button className="btn btn-dark" onClick={() => this.handleShowEditReward(v.name, v.id, v.count, v.description, v.amount, types.token, v.address, undefined, v.symbol)}>Edit</button>
                                         <button className="btn btn-dark" disabled>Stat</button>
                                         <button className="btn btn-dark" onClick={() => this.handleShowReward(v.name, v.id)}>Reward</button>
-                                        <button className="btn btn-danger" onClick={() => this.deleteReward(v.id)}>Delete</button>
+                                        <button className="btn btn-danger" onClick={() => this.handleShowDelete(types.token, v.id, v.name)}>Delete</button>
                                     </td>
                                 </tr>
                                 )
@@ -852,7 +860,7 @@ class Rewards extends Component {
                                         <button className="btn btn-dark" onClick={() => this.handleShowEditReward(v.name, v.id, v.count, v.description, null, types.nft, v.address, v.nft_id, v.symbol, v.nft_name)}>Edit</button>
                                         <button className="btn btn-dark" disabled>Stat</button>
                                         <button className="btn btn-dark" onClick={() => this.handleShowReward(v.name, v.id)} >Reward</button>
-                                        <button className="btn btn-danger" onClick={() => this.deleteNFTReward(v.id)}>Delete</button>
+                                        <button className="btn btn-danger" onClick={() => this.handleShowDelete(types.nft, v.id, v.name)}>Delete</button>
                                     </td>
                                 </tr>
                                 )
@@ -990,6 +998,15 @@ class Rewards extends Component {
                     <button className="btn btn-light" onClick={this.handleClose}>
                         Cancel
                     </button>
+                    </Modal.Footer>
+                </Modal>
+                <Modal show={this.state.showDelete} onHide={this.handleCloseDelete} centered>
+                    <Modal.Header closeButton>
+                    <Modal.Title>Delete {this.state.reward_name}?</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Footer>
+                        <button onClick={() => this.state.reward_type === types.token ? this.deleteReward(this.state.reward_id) : this.deleteNFTReward(this.state.reward_id)} className="btn btn-danger">Delete</button>
+                        <button onClick={this.handleCloseDelete} className="btn btn-light">Cancel</button>
                     </Modal.Footer>
                 </Modal>
             </div>

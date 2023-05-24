@@ -3,6 +3,8 @@ import { config } from "../utils/config";
 import { getBearerHeader } from "../utils/getBearerHeader";
 import { createLongStrView } from "../utils/longStrView";
 import '../styles/rewardEvents.css'
+import { ethers } from "ethers";
+import { Modal } from "react-bootstrap";
 
 const types = {
     token: 'token',
@@ -16,7 +18,10 @@ class RewardEvents extends Component {
         this.state = {
             rewardTokenEvents: [],
             rewardNFTEvents: [],
-            switcher: types.token
+            switcher: types.token,
+            showRevoke: false,
+            revoke_event_id: null,
+            revoke_event_type: null
         }
     }
 
@@ -90,6 +95,7 @@ class RewardEvents extends Component {
                 this.setState({
                     rewardTokenEvents: tokenEvents
                 })
+                this.handleCloseRevoke()
             }
             else alert('Something went wrong')
         } catch (error) {
@@ -120,6 +126,7 @@ class RewardEvents extends Component {
                 this.setState({
                     rewardNFTEvents
                 })
+                this.handleCloseRevoke()
             }
             else alert('Something went wrong')
         } catch (error) {
@@ -127,8 +134,13 @@ class RewardEvents extends Component {
         }
     }
 
+    handleShowRevoke = (revoke_event_id, revoke_event_type) => this.setState({showRevoke: true, revoke_event_id, revoke_event_type})
+    handleCloseRevoke = () => this.setState({showRevoke: false, revoke_event_id: null, revoke_event_type: null})
+
     deleteTokenRewardEvent = this.deleteTokenRewardEvent.bind(this)
     deleteNFTRewardEvent = this.deleteNFTRewardEvent.bind(this)
+    handleShowRevoke = this.handleShowRevoke.bind(this)
+    handleCloseRevoke = this.handleCloseRevoke.bind(this)
 
     render() {
         return (
@@ -166,7 +178,7 @@ class RewardEvents extends Component {
                                     {v.reward_name}
                                 </td>
                                 <td className="table-secondary">
-                                    {v.token_amount} {v.token_symbol}
+                                    {ethers.utils.formatEther(v.token_amount)} {v.token_symbol}
                                 </td>
                                 <td className="table-secondary">
                                     <div>
@@ -180,10 +192,11 @@ class RewardEvents extends Component {
                                     {v.event_comment}
                                 </td>
                                 <td className="table-secondary">
+                                    <a className="claim-link" href={`${config.api}/claim/token?id=${v.event_id}&user_id=${v.user_id}`} target="_blank">Claim Link</a>
                                     {
                                         v.status === 'Accrued'
                                         ?
-                                        <button className="btn btn-dark" onClick={() => this.deleteTokenRewardEvent(v.event_id)}>Revoke</button>
+                                        <button className="btn btn-dark" onClick={() => this.handleShowRevoke(v.event_id, types.token)}>Revoke</button>
                                         :
                                         null
                                     }
@@ -221,7 +234,7 @@ class RewardEvents extends Component {
                                     {
                                         v.status === 'Accrued'
                                         ?
-                                        <button className="btn btn-dark" onClick={() => this.deleteNFTRewardEvent(v.event_id)}>Revoke</button>
+                                        <button className="btn btn-dark" onClick={() => this.handleShowRevoke(v.event_id, types.nft)}>Revoke</button>
                                         :
                                         null
                                     }
@@ -231,6 +244,20 @@ class RewardEvents extends Component {
                         }
                     </tbody>
                 </table>
+                <Modal show={this.state.showRevoke} onHide={this.handleCloseRevoke} centered>
+                        <Modal.Header closeButton>
+                            Revoke {createLongStrView(this.state.revoke_event_id)} event?
+                        </Modal.Header>
+                        <Modal.Footer>
+                            <button className="btn btn-dark" onClick={
+                                () => 
+                                    this.state.revoke_event_type === types.token ? 
+                                    this.deleteTokenRewardEvent(this.state.revoke_event_id) :
+                                    this.deleteNFTRewardEvent(this.state.revoke_event_id)
+                            }>Revoke</button>
+                            <button className="btn btn-dark" onClick={this.handleCloseRevoke}>Cancel</button>
+                        </Modal.Footer>
+                </Modal>
             </div>
         )
     }

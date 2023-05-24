@@ -27,6 +27,7 @@ class Users extends Component {
             showAdd: false,
             showToReward: false,
             showEdit: false,
+            showDelete: false,
             chosen_user_external_id: null,
             chosen_user_id: null,
             users: [],
@@ -122,8 +123,8 @@ class Users extends Component {
                     email: this.state.add_email,
                     wallet: this.state.add_wallet,
                     notes: this.state.add_notes,
-                    propertiesElements: [],
-                    statsElements: []
+                    properties: propertiesElements,
+                    stats: statsElements
                 })
                 this.setState({
                     users: _users,
@@ -176,7 +177,8 @@ class Users extends Component {
             if (res.status === 200) {
                 const _users = this.state.users.filter(v => v.id != id)
                 this.setState({
-                    users: _users
+                    users: _users,
+                    showDelete: false
                 })
             } else {
                 alert('Something went wrong')
@@ -454,6 +456,9 @@ class Users extends Component {
         })
     }
     handleCloseEdit = () => this.setState({showEdit: false, edit_user: {}, basic_edit_user: {}, editPropertiesElements: [], editStatsElements: []})
+    handleShowDelete = (chosen_user_external_id, chosen_user_id) => this.setState({showDelete: true, chosen_user_external_id, chosen_user_id})
+    handleCloseDelete = () => this.setState({showDelete: false, chosen_user_external_id: null, chosen_user_id: null})
+
     deleteEditPropertyInput = (index) => {
         let propertiesElements = this.state.editPropertiesElements
         propertiesElements.forEach(v => {if (v.id === index) v.work = false})
@@ -616,6 +621,8 @@ class Users extends Component {
     handleCloseToReward = this.handleCloseToReward.bind(this)
     handleShowEdit = this.handleShowEdit.bind(this)
     handleCloseEdit = this.handleCloseEdit.bind(this)
+    handleShowDelete = this.handleShowDelete.bind(this)
+    handleCloseDelete = this.handleCloseDelete.bind(this)
     addPropertyInput = this.addPropertyInput.bind(this)
     deletePropertyInput = this.deletePropertyInput.bind(this)
     getTokenRewards = this.getTokenRewards.bind(this)
@@ -756,7 +763,7 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                                         <button type="button" className="btn btn-dark" onClick={() => this.handleShowEdit(v)}>Edit</button>
                                         <button type="button" className="btn btn-dark" disabled>Stat</button>
                                         <button type="button" className="btn btn-dark" onClick={() => this.handleShowToReward(v.external_id, v.id)}>To reward</button>
-                                        <button onClick={async () => await this.deleteUser(v.id)} type="button" className="btn btn-danger">Delete</button>
+                                        <button onClick={() => this.handleShowDelete(v.external_id, v.id)} type="button" className="btn btn-danger">Delete</button>
                                     </td>
                                 </tr>
                                 )
@@ -884,6 +891,15 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                     <button className="btn btn-light" onClick={this.handleCloseEdit}>
                         Cancel
                     </button>
+                    </Modal.Footer>
+                </Modal>
+                <Modal show={this.state.showDelete} onHide={this.handleCloseDelete} centered>
+                    <Modal.Header closeButton>
+                        Delete {this.state.chosen_user_external_id} (FAIR id: {createLongStrView(this.state.chosen_user_id ? this.state.chosen_user_id : '')})?
+                    </Modal.Header>
+                    <Modal.Footer>
+                        <button className="btn btn-danger" onClick={() => this.deleteUser(this.state.chosen_user_id)}>Delete</button>
+                        <button className="btn btn-light" onClick={this.handleCloseDelete}>Cancel</button>
                     </Modal.Footer>
                 </Modal>
             </div>

@@ -258,7 +258,6 @@ class NFTCollections extends Component {
                     name: null,
                     symbol: null,
                     description: null,
-                    network: null,
                     beneficialType: beneficialTypes.company,
                     royalties: null,
                     website: null, instagram: null, telegram: null, medium: null, facebook: null, discord: null, other: null
