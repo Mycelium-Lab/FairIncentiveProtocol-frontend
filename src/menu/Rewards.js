@@ -464,7 +464,7 @@ class Rewards extends Component {
                     id: reward_id,
                     name: reward_name,
                     description: reward_description,
-                    amount: reward_amount.toString()
+                    amount: ethers.utils.parseEther(reward_amount.toString()).toString()
                 }
             } else {
                 rawJSON = {
@@ -489,7 +489,7 @@ class Rewards extends Component {
                         if (v.id == reward_id) {
                             v.name = reward_name
                             v.description = reward_description
-                            v.amount = reward_amount
+                            v.amount = ethers.utils.parseEther(reward_amount.toString()).toString()
                             v.symbol = reward_symbol
                             v.address = reward_token
                             v.nft_id = reward_nft_id
@@ -585,7 +585,7 @@ class Rewards extends Component {
 
     changeRewardAmount(event) {
         this.setState({
-            reward_amount: ethers.utils.parseEther(event.target.value)
+            reward_amount: event.target.value
         })
     }
 
@@ -618,6 +618,58 @@ class Rewards extends Component {
         })
     }
 
+    async changeTokenRewardStatus(reward_id, status) {
+        try {
+            const headers = new Headers();
+            headers.append("Content-Type", "application/json");
+            headers.append("Authorization", getBearerHeader())
+            const raw = JSON.stringify({
+                reward_id,
+                status: status === 0 ? 1 : 0
+            });
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                body: raw,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/rewards/update/status/token`, requestOptions)
+            if (res.status === 200) {
+                const tokenRewards = this.state.tokenRewards
+                tokenRewards.forEach(v => {if (v.id === reward_id) v.status = status === 0 ? 1 : 0})
+                this.setState({tokenRewards})
+            }
+        } catch (error) {
+            alert('Something went wrong')
+        }
+    }
+
+    async changeNFTRewardStatus(reward_id, status) {
+        try {
+            const headers = new Headers();
+            headers.append("Content-Type", "application/json");
+            headers.append("Authorization", getBearerHeader())
+            const raw = JSON.stringify({
+                reward_id,
+                status: status === 0 ? 1 : 0
+            });
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                body: raw,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/rewards/update/status/nft`, requestOptions)
+            if (res.status === 200) {
+                const nftRewards = this.state.nftRewards
+                nftRewards.forEach(v => {if (v.id === reward_id) v.status = status === 0 ? 1 : 0})
+                this.setState({nftRewards})
+            }
+        } catch (error) {
+            alert('Something went wrong')
+        }
+    }
+
     handleClose = () => this.setState({show: false});
     handleShow = () => this.setState({show: true});
     handleCloseReward = () => this.setState({showReward: false})
@@ -640,7 +692,7 @@ class Rewards extends Component {
                 reward_id,
                 reward_count,
                 reward_description,
-                reward_amount,
+                reward_amount: reward_amount ? parseFloat(ethers.utils.formatEther(reward_amount)) : '0',
                 reward_type,
                 reward_token,
                 reward_nft_id,
@@ -689,6 +741,8 @@ class Rewards extends Component {
     handleCloseEditReward = this.handleCloseEditReward.bind(this)
     handleShowDelete = this.handleShowDelete.bind(this)
     handleCloseDelete = this.handleCloseDelete.bind(this)
+    changeTokenRewardStatus = this.changeTokenRewardStatus.bind(this)
+    changeNFTRewardStatus = this.changeNFTRewardStatus.bind(this)
     saveEdit = this.saveEdit.bind(this)
 
     render() {
@@ -805,7 +859,9 @@ class Rewards extends Component {
                             this.state.tokenRewards.map(v =>
                                 <tr className="table-secondary">
                                     <td className="table-secondary">
-                                        (soon)
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" onChange={() => this.changeTokenRewardStatus(v.id, v.status)} role="switch" id="flexSwitchCheckDefault" checked={!v.status}/>
+                                        </div>
                                     </td>
                                     <td className="table-secondary">
                                         {v.name}
@@ -822,7 +878,7 @@ class Rewards extends Component {
                                     <td className="table-secondary">
                                         <button className="btn btn-dark" onClick={() => this.handleShowEditReward(v.name, v.id, v.count, v.description, v.amount, types.token, v.address, undefined, v.symbol)}>Edit</button>
                                         <button className="btn btn-dark" disabled>Stat</button>
-                                        <button className="btn btn-dark" onClick={() => this.handleShowReward(v.name, v.id)}>Reward</button>
+                                        <button className="btn btn-dark" onClick={() => this.handleShowReward(v.name, v.id)}>To reward</button>
                                         <button className="btn btn-danger" onClick={() => this.handleShowDelete(types.token, v.id, v.name)}>Delete</button>
                                     </td>
                                 </tr>
@@ -831,7 +887,9 @@ class Rewards extends Component {
                             this.state.nftRewards.map(v =>
                                 <tr className="table-secondary">
                                     <td className="table-secondary">
-                                        (soon)
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" onChange={() => this.changeNFTRewardStatus(v.id, v.status)} role="switch" id="flexSwitchCheckDefault" checked={!v.status}/>
+                                        </div>
                                     </td>
                                     <td className="table-secondary">
                                         {v.name}
@@ -848,7 +906,7 @@ class Rewards extends Component {
                                     <td className="table-secondary">
                                         <button className="btn btn-dark" onClick={() => this.handleShowEditReward(v.name, v.id, v.count, v.description, null, types.nft, v.address, v.nft_id, v.symbol, v.nft_name)}>Edit</button>
                                         <button className="btn btn-dark" disabled>Stat</button>
-                                        <button className="btn btn-dark" onClick={() => this.handleShowReward(v.name, v.id)} >Reward</button>
+                                        <button className="btn btn-dark" onClick={() => this.handleShowReward(v.name, v.id)} >To reward</button>
                                         <button className="btn btn-danger" onClick={() => this.handleShowDelete(types.nft, v.id, v.name)}>Delete</button>
                                     </td>
                                 </tr>
@@ -956,7 +1014,7 @@ class Rewards extends Component {
                             <div>
                                 <label style={this.state.reward_count != 0 ? {color: "grey"}: null} className="form-label">Amount</label>
                                 <div className="input-group mb-3">
-                                    <input style={this.state.reward_count != 0 ? {color: "grey"}: null } type="number" value={ethers.utils.formatEther(this.state.reward_amount)} disabled={this.state.reward_count != 0 ? true : false} className="form-control" onChange={this.changeRewardAmount} aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default"/>
+                                    <input style={this.state.reward_count != 0 ? {color: "grey"}: null } type="number" defaultValue={this.state.reward_amount ? this.state.reward_amount : '0'} disabled={this.state.reward_count != 0 ? true : false} className="form-control" onChange={this.changeRewardAmount} aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default"/>
                                 </div>
                             </div>
                             :

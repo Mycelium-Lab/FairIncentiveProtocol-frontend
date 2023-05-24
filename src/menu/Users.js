@@ -277,8 +277,17 @@ class Users extends Component {
             const headers = new Headers();
             headers.append("Content-Type", "application/json");
             headers.append("Authorization", getBearerHeader())
-
-            const raw = JSON.stringify(edit_user);
+            const raw = JSON.stringify({
+                company_id: edit_user.company_id,
+                email: edit_user.email,
+                external_id: edit_user.external_id,
+                id: edit_user.id,
+                image: edit_user.image,
+                notes: edit_user.notes,
+                properties: edit_user.properties,
+                stats: edit_user.stats,
+                wallet: edit_user.wallet
+            });
             const requestOptions = {
                 method: 'POST',
                 headers: headers,
@@ -418,8 +427,8 @@ class Users extends Component {
                     id: propertyId,
                     element: 
                     <div className="user-custom-params">
-                        <input type="text" id={`edit-property-name-${propertyId}`} onChange={(event) => this.changeEditPropertyName(propertyId, event.target.value)} value={v.name} className="form-control" placeholder="Property name"/>
-                        <input type="text" id={`edit-property-value-${propertyId}`} onChange={(event) => this.changeEditPropertyValue(propertyId, event.target.value)} value={v.value} className="form-control" placeholder="Property value"/>
+                        <input type="text" id={`edit-property-name-${propertyId}`} onChange={(event) => this.changeEditPropertyName(propertyId, event.target.value)} defaultValue={v.name} className="form-control" placeholder="Property name"/>
+                        <input type="text" id={`edit-property-value-${propertyId}`} onChange={(event) => this.changeEditPropertyValue(propertyId, event.target.value)} defaultValue={v.value} className="form-control" placeholder="Property value"/>
                         <button type="button" className="btn btn-dark" onClick={() => this.deleteEditPropertyInput(propertyId)}>-</button>
                     </div>,
                     name: v.name,
@@ -436,8 +445,8 @@ class Users extends Component {
                     id: statId,
                     element: 
                     <div className="user-custom-params">
-                        <input type="text" id={`edit-stat-name-${statId}`} onChange={this.changeEditStatName} value={v.name} className="form-control" placeholder="Stat name"/>
-                        <input type="number" id={`edit-stat-value-${statId}`} onChange={this.changeEditStatValue} value={v.value} className="form-control" placeholder="Stat value"/>
+                        <input type="text" id={`edit-stat-name-${statId}`} onChange={this.changeEditStatName} defaultValue={v.name} className="form-control" placeholder="Stat name"/>
+                        <input type="number" id={`edit-stat-value-${statId}`} onChange={this.changeEditStatValue} defaultValue={v.value} className="form-control" placeholder="Stat value"/>
                         <button type="button" className="btn btn-dark" onClick={() => this.deleteEditStatInput(statId)}>-</button>
                     </div>,
                     name: v.name,
@@ -758,19 +767,19 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                                     </td>
                                     <td className="table-secondary">
                                         <div>
-                                            NFTs: {v.nft_rewards.map((reward, i, arr) => 
+                                            NFTs: {v.nft_rewards ? v.nft_rewards.map((reward, i, arr) => 
                                                 `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
-                                            )}
+                                            ): null}
                                         </div>
                                         <div>
-                                            Tokens: {v.token_rewards.map((reward, i, arr) => 
+                                            Tokens: {v.token_rewards ? v.token_rewards.map((reward, i, arr) => 
                                                 `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
-                                            )}
+                                            ): null}
                                         </div>
                                     </td>
                                     <td className="table-secondary">
-                                        <button type="button" className="btn btn-dark" onClick={() => this.handleShowEdit(v)}>Edit</button>
                                         <button type="button" className="btn btn-dark" disabled>Stat</button>
+                                        <button type="button" className="btn btn-dark" onClick={() => this.handleShowEdit(v)}>Edit</button>
                                         <button type="button" className="btn btn-dark" onClick={() => this.handleShowToReward(v.external_id, v.id)}>To reward</button>
                                         <button onClick={() => this.handleShowDelete(v.external_id, v.id)} type="button" className="btn btn-danger">Delete</button>
                                     </td>
