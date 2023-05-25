@@ -8,6 +8,10 @@ import { config } from "../utils/config";
 import Modal from 'react-bootstrap/Modal';
 import { networks } from "../utils/networks";
 import '../styles/tokens.css'
+import ConfirmModal from "../common/modals/confirm";
+import ProgressModal from "../common/modals/progress";
+import SuccessModal from "../common/modals/success";
+import ErrorModal from "../common/modals/error";
 
 //TODO: Как-то добавлять провайдера и signer сразу
 
@@ -40,6 +44,15 @@ class Tokens extends Component {
             showCreate: false,
             showMint: false,
             showPause: false,
+            showConfirm: false,
+            showProgress: false,
+            showSuccess: false,
+            showError: false,
+            successName: null,
+            successText: null,
+            errorText: null,
+            confirmName: null,
+            confirmText: null,
             isCurrentTokenPaused: null,
             currentTokenSymbol: null,
             currentTokenAddress: null,
@@ -137,6 +150,7 @@ class Tokens extends Component {
             const chainid = (await provider.getNetwork()).chainId
             if (chainid.toString() !== network.chainid) {
                 try {
+                    this.handleShowConfirm('Confirm the network change', 'Please, confirm the network change in your wallet')
                     await window.ethereum.request({
                       method: 'wallet_switchEthereumChain',
                       params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
@@ -159,6 +173,7 @@ class Tokens extends Component {
                     //   .then(() => window.location.reload())
                     }
                   }
+                  this.handleCloseConfirm()
             }
             this.setState({
                 provider,
@@ -175,6 +190,7 @@ class Tokens extends Component {
         const network = networks[event.target.value]
         if (this.state.address) {
             try {
+                this.handleShowConfirm('Confirm the network change', 'Please, confirm the network change in your wallet')
                 await window.ethereum.request({
                   method: 'wallet_switchEthereumChain',
                   params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
@@ -197,6 +213,7 @@ class Tokens extends Component {
                 //   .then(() => window.location.reload())
                 }
               }
+            this.handleCloseConfirm()
         }
         this.setState({
             network
@@ -221,6 +238,7 @@ class Tokens extends Component {
                 network
             } = this.state
             const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
+            this.handleShowConfirm(`Confirm ${symbol} token creation`, `Please, confirm contract creation in your wallet`)
             const contract = await Token.deploy(
                 name,
                 symbol,
@@ -233,6 +251,8 @@ class Tokens extends Component {
                 recoverable,
                 network.fpmanager
             );
+            this.handleCloseConfirm()
+            this.handleShowProgress()
             const contractAdddress = contract.address
             const headers = new Headers();
             headers.append("Content-Type", "application/json");
@@ -261,7 +281,6 @@ class Tokens extends Component {
               };
             const res = await fetch(`${config.api}/tokens/add`, requestOptions)
             if (res.status === 200) {
-                alert('Added to database. Please to use wait for tx to complete.')
                 const _tokens = this.state.tokens
                 _tokens.push({
                     symbol: this.state.symbol,
@@ -274,6 +293,10 @@ class Tokens extends Component {
             } else {
                 alert('Something went wrong')
             }
+            contract.deployed().then(() => {
+                this.handleCloseProgress()
+                this.handleShowSuccess(`${symbol} token created`, `The contract creation was successful`)
+            })
         } catch (error) {
             alert(error)
         }
@@ -385,7 +408,14 @@ class Tokens extends Component {
         this.setState({showPause: true, currentTokenSymbol, currentTokenAddress, isCurrentTokenPaused: paused})
     }
     handleClosePause = () => this.setState({showPause: false})
-
+    handleShowConfirm = (confirmName, confirmText) => this.setState({showConfirm: true, confirmName, confirmText})
+    handleCloseConfirm = () => this.setState({showConfirm: false, confirmName: null, confirmText: null})
+    handleShowProgress = () => this.setState({showProgress: true})
+    handleCloseProgress = () => this.setState({showProgress: false})
+    handleShowSuccess = (successName, successText) => this.setState({showSuccess: true, successName, successText})
+    handleCloseSuccess = () => this.setState({showSuccess: false, successName: null, successText: null})
+    handleShowError = (errorText) => this.setState({showError: true, errorText})
+    handleCloseError = () => this.setState({showError: false})
     onChangeName = this.onChangeName.bind(this)
     onChangeSymbol = this.onChangeSymbol.bind(this)
     onChangeEmissionType = this.onChangeEmissionType.bind(this)
@@ -410,6 +440,14 @@ class Tokens extends Component {
     onChangeMintTokenAmount = this.onChangeMintTokenAmount.bind(this)
     mint = this.mint.bind(this)
     pause = this.pause.bind(this)
+    handleShowConfirm = this.handleShowConfirm.bind(this)
+    handleCloseConfirm = this.handleCloseConfirm.bind(this)
+    handleShowProgress = this.handleShowProgress.bind(this)
+    handleCloseProgress = this.handleCloseProgress.bind(this)
+    handleShowSuccess = this.handleShowSuccess.bind(this)
+    handleCloseSuccess = this.handleCloseSuccess.bind(this)
+    handleShowError = this.handleShowError.bind(this)
+    handleCloseError = this.handleCloseError.bind(this)
 
     render() {
         return (
@@ -622,6 +660,24 @@ class Tokens extends Component {
                         <button type="button" className="btn btn-dark" onClick={this.pause}>{this.state.isCurrentTokenPaused ? "Unpause" : "Pause"}</button>
                     </Modal.Footer>
                 </Modal>
+                <ConfirmModal 
+                    showConfirm={this.state.showConfirm} 
+                    handleCloseConfirm={this.handleCloseConfirm}
+                    confirmName={this.state.confirmName}
+                    confirmText={this.state.confirmText}
+                />
+                <ProgressModal showProgress={this.state.showProgress} handleCloseProgress={this.handleCloseProgress}/>
+                <SuccessModal 
+                    showSuccess={this.state.showSuccess} 
+                    handleCloseSuccess={this.handleCloseSuccess}
+                    successName={this.state.successName} 
+                    successText={this.state.successText}
+                />
+                <ErrorModal 
+                    showError={this.state.showError}
+                    handleCloseError={this.handleCloseError}
+                    errorText={this.state.errorText}
+                />
             </div>
         )
     }

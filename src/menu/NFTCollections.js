@@ -9,6 +9,10 @@ import { config } from "../utils/config";
 import { networks } from '../utils/networks'
 import Modal from 'react-bootstrap/Modal';
 import '../styles/nftCollections.css'
+import ConfirmModal from "../common/modals/confirm";
+import ProgressModal from "../common/modals/progress";
+import SuccessModal from "../common/modals/success";
+import ErrorModal from "../common/modals/error";
 
 const beneficialTypes = {
     company: "company",
@@ -33,6 +37,15 @@ class NFTCollections extends Component {
             showCreateBeneficialPage: false,
             showCreateLinkPage: false,
             showAddNFT: false,
+            showConfirm: false,
+            showProgress: false,
+            showSuccess: false,
+            showError: false,
+            successName: null,
+            successText: null,
+            errorText: null,
+            confirmName: null,
+            confirmText: null,
             addNFTAddress: '',
             addNFTAmount: null,
             addNFTName: '',
@@ -122,6 +135,7 @@ class NFTCollections extends Component {
         const network = networks[event.target.value]
         if (this.state.address) {
             try {
+                this.handleShowConfirm('Confirm the network change', 'Please, confirm the network change in your wallet')
                 await window.ethereum.request({
                   method: 'wallet_switchEthereumChain',
                   params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
@@ -144,6 +158,7 @@ class NFTCollections extends Component {
                 //   .then(() => window.location.reload())
                 }
               }
+              this.handleCloseConfirm()
         }
         this.setState({
             network
@@ -160,6 +175,7 @@ class NFTCollections extends Component {
             const chainid = (await provider.getNetwork()).chainId
             if (chainid.toString() !== network.chainid) {
                 try {
+                    this.handleShowConfirm('Confirm the network change', 'Please, confirm the network change in your wallet')
                     await window.ethereum.request({
                       method: 'wallet_switchEthereumChain',
                       params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
@@ -181,7 +197,8 @@ class NFTCollections extends Component {
                       })
                     //   .then(() => window.location.reload())
                     }
-                  }
+                }
+                this.handleCloseConfirm()
             }
             this.setState({
                 provider,
@@ -215,6 +232,7 @@ class NFTCollections extends Component {
             if (discord) links.push({link: discord})
             if (other) links.push({link: other})
             let NFT, contract
+            this.handleShowConfirm(`Confirm ${symbol} collection creation`, `Please, confirm contract creation in your wallet`)
             if (beneficialType === beneficialTypes.company) {
                 NFT = new ethers.ContractFactory(ERC721DefaultRoyalty.abi, ERC721DefaultRoyalty.bytecode, this.state.signer)
                 contract = await NFT.deploy(this.state.name, this.state.symbol, config.signerAddress, beneficialAddress, royalties);
@@ -222,6 +240,8 @@ class NFTCollections extends Component {
                 NFT = new ethers.ContractFactory(ERC721TokenRoyalty.abi, ERC721TokenRoyalty.bytecode, this.state.signer)
                 contract = await NFT.deploy(this.state.name, this.state.symbol, config.signerAddress, royalties);
             } 
+            this.handleCloseConfirm()
+            this.handleShowProgress()
             const contractAdddress = contract.address
             const headers = new Headers();
             headers.append("Content-Type", "application/json");
@@ -244,7 +264,6 @@ class NFTCollections extends Component {
               };
             const res = await fetch(`${config.api}/nfts/add/collection`, requestOptions)
             if (res.status === 200) {
-                alert('Added to database. Please to use wait for tx to complete.')
                 const _nfts = this.state.nftCollections
                 _nfts.push({
                     name: this.state.name,
@@ -265,6 +284,10 @@ class NFTCollections extends Component {
             } else {
                 alert('Something went wrong')
             }
+            contract.deployed().then(() => {
+                this.handleCloseProgress()
+                this.handleShowSuccess(`${symbol} token created`, `The contract creation was successful`)
+            })
         } catch (error) {
             alert(error)
         }
@@ -337,6 +360,14 @@ class NFTCollections extends Component {
 
     handleCloseAddNFT = () => this.setState({showAddNFT: false})
     handleShowAddNFT = (addNFTAddress) => this.setState({showAddNFT: true, addNFTAddress})
+    handleShowConfirm = (confirmName, confirmText) => this.setState({showConfirm: true, confirmName, confirmText})
+    handleCloseConfirm = () => this.setState({showConfirm: false, confirmName: null, confirmText: null})
+    handleShowProgress = () => this.setState({showProgress: true})
+    handleCloseProgress = () => this.setState({showProgress: false})
+    handleShowSuccess = (successName, successText) => this.setState({showSuccess: true, successName, successText})
+    handleCloseSuccess = () => this.setState({showSuccess: false, successName: null, successText: null})
+    handleShowError = (errorText) => this.setState({showError: true, errorText})
+    handleCloseError = () => this.setState({showError: false})
 
     onChangeName = this.onChangeName.bind(this)
     onChangeSymbol = this.onChangeSymbol.bind(this)
@@ -369,6 +400,14 @@ class NFTCollections extends Component {
     onChangeFacebook = this.onChangeFacebook.bind(this)
     onChangeDiscord = this.onChangeDiscord.bind(this)
     onChangeOther = this.onChangeOther.bind(this)
+    handleShowConfirm = this.handleShowConfirm.bind(this)
+    handleCloseConfirm = this.handleCloseConfirm.bind(this)
+    handleShowProgress = this.handleShowProgress.bind(this)
+    handleCloseProgress = this.handleCloseProgress.bind(this)
+    handleShowSuccess = this.handleShowSuccess.bind(this)
+    handleCloseSuccess = this.handleCloseSuccess.bind(this)
+    handleShowError = this.handleShowError.bind(this)
+    handleCloseError = this.handleCloseError.bind(this)
 
     render() {
         return (
@@ -693,6 +732,24 @@ class NFTCollections extends Component {
                         </tbody>
                     </table>
                 </div>
+                <ConfirmModal
+                    showConfirm={this.state.showConfirm} 
+                    handleCloseConfirm={this.handleCloseConfirm}
+                    confirmName={this.state.confirmName}
+                    confirmText={this.state.confirmText}
+                />
+                <ProgressModal showProgress={this.state.showProgress} handleCloseProgress={this.handleCloseProgress}/>
+                <SuccessModal
+                    showSuccess={this.state.showSuccess} 
+                    handleCloseSuccess={this.handleCloseSuccess}
+                    successName={this.state.successName} 
+                    successText={this.state.successText}
+                />
+                <ErrorModal
+                    showError={this.state.showError}
+                    handleCloseError={this.handleCloseError}
+                    errorText={this.state.errorText}
+                />
             </div>
         )
     }
