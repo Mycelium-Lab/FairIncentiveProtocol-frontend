@@ -878,7 +878,7 @@ class Rewards extends Component {
                                     <td className="table-secondary">
                                         <button className="btn btn-dark" onClick={() => this.handleShowEditReward(v.name, v.id, v.count, v.description, v.amount, types.token, v.address, undefined, v.symbol)}>Edit</button>
                                         <button className="btn btn-dark" disabled>Stat</button>
-                                        <button className="btn btn-dark" onClick={() => this.handleShowReward(v.name, v.id)}>To reward</button>
+                                        <button className="btn btn-dark" onClick={() => this.handleShowReward(v.name, v.id)} disabled={v.status}>To reward</button>
                                         <button className="btn btn-danger" onClick={() => this.handleShowDelete(types.token, v.id, v.name)}>Delete</button>
                                     </td>
                                 </tr>
@@ -906,7 +906,7 @@ class Rewards extends Component {
                                     <td className="table-secondary">
                                         <button className="btn btn-dark" onClick={() => this.handleShowEditReward(v.name, v.id, v.count, v.description, null, types.nft, v.address, v.nft_id, v.symbol, v.nft_name)}>Edit</button>
                                         <button className="btn btn-dark" disabled>Stat</button>
-                                        <button className="btn btn-dark" onClick={() => this.handleShowReward(v.name, v.id)} >To reward</button>
+                                        <button className="btn btn-dark" onClick={() => this.handleShowReward(v.name, v.id)} disabled={v.status}>To reward</button>
                                         <button className="btn btn-danger" onClick={() => this.handleShowDelete(types.nft, v.id, v.name)}>Delete</button>
                                     </td>
                                 </tr>

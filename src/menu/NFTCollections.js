@@ -264,13 +264,9 @@ class NFTCollections extends Component {
               };
             const res = await fetch(`${config.api}/nfts/add/collection`, requestOptions)
             if (res.status === 200) {
+                const collection = (await res.json()).collection
                 const _nfts = this.state.nftCollections
-                _nfts.push({
-                    name: this.state.name,
-                    symbol: this.state.symbol,
-                    address: contractAdddress,
-                    totalSupply: '0'
-                })
+                _nfts.push(collection)
                 this.setState({
                     nftCollections: _nfts,
                     showCreate: false,
@@ -286,7 +282,7 @@ class NFTCollections extends Component {
             }
             contract.deployed().then(() => {
                 this.handleCloseProgress()
-                this.handleShowSuccess(`${symbol} token created`, `The contract creation was successful`)
+                this.handleShowSuccess(`${symbol} collection created`, `The contract creation was successful`)
             })
         } catch (error) {
             alert(error)

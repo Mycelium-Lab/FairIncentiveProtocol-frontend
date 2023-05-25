@@ -281,12 +281,9 @@ class Tokens extends Component {
               };
             const res = await fetch(`${config.api}/tokens/add`, requestOptions)
             if (res.status === 200) {
+                const token = (await res.json()).token
                 const _tokens = this.state.tokens
-                _tokens.push({
-                    symbol: this.state.symbol,
-                    address: contractAdddress,
-                    totalSupply: '0'
-                })
+                _tokens.push(token)
                 this.setState({
                     tokens: _tokens
                 })
@@ -298,13 +295,28 @@ class Tokens extends Component {
                 this.handleShowSuccess(`${symbol} token created`, `The contract creation was successful`)
             })
         } catch (error) {
-            alert(error)
+            if (error.message.includes('user rejected transaction')) {
+                this.handleCloseProgress()
+                this.handleShowError('User rejected transaction')
+            }
+            if (error.message.includes('Cap is 0')) {
+                this.handleCloseConfirm()
+                this.handleCloseProgress()
+                this.handleShowError('The maximum supply is not set')
+            }
+            if (error.message.includes('Initial supply is 0')) {
+                this.handleCloseConfirm()
+                this.handleCloseProgress()
+                this.handleShowError('The initial supply is not set')
+            }
+            console.log(error)
         }
     }
 
     async mint() {
         try {
             const {
+                currentTokenSymbol,
                 currentTokenAddress,
                 mintTokenAmount
             } = this.state
@@ -314,10 +326,21 @@ class Tokens extends Component {
             const signer = await provider.getSigner()
             const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
             const token = Token.attach(currentTokenAddress)
+            this.handleShowConfirm(`Confirm the minting of ${mintTokenAmount} ${currentTokenSymbol} tokens`, `Please, confirm transaction in your wallet`)
             const tx = await token.mint(ethers.utils.parseEther(mintTokenAmount))
+            this.handleCloseConfirm()
+            this.handleShowProgress()
             tx.wait()
-                .then(() => alert('Done'))
+                .then(() => {
+                    this.handleCloseProgress()
+                    this.handleShowSuccess(`Token minted`, `You have successfully minted ${mintTokenAmount} ${currentTokenSymbol} tokens`)
+                })
         } catch (error) {
+            if (error.message.includes('user rejected transaction')) {
+                this.handleCloseConfirm()
+                this.handleCloseProgress()
+                this.handleShowError('User rejected transaction')
+            }
             console.log(error)
         }
     }
@@ -325,6 +348,7 @@ class Tokens extends Component {
     async pause() {
         try {
             const {
+                currentTokenSymbol,
                 currentTokenAddress,
                 isCurrentTokenPaused
             } = this.state
@@ -334,17 +358,26 @@ class Tokens extends Component {
             const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
             const token = Token.attach(currentTokenAddress)
             let tx;
+            this.handleShowConfirm(`Confirm ${!isCurrentTokenPaused ? 'pausing' : 'unpausing'} ${currentTokenSymbol} token`, `Please, confirm transaction in your wallet`)
             if (!isCurrentTokenPaused) {
                 tx = await token.pause()
             } else {
                 tx = await token.unpause()
             }
+            this.handleCloseConfirm()
+            this.handleShowProgress()
             tx.wait()
                 .then(() => {
-                    alert('Done')
+                    this.handleCloseProgress()
+                    this.handleShowSuccess(`Token ${!isCurrentTokenPaused ? 'paused' : 'unpaused'}`, `You have successfully ${!isCurrentTokenPaused ? 'paused' : 'unpaused'} ${currentTokenSymbol} token`)
                     this.setState({isCurrentTokenPaused: isCurrentTokenPaused ? false : true})
                 })
         } catch (error) {
+            if (error.message.includes('user rejected transaction')) {
+                this.handleCloseConfirm()
+                this.handleCloseProgress()
+                this.handleShowError('User rejected transaction')
+            }
             console.log(error)
         }
     }
@@ -511,7 +544,7 @@ class Tokens extends Component {
                             null
                         }
                         <div className="mb-3">
-                            <label className="form-label">Blockchain</label>
+                            <label className="form-labelerc20_tokens_supply_types">Blockchain</label>
                             <div className="input-group">
                                 <select onChange={this.changeNetwork} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
                                     <option value={config.status === "test" ? '5' : '1'} selected={this.state.network.chainid === (config.status === "test" ? '5' : '1')}>{networks[config.status === "test" ? '5' : '1'].name}</option>
@@ -607,7 +640,7 @@ class Tokens extends Component {
                                             (soon)
                                         </td>
                                         <td className="table-secondary">
-                                            <button className="btn btn-dark" onClick={() => this.handleShowMint(v.symbol, v.address)} disabled={v.supply_type === 1 ? true : false}>Mint</button>
+                                            <button className="btn btn-dark" onClick={() => this.handleShowMint(v.symbol, v.address)} disabled={v.supply_type == 1 ? true : false}>Mint</button>
                                             <button className="btn btn-dark" disabled>Roles control</button>
                                             <button className="btn btn-dark" onClick={() => this.handleShowPause(v.symbol, v.address)} disabled={!v.pausable}>{v.paused ? "Unpause" : "Pause"}</button>
                                             <button className="btn btn-dark" disabled={!v.blacklist}>Blacklist</button>
