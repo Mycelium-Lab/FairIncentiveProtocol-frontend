@@ -1,6 +1,7 @@
 import { Component } from "react";
 import { config } from "../utils/config";
 import { getBearerHeader } from "../utils/getBearerHeader";
+import ErrorModal from "../common/modals/error";
 
 class Settings extends Component {
 
@@ -11,7 +12,9 @@ class Settings extends Component {
             email: props.auth.email,
             phone: props.auth.phone,
             wallet: props.auth.wallet,
-            password: ''
+            password: '',
+            showSuccess: false,
+            showError: false
         }
     }
 
@@ -62,9 +65,13 @@ class Settings extends Component {
               };
             const res = await fetch(`${config.api}/company/changename`, requestOptions)
             const json = await res.json()
-            alert(json.message)
+            if (res.status === 200) {
+                this.handleShowSuccess(json.message, json.message)
+            } else {
+                this.handleShowError(json.error)
+            }
         } catch (error) {
-            alert(error)
+            this.handleShowError(error.message)
         }
     }
 
@@ -160,6 +167,11 @@ class Settings extends Component {
         }
     }
 
+    handleShowSuccess = (successName, successText) => this.setState({showSuccess: true, successName, successText})
+    handleCloseSuccess = () => this.setState({showSuccess: false, successName: null, successText: null})
+    handleShowError = (errorText) => this.setState({showError: true, errorText})
+    handleCloseError = () => this.setState({showError: false})
+
     onChangeName = this.onChangeName.bind(this)
     onChangeEmail = this.onChangeEmail.bind(this)
     onChangePhone = this.onChangePhone.bind(this)
@@ -170,6 +182,10 @@ class Settings extends Component {
     changePhone = this.changePhone.bind(this)
     changeWallet = this.changeWallet.bind(this)
     changePassword = this.changePassword.bind(this)
+    handleShowSuccess = this.handleShowSuccess.bind(this)
+    handleCloseSuccess = this.handleCloseSuccess.bind(this)
+    handleShowError = this.handleShowError.bind(this)
+    handleCloseError = this.handleCloseError.bind(this)
 
     render() {
         return (
@@ -235,6 +251,11 @@ class Settings extends Component {
                         </li>
                     </ul>
                 </div>
+                <ErrorModal 
+                    showError={this.state.showError}
+                    handleCloseError={this.handleCloseError}
+                    errorText={this.state.errorText}
+                />
             </div>
         )
     }

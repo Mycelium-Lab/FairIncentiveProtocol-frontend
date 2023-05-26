@@ -1,3 +1,4 @@
+/* global BigInt */
 import { Component } from "react";
 import { ethers, ContractFactory } from "ethers";
 import { Contract, Provider } from 'ethers-multicall';
@@ -31,6 +32,11 @@ const emissionTypes = [
     },
 ]
 
+const burnAddressType = {
+    current: 'current',
+    other: 'other'
+}
+
 class Tokens extends Component {
 
     constructor(props) {
@@ -45,9 +51,10 @@ class Tokens extends Component {
             showCreate: false,
             showMint: false,
             showBlacklist: false,
-            showBlacklistLoading: false,
+            showLoading: false,
             showBlacklistAdd: false,
             showPause: false,
+            showBurn: false,
             showConfirm: false,
             showProgress: false,
             showSuccess: false,
@@ -61,7 +68,11 @@ class Tokens extends Component {
             currentTokenSymbol: null,
             currentTokenAddress: null,
             currentToken: null,
+            currentTokenChainid: null,
             mintTokenAmount: null,
+            mintTokenTotalSupply: null,
+            mintTokenMaxSupply: null,
+            mintTokenAvailableToMint: null,
             tokens: [],
             network: networks[config.status === "test" ? '5' : '1'],
             emissionType: emissionTypes[0].value,
@@ -74,7 +85,10 @@ class Tokens extends Component {
             recoverable: false,
             currentTokenBlacklist: [],
             currentTokenBlacklistAddText: null,
-            currentTokenBlacklistRemove: []
+            currentTokenBlacklistRemove: [],
+            currentBurnAddressType: burnAddressType.current,
+            burnAmount: null,
+            otherBurnAddress: null
         }
     }
 
@@ -164,6 +178,18 @@ class Tokens extends Component {
         this.setState({currentTokenBlacklistRemove})
     }
 
+    onChangeCurrentBurnType(event) {
+        this.setState({currentBurnAddressType: event.target.value})
+    }
+
+    onChangeOtherBurnAddress(event) {
+        this.setState({otherBurnAddress: event.target.value})
+    }
+
+    onChangeBurnAmount(event) {
+        this.setState({burnAmount: event.target.value})
+    }
+
     async connect() {
         try {
             const { network } = this.state
@@ -210,9 +236,9 @@ class Tokens extends Component {
         }
     }
 
-    async changeNetwork(event) {
-        const network = networks[event.target.value]
-        if (this.state.address) {
+    async changeNetwork(id) {
+        const network = networks[id]
+        if (window.ethereum.isConnected()) {
             try {
                 this.handleShowConfirm('Confirm the network change', 'Please, confirm the network change in your wallet')
                 await window.ethereum.request({
@@ -319,21 +345,7 @@ class Tokens extends Component {
                 this.handleShowSuccess(`${symbol} token created`, `The contract creation was successful`)
             })
         } catch (error) {
-            if (error.message.includes('user rejected transaction')) {
-                this.handleCloseProgress()
-                this.handleShowError('User rejected transaction')
-            }
-            if (error.message.includes('Cap is 0')) {
-                this.handleCloseConfirm()
-                this.handleCloseProgress()
-                this.handleShowError('The maximum supply is not set')
-            }
-            if (error.message.includes('Initial supply is 0')) {
-                this.handleCloseConfirm()
-                this.handleCloseProgress()
-                this.handleShowError('The initial supply is not set')
-            }
-            console.log(error)
+            this.customError(error)
         }
     }
 
@@ -342,10 +354,15 @@ class Tokens extends Component {
             const {
                 currentTokenSymbol,
                 currentTokenAddress,
-                mintTokenAmount
+                mintTokenAmount,
+                currentTokenChainid
             } = this.state
-            //TODO: учитывать сеть
-            const provider = new ethers.providers.Web3Provider(window.ethereum)
+            let provider = new ethers.providers.Web3Provider(window.ethereum)
+            let chainid = (await provider.getNetwork()).chainId
+            if (chainid.toString() !== currentTokenChainid) {
+                await this.changeNetwork(currentTokenChainid)
+                provider = new ethers.providers.Web3Provider(window.ethereum)
+            }
             await provider.send("eth_requestAccounts", [])
             const signer = await provider.getSigner()
             const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
@@ -360,17 +377,7 @@ class Tokens extends Component {
                     this.handleShowSuccess(`Token minted`, `You have successfully minted ${mintTokenAmount} ${currentTokenSymbol} tokens`)
                 })
         } catch (error) {
-            if (error.message.includes('user rejected transaction')) {
-                this.handleCloseConfirm()
-                this.handleCloseProgress()
-                this.handleShowError('User rejected transaction')
-            }
-            if (error.message.includes('Cap exceeded')) {
-                this.handleCloseConfirm()
-                this.handleCloseProgress()
-                this.handleShowError('Maximum supply exceeded')
-            }
-            console.log(error)
+            this.customError(error)
         }
     }
 
@@ -379,9 +386,15 @@ class Tokens extends Component {
             const {
                 currentTokenSymbol,
                 currentTokenAddress,
-                isCurrentTokenPaused
+                isCurrentTokenPaused,
+                currentTokenChainid
             } = this.state
-            const provider = new ethers.providers.Web3Provider(window.ethereum)
+            let provider = new ethers.providers.Web3Provider(window.ethereum)
+            const chainid = (await provider.getNetwork()).chainId
+            if (chainid.toString() !== currentTokenChainid) {
+                await this.changeNetwork(currentTokenChainid)
+                provider = new ethers.providers.Web3Provider(window.ethereum)
+            }
             await provider.send("eth_requestAccounts", [])
             const signer = await provider.getSigner()
             const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
@@ -402,12 +415,28 @@ class Tokens extends Component {
                     this.setState({isCurrentTokenPaused: isCurrentTokenPaused ? false : true})
                 })
         } catch (error) {
-            if (error.message.includes('user rejected transaction')) {
-                this.handleCloseConfirm()
-                this.handleCloseProgress()
-                this.handleShowError('User rejected transaction')
+            this.customError(error)
+        }
+    }
+
+    async burn() {
+        try {
+            const { currentBurnAddressType, otherBurnAddress, currentToken, currentTokenSymbol, burnAmount } = this.state
+            this.handleShowConfirm(`Confirm burning ${currentTokenSymbol} token`, `Please, confirm tx in your wallet`)
+            let tx;
+            if (currentBurnAddressType === burnAddressType.current) {
+                tx = await currentToken.burn(ethers.utils.parseEther(burnAmount.toString()))
+            } else {
+                tx = await currentToken.burnFrom(otherBurnAddress, ethers.utils.parseEther(burnAmount.toString()))
             }
-            console.log(error)
+            this.handleCloseConfirm()
+            this.handleShowProgress()
+            tx.wait().then(() => {
+                this.handleCloseProgress()
+                this.handleShowSuccess(`Success burning ${burnAmount} ${currentTokenSymbol} tokens`, `You have successfully burned ${currentTokenSymbol} tokens`)
+            })
+        } catch (error) {
+            this.customError(error)
         }
     }
 
@@ -475,15 +504,11 @@ class Tokens extends Component {
                         })
                     })
                     this.setState({currentTokenBlacklist})
+                    this.handleCloseBlacklistAdd()
                 }
             )
         } catch (error) {
-            if (error.message.includes('user rejected transaction')) {
-                this.handleCloseConfirm()
-                this.handleCloseProgress()
-                this.handleShowError('User rejected transaction')
-            }
-            console.log(error)
+            this.customError(error)
         }
     }
 
@@ -507,27 +532,79 @@ class Tokens extends Component {
                 )
             } else throw Error('Empty list')
         } catch (error) {
-            if (error.message.includes('Empty list')) {
-                this.handleShowError('Empty removing list')
-            }
-            if (error.message.includes('user rejected transaction')) {
-                this.handleCloseConfirm()
-                this.handleCloseProgress()
-                this.handleShowError('User rejected transaction')
-            }
-            console.log(error)
+            this.customError(error)
         }
     }
 
+    customError = (error) => {
+        this.handleCloseConfirm()
+        this.handleCloseProgress()
+        if (error.message.includes('user rejected transaction')) {
+            this.handleShowError('User rejected transaction')
+        }
+        if (error.message.includes('insufficient allowance')) {
+            this.handleShowError('Insufficient allowance')
+        }
+        if (error.message.includes('User in blacklist')) {
+            this.handleShowError('User in blacklist')
+        }
+        if (error.message.includes('Cap exceeded')) {
+            this.handleShowError('Maximum supply exceeded')
+        }
+        if (error.message.includes('Empty list')) {
+            this.handleShowError('Empty removing list')
+        }
+        if (error.message.includes('Cap is 0')) {
+            this.handleShowError('The maximum supply is not set')
+        }
+        if (error.message.includes('Initial supply is 0')) {
+            this.handleShowError('The initial supply is not set')
+        }
+        console.log(error)
+    } 
+
     handleCloseCreate = () => this.setState({showCreate: false})
     handleShowCreate = () => this.setState({showCreate: true})
-    handleShowMint = (currentTokenSymbol, currentTokenAddress) => this.setState({showMint: true, currentTokenSymbol, currentTokenAddress})
+    handleShowMint = async (currentTokenSymbol, currentTokenAddress, currentTokenChainid) => {
+        this.setState({showMint: true, showLoading: true})
+        let provider = new ethers.providers.Web3Provider(window.ethereum)
+        const chainid = (await provider.getNetwork()).chainId
+        if (chainid.toString() !== currentTokenChainid) {
+            await this.changeNetwork(currentTokenChainid)
+            provider = new ethers.providers.Web3Provider(window.ethereum)
+        }
+        await provider.send("eth_requestAccounts", [])
+        const signer = await provider.getSigner()
+        const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
+        const tokenUsual = Token.attach(currentTokenAddress)  
+        const totalSupply = BigInt((await tokenUsual.totalSupply()).toString())
+        let cap;
+        let mintTokenAvailableToMint = BigInt(0);
+        try {
+            cap = await tokenUsual.cap()
+            cap = BigInt(cap.toString())
+            mintTokenAvailableToMint = cap - totalSupply
+        } catch (error) {
+            cap = BigInt(0)
+        }
+        // const 
+        this.setState({
+            currentTokenSymbol, currentTokenAddress, currentTokenChainid, 
+            mintTokenTotalSupply: ethers.utils.formatEther(totalSupply.toString()), mintTokenMaxSupply: ethers.utils.formatEther(cap.toString()),
+            showLoading: false, mintTokenAvailableToMint: ethers.utils.formatEther(mintTokenAvailableToMint.toString())
+        })
+    }
     handleCloseMint = () => this.setState({showMint: false})
 
-    handleShowBlacklist = async (currentTokenSymbol, currentTokenAddress) => {
+    handleShowBlacklist = async (currentTokenSymbol, currentTokenAddress, currentTokenChainid) => {
         try {
-            this.setState({showBlacklist: true, currentTokenSymbol, currentTokenAddress, showBlacklistLoading: true})
-            const provider = new ethers.providers.Web3Provider(window.ethereum)
+            this.setState({showBlacklist: true, currentTokenSymbol, currentTokenAddress, showLoading: true})
+            let provider = new ethers.providers.Web3Provider(window.ethereum)
+            const chainid = (await provider.getNetwork()).chainId
+            if (chainid.toString() !== currentTokenChainid) {
+                await this.changeNetwork(currentTokenChainid)
+                provider = new ethers.providers.Web3Provider(window.ethereum)
+            }
             const ethcallProvider = new Provider(provider);
             await ethcallProvider.init();
             await provider.send("eth_requestAccounts", [])
@@ -556,19 +633,27 @@ class Tokens extends Component {
                 }
             }
             this.setState({
-                currentTokenBlacklist, showBlacklistLoading: false, provider,
+                currentTokenBlacklist, showLoading: false, provider,
                 signer, currentToken: tokenUsual
             })
         } catch (error) {
+            this.setState({
+                currentTokenBlacklist: [], showLoading: false
+            })
             console.log(error)
         }
     }
-    handleCloseBlacklist = () => this.setState({showBlacklist: false, currentTokenSymbol: null, currentTokenAddress: null, currentTokenBlacklistRemove: []})
+    handleCloseBlacklist = () => this.setState({showBlacklist: false, currentTokenSymbol: null, currentTokenAddress: null, currentTokenChainid: null, currentTokenBlacklistRemove: []})
     handleShowBlacklistAdd = () => this.setState({showBlacklistAdd: true, showBlacklist: false, currentTokenBlacklistRemove: []})
     handleCloseBlacklistAdd = () => this.setState({showBlacklistAdd: false, showBlacklist: true})
 
-    handleShowPause = async (currentTokenSymbol, currentTokenAddress) => {
-        const provider = new ethers.providers.Web3Provider(window.ethereum)
+    handleShowPause = async (currentTokenSymbol, currentTokenAddress, currentTokenChainid) => {
+        let provider = new ethers.providers.Web3Provider(window.ethereum)
+        const chainid = (await provider.getNetwork()).chainId
+        if (chainid.toString() !== currentTokenChainid) {
+            await this.changeNetwork(currentTokenChainid)
+            provider = new ethers.providers.Web3Provider(window.ethereum)
+        }
         await provider.send("eth_requestAccounts", [])
         const signer = await provider.getSigner()
         const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
@@ -585,6 +670,21 @@ class Tokens extends Component {
     handleCloseSuccess = () => this.setState({showSuccess: false, successName: null, successText: null})
     handleShowError = (errorText) => this.setState({showError: true, errorText})
     handleCloseError = () => this.setState({showError: false})
+    handleShowBurn = async (currentTokenSymbol, currentTokenAddress, currentTokenChainid) => {
+        this.setState({showLoading: true, showBurn: true})
+        let provider = new ethers.providers.Web3Provider(window.ethereum)
+        const chainid = (await provider.getNetwork()).chainId
+        if (chainid.toString() !== currentTokenChainid) {
+            await this.changeNetwork(currentTokenChainid)
+            provider = new ethers.providers.Web3Provider(window.ethereum)
+        }
+        await provider.send("eth_requestAccounts", [])
+        const signer = await provider.getSigner()
+        const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
+        const token = Token.attach(currentTokenAddress)
+        this.setState({showLoading: false, currentTokenSymbol, currentTokenAddress, currentTokenChainid, currentToken: token})
+    }
+    handleCloseBurn = () => this.setState({showBurn: false, currentTokenSymbol: null, currentTokenAddress: null, currentTokenChainid: null, currentToken: null})
     onChangeName = this.onChangeName.bind(this)
     onChangeSymbol = this.onChangeSymbol.bind(this)
     onChangeEmissionType = this.onChangeEmissionType.bind(this)
@@ -625,6 +725,12 @@ class Tokens extends Component {
     addToBlacklist = this.addToBlacklist.bind(this)
     removeFromBlacklist = this.removeFromBlacklist.bind(this)
     onChangeBlacklistRemove = this.onChangeBlacklistRemove.bind(this)
+    handleShowBurn = this.handleShowBurn.bind(this)
+    handleCloseBurn = this.handleCloseBurn.bind(this)
+    onChangeCurrentBurnType = this.onChangeCurrentBurnType.bind(this)
+    burn = this.burn.bind(this)
+    onChangeOtherBurnAddress = this.onChangeOtherBurnAddress.bind(this)
+    onChangeBurnAmount = this.onChangeBurnAmount.bind(this)
 
     render() {
         return (
@@ -690,7 +796,7 @@ class Tokens extends Component {
                         <div className="mb-3">
                             <label className="form-labelerc20_tokens_supply_types">Blockchain</label>
                             <div className="input-group">
-                                <select onChange={this.changeNetwork} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                <select onChange={e => this.changeNetwork(e.target.value)} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
                                     <option value={config.status === "test" ? '5' : '1'} selected={this.state.network.chainid === (config.status === "test" ? '5' : '1')}>{networks[config.status === "test" ? '5' : '1'].name}</option>
                                     <option value={config.status === "test" ? '97' : '56'} selected={this.state.network.chainid === (config.status === "test" ? '97' : '56')}>{networks[config.status === "test" ? '97' : '56'].name}</option>
                                     <option value={config.status === "test" ? '80001' : '137'} selected={this.state.network.chainid === (config.status === "test" ? '80001' : '137')}>{networks[config.status === "test" ? '80001' : '137'].name}</option>
@@ -710,33 +816,33 @@ class Tokens extends Component {
                         </div>
                         <h4>Advanced settings</h4>
                         <div className="checks-contracts-types">
-                            <div class="form-check">
-                                <input onChange={() => this.onChangePausable(this.state.pausable ? false : true)} checked={this.state.pausable} class="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
-                                <label class="form-check-label" for="flexCheckDefault">
+                            <div className="form-check">
+                                <input onChange={() => this.onChangePausable(this.state.pausable ? false : true)} checked={this.state.pausable} className="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
+                                <label className="form-check-label" for="flexCheckDefault">
                                     Pausable
                                 </label>
                             </div>
-                            <div class="form-check">
-                                <input onChange={() => this.onChangeBurnable(this.state.burnable ? false : true)} checked={this.state.burnable} class="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
-                                <label class="form-check-label" for="flexCheckDefault">
+                            <div className="form-check">
+                                <input onChange={() => this.onChangeBurnable(this.state.burnable ? false : true)} checked={this.state.burnable} className="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
+                                <label className="form-check-label" for="flexCheckDefault">
                                     Burnable
                                 </label>
                             </div>
-                            <div class="form-check">
-                                <input onChange={() => this.onChangeBlacklist(this.state.blacklist ? false : true)} checked={this.state.blacklist} class="form-check-input" type="checkbox" value="" id="flexCheckChecked"/>
-                                <label class="form-check-label" for="flexCheckChecked">
+                            <div className="form-check">
+                                <input onChange={() => this.onChangeBlacklist(this.state.blacklist ? false : true)} checked={this.state.blacklist} className="form-check-input" type="checkbox" value="" id="flexCheckChecked"/>
+                                <label className="form-check-label" for="flexCheckChecked">
                                     Blacklist
                                 </label>
                             </div>
-                            <div class="form-check">
-                                <input onChange={() => this.onChangeVerified(this.state.verified ? false : true)} checked={this.state.verified} class="form-check-input" type="checkbox" value="" id="flexCheckChecked"/>
-                                <label class="form-check-label" for="flexCheckChecked">
+                            <div className="form-check">
+                                <input onChange={() => this.onChangeVerified(this.state.verified ? false : true)} checked={this.state.verified} className="form-check-input" type="checkbox" value="" id="flexCheckChecked"/>
+                                <label className="form-check-label" for="flexCheckChecked">
                                     Verified on Etherscan
                                 </label>
                             </div>
-                            <div class="form-check">
-                                <input onChange={() => this.onChangeRecoverable(this.state.recoverable ? false : true)} checked={this.state.recoverable} class="form-check-input" type="checkbox" value="" id="flexCheckChecked"/>
-                                <label class="form-check-label" for="flexCheckChecked">
+                            <div className="form-check">
+                                <input onChange={() => this.onChangeRecoverable(this.state.recoverable ? false : true)} checked={this.state.recoverable} className="form-check-input" type="checkbox" value="" id="flexCheckChecked"/>
+                                <label className="form-check-label" for="flexCheckChecked">
                                     Recoverable
                                 </label>
                             </div>
@@ -784,10 +890,11 @@ class Tokens extends Component {
                                             (soon)
                                         </td>
                                         <td className="table-secondary">
-                                            <button className="btn btn-dark" onClick={() => this.handleShowMint(v.symbol, v.address)} disabled={v.supply_type == 1 ? true : false}>Mint</button>
+                                            <button className="btn btn-dark" onClick={() => this.handleShowMint(v.symbol, v.address, v.chainid)} disabled={v.supply_type == 1 ? true : false}>Mint</button>
                                             <button className="btn btn-dark" disabled>Roles control</button>
-                                            <button className="btn btn-dark" onClick={() => this.handleShowPause(v.symbol, v.address)} disabled={!v.pausable}>{v.paused ? "Unpause" : "Pause"}</button>
-                                            <button className="btn btn-dark" onClick={() => this.handleShowBlacklist(v.symbol, v.address)} disabled={!v.blacklist}>Blacklist</button>
+                                            <button className="btn btn-dark" onClick={() => this.handleShowPause(v.symbol, v.address, v.chainid)} disabled={!v.pausable}>{v.paused ? "Unpause" : "Pause"}</button>
+                                            <button className="btn btn-dark" onClick={() => this.handleShowBlacklist(v.symbol, v.address, v.chainid)} disabled={!v.blacklist}>Blacklist</button>
+                                            <button className="btn btn-dark" onClick={() => this.handleShowBurn(v.symbol, v.address, v.chainid)} disabled={!v.burnable}>Burn</button>
                                             <button className="btn btn-dark" disabled>Token info</button>
                                         </td>
                                     </tr>
@@ -801,29 +908,46 @@ class Tokens extends Component {
                             Mint new {this.state.currentTokenSymbol} tokens
                     </Modal.Header>
                     <Modal.Body>
-                        <div>
-                            <ol className="mint-token-info-list">
-                                <li>
-                                    Contract balance: (soon) {this.state.currentTokenSymbol} 
-                                </li>
-                                <li>
-                                    Total supply: (soon) {this.state.currentTokenSymbol} 
-                                </li>
-                                <li>
-                                    Max supply: (soon) {this.state.currentTokenSymbol} 
-                                </li>
-                                <li>
-                                    Available to mint: (soon) {this.state.currentTokenSymbol} 
-                                </li>
-                            </ol>
-                        </div>
-                        <div className="mb-3">
-                            <label className="form-label">Amount to mint *</label>
-                            <div className="input-group">
-                                <input type="number" onChange={this.onChangeMintTokenAmount} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                        {
+                            this.state.showLoading
+                            ?
+                            <div className="spinner-border" role="status"></div>
+                            :
+                            <>
+                            <div>
+                                <ol className="mint-token-info-list">
+                                    <li>
+                                        Total supply: {this.state.mintTokenTotalSupply} {this.state.currentTokenSymbol} 
+                                    </li>
+                                    <li>
+                                        Max supply: {
+                                            this.state.mintTokenMaxSupply === '0.0'
+                                            ?
+                                            `Infinity`
+                                            :
+                                            `${this.state.mintTokenMaxSupply} ${this.state.currentTokenSymbol}`
+                                        } 
+                                    </li>
+                                    <li>
+                                        Available to mint: {
+                                            this.state.mintTokenMaxSupply === '0.0'
+                                            ?
+                                            `Infinity`
+                                            :
+                                            `${this.state.mintTokenAvailableToMint} ${this.state.currentTokenSymbol}`
+                                        }
+                                    </li>
+                                </ol>
                             </div>
-                            <div className="form-text" id="basic-addon4">Enter the number of the ABC tokens you want to create</div>
-                        </div>
+                            <div className="mb-3">
+                                <label className="form-label">Amount to mint *</label>
+                                <div className="input-group">
+                                    <input type="number" onChange={this.onChangeMintTokenAmount} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                </div>
+                                <div className="form-text" id="basic-addon4">Enter the number of the ABC tokens you want to create</div>
+                            </div>
+                            </>
+                        }
                     </Modal.Body>
                     <Modal.Footer>
                         <button onClick={this.mint} type="button" className="btn btn-dark">Mint</button>
@@ -845,7 +969,7 @@ class Tokens extends Component {
                     </Modal.Header>
                     <Modal.Body>
                         {
-                            this.state.showBlacklistLoading
+                            this.state.showLoading
                             ?
                             <div className="spinner-border" role="status"></div>
                             :
@@ -866,8 +990,8 @@ class Tokens extends Component {
                                             return (
                                                 <tr className="table-secondary">
                                                     <td className="table-secondary">
-                                                        <div class="form-check">
-                                                            <input onChange={() => this.onChangeBlacklistRemove(v.address)} class="form-check-input" type="checkbox" value="" id="flexCheckChecked"/>
+                                                        <div className="form-check">
+                                                            <input onChange={() => this.onChangeBlacklistRemove(v.address)} className="form-check-input" type="checkbox" value="" id="flexCheckChecked"/>
                                                         </div>
                                                     </td>
                                                     <td className="table-secondary">
@@ -908,6 +1032,58 @@ class Tokens extends Component {
                         <Modal.Footer>
                             <button className="btn btn-dark" onClick={this.addToBlacklist}>Add</button>
                         </Modal.Footer>
+                </Modal>
+                <Modal show={this.state.showBurn} onHide={this.handleCloseBurn} centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Burn {this.state.currentTokenSymbol} token</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <label className="form-label">From who:</label>
+                        <div className="choose-reward-node">
+                            <div className="form-check">
+                                <input 
+                                    className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1"
+                                    value={burnAddressType.current} checked={this.state.currentBurnAddressType === burnAddressType.current}
+                                    onChange={this.onChangeCurrentBurnType}
+                                />
+                                <label className="form-check-label" for="flexRadioDefault1">
+                                    Current account
+                                </label>
+                            </div>
+                            <div className="form-check">
+                                <input 
+                                    className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2"
+                                    value={burnAddressType.other} checked={this.state.currentBurnAddressType === burnAddressType.other}
+                                    onChange={this.onChangeCurrentBurnType}
+                                />
+                                <label className="form-check-label" for="flexRadioDefault2">
+                                    Other
+                                </label>
+                            </div>
+                        </div>
+                        {
+                            this.state.currentBurnAddressType === burnAddressType.other
+                            ?
+                            <div className="mb-3">
+                                <label className="form-label">Other address:</label>
+                                <div className="input-group">
+                                    <input onChange={this.onChangeOtherBurnAddress} type="text" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                </div>
+                            </div>
+                            :
+                            null
+                        }
+                        <div className="mb-3">
+                            <label className="form-label">Burn amount:</label>
+                            <div className="input-group">
+                                <input onChange={this.onChangeBurnAmount} type="number" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                            </div>
+                        </div>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <button className="btn btn-dark" onClick={this.burn}>Burn</button>
+                        <button className="btn btn-light" onClick={this.handleCloseBurn}>Cancel</button>
+                    </Modal.Footer>
                 </Modal>
                 <ConfirmModal 
                     showConfirm={this.state.showConfirm} 
