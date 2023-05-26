@@ -43,6 +43,9 @@ class Tokens extends Component {
             address: null,
             showCreate: false,
             showMint: false,
+            showBlacklist: false,
+            showBlacklistLoading: false,
+            showBlacklistAdd: false,
             showPause: false,
             showConfirm: false,
             showProgress: false,
@@ -56,6 +59,7 @@ class Tokens extends Component {
             isCurrentTokenPaused: null,
             currentTokenSymbol: null,
             currentTokenAddress: null,
+            currentToken: null,
             mintTokenAmount: null,
             tokens: [],
             network: networks[config.status === "test" ? '5' : '1'],
@@ -66,7 +70,10 @@ class Tokens extends Component {
             burnable: false,
             blacklist: false,
             verified: false,
-            recoverable: false
+            recoverable: false,
+            currentTokenBlacklist: [],
+            currentTokenBlacklistAddText: null,
+            currentTokenBlacklistRemove: []
         }
     }
 
@@ -138,6 +145,22 @@ class Tokens extends Component {
         this.setState({
             mintTokenAmount: event.target.value
         })
+    }
+
+    onChangeBlacklistAddText(event) {
+        this.setState({
+            currentTokenBlacklistAddText: event.target.value
+        })
+    }
+
+    onChangeBlacklistRemove(address) {
+        let currentTokenBlacklistRemove = this.state.currentTokenBlacklistRemove
+        if (currentTokenBlacklistRemove.find(v => v === address)) {
+            currentTokenBlacklistRemove = currentTokenBlacklistRemove.filter(v => v !== address)
+        } else {
+            currentTokenBlacklistRemove.push(address)
+        }
+        this.setState({currentTokenBlacklistRemove})
     }
 
     async connect() {
@@ -341,6 +364,11 @@ class Tokens extends Component {
                 this.handleCloseProgress()
                 this.handleShowError('User rejected transaction')
             }
+            if (error.message.includes('Cap exceeded')) {
+                this.handleCloseConfirm()
+                this.handleCloseProgress()
+                this.handleShowError('Maximum supply exceeded')
+            }
             console.log(error)
         }
     }
@@ -427,10 +455,96 @@ class Tokens extends Component {
         }
     }
 
+    async addToBlacklist() {
+        try {
+            const { currentTokenSymbol, currentToken, currentTokenBlacklistAddText, currentTokenBlacklist } = this.state
+            const blacklistAdd = currentTokenBlacklistAddText.split('\n')
+            this.handleShowConfirm(`Confirm adding addresses to ${currentTokenSymbol} token blacklist`, `Please, confirm transaction in your wallet`)
+            const tx = await currentToken.setBlacklistUsers(blacklistAdd)
+            this.handleCloseConfirm()
+            this.handleShowProgress()
+            tx.wait().then(
+                () => {
+                    this.handleCloseProgress()
+                    this.handleShowSuccess('Success adding to blacklist', `You have successfully added addresses to ${currentTokenSymbol} token blacklist`)
+                    blacklistAdd.forEach(v => {
+                        currentTokenBlacklist.push({
+                            address: v,
+                            time: new Date()
+                        })
+                    })
+                    this.setState({currentTokenBlacklist})
+                }
+            )
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async removeFromBlacklist() {
+        try {
+            const { currentTokenSymbol, currentToken, currentTokenBlacklistRemove } = this.state
+            if (currentTokenBlacklistRemove.length) {
+                this.handleShowConfirm(`Confirm removing addresses from ${currentTokenSymbol} token blacklist`, `Please, confirm transaction in your wallet`)
+                const tx = await currentToken.deleteBlacklistUsers(currentTokenBlacklistRemove)
+                this.handleCloseConfirm()
+                this.handleShowProgress()
+                tx.wait().then(
+                    () => {
+                        this.handleCloseProgress()
+                        this.handleShowSuccess('Success removing from blacklist', `You have successfully removed addresses from ${currentTokenSymbol} token blacklist`)
+                        this.setState({
+                            currentTokenBlacklistRemove: [],
+                            currentTokenBlacklist: this.state.currentTokenBlacklist.filter(v => !currentTokenBlacklistRemove.includes(v.address))
+                        })
+                    }
+                )
+            } else throw Error('Empty list')
+        } catch (error) {
+            if (error.message.includes('Empty list')) {
+                this.handleShowError('Empty removing list')
+            }
+            console.log(error)
+        }
+    }
+
     handleCloseCreate = () => this.setState({showCreate: false})
     handleShowCreate = () => this.setState({showCreate: true})
     handleShowMint = (currentTokenSymbol, currentTokenAddress) => this.setState({showMint: true, currentTokenSymbol, currentTokenAddress})
     handleCloseMint = () => this.setState({showMint: false})
+
+    handleShowBlacklist = async (currentTokenSymbol, currentTokenAddress) => {
+        this.setState({showBlacklist: true, currentTokenSymbol, currentTokenAddress, showBlacklistLoading: true})
+        const provider = new ethers.providers.Web3Provider(window.ethereum)
+        await provider.send("eth_requestAccounts", [])
+        const signer = await provider.getSigner()
+        const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
+        const token = Token.attach(currentTokenAddress)
+        const lastBlacklistID = await token.blacklistLastID()
+        let currentTokenBlacklist = []
+        for (let i = 0; i <= parseInt(lastBlacklistID); i++) {
+            try {
+                const user = await token.blacklistUsers(i)
+                if (user !== ethers.constants.AddressZero) {
+                    const blockTime = await token.blacklistTime(user)
+                    currentTokenBlacklist.push({
+                        address: user,
+                        time: new Date(parseInt(blockTime)*1000)
+                    })
+                }
+            } catch (error) {
+                
+            }
+        }
+        this.setState({
+            currentTokenBlacklist, showBlacklistLoading: false, provider,
+            signer, currentToken: token
+        })
+    }
+    handleCloseBlacklist = () => this.setState({showBlacklist: false, currentTokenSymbol: null, currentTokenAddress: null, currentTokenBlacklistRemove: []})
+    handleShowBlacklistAdd = () => this.setState({showBlacklistAdd: true, showBlacklist: false, currentTokenBlacklistRemove: []})
+    handleCloseBlacklistAdd = () => this.setState({showBlacklistAdd: false, showBlacklist: true})
+
     handleShowPause = async (currentTokenSymbol, currentTokenAddress) => {
         const provider = new ethers.providers.Web3Provider(window.ethereum)
         await provider.send("eth_requestAccounts", [])
@@ -460,6 +574,8 @@ class Tokens extends Component {
     handleCloseCreate = this.handleCloseCreate.bind(this)
     handleShowMint = this.handleShowMint.bind(this)
     handleCloseMint = this.handleCloseMint.bind(this)
+    handleShowBlacklist = this.handleShowBlacklist.bind(this)
+    handleCloseBlacklist = this.handleCloseBlacklist.bind(this)
     handleShowPause = this.handleShowPause.bind(this)
     handleClosePause = this.handleClosePause.bind(this)
     onChangeInitialSupply = this.onChangeInitialSupply.bind(this)
@@ -481,6 +597,12 @@ class Tokens extends Component {
     handleCloseSuccess = this.handleCloseSuccess.bind(this)
     handleShowError = this.handleShowError.bind(this)
     handleCloseError = this.handleCloseError.bind(this)
+    handleShowBlacklistAdd = this.handleShowBlacklistAdd.bind(this)
+    handleCloseBlacklistAdd = this.handleCloseBlacklistAdd.bind(this)
+    onChangeBlacklistAddText = this.onChangeBlacklistAddText.bind(this)
+    addToBlacklist = this.addToBlacklist.bind(this)
+    removeFromBlacklist = this.removeFromBlacklist.bind(this)
+    onChangeBlacklistRemove = this.onChangeBlacklistRemove.bind(this)
 
     render() {
         return (
@@ -643,7 +765,7 @@ class Tokens extends Component {
                                             <button className="btn btn-dark" onClick={() => this.handleShowMint(v.symbol, v.address)} disabled={v.supply_type == 1 ? true : false}>Mint</button>
                                             <button className="btn btn-dark" disabled>Roles control</button>
                                             <button className="btn btn-dark" onClick={() => this.handleShowPause(v.symbol, v.address)} disabled={!v.pausable}>{v.paused ? "Unpause" : "Pause"}</button>
-                                            <button className="btn btn-dark" disabled={!v.blacklist}>Blacklist</button>
+                                            <button className="btn btn-dark" onClick={() => this.handleShowBlacklist(v.symbol, v.address)} disabled={!v.blacklist}>Blacklist</button>
                                             <button className="btn btn-dark" disabled>Token info</button>
                                         </td>
                                     </tr>
@@ -692,6 +814,78 @@ class Tokens extends Component {
                     <Modal.Footer>
                         <button type="button" className="btn btn-dark" onClick={this.pause}>{this.state.isCurrentTokenPaused ? "Unpause" : "Pause"}</button>
                     </Modal.Footer>
+                </Modal>
+                <Modal show={this.state.showBlacklist} onHide={this.handleCloseBlacklist} centered>
+                    <Modal.Header>
+                        <Modal.Title>
+                            {this.state.currentTokenSymbol} token blacklist 
+                        </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {
+                            this.state.showBlacklistLoading
+                            ?
+                            <div className="spinner-border" role="status"></div>
+                            :
+                            (
+                                <table className="table table-bordered border-dark">
+                                <thead>
+                                    <tr className="table-secondary" >
+                                    <th className="table-secondary" scope="col">Select</th>
+                                    <th className="table-secondary" scope="col">Wallet</th>
+                                    <th className="table-secondary" scope="col">Block Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    {
+                                    this.state.currentTokenBlacklist.map(
+                                        v => {
+                                            return (
+                                                <tr className="table-secondary">
+                                                    <td className="table-secondary">
+                                                        <div class="form-check">
+                                                            <input onChange={() => this.onChangeBlacklistRemove(v.address)} class="form-check-input" type="checkbox" value="" id="flexCheckChecked"/>
+                                                        </div>
+                                                    </td>
+                                                    <td className="table-secondary">
+                                                        {createLongStrView(v.address)}
+                                                    </td>
+                                                    <td className="table-secondary">
+                                                        {
+                                                            `${v.time.toLocaleDateString()} ${v.time.toLocaleTimeString().slice(0,5)}`
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            )
+                                        }
+                                        )
+                                    }
+                                </tbody>
+                                </table>
+                            )
+                        }
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <button className="btn btn-dark" onClick={this.removeFromBlacklist}>Remove</button>
+                        <button className="btn btn-light" onClick={this.handleShowBlacklistAdd}>Add new</button>
+                    </Modal.Footer>
+                </Modal>
+                <Modal show={this.state.showBlacklistAdd} onHide={this.handleCloseBlacklistAdd} centered>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Add to blacklist</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <div>
+                            {this.state.currentTokenSymbol} tokens on blacklisted users' wallets will be frozen and cannot be sent from them. Add list of wallets to the text box. Each wallet on a new line.
+                            </div>
+                            <div>
+                                <textarea onChange={this.onChangeBlacklistAddText}></textarea>
+                            </div>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <button className="btn btn-dark" onClick={this.addToBlacklist}>Add</button>
+                        </Modal.Footer>
                 </Modal>
                 <ConfirmModal 
                     showConfirm={this.state.showConfirm} 
