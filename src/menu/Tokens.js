@@ -1,5 +1,6 @@
 import { Component } from "react";
 import { ethers, ContractFactory } from "ethers";
+import { Contract, Provider } from 'ethers-multicall';
 import { createLongStrView } from "../utils/longStrView";
 import ERC20Mintable from "../contracts/erc20/ERC20Mintable.json";
 import ERC20Universal from "../contracts/erc20/ERC20Universal.json"
@@ -477,6 +478,11 @@ class Tokens extends Component {
                 }
             )
         } catch (error) {
+            if (error.message.includes('user rejected transaction')) {
+                this.handleCloseConfirm()
+                this.handleCloseProgress()
+                this.handleShowError('User rejected transaction')
+            }
             console.log(error)
         }
     }
@@ -504,6 +510,11 @@ class Tokens extends Component {
             if (error.message.includes('Empty list')) {
                 this.handleShowError('Empty removing list')
             }
+            if (error.message.includes('user rejected transaction')) {
+                this.handleCloseConfirm()
+                this.handleCloseProgress()
+                this.handleShowError('User rejected transaction')
+            }
             console.log(error)
         }
     }
@@ -514,32 +525,43 @@ class Tokens extends Component {
     handleCloseMint = () => this.setState({showMint: false})
 
     handleShowBlacklist = async (currentTokenSymbol, currentTokenAddress) => {
-        this.setState({showBlacklist: true, currentTokenSymbol, currentTokenAddress, showBlacklistLoading: true})
-        const provider = new ethers.providers.Web3Provider(window.ethereum)
-        await provider.send("eth_requestAccounts", [])
-        const signer = await provider.getSigner()
-        const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
-        const token = Token.attach(currentTokenAddress)
-        const lastBlacklistID = await token.blacklistLastID()
-        let currentTokenBlacklist = []
-        for (let i = 0; i <= parseInt(lastBlacklistID); i++) {
-            try {
-                const user = await token.blacklistUsers(i)
-                if (user !== ethers.constants.AddressZero) {
-                    const blockTime = await token.blacklistTime(user)
+        try {
+            this.setState({showBlacklist: true, currentTokenSymbol, currentTokenAddress, showBlacklistLoading: true})
+            const provider = new ethers.providers.Web3Provider(window.ethereum)
+            const ethcallProvider = new Provider(provider);
+            await ethcallProvider.init();
+            await provider.send("eth_requestAccounts", [])
+            const signer = await provider.getSigner()
+            const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
+            const tokenUsual = Token.attach(currentTokenAddress)
+            const tokenMulticall = new Contract(currentTokenAddress, ERC20Universal.abi)
+            const lastBlacklistID = await tokenUsual.blacklistLastID()
+            const usersPromises = [];
+            for (let i = 0; i <= parseInt(lastBlacklistID); i++) {
+                usersPromises.push(tokenMulticall.blacklistUsers(i));
+            }
+            const users = await ethcallProvider.all(usersPromises)
+            const timesPromises = []
+            for (let i = 0; i < users.length; i++) {
+                timesPromises.push(tokenMulticall.blacklistTime(users[i]));
+            }
+            const times = await ethcallProvider.all(timesPromises)
+            let currentTokenBlacklist = []
+            for (let i = 0; i < users.length; i++) {
+                if (users[i] !== ethers.constants.AddressZero) {
                     currentTokenBlacklist.push({
-                        address: user,
-                        time: new Date(parseInt(blockTime)*1000)
+                        address: users[i],
+                        time: new Date(parseInt(times[i])*1000)
                     })
                 }
-            } catch (error) {
-                
             }
+            this.setState({
+                currentTokenBlacklist, showBlacklistLoading: false, provider,
+                signer, currentToken: tokenUsual
+            })
+        } catch (error) {
+            console.log(error)
         }
-        this.setState({
-            currentTokenBlacklist, showBlacklistLoading: false, provider,
-            signer, currentToken: token
-        })
     }
     handleCloseBlacklist = () => this.setState({showBlacklist: false, currentTokenSymbol: null, currentTokenAddress: null, currentTokenBlacklistRemove: []})
     handleShowBlacklistAdd = () => this.setState({showBlacklistAdd: true, showBlacklist: false, currentTokenBlacklistRemove: []})
@@ -816,7 +838,7 @@ class Tokens extends Component {
                     </Modal.Footer>
                 </Modal>
                 <Modal show={this.state.showBlacklist} onHide={this.handleCloseBlacklist} centered>
-                    <Modal.Header>
+                    <Modal.Header closeButton>
                         <Modal.Title>
                             {this.state.currentTokenSymbol} token blacklist 
                         </Modal.Title>
