@@ -291,8 +291,6 @@ class NFTCollections extends Component {
 
     async createNFT() {
         try {
-            const provider = new ethers.providers.Web3Provider(window.ethereum)
-            const chainid = (await provider.getNetwork()).chainId
             const headers = new Headers();
             headers.append("Content-Type", "application/json");
             headers.append("Authorization", getBearerHeader())
@@ -300,8 +298,7 @@ class NFTCollections extends Component {
                 "address": this.state.addNFTAddress,
                 "amount": this.state.addNFTAmount,
                 "name": this.state.addNFTName,
-                "description": this.state.addNFTDescription,
-                "chainid": chainid.toString()
+                "description": this.state.addNFTDescription
             });
             const requestOptions = {
                 method: 'POST',
