@@ -331,7 +331,7 @@ class Tokens extends Component {
               };
             const res = await fetch(`${config.api}/tokens/add`, requestOptions)
             if (res.status === 200) {
-                const token = (await res.json()).token
+                const token = (await res.json()).body.data
                 const _tokens = this.state.tokens
                 _tokens.push(token)
                 this.setState({
@@ -390,6 +390,7 @@ class Tokens extends Component {
                 currentTokenChainid
             } = this.state
             let provider = new ethers.providers.Web3Provider(window.ethereum)
+            console.log(await provider.getNetwork())
             const chainid = (await provider.getNetwork()).chainId
             if (chainid.toString() !== currentTokenChainid) {
                 await this.changeNetwork(currentTokenChainid)
@@ -452,14 +453,14 @@ class Tokens extends Component {
               };
             const res = await fetch(`${config.api}/tokens`, requestOptions)
             const json = await res.json()
-            const tokens = json.tokens
+            const tokens = json.body.data
             tokens.forEach(async (v) => {
                 const data = await this.getToken(v.address)
                 v.tokenSupply = data.tokenSupply
                 v.paused = data.paused
             })
             this.setState({
-                tokens: json.tokens
+                tokens: json.body.data
             })
         } catch (error) {
             alert(error)
@@ -797,12 +798,12 @@ class Tokens extends Component {
                             <label className="form-labelerc20_tokens_supply_types">Blockchain</label>
                             <div className="input-group">
                                 <select onChange={e => this.changeNetwork(e.target.value)} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                    <option value={config.status === "test" ? '5' : '1'} selected={this.state.network.chainid === (config.status === "test" ? '5' : '1')}>{networks[config.status === "test" ? '5' : '1'].name}</option>
-                                    <option value={config.status === "test" ? '97' : '56'} selected={this.state.network.chainid === (config.status === "test" ? '97' : '56')}>{networks[config.status === "test" ? '97' : '56'].name}</option>
-                                    <option value={config.status === "test" ? '80001' : '137'} selected={this.state.network.chainid === (config.status === "test" ? '80001' : '137')}>{networks[config.status === "test" ? '80001' : '137'].name}</option>
-                                    <option value={config.status === "test" ? '420' : '10'} selected={this.state.network.chainid === (config.status === "test" ? '420' : '10')} disabled={config.status === "test" ? true : false} >{networks[config.status === "test" ? '420' : '10'].name}</option>
-                                    <option value={config.status === "test" ? '43113' : '43114'} selected={this.state.network.chainid === (config.status === "test" ? '43113' : '43114')}>{networks[config.status === "test" ? '43113' : '43114'].name}</option>
-                                    <option value={config.status === "test" ? '421613' : '42161'} selected={this.state.network.chainid === (config.status === "test" ? '421613' : '42161')}>{networks[config.status === "test" ? '421613' : '42161'].name}</option>
+                                    <option value={config.status === "test" ? '5' : '1'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '5' : '1')) : false}>{networks[config.status === "test" ? '5' : '1'].name}</option>
+                                    <option value={config.status === "test" ? '97' : '56'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '97' : '56')) : false}>{networks[config.status === "test" ? '97' : '56'].name}</option>
+                                    <option value={config.status === "test" ? '80001' : '137'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '80001' : '137')) : false}>{networks[config.status === "test" ? '80001' : '137'].name}</option>
+                                    <option value={config.status === "test" ? '420' : '10'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '420' : '10')) : false} disabled={config.status === "test" ? true : false} >{networks[config.status === "test" ? '420' : '10'].name}</option>
+                                    <option value={config.status === "test" ? '43113' : '43114'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '43113' : '43114')) : false}>{networks[config.status === "test" ? '43113' : '43114'].name}</option>
+                                    <option value={config.status === "test" ? '421613' : '42161'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '421613' : '42161')) : false}>{networks[config.status === "test" ? '421613' : '42161'].name}</option>
                                 </select>
                             </div>
                         </div>
