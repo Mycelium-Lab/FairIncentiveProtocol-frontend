@@ -118,7 +118,7 @@ class Users extends Component {
             if (res.status === 200) {
                 const _users = this.state.users
                 _users.push({
-                    id: json.id,
+                    id: json.body.data.id,
                     external_id: this.state.add_externalID,
                     email: this.state.add_email,
                     wallet: this.state.add_wallet,
@@ -151,7 +151,7 @@ class Users extends Component {
             const res = await fetch(`${config.api}/users`, requestOptions)
             const json = await res.json()
             this.setState({
-                users: json.users
+                users: json.body.data
             })
         } catch (error) {
             alert(error)
@@ -200,10 +200,10 @@ class Users extends Component {
               };
             const res = await fetch(`${config.api}/rewards/get/token`, requestOptions)
             const json = await res.json()
-            json.tokenRewards = json.tokenRewards.filter(v => v.status !== 1)
+            json.body.data = json.body.data.filter(v => v.status !== 1)
             this.setState({
-                tokenRewards: json.tokenRewards,
-                chosen_reward_token: json.tokenRewards[0] ? json.tokenRewards[0].id : null
+                tokenRewards: json.body.data,
+                chosen_reward_token: json.body.data[0] ? json.body.data[0].id : null
             })
         } catch (error) {
             console.log(error)
@@ -222,10 +222,10 @@ class Users extends Component {
               };
             const res = await fetch(`${config.api}/rewards/get/nfts`, requestOptions)
             const json = await res.json()
-            json.nftRewards = json.nftRewards.filter(v => v.status !== 1)
+            json.body.data = json.body.data.filter(v => v.status !== 1)
             this.setState({
-                nftRewards: json.nftRewards,
-                chosen_reward_nft: json.nftRewards[0] ? json.nftRewards[0].id : null
+                nftRewards: json.body.data,
+                chosen_reward_nft: json.body.data[0] ? json.body.data[0].id : null
             })
         } catch (error) {
             console.log(error)
