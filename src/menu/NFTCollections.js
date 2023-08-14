@@ -264,7 +264,7 @@ class NFTCollections extends Component {
               };
             const res = await fetch(`${config.api}/nfts/add/collection`, requestOptions)
             if (res.status === 200) {
-                const collection = (await res.json()).collection
+                const collection = (await res.json()).body.data
                 const _nfts = this.state.nftCollections
                 _nfts.push(collection)
                 this.setState({
@@ -332,7 +332,7 @@ class NFTCollections extends Component {
             const res = await fetch(`${config.api}/nfts/collections`, requestOptions)
             const json = await res.json()
             this.setState({
-                nftCollections: json.nftCollections
+                nftCollections: json.body.data
             })
         } catch (error) {
             alert(error)
