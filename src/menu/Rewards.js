@@ -79,8 +79,8 @@ class Rewards extends Component {
             const res = await fetch(`${config.api}/tokens`, requestOptions)
             const json = await res.json()
             this.setState({
-                tokens: json.tokens,
-                chosen_token: json.tokens.length > 0 ? json.tokens[0].address : null
+                tokens: json.body.data,
+                chosen_token: json.body.data.length > 0 ? json.body.data[0].address : null
             })
         } catch (error) {
             console.log(error)
@@ -100,8 +100,8 @@ class Rewards extends Component {
             const res = await fetch(`${config.api}/nfts/collections`, requestOptions)
             const json = await res.json()
             this.setState({
-                nftCollections: json.nftCollections,
-                chosen_nft_collection: json.nftCollections.length > 0 ? json.nftCollections[0].address : null
+                nftCollections: json.body.data,
+                chosen_nft_collection: json.body.data.length > 0 ? json.body.data[0].address : null
             })
         } catch (error) {
             console.log(error)
@@ -120,10 +120,10 @@ class Rewards extends Component {
               };
             const res = await fetch(`${config.api}/nfts/nfts`, requestOptions)
             const json = await res.json()
-            const current_nfts = this.state.chosen_nft_collection ? json.nfts[this.state.chosen_nft_collection] : []
+            const current_nfts = this.state.chosen_nft_collection ? json.body.data[this.state.chosen_nft_collection] : []
             const chosen_nft = current_nfts[0] ? current_nfts[0].nft_id : null
             this.setState({
-                nfts: json.nfts,
+                nfts: json.body.data,
                 current_nfts,
                 chosen_nft
             })
@@ -144,10 +144,10 @@ class Rewards extends Component {
               };
             const res = await fetch(`${config.api}/users`, requestOptions)
             const json = await res.json()
-            const users = json.users.map(v => <option value={v.id}>{v.external_id}</option>)
+            const users = json.body.data.map(v => <option value={v.id}>{v.external_id}</option>)
             this.setState({
                 users,
-                chosen_user: json.users.length > 0 ? json.users[0].id : null
+                chosen_user: json.body.data.length > 0 ? json.body.data[0].id : null
             })
         } catch (error) {
             console.log(error)
@@ -167,7 +167,7 @@ class Rewards extends Component {
             const res = await fetch(`${config.api}/rewards/get/token`, requestOptions)
             const json = await res.json()
             this.setState({
-                tokenRewards: json.tokenRewards
+                tokenRewards: json.body.data
             })
         } catch (error) {
             console.log(error)
@@ -187,7 +187,7 @@ class Rewards extends Component {
             const res = await fetch(`${config.api}/rewards/get/nfts`, requestOptions)
             const json = await res.json()
             this.setState({
-                nftRewards: json.nftRewards
+                nftRewards: json.body.data
             })
         } catch (error) {
             console.log(error)
@@ -256,8 +256,8 @@ class Rewards extends Component {
             const json = await res.json()
             if (res.status === 200) {
                 const tokenRewards = this.state.tokenRewards
-                json.createdTokenReward.count = 0
-                tokenRewards.push(json.createdTokenReward)
+                json.body.data.count = 0
+                tokenRewards.push(json.body.data)
                 this.setState({
                     tokenRewards,
                     show: false,
@@ -292,8 +292,8 @@ class Rewards extends Component {
             const json = await res.json()
             if (res.status === 200) {
                 const nftRewards = this.state.nftRewards
-                json.createdNFTReward.count = 0
-                nftRewards.push(json.createdNFTReward)
+                json.body.data.count = 0
+                nftRewards.push(json.body.data)
                 this.setState({
                     nftRewards,
                     show: false,
@@ -394,7 +394,7 @@ class Rewards extends Component {
               };
             const res = await fetch(`${config.api}/rewards/reward/token`, requestOptions)
             const json = await res.json()
-            if (json.rewarded) {
+            if (res.status === 200) {
                 let tokenRewards = this.state.tokenRewards
                 tokenRewards.forEach(v => {if (v.id == this.state.reward_id) v.count = parseInt(v.count) + 1})
                 alert('Done')
@@ -428,7 +428,7 @@ class Rewards extends Component {
               };
             const res = await fetch(`${config.api}/rewards/reward/nft`, requestOptions)
             const json = await res.json()
-            if (json.rewarded) {
+            if (res.status === 200) {
                 let nftRewards = this.state.nftRewards
                 nftRewards.forEach(v => {if (v.id == this.state.reward_id) v.count = parseInt(v.count) + 1})
                 alert('Done')
