@@ -28,10 +28,10 @@ class SignIn extends Component {
             const res = await fetch(`${config.api}/auth/signin`, requestOptions)
             const json = await res.json()
             if (res.status === 200) {
-                document.cookie = `token=${json.message}`
+                document.cookie = `token=${json.body.data.token}`
                 window.location.reload()
             } else {
-                alert(json.message)
+                alert(json.error.message)
             }
         } catch (error) {
             console.log(error)
@@ -57,17 +57,22 @@ class SignIn extends Component {
 
     render() {
         return (
-            <div className='container'>
-                <div className='window'>
-                    <div className='overlay'></div>
-                    <div className='content'>
-                    <div className='welcome'>Hello There!</div>
-                    <div className='subtitle'>Before using our services you need to signin.</div>
-                    <div className='input-fields'>
-                        <input onChange={this.onChangeEmail} type='email' placeholder='Email' className='input-line full-width'></input>
-                        <input onChange={this.onChangePassword} type='password' placeholder='Password' className='input-line full-width'></input>
-                    </div>
-                    <div><button onClick={this.signin} className='ghost-round full-width'>SignIn</button></div>
+            <div>
+                <div>
+                    <h4>Sign In</h4>
+                    <div>
+                        <div>Please login to your account</div>
+                        <div className='input-fields'>
+                            <div>Email</div>
+                            <div>
+                                <input onChange={this.onChangeEmail} type='email' placeholder='Email' className='input-line full-width'></input>
+                            </div>
+                            <div>Password</div>
+                            <div>
+                                <input onChange={this.onChangePassword} type='password' placeholder='Password' className='input-line full-width'></input>
+                            </div>
+                        </div>
+                        <div><button onClick={this.signin} className='ghost-round full-width'>SignIn</button></div>
                     </div>
                 </div>
             </div>

@@ -55,7 +55,8 @@ class App extends Component {
                 this.state.switcher !== switcher.signed
                 ?
                 <div className='switch-button'>
-                <button onClick={this.switch} className='btn btn-secondary' value={switcher.signup}>{switcher.signup.toUpperCase()}</button>
+                {this.state.switcher === switcher.signin ? "Don't have an account?" : "Already a user?"} 
+                <button onClick={this.switch} value={switcher.signup}>{switcher.signup.toUpperCase()}</button>
                 </div>
                 :
                 null
