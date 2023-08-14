@@ -42,7 +42,7 @@ class RewardEvents extends Component {
                 };
             const res = await fetch(`${config.api}/rewards/events/tokens`, requestOptions)
             const json = await res.json()
-            const rewardEvents = json.rewardEvents
+            const rewardEvents = json.body.data
             this.setState({
                 rewardTokenEvents: rewardEvents
             })
@@ -63,7 +63,7 @@ class RewardEvents extends Component {
                 };
             const res = await fetch(`${config.api}/rewards/events/nfts`, requestOptions)
             const json = await res.json()
-            const rewardEvents = json.rewardEvents
+            const rewardEvents = json.body.data
             this.setState({
                 rewardNFTEvents: rewardEvents
             })
