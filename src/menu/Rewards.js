@@ -120,8 +120,8 @@ class Rewards extends Component {
               };
             const res = await fetch(`${config.api}/nfts/nfts`, requestOptions)
             const json = await res.json()
-            const current_nfts = this.state.chosen_nft_collection ? json.body.data[this.state.chosen_nft_collection] : []
-            const chosen_nft = current_nfts[0] ? current_nfts[0].nft_id : null
+            const current_nfts = this.state.chosen_nft_collection ? json.body.data.find(v => v.collection_address === this.state.chosen_nft_collection).nfts : []
+            const chosen_nft = current_nfts[0] ? current_nfts[0].id : null
             this.setState({
                 nfts: json.body.data,
                 current_nfts,
@@ -528,10 +528,11 @@ class Rewards extends Component {
     }
 
     changeNFTCollection(event) {
+        const current_nfts = this.state.nfts.find(v => v.collection_address === event.target.value).nfts
         this.setState({
             chosen_nft_collection: event.target.value,
-            current_nfts: this.state.nfts[event.target.value],
-            chosen_nft: this.state.nfts[event.target.value] ? this.state.nfts[event.target.value][0].nft_id : null 
+            current_nfts: current_nfts,
+            chosen_nft: current_nfts ? current_nfts[0].id : null 
         })
     }
 
@@ -823,7 +824,7 @@ class Rewards extends Component {
                                     {
                                         this.state.current_nfts 
                                         ?
-                                        this.state.current_nfts.map(v => <option value={v.nft_id}>{v.nft_name}</option>)
+                                        this.state.current_nfts.map(v => <option value={v.id}>{v.name}</option>)
                                         :
                                         null
                                     }
