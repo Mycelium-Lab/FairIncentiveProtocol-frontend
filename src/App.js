@@ -27,7 +27,7 @@ class App extends Component {
 
   async componentDidMount() {
     const checker = await checkAuth()
-    if (checker) this.setState({switcher: switcher.signed, auth: checker})
+    if (checker) this.setState({switcher: switcher.signed, auth: checker.body.data})
   }
 
   switch(event) {

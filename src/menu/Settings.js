@@ -2,6 +2,7 @@ import { Component } from "react";
 import { config } from "../utils/config";
 import { getBearerHeader } from "../utils/getBearerHeader";
 import ErrorModal from "../common/modals/error";
+import SuccessModal from "../common/modals/success";
 
 class Settings extends Component {
 
@@ -66,9 +67,10 @@ class Settings extends Component {
             const res = await fetch(`${config.api}/company/changename`, requestOptions)
             const json = await res.json()
             if (res.status === 200) {
-                this.handleShowSuccess(json.message, json.message)
+                console.log(json.body.message)
+                this.handleShowSuccess(json.body.message, json.body.message)
             } else {
-                this.handleShowError(json.error)
+                this.handleShowError(json.error.message)
             }
         } catch (error) {
             this.handleShowError(error.message)
@@ -92,7 +94,12 @@ class Settings extends Component {
               };
             const res = await fetch(`${config.api}/company/changeemail`, requestOptions)
             const json = await res.json()
-            alert(json.message)
+            if (res.status === 200) {
+                console.log(json.body.message)
+                this.handleShowSuccess(json.body.message, json.body.message)
+            } else {
+                this.handleShowError(json.error.message)
+            }
         } catch (error) {
             alert(error)
         }
@@ -115,7 +122,12 @@ class Settings extends Component {
               };
             const res = await fetch(`${config.api}/company/changephone`, requestOptions)
             const json = await res.json()
-            alert(json.message)
+            if (res.status === 200) {
+                console.log(json.body.message)
+                this.handleShowSuccess(json.body.message, json.body.message)
+            } else {
+                this.handleShowError(json.error.message)
+            }
         } catch (error) {
             alert(error)
         }
@@ -138,7 +150,12 @@ class Settings extends Component {
               };
             const res = await fetch(`${config.api}/company/changewallet`, requestOptions)
             const json = await res.json()
-            alert(json.message)
+            if (res.status === 200) {
+                console.log(json.body.message)
+                this.handleShowSuccess(json.body.message, json.body.message)
+            } else {
+                this.handleShowError(json.error.message)
+            }
         } catch (error) {
             alert(error)
         }
@@ -161,7 +178,12 @@ class Settings extends Component {
               };
             const res = await fetch(`${config.api}/company/changepassword`, requestOptions)
             const json = await res.json()
-            alert(json.message)
+            if (res.status === 200) {
+                console.log(json.body.message)
+                this.handleShowSuccess(json.body.message, json.body.message)
+            } else {
+                this.handleShowError(json.error.message)
+            }
         } catch (error) {
             alert(error)
         }
@@ -251,7 +273,13 @@ class Settings extends Component {
                         </li>
                     </ul>
                 </div>
-                <ErrorModal 
+                <SuccessModal 
+                    showSuccess={this.state.showSuccess} 
+                    handleCloseSuccess={this.handleCloseSuccess}
+                    successName={this.state.successName} 
+                    successText={this.state.successText}
+                />
+                <ErrorModal
                     showError={this.state.showError}
                     handleCloseError={this.handleCloseError}
                     errorText={this.state.errorText}
