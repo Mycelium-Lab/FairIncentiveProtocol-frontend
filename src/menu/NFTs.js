@@ -30,11 +30,12 @@ class NFTs extends Component {
             const nfts = []
             const keys = Object.keys(json.body.data)
             for (let i = 0; i < keys.length; i++) {
-                for (let j = 0; j < json.body.data[keys[i]].length; j++) {
+                for (let j = 0; j < json.body.data[keys[i]].nfts.length; j++) {
                     let nft = {}
-                    nft = json.body.data[keys[i]][j]
-                    const _res = await (await fetch(json.body.data[keys[i]][j].image)).json() 
+                    nft = json.body.data[keys[i]].nfts[j]
+                    const _res = await (await fetch(nft.image)).json() 
                     const jsonImage = _res.image
+                    nft.collection_name = json.body.data[keys[i]].collection_name
                     nft.real_image = jsonImage
                     nfts.push(nft)
                 } 
@@ -99,22 +100,22 @@ class NFTs extends Component {
                                                 {v.collection_name}
                                             </td>
                                             <td className="table-secondary">
-                                                {v.nft_name}
+                                                {v.name}
                                             </td>
                                             <td className="table-secondary">
-                                                {v.nft_description ? v.nft_description : '-'}
+                                                {v.description ? v.description : '-'}
                                             </td>
                                             <td className="table-secondary">
-                                                {v.nft_amount ? v.nft_amount : '-'}
+                                                {v.amount ? v.amount : '-'}
                                             </td>
                                             <td className="table-secondary">
                                                 <img width="300px" height="300px" src={v.real_image}/>
                                             </td>
                                             {
-                                                parseInt(v.rewards_count) === 0
+                                                parseInt(v.count) === 0
                                                 ?
                                                 <td className="table-secondary">
-                                                    <button className="btn btn-dark" onClick={() => this.deleteNFT(v.nft_id)}>Delete</button>
+                                                    <button className="btn btn-dark" onClick={() => this.deleteNFT(v.id)}>Delete</button>
                                                 </td>
                                                 :
                                                 null
