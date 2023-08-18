@@ -593,10 +593,11 @@ class Rewards extends Component {
     changeRewardToken(event) {
         let current_nfts = {}
         if (this.state.reward_type === types.nft) {
+            const _nfts = this.state.nfts.find(v => v.collection_address === event.target.value)
             current_nfts = {
-                current_nfts: this.state.nfts[event.target.value],
-                reward_nft_id: this.state.nfts[event.target.value] ? this.state.nfts[event.target.value][0].nft_id : null,
-                reward_nft_name: this.state.nfts[event.target.value] ? this.state.nfts[event.target.value][0].nft_name : null
+                current_nfts: _nfts ? _nfts.nfts : [],
+                reward_nft_id: _nfts ? _nfts.nfts[0].id : null,
+                reward_nft_name: _nfts ? _nfts.nfts[0].name : null
             }
         } 
         this.setState({
