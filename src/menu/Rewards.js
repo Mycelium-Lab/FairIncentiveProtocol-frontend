@@ -492,7 +492,6 @@ class Rewards extends Component {
                             v.amount = ethers.utils.parseEther(reward_amount.toString()).toString()
                             v.symbol = reward_symbol
                             v.address = reward_token
-                            v.nft_id = reward_nft_id
                         }}
                     )
                     alert('Done')
@@ -505,6 +504,7 @@ class Rewards extends Component {
                             v.symbol = reward_symbol
                             v.address = reward_token
                             v.nft_name = reward_nft_name 
+                            v.nft_id = reward_nft_id
                         }
                     })
                     alert('Done')
@@ -615,7 +615,7 @@ class Rewards extends Component {
     changeChosenRewardNFT(event) {
         this.setState({
             reward_nft_id: event.target.value,
-            reward_nft_name: this.state.nfts[this.state.reward_token].find(v => v.nft_id === event.target.value).nft_name
+            reward_nft_name: this.state.nfts.find(v => v.collection_address === this.state.reward_token).nfts.find(v => v.id === event.target.value).name
         })
     }
 
@@ -683,7 +683,7 @@ class Rewards extends Component {
         let current_nfts = {}
         if (reward_type === types.nft) {
             current_nfts = {
-                current_nfts: this.state.nfts[reward_token]
+                current_nfts: this.state.nfts.find(v => v.collection_address === reward_token).nfts
             }
         }
         this.setState(
@@ -1026,10 +1026,10 @@ class Rewards extends Component {
                                         this.state.current_nfts 
                                         ?
                                         this.state.current_nfts.map(v => {
-                                            if (v.nft_id === this.state.reward_nft_id) {
-                                                return <option value={v.nft_id} selected>{v.nft_name}</option>
+                                            if (v.id === this.state.reward_nft_id) {
+                                                return <option value={v.id} selected>{v.name}</option>
                                             }
-                                            return <option value={v.nft_id}>{v.nft_name}</option>
+                                            return <option value={v.id}>{v.name}</option>
                                         }
                                         )
                                         :
