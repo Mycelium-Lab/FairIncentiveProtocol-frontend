@@ -1,6 +1,6 @@
 import { Component } from "react";
-import { config } from "../utils/config";
-import { getBearerHeader } from "../utils/getBearerHeader";
+import { config } from "../../utils/config";
+import { getBearerHeader } from "../../utils/getBearerHeader";
 import ErrorModal from "../common/modals/error";
 import SuccessModal from "../common/modals/success";
 

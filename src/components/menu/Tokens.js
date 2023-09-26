@@ -2,14 +2,14 @@
 import { Component } from "react";
 import { ethers, ContractFactory } from "ethers";
 import { Contract, Provider } from 'ethers-multicall';
-import { createLongStrView } from "../utils/longStrView";
-import ERC20Mintable from "../contracts/erc20/ERC20Mintable.json";
-import ERC20Universal from "../contracts/erc20/ERC20Universal.json"
-import { getBearerHeader } from "../utils/getBearerHeader";
-import { config } from "../utils/config";
+import { createLongStrView } from "../../utils/longStrView";
+import ERC20Mintable from "../../contracts/erc20/ERC20Mintable.json";
+import ERC20Universal from "../../contracts/erc20/ERC20Universal.json"
+import { getBearerHeader } from "../../utils/getBearerHeader";
+import { config } from "../../utils/config";
 import Modal from 'react-bootstrap/Modal';
-import { networks } from "../utils/networks";
-import '../styles/tokens.css'
+import { networks } from "../../utils/networks";
+import '../../styles/tokens.css'
 import ConfirmModal from "../common/modals/confirm";
 import ProgressModal from "../common/modals/progress";
 import SuccessModal from "../common/modals/success";

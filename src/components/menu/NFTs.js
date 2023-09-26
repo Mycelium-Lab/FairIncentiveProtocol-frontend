@@ -1,6 +1,6 @@
 import { Component } from "react";
-import { getBearerHeader } from "../utils/getBearerHeader";
-import { config } from "../utils/config";
+import { getBearerHeader } from "../../utils/getBearerHeader";
+import { config } from "../../utils/config";
 
 class NFTs extends Component {
 

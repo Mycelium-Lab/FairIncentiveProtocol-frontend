@@ -1,9 +1,9 @@
 import { Component } from "react";
 import Modal from 'react-bootstrap/Modal';
-import { getBearerHeader } from "../utils/getBearerHeader";
-import { config } from "../utils/config";
-import { createLongStrView } from "../utils/longStrView";
-import '../styles/users.css'
+import { getBearerHeader } from "../../utils/getBearerHeader";
+import { config } from "../../utils/config";
+import { createLongStrView } from "../../utils/longStrView";
+import '../../styles/users.css'
 
 let propertiesElementsLength = 0
 let statsElementsLength = 0

@@ -1,12 +1,12 @@
 import { Component } from "react";
 import Modal from 'react-bootstrap/Modal';
-import '../styles/rewards.css'
+import '../../styles/rewards.css'
 import { ethers, utils } from "ethers";
-import { createLongStrView } from "../utils/longStrView";
-import { getBearerHeader } from "../utils/getBearerHeader";
-import { config } from "../utils/config";
-import ERC20Mintable from '../contracts/erc20/ERC20Mintable.json'
-import ERC721Mintable from '../contracts/erc721/ERC721Mintable.json'
+import { createLongStrView } from "../../utils/longStrView";
+import { getBearerHeader } from "../../utils/getBearerHeader";
+import { config } from "../../utils/config";
+import ERC20Mintable from '../../contracts/erc20/ERC20Mintable.json'
+import ERC721Mintable from '../../contracts/erc721/ERC721Mintable.json'
 
 const types = {
     token: 'token',

@@ -1,9 +1,8 @@
 import logo from './logo.svg';
 import './App.css';
-import './styles/auth.css'
 import { Component } from 'react';
-import SignUp from './auth/signup'; 
-import SignIn from './auth/signin';
+import SignUp from './components/auth/signup'; 
+import SignIn from './components/auth/signin';
 import { getCookie } from './utils/cookie';
 import { config } from './utils/config';
 import { checkAuth } from './utils/checkAuth';

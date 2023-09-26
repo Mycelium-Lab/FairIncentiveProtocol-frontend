@@ -1,5 +1,5 @@
 import { Component } from "react";
-import { config } from "../utils/config"
+import { config } from "../../utils/config"
 
 const steps = {
     step1: "1",

@@ -4,15 +4,15 @@ import './styles/middle.css'
 import './styles/header.css'
 import './styles/settings.css'
 import notificationsImage from './media/header/notifications.png'
-import Dashboard from "./menu/Dashboard";
-import Rewards from "./menu/Rewards";
-import Tokens from "./menu/Tokens";
-import Users from "./menu/Users";
-import NFTCollections from "./menu/NFTCollections";
-import Settings from "./menu/Settings";
+import Dashboard from "./components/menu/Dashboard";
+import Rewards from "./components/menu/Rewards";
+import Tokens from "./components/menu/Tokens";
+import Users from "./components/menu/Users";
+import NFTCollections from "./components/menu/NFTCollections";
+import Settings from "./components/menu/Settings";
 import { checkAuth } from "./utils/checkAuth";
-import RewardEvents from "./menu/RewardEvents";
-import NFTs from "./menu/NFTs";
+import RewardEvents from "./components/menu/RewardEvents";
+import NFTs from "./components/menu/NFTs";
 
 const switcher = {
     dashboard: 'dashboard',
@@ -80,7 +80,7 @@ class MainScreen extends Component {
                             <i className="fa fa-bell"></i>
                         </div>
                         <div>
-                            {this.state.auth.name}
+                        {this.state.auth.name}
                         </div>
                         <div>
                             <button onClick={this.logout} className="btn btn-danger"><i className="fa fa-sign-out fa-2x"></i></button>

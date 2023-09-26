@@ -1,14 +1,14 @@
 import { Component } from "react";
 import { ethers } from "ethers";
-import { createLongStrView } from "../utils/longStrView";
-import ERC721Mintable from "../contracts/erc721/ERC721Mintable.json";
-import ERC721DefaultRoyalty from "../contracts/erc721/ERC721DefaultRoyalty.json";
-import ERC721TokenRoyalty from "../contracts/erc721/ERC721TokenRoyalty.json";
-import { getBearerHeader } from "../utils/getBearerHeader";
-import { config } from "../utils/config";
-import { networks } from '../utils/networks'
+import { createLongStrView } from "../../utils/longStrView";
+import ERC721Mintable from "../../contracts/erc721/ERC721Mintable.json";
+import ERC721DefaultRoyalty from "../../contracts/erc721/ERC721DefaultRoyalty.json";
+import ERC721TokenRoyalty from "../../contracts/erc721/ERC721TokenRoyalty.json";
+import { getBearerHeader } from "../../utils/getBearerHeader";
+import { config } from "../../utils/config";
+import { networks } from '../../utils/networks'
 import Modal from 'react-bootstrap/Modal';
-import '../styles/nftCollections.css'
+import '../../styles/nftCollections.css'
 import ConfirmModal from "../common/modals/confirm";
 import ProgressModal from "../common/modals/progress";
 import SuccessModal from "../common/modals/success";

@@ -1,5 +1,6 @@
 import { Component } from "react";
-import { config } from "../utils/config"
+import { config } from "../../utils/config"
+import '../../styles/auth/signIn.css'
 
 class SignIn extends Component {
     constructor() {

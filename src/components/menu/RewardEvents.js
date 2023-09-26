@@ -1,8 +1,8 @@
 import { Component } from "react";
-import { config } from "../utils/config";
-import { getBearerHeader } from "../utils/getBearerHeader";
-import { createLongStrView } from "../utils/longStrView";
-import '../styles/rewardEvents.css'
+import { config } from "../../utils/config";
+import { getBearerHeader } from "../../utils/getBearerHeader";
+import { createLongStrView } from "../../utils/longStrView";
+import '../../styles/rewardEvents.css'
 import { ethers } from "ethers";
 import { Modal } from "react-bootstrap";
 
