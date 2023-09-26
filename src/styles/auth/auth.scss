@@ -1,0 +1,53 @@
+.auth-warapp{
+    max-width: 652px;
+    padding: 0px;
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+    //position: relative;
+}
+
+.auth-decore_left{
+    position: absolute;
+    left: 0px;
+}
+.auth-decore_right{
+    position: absolute;
+    right: 0px;
+}
+
+.auth-decore_left-people{
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    top: 480px;
+}
+
+.auth-decore_right-people{
+    position: absolute;
+    right: 0px;
+    bottom: 0px;
+    top: 180px;
+}
+
+.auth-logo{
+    margin-top: 85.05px;
+}
+
+.switch-button{
+    max-width: 652px;
+}
+
+.auth-switcher{
+    background: none;
+    border: none;
+    color: map-get($theme-colors, "primary");
+    font-weight: 600;
+    font-size: map-get($theme-fontSize, "subtitle");
+    line-height: 26.55px;
+}
+
+.auth-switcher:hover{
+    background: none !important;
+    color: map-get($theme-colors, "primary") !important;
+}

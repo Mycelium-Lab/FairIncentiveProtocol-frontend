@@ -2,7 +2,7 @@ import { Component } from "react";
 import { config } from "../../utils/config";
 import { getBearerHeader } from "../../utils/getBearerHeader";
 import { createLongStrView } from "../../utils/longStrView";
-import '../../styles/rewardEvents.css'
+import '../../styles/rewardEvents.scss'
 import { ethers } from "ethers";
 import { Modal } from "react-bootstrap";
 

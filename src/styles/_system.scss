@@ -1,0 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap');
+
+$theme-colors: (
+  "primary": rgba(33, 43, 54, 1),
+  "info": #17a2b8,
+  "error": rgba(220, 53, 69, 1),
+  "warning": rgba(255, 159, 67, 1),
+  "white": rgba(255, 255, 255, 1),
+  "text": rgba(182, 188, 196, 1),
+  "back": rgba(99, 115, 129, 1),
+); 
+
+$theme-family: (
+  "primary": 'Nunito'
+);
+
+$theme-fontSize: (
+  "primary": 14px,
+  "caption": 12px,
+  "subtitle": 17.7px,
+  "smTitile": 18px,
+  "preMdTitile": 20.23px,
+  "mdTitile": 22px,
+  "lgTitle": 30.34px,
+);
+$theme-fontSize-mobile: (
+  "subtitle": 14px,
+  "preMdTitile": 16px,
+  "lgTitle": 24px
+);
+
+$breakpoints: (
+  "sm": 576px,
+  "md": 769px,
+  "lg": 992px,
+  "xl": 1264px,
+)

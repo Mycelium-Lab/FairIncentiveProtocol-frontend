@@ -1,6 +1,6 @@
 import { Component } from "react";
 import Modal from 'react-bootstrap/Modal';
-import '../../styles/rewards.css'
+import '../../styles/rewards.scss'
 import { ethers, utils } from "ethers";
 import { createLongStrView } from "../../utils/longStrView";
 import { getBearerHeader } from "../../utils/getBearerHeader";

@@ -1,8 +1,8 @@
 import { Component } from "react";
-import './styles/menu.css'
-import './styles/middle.css'
-import './styles/header.css'
-import './styles/settings.css'
+import './styles/menu.scss'
+import './styles/middle.scss'
+import './styles/header.scss'
+import './styles/settings.scss'
 import notificationsImage from './media/header/notifications.png'
 import Dashboard from "./components/menu/Dashboard";
 import Rewards from "./components/menu/Rewards";

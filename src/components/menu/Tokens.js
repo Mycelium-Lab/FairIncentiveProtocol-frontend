@@ -9,7 +9,7 @@ import { getBearerHeader } from "../../utils/getBearerHeader";
 import { config } from "../../utils/config";
 import Modal from 'react-bootstrap/Modal';
 import { networks } from "../../utils/networks";
-import '../../styles/tokens.css'
+import '../../styles/tokens.scss'
 import ConfirmModal from "../common/modals/confirm";
 import ProgressModal from "../common/modals/progress";
 import SuccessModal from "../common/modals/success";

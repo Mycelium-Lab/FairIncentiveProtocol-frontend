@@ -1,4 +1,6 @@
 import { Component } from "react";
+import { Button, Container, Form, FormGroup } from "react-bootstrap";
+import DefaultAuth from "../../layouts/defaultAuth";
 import { config } from "../../utils/config"
 
 const steps = {
@@ -115,6 +117,12 @@ class SignUp extends Component {
         })
     }
 
+    handleSwitch(event) {
+        this.props.switch(event)
+    }
+
+    handleSwitch = this.handleSwitch.bind(this)
+
     onChangeCompanyName = this.onChangeCompanyName.bind(this)
     createAccount = this.createAccount.bind(this)
     onChangeEmail = this.onChangeEmail.bind(this)
@@ -127,66 +135,92 @@ class SignUp extends Component {
     onChangeRepname = this.onChangeRepname.bind(this)
 
     render() {
+        const { switcher, switcherText } = this.props;
         return (
-            <div>
-                <div>
-                    <h4>Create an Account</h4>
-                    <div>Step {this.state.current_step}/2</div>
-                    {
-                        this.state.current_step === steps.step1
-                        ?
-                        <div>
-                            <div>
-                                <div>Company name</div>
-                                <div>
-                                    <input value={this.state.companyName} id="companyname-input-signup" onChange={this.onChangeCompanyName} type='text' placeholder='Enter your company name' className='input-line full-width'></input>
-                                </div>
-                                <div>Country</div>
-                                <div>
-                                    <input value={this.state.country} id="companycountry-input-signup" onChange={this.onChangeCountry} placeholder="Choose your country"></input>
-                                </div>
-                                <div>Representative's name and surname</div>
-                                <div>
-                                    <input value={this.state.repname} id="companyrepname-input-signup" onChange={this.onChangeRepname} placeholder="Enter your name and surname"></input>
-                                </div>
-                            </div>
+            <>
+            <DefaultAuth>
+
+            </DefaultAuth>
+                <Container className="auth-warapp">
+                <img className="auth-logo w-100" src={require('../../media/auth/logo.png')}/>
+                <div className="auth">
+                    <div className="auth__form">
+                        <div className="auth__form-header">
+                            <h4 className="auth__form-title">Create an Account</h4>
+                            <div className="auth__form-subtitle">Step {this.state.current_step}/2</div>
                         </div>
-                        :
-                        <div>
-                            <div>
-                                <div>Phone number</div>
-                                <div>
-                                    <input value={this.state.phone} id="companyphone-input-signup" onChange={this.onChangePhone} placeholder="Enter your phone number"></input>
-                                </div>
-                                <div>Email</div>
-                                <div>
-                                    <input value={this.state.email} id="companyemail-input-signup" onChange={this.onChangeEmail} type='email' placeholder='Email' className='input-line full-width'></input>
-                                </div>
-                                <div>Password</div>
-                                <div>
-                                    <input value={this.state.password} id="companypassword-input-signup" onChange={this.onChangePassword} type='password' placeholder='Enter your password' className='input-line full-width'></input>
-                                </div>
-                                <div>Repeat password</div>
-                                <div>
-                                    <input value={this.state.repeat_password} id="companyreppassword-input-signup" onChange={this.onChangeRepeatPassword} type='password' placeholder='Repeat your password' className='input-line full-width'></input>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                    <div>
+
                         {
                             this.state.current_step === steps.step1
                             ?
-                            <button onClick={this.goToStep2} className='ghost-round full-width'>Next</button>
-                            :
                             <>
-                            <button onClick={this.goToStep1} className='ghost-round full-width'>Back</button>
-                            <button onClick={this.createAccount} className='ghost-round full-width'>Sign Up</button>
+                            <Form className='auth__form-fields'>
+                                <FormGroup>
+                                    <Form.Label className='auth__form-fields-label'>Company name</Form.Label>
+                                    <Form.Control className='auth__form-fields-input' value={this.state.companyName} onChange={this.onChangeCompanyName} type="text" placeholder="Enter your company name" />
+                                </FormGroup>
+
+                                <FormGroup>
+                                    <Form.Label className="auth__form-fields-label">Country</Form.Label>
+                                    <Form.Control className='auth__form-fields-input'  value={this.state.country} id="companycountry-input-signup" onChange={this.onChangeCountry} placeholder="Choose your country" />
+                                </FormGroup>
+
+                                <FormGroup>
+                                    <Form.Label className="auth__form-fields-label">Representative's name and surname</Form.Label>
+                                    <Form.Control className='auth__form-fields-input'   value={this.state.repname} id="companyrepname-input-signup" onChange={this.onChangeRepname} placeholder="Enter your name and surname"/>
+                                </FormGroup>
+                            </Form>
                             </>
+                            :
+                            <div>
+                                <Form className='auth__form-fields'>
+
+                                <FormGroup>
+                                    <Form.Label className='auth__form-fields-label'>Phone number</Form.Label>
+                                    <Form.Control className='auth__form-fields-input' value={this.state.phone} id="companyphone-input-signup" onChange={this.onChangePhone} placeholder="Enter your phone number" />
+                                </FormGroup>
+
+                                <FormGroup>
+                                    <Form.Label className='auth__form-fields-label'>Email</Form.Label>
+                                    <Form.Control className='auth__form-fields-input' value={this.state.email} id="companyemail-input-signup" onChange={this.onChangeEmail} type='email' placeholder='Email' />
+                                </FormGroup>
+
+                                <FormGroup>
+                                    <Form.Label className='auth__form-fields-label'>Password</Form.Label>
+                                    <Form.Control className='auth__form-fields-input' value={this.state.password} id="companypassword-input-signup" onChange={this.onChangePassword} type='password' placeholder='Enter your password' />
+                                </FormGroup>
+
+                                <FormGroup>
+                                    <Form.Label className='auth__form-fields-label'>Repeat password</Form.Label>
+                                    <Form.Control className='auth__form-fields-input' value={this.state.repeat_password} id="companyreppassword-input-signup" onChange={this.onChangeRepeatPassword} type='password' placeholder='Repeat your password' />
+                                </FormGroup>
+
+                                </Form>
+                            </div>
                         }
+                        <div className='auth__form-action'>
+                            {
+                                this.state.current_step === steps.step1
+                                ?
+                                <div className="auth__form-action-group-btn">
+                                    <Button onClick={this.goToStep1} className='auth__form-action-btn_back auth__form-action-btn w-50'>Back</Button>
+                                    <Button onClick={this.goToStep2} className="auth__form-action-btn w-50">Next</Button>
+                                </div>
+                                :
+                                <div className="auth__form-action-group-btn">
+                                    <Button onClick={this.goToStep1} className='auth__form-action-btn_back auth__form-action-btn w-50'>Back</Button>
+                                    <Button onClick={this.createAccount} className="auth__form-action-btn w-50">Sign Up</Button>
+                                </div>
+                            }
+                            <div className="auth__form-action-group">
+                                <span className="auth__form-action-group-text">Don't have an account?</span>
+                                <Button onClick={this.handleSwitch} value={switcher} className="auth-switcher">{switcherText}</Button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+                </Container>
+            </>
         )
     }
 }

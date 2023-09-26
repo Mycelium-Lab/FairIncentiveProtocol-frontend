@@ -1,5 +1,5 @@
 import logo from './logo.svg';
-import './App.css';
+import './App.scss';
 import { Component } from 'react';
 import SignUp from './components/auth/signup'; 
 import SignIn from './components/auth/signin';
@@ -7,6 +7,8 @@ import { getCookie } from './utils/cookie';
 import { config } from './utils/config';
 import { checkAuth } from './utils/checkAuth';
 import MainScreen from './MainScreen';
+import splitText from './utils/textFormatting/splitText';
+import capitalize from './utils/textFormatting/capitalize';
 
 const switcher = {
   signup: 'signup',
@@ -38,9 +40,13 @@ class App extends Component {
 
   switch = this.switch.bind(this)
 
+      formatText() {
+        const splited = splitText(this.state.switcher, 'sign')
+        return capitalize(splited)
+      }
       getWindow() {
-      if (this.state.switcher === switcher.signin) return <SignIn/>
-      if (this.state.switcher === switcher.signup) return <SignUp/>
+      if (this.state.switcher === switcher.signin) return <SignIn switcher={switcher.signup} switcherText={this.formatText()} switch={this.switch}/>
+      if (this.state.switcher === switcher.signup) return <SignUp switcher={switcher.signup} switcherText={this.formatText()} switch={this.switch}/>
       return <MainScreen auth={this.state.auth}/>
   }
 
@@ -49,16 +55,6 @@ class App extends Component {
       <div className="App">
             {
                 this.getWindow()
-            }
-            {
-                this.state.switcher !== switcher.signed
-                ?
-                <div className='switch-button'>
-                {this.state.switcher === switcher.signin ? "Don't have an account?" : "Already a user?"} 
-                <button onClick={this.switch} value={switcher.signup}>{switcher.signup.toUpperCase()}</button>
-                </div>
-                :
-                null
             }
       </div>
     );

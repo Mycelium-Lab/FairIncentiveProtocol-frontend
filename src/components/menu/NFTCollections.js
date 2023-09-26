@@ -8,7 +8,7 @@ import { getBearerHeader } from "../../utils/getBearerHeader";
 import { config } from "../../utils/config";
 import { networks } from '../../utils/networks'
 import Modal from 'react-bootstrap/Modal';
-import '../../styles/nftCollections.css'
+import '../../styles/nftCollections.scss'
 import ConfirmModal from "../common/modals/confirm";
 import ProgressModal from "../common/modals/progress";
 import SuccessModal from "../common/modals/success";

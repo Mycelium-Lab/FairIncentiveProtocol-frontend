@@ -1,6 +1,8 @@
 import { Component } from "react";
 import { config } from "../../utils/config"
-import '../../styles/auth/signIn.css'
+import Container from 'react-bootstrap/Container';
+import { Button, Form, FormGroup } from "react-bootstrap";
+import DefaultAuth from "../../layouts/defaultAuth";
 
 class SignIn extends Component {
     constructor() {
@@ -51,32 +53,63 @@ class SignIn extends Component {
         })
     }
 
+    handleSwitch(event) {
+        this.props.switch(event)
+    }
 
+    handleSwitch = this.handleSwitch.bind(this)
     signin = this.signin.bind(this)
     onChangeEmail = this.onChangeEmail.bind(this)
     onChangePassword = this.onChangePassword.bind(this)
 
     render() {
+        const { switcher, switcherText } = this.props;
         return (
-            <div>
-                <div>
-                    <h4>Sign In</h4>
-                    <div>
-                        <div>Please login to your account</div>
-                        <div className='input-fields'>
-                            <div>Email</div>
-                            <div>
-                                <input onChange={this.onChangeEmail} type='email' placeholder='Email' className='input-line full-width'></input>
-                            </div>
-                            <div>Password</div>
-                            <div>
-                                <input onChange={this.onChangePassword} type='password' placeholder='Password' className='input-line full-width'></input>
-                            </div>
-                        </div>
-                        <div><button onClick={this.signin} className='ghost-round full-width'>SignIn</button></div>
-                    </div>
-                </div>
-            </div>
+            <>
+            <DefaultAuth>
+                {
+                    /*<img className="auth-decore_left" src={require('../../media/auth/left-wave.png')}/>
+                    <img className="auth-decore_right" src={require('../../media/auth/right-wave.png')}/>
+
+                    <img className="auth-decore_left" src={require('../../media/auth/left-wave.png')}/>
+                    <img className="auth-decore_right" src={require('../../media/auth/right-wave.png')}/>*/
+                    }
+            </DefaultAuth>
+           <Container className="auth-warapp">
+           <img className="auth-logo w-100" src={require('../../media/auth/logo.png')}/>
+           <div className="auth">
+                <div className="auth__form">
+                   <div className="auth__form-header">
+                       <h4 className="auth__form-title">Sign In</h4>
+                       <span className="auth__form-subtitle">Please login to your account</span>
+                   </div>
+                  
+                   <Form className='auth__form-fields'>
+                       <FormGroup>
+                           <Form.Label className='auth__form-fields-label'>Email</Form.Label>
+                           <Form.Control className='auth__form-fields-input' onChange={this.onChangeEmail} type="email" placeholder="Email" />
+                       </FormGroup>
+
+                       <FormGroup>
+                           <Form.Label className="auth__form-fields-label">Password</Form.Label>
+                           <Form.Control className='auth__form-fields-input' onChange={this.onChangePassword} type='password' placeholder='Password' />
+                       </FormGroup>
+                   </Form>
+
+                   <a className="auth__form-forgotpassword">Forgot Password?</a>
+
+                   <div className='auth__form-action'>
+                       <Button  onClick={this.signin} className='auth__form-action-btn w-100'>Sign In</Button>
+                       <div className="auth__form-action-group">
+                           <span className="auth__form-action-group-text">Don't have an account?</span>
+                           <Button onClick={this.handleSwitch} value={switcher} className="auth-switcher">{switcherText}</Button>
+                       </div>
+                   </div>
+               </div>
+           </div>
+           </Container>
+           <img className="auth-decore_left-people" src={require('../../media/auth/man.png')}/>
+           <img className="auth-decore_right-people" src={require('../../media/auth/woman.png')}/></>
         )
     }
 }
