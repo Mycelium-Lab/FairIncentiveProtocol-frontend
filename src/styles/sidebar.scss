@@ -1,0 +1,95 @@
+.wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+}
+
+#sidebar {
+    min-width: 250px;
+    max-width: 250px;
+    background: map-get($theme-colors, "white");
+    color: map-get($theme-colors, "back");
+    transition: all 0.3s;
+    margin-top: 20px;
+    border-radius: 20px;
+    border: 2px solid rgba(232, 235, 237, 1);
+    box-shadow: 0px 10px 15px 0px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    height: 912px;
+}
+
+
+
+.menu-list {
+    display: flex;
+    flex-direction:column ;
+    padding: 43px 24px 0;
+    gap: 36px;
+    
+}
+
+.menu-list__item{
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    font-weight: 600;
+    font-size: map-get($theme-fontSize, "secondary");
+    line-height: 21.82px;
+    color: map-get($theme-colors, "back");
+    cursor: pointer;
+    background: map-get($theme-colors, "white");
+    border-radius: 8px;
+    padding: 12px 16px;
+}
+
+.menu-list__item:hover path{
+    fill: map-get($theme-colors, "activeTab");   
+}
+
+.menu-list__item:hover .menu-list__item-name{
+    color: map-get($theme-colors, "activeTab");   
+}
+
+.menu-list__item-name{
+    padding-top: 3px;
+}
+
+.menu-list__item_active{
+    background: map-get($theme-colors, "activeTab");
+    color: map-get($theme-colors, "white");
+}
+
+.menu-list__item_active svg path {
+    fill: map-get($theme-colors, "white") !important;
+}
+
+.menu-list__item_active .menu-list__item-name{
+    color: map-get($theme-colors, "white") !important;   
+}
+
+.menu-list__item-name_sub{
+    font-size: map-get($theme-fontSize, "primary");
+}
+
+#sidebar ul p {
+    color: #fff;
+    padding: 10px;
+}
+
+#sidebar ul li a {
+    padding: 10px;
+    font-size: 1.1em;
+    display: block;
+}
+
+
+
+.CTAs {
+    padding: 39px;
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    gap: 23px;
+}

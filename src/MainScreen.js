@@ -12,6 +12,7 @@ import { checkAuth } from "./utils/checkAuth";
 import RewardEvents from "./components/menu/RewardEvents";
 import NFTs from "./components/menu/NFTs";
 import Header from "./components/Header";
+import Sidebar from "./components/Sidebar";
 
 const switcher = {
     dashboard: 'dashboard',
@@ -60,78 +61,7 @@ class MainScreen extends Component {
             <div>
                 <Header userName={this.state.auth.name}></Header>
                 <div className="middle">
-                <nav className="main-menu">
-                        <ul>
-                            <li onClick={() => this.onSwitch(switcher.dashboard)}>
-                                <a href="#">
-                                    <i className="fa fa-home fa-2x"></i>
-                                    <span className="nav-text">
-                                        Dashboard
-                                    </span>
-                                </a>
-                            </li>
-                            <li onClick={() => this.onSwitch(switcher.rewards)}>
-                                <a href="#">
-                                    <i className="fa fa-plus fa-2x"></i>
-                                    <span className="nav-text">
-                                        Rewards
-                                    </span>
-                                </a>
-                                
-                            </li>
-                            <li onClick={() => this.onSwitch(switcher.reward_events)}>
-                                <a href="#">
-                                    <i className="fa fa-star fa-2x"></i>
-                                    <span className="nav-text">
-                                        Reward events
-                                    </span>
-                                </a>
-                                
-                            </li>
-                            <li onClick={() => this.onSwitch(switcher.users)}>
-                                <a href="#">
-                                <i className="fa fa-users fa-2x"></i>
-                                    <span className="nav-text">
-                                        Users
-                                    </span>
-                                </a>
-                                
-                            </li>
-                            <li onClick={() => this.onSwitch(switcher.tokens)}>
-                                <a href="#">
-                                <i className="fa fa-usd fa-2x"></i>
-                                    <span className="nav-text">
-                                        Tokens
-                                    </span>
-                                </a>
-                            
-                            </li>
-                            <li onClick={() => this.onSwitch(switcher.nftcollection)}>
-                                <a href="#">
-                                    <i className="fa fa-picture-o fa-2x"></i>
-                                    <span className="nav-text">
-                                        NFT Collections
-                                    </span>
-                                </a>
-                            </li>
-                            <li onClick={() => this.onSwitch(switcher.nft)}>
-                                <a href="#">
-                                    <i className="fa fa-picture-o fa-2x"></i>
-                                    <span className="nav-text">
-                                        NFTs
-                                    </span>
-                                </a>
-                            </li>
-                            <li onClick={() => this.onSwitch(switcher.settings)}>
-                                <a href="#">
-                                    <i className="fa fa-cog fa-2x"></i>
-                                    <span className="nav-text">
-                                        Settings
-                                    </span>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
+                <Sidebar switcher={switcher} onSwitch={this.onSwitch}></Sidebar>
                     <div className="middle-info">
                         {this.renderInfo()}
                     </div>
