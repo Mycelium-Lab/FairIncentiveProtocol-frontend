@@ -1,0 +1,55 @@
+.dropdown-profile__toggle{
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.dropdown__toggle{
+    background: none !important;
+    border: none !important;
+    color: map-get($theme-colors, "back") !important;
+}
+
+.dropdown__toggle::after{
+    display: none !important;
+}
+
+.dropdown__toggle-icon{
+    transition: all 0.5s ease-out;
+}
+
+.dropdown__menu{
+    margin-top: 8px;
+    box-shadow: 0 0 24px 0 rgba(0, 0, 0, 0.08);
+}
+.dropdown__menu-item{
+    font-size: map-get($theme-fontSize, "lgCaption");
+    color: map-get($theme-colors, "back");
+    font-weight: 500;
+    line-height: 22.5px;
+    border-bottom: 1px solid rgba(232, 235, 237, 1);
+}
+.dropdown__menu-item_logout{
+    color: map-get($theme-colors, "errorSecondary");
+    border-bottom: none;
+}
+.dropdown__menu-item_profile{
+    display: flex;
+    gap: 10px;
+    border-bottom: none;
+    padding: 12PX;
+}
+.dropdown__menu-item_profile-info{
+    display: flex;
+    flex-direction: column;
+}
+.dropdown__menu-item_profile-username{
+    font-size: map-get($theme-fontSize, "primary");
+    line-height: 19.1px;
+    color: map-get($theme-colors, "secondBlack");
+    font-weight: 400;
+}
+.dropdown__menu-item_profile-status{
+    font-size: map-get($theme-fontSize, "caption");
+    line-height: 21px;
+    color: map-get($theme-colors, "back");
+}

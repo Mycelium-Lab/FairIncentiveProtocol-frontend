@@ -1,9 +1,7 @@
 import { Component } from "react";
 import './styles/menu.scss'
 import './styles/middle.scss'
-import './styles/header.scss'
 import './styles/settings.scss'
-import notificationsImage from './media/header/notifications.png'
 import Dashboard from "./components/menu/Dashboard";
 import Rewards from "./components/menu/Rewards";
 import Tokens from "./components/menu/Tokens";
@@ -13,6 +11,7 @@ import Settings from "./components/menu/Settings";
 import { checkAuth } from "./utils/checkAuth";
 import RewardEvents from "./components/menu/RewardEvents";
 import NFTs from "./components/menu/NFTs";
+import Header from "./components/Header";
 
 const switcher = {
     dashboard: 'dashboard',
@@ -52,41 +51,14 @@ class MainScreen extends Component {
         if (this.state.switcher === switcher.settings) return <Settings auth={this.state.auth}/>
     }
 
-    logout() {
-        console.log('here')
-        const cookies = document.cookie.split(";");
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i];
-            const eqPos = cookie.indexOf("=");
-            const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-            document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
-        }
-        window.location.reload()
-    }
 
     onSwitch = this.onSwitch.bind(this)
     renderInfo = this.renderInfo.bind(this)
-    logout = this.logout.bind(this)
 
     render() {
         return (
             <div>
-                <header>
-                    <div className="header-left">
-                        FAIR Protocol
-                    </div>
-                    <div className="header-right">
-                        <div>
-                            <i className="fa fa-bell"></i>
-                        </div>
-                        <div>
-                        {this.state.auth.name}
-                        </div>
-                        <div>
-                            <button onClick={this.logout} className="btn btn-danger"><i className="fa fa-sign-out fa-2x"></i></button>
-                        </div>
-                    </div>
-                </header>
+                <Header userName={this.state.auth.name}></Header>
                 <div className="middle">
                 <nav className="main-menu">
                         <ul>
