@@ -6,3 +6,9 @@
 
     background: #585858;
 }
+
+.menu__title{
+    font-weight: 600;
+    line-height: 33px;
+    font-size: map-get($theme-fontSize, "mdTitile");
+}

@@ -5,8 +5,11 @@
 @import './styles/auth/signIn.scss';
 @import './styles/header.scss';
 @import './styles/sidebar.scss';
+@import './styles/menu.scss';
+@import './styles/dashboard.scss';
 @import './styles/common/dropdown.scss';
 @import './styles/common/accordion.scss';
+@import './styles/dasboardInfo/dashboardInfo.scss';
 
 body {
   margin: 0;
@@ -31,4 +34,9 @@ h1, h2, h3, h4, h5, h6 {
   background-color: inherit;
   border-color: inherit;
   box-shadow: none;
+}
+
+.unlist{
+  list-style: none;
+  padding-left: 0px;
 }

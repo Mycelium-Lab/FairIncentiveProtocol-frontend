@@ -1,0 +1,78 @@
+.dashboard .nav-link{ 
+    color: rgba(136, 136, 136, 1);
+    line-height: 21px;
+    font-weight: 400;
+    font-size: map-get($theme-fontSize, "primary");
+    padding: 10px 24px 10px 40px;
+    height: 42px;
+}
+
+.dashboard .nav-tabs .nav-link{
+    border: none;
+}
+
+.dashboard .nav-tabs .nav-link.active{
+    color: map-get($theme-colors, "white");
+    background: map-get($theme-colors, "warning");
+    border: none;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+.dashboard .nav-tabs .nav-link:hover{
+    border: none;
+}
+
+.dashboard .nav-tabs{
+    margin: 24px 0px;
+}
+
+.dashboard .nav-item{
+    margin-bottom: 0px;
+}
+
+
+.dashboard .nav-item:first-child button, .dashboard .nav-item:first-child .nav-link.active{
+    background-image: url('../media/sidebar/user.svg');
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    background-position: 20px;
+    width: 109px;
+}
+.dashboard .nav-item:first-child .nav-link.active{
+    background-image: url('../media/sidebar/active/user.svg');
+}
+
+.dashboard .nav-item:nth-child(2) button, .dashboard .nav-item:nth-child(2) .nav-link.active{
+    background-image: url('../media/sidebar/rewards.svg');
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    background-position: 20px;
+    width: 128px;
+}
+.dashboard .nav-item:nth-child(2) .nav-link.active{
+    background-image: url('../media/sidebar/active/rewards.svg');
+}
+
+.dashboard .nav-item:nth-child(3) button, .dashboard .nav-item:nth-child(3) .nav-link.active{
+    background-image: url('../media/sidebar/tokens.svg');
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    background-position: 20px;
+    width: 117px;
+}
+.dashboard .nav-item:nth-child(3) .nav-link.active{
+    background-image: url('../media/sidebar/active/tokens.svg');
+}
+
+.dashboard .nav-item:last-child button, .dashboard .nav-item:last-child .nav-link.active{
+    background-image: url('../media/sidebar/nfts.svg');
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    background-position: 20px;
+    width: 105px;
+}
+.dashboard .nav-item:last-child .nav-link.active{
+    background-image: url('../media/sidebar/active/nfts.svg');
+}
+

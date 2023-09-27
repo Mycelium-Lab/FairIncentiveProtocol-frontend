@@ -1,5 +1,4 @@
 import { Component } from "react";
-import './styles/menu.scss'
 import './styles/middle.scss'
 import './styles/settings.scss'
 import Dashboard from "./components/menu/Dashboard";
