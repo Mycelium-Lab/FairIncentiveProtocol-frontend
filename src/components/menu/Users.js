@@ -12,6 +12,7 @@ import info from '../../media/common/info-small.svg'
 import drug_drop from '../../media/common/drug&drop.svg'
 import FileUpload from "../FileUpload";
 
+
 let propertiesElementsLength = 0
 let statsElementsLength = 0
 let editPropertiesElementsLength = 0
@@ -37,6 +38,7 @@ class Users extends Component {
             showDelete: false,
             chosen_user_external_id: null,
             chosen_user_id: null,
+            // Демонстрационные данные
             users: [],
             propertiesElements: [],
             statsElements: [],
@@ -53,7 +55,8 @@ class Users extends Component {
             nfts: {},
             current_nfts: [],
             comment: null,
-            tabelData: userTable
+            tabelData: userTable,
+            showEditUser: false
         }
     }
 
@@ -437,9 +440,13 @@ class Users extends Component {
                     id: propertyId,
                     element: 
                     <div className="user-custom-params">
-                        <input type="text" id={`edit-property-name-${propertyId}`} onChange={(event) => this.changeEditPropertyName(propertyId, event.target.value)} defaultValue={v.name} className="form-control" placeholder="Property name"/>
-                        <input type="text" id={`edit-property-value-${propertyId}`} onChange={(event) => this.changeEditPropertyValue(propertyId, event.target.value)} defaultValue={v.value} className="form-control" placeholder="Property value"/>
-                        <button type="button" className="btn btn-dark" onClick={() => this.deleteEditPropertyInput(propertyId)}>-</button>
+                        <div className="input-group">
+                            <input type="text" id={`edit-property-name-${propertyId}`} onChange={(event) => this.changeEditPropertyName(propertyId, event.target.value)} defaultValue={v.name} className="form-control" placeholder="Property name"/>
+                        </div>
+                        <div className="input-group">
+                            <input type="text" id={`edit-property-value-${propertyId}`} onChange={(event) => this.changeEditPropertyValue(propertyId, event.target.value)} defaultValue={v.value} className="form-control" placeholder="Property value"/>
+                        </div>
+                    <button type="button" className="btn btn-dark" onClick={() => this.deleteEditPropertyInput(propertyId)}>-</button>
                     </div>,
                     name: v.name,
                     value: v.value,
@@ -455,8 +462,12 @@ class Users extends Component {
                     id: statId,
                     element: 
                     <div className="user-custom-params">
-                        <input type="text" id={`edit-stat-name-${statId}`} onChange={this.changeEditStatName} defaultValue={v.name} className="form-control" placeholder="Stat name"/>
-                        <input type="number" id={`edit-stat-value-${statId}`} onChange={this.changeEditStatValue} defaultValue={v.value} className="form-control" placeholder="Stat value"/>
+                        <div className="input-group">
+                            <input type="text" id={`edit-stat-name-${statId}`} onChange={this.changeEditStatName} defaultValue={v.name} className="form-control" placeholder="Stat name"/>
+                        </div>
+                        <div className="user-custom-params">
+                            <input type="number" id={`edit-stat-value-${statId}`} onChange={this.changeEditStatValue} defaultValue={v.value} className="form-control" placeholder="Stat value"/>
+                        </div>
                         <button type="button" className="btn btn-dark" onClick={() => this.deleteEditStatInput(statId)}>-</button>
                     </div>,
                     name: v.name,
@@ -494,9 +505,13 @@ class Users extends Component {
                 id,
                 element: 
                 <div className="user-custom-params">
-                    <input type="text" id={`edit-property-name-${id}`} onChange={(event) => this.changeEditPropertyName(id, event.target.value)} className="form-control" placeholder="Property name"/>
-                    <input type="text" id={`edit-property-value-${id}`} onChange={(event) => this.changeEditPropertyValue(id, event.target.value)} className="form-control" placeholder="Property value"/>
-                    <button type="button" className="btn btn-dark" onClick={() => this.deleteEditPropertyInput(id)}>-</button>
+                    <div className="input-group">
+                        <input type="text" id={`edit-property-name-${id}`} onChange={(event) => this.changeEditPropertyName(id, event.target.value)} className="form-control" placeholder="Property name"/>
+                    </div>
+                    <div className="input-group">
+                        <input type="text" id={`edit-property-value-${id}`} onChange={(event) => this.changeEditPropertyValue(id, event.target.value)} className="form-control" placeholder="Property value"/>
+                    </div>
+                    <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={() => this.deleteEditPropertyInput(id)}>-</button>      
                 </div>,
                 name: undefined,
                 value: undefined,
@@ -541,9 +556,13 @@ class Users extends Component {
                 id,
                 element: 
                 <div className="user-custom-params">
-                    <input type="text" id={`edit-stat-name-${id}`} onChange={this.changeEditStatName} className="form-control" placeholder="Stat name"/>
-                    <input type="number" id={`edit-stat-value-${id}`} onChange={this.changeEditStatValue} className="form-control" placeholder="Stat value"/>
-                    <button type="button" className="btn btn-dark" onClick={() => this.deleteEditStatInput(id)}>-</button>
+                    <div className="input-group">
+                        <input type="text" id={`edit-stat-name-${id}`} onChange={this.changeEditStatName} className="form-control" placeholder="Stat name"/>
+                    </div>
+                    <div className="input-group">
+                        <input type="number" id={`edit-stat-value-${id}`} onChange={this.changeEditStatValue} className="form-control" placeholder="Stat value"/>
+                    </div>
+                    <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={() => this.deleteEditStatInput(id)}>-</button>
                 </div>,
                 name: undefined,
                 value: undefined,
@@ -626,7 +645,7 @@ class Users extends Component {
             edit_user
         })
     }
-    
+
     onChangeExternalID = this.onChangeExternalID.bind(this)
     onChangeNotes = this.onChangeNotes.bind(this)
     onChangeEmail = this.onChangeEmail.bind(this)
@@ -718,10 +737,14 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                                     <img src={drug_drop}></img>
                                     <div>
                                         <label className="form__label_group form__label">Properties:  <img className="form__icon-info" src={info} />
-                                        { /*<button type="button" className="btn btn-dark" onClick={this.addEditPropertyInput}>+</button> */}
                                         </label>
-                                        {
-                                            /*
+                                        <div className="form__prompt" id="basic-addon4">Textual parameters of user</div>
+                                    </div>
+                                </div>
+                                <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={this.addEditPropertyInput}>+</button> 
+                            </div>
+                            <div className="form__group_bottom-row">
+                                {
                                             <div id="user-properties">
                                             {
                                                 this.state.editPropertiesElements ?
@@ -729,21 +752,15 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                                                 null
                                             }
                                         </div>
-                                        */
-                                        }
-                                        <div className="form__prompt" id="basic-addon4">Textual parameters of user</div>
+                                }
+                                <div className="form__group_bottom-row-last">
+                                    <div className="input-group">
+                                        <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                    <div className="input-group">
+                                        <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                     </div>
                                 </div>
-                                <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={this.addEditPropertyInput}>+</button>
-                            </div>
-                            <div className="form__group_bottom-row">
-                                <div className="input-group">
-                                    <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                </div>
-                                <div className="input-group">
-                                    <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                </div>
-                                <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={this.addEditPropertyInput}>-</button>
                             </div>
                             
                         </div>
@@ -753,10 +770,14 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                                     <img src={drug_drop}></img>
                                     <div>
                                         <label className="form__label_group form__label">Stats: <img className="form__icon-info" src={info} />
-                                        {/*<button type="button" className="btn btn-dark" onClick={this.addEditStatInput}>+</button>*/}
                                         </label>
-                                        {
-                                            /*
+                                        <div className="form__prompt" id="basic-addon4">Numerical parameters of user</div>
+                                    </div>
+                                </div>
+                                <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={this.addEditStatInput}>+</button>
+                            </div>
+                            <div className="form__group_bottom-row">
+                            {
                                             <div id="user-stats">
                                             {
                                                 this.state.editStatsElements ?
@@ -764,21 +785,15 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                                                 null
                                             }
                                         </div>
-                                        */
                                         }
-                                        <div className="form__prompt" id="basic-addon4">Numerical parameters of user</div>
+                                <div className="form__group_bottom-row-last">
+                                    <div className="input-group">
+                                        <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                    <div className="input-group">
+                                        <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                     </div>
                                 </div>
-                                <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={this.addEditPropertyInput}>+</button>
-                            </div>
-                            <div className="form__group_bottom-row">
-                                <div className="input-group">
-                                    <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                </div>
-                                <div className="input-group">
-                                    <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                </div>
-                                <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={this.addEditPropertyInput}>-</button>
                             </div>
                             
                         </div>
@@ -854,99 +869,51 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                     */
                     }
                     <FPTable data={this.state.tabelData}>
-                        <tr>
-                            <td>1</td>
-                            <td>Name 1</td>
-                            <td>
-                                <a className="link__primary">0x12c4...32f4</a>
-                            </td>
-                            <td>
-                                <ul className="tokens-list unlist">
-                                    <li className="tokens-list__item">
-                                    345 ABC
-                                    </li>
-                                    <li className="tokens-list__item">
-                                    105 545 CBA
-                                    </li>
-                                    <li className="tokens-list__item">
-                                    5 NFTs from ABC collection
-                                    </li>
-                                </ul>
-                            </td>
-                            <td>
-                            <a className="link__primary">5 from ABC collection</a>
-                            </td>
-                            <td>
-                                <FPDropdown icon={more}>
-                                    <Dropdown.Item className="dropdown__menu-item">Stat</Dropdown.Item>
-                                    <Dropdown.Item className="dropdown__menu-item">Edit</Dropdown.Item>
-                                    <Dropdown.Item className="dropdown__menu-item">To reward</Dropdown.Item>
-                                    <Dropdown.Item className="dropdown__menu-item">Delete</Dropdown.Item>
-                                </FPDropdown>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Name 2</td>
-                            <td>
-                                <a className="link__primary">0x12c4...32f7</a>
-                            </td>
-                            <td>
-                                <ul className="tokens-list unlist">
-                                        <li className="tokens-list__item">
-                                        345 ABC
-                                        </li>
-                                        <li className="tokens-list__item">
-                                        105 545 CBA
-                                        </li>
-                                        <li className="tokens-list__item">
-                                        5 NFTs from ABC collection
-                                        </li>
-                                </ul>
-                            </td>
-                            <td>
-                                <a className="link__primary">5 from ABC collection</a>
-                            </td>
-                            <td>
-                                <FPDropdown icon={more}>
-                                <Dropdown.Item className="dropdown__menu-item">Stat</Dropdown.Item>
-                                <Dropdown.Item className="dropdown__menu-item">Edit</Dropdown.Item>
-                                <Dropdown.Item className="dropdown__menu-item">To reward</Dropdown.Item>
-                                <Dropdown.Item className="dropdown__menu-item">Delete</Dropdown.Item>
-                        </FPDropdown>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>Name 3</td>
-                            <td>
-                                <a className="link__primary">0x12c4...32f9</a>
-                            </td>
-                            <td>
-                            <ul className="tokens-list unlist">
-                                    <li className="tokens-list__item">
-                                    345 ABC
-                                    </li>
-                                    <li className="tokens-list__item">
-                                    105 545 CBA
-                                    </li>
-                                    <li className="tokens-list__item">
-                                    5 NFTs from ABC collection
-                                    </li>
-                                </ul>
-                            </td>
-                            <td>
-                            <a className="link__primary">5 from ABC collection</a>
-                            </td>
-                        <td>
-                        <FPDropdown icon={more}>
-                            <Dropdown.Item className="dropdown__menu-item">Stat</Dropdown.Item>
-                            <Dropdown.Item className="dropdown__menu-item">Edit</Dropdown.Item>
-                            <Dropdown.Item className="dropdown__menu-item">To reward</Dropdown.Item>
-                            <Dropdown.Item className="dropdown__menu-item">Delete</Dropdown.Item>
-                        </FPDropdown>
-                        </td>
-                    </tr>
+                    {
+                                this.state.users.map(v =>
+                                <tr>
+                                    <td>
+                                        {createLongStrView(v.id)}
+                                    </td>
+                                    <td>
+                                        {v.external_id}
+                                    </td>
+                                    <td>
+                                    <a className="link__primary">{createLongStrView(v.wallet)}</a>
+                                    </td>
+                                    <td>
+                                        (soon)
+                                    </td>
+                                    <td>
+                                        <div>
+                                            NFTs: {v.nft_rewards ? v.nft_rewards.map((reward, i, arr) => 
+                                                `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
+                                            ): null}
+                                        </div>
+                                        <div>
+                                            Tokens: {v.token_rewards ? v.token_rewards.map((reward, i, arr) => 
+                                                `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
+                                            ): null}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <FPDropdown icon={more}>
+                                            <Dropdown.Item className="dropdown__menu-item">Stat</Dropdown.Item>
+                                            <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowEdit(v)}>Edit</Dropdown.Item>
+                                            <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowToReward(v.external_id, v.id)}>To reward</Dropdown.Item>
+                                            <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowDelete(v.external_id, v.id)}>Delete</Dropdown.Item>
+                                        </FPDropdown>
+                                       {
+                                       /* <button type="button" className="btn btn-dark" disabled>Stat</button>
+                                        <button type="button" className="btn btn-dark" onClick={() => this.handleShowEdit(v)}>Edit</button>
+                                        <button type="button" className="btn btn-dark" onClick={() => this.handleShowToReward(v.external_id, v.id)}>To reward</button>
+                                        <button onClick={() => this.handleShowDelete(v.external_id, v.id)} type="button" className="btn btn-danger">Delete</button>
+                                        */
+                                            }
+                                    </td>
+                                </tr>
+                                )
+                            }
                 </FPTable>
                 </div>
                 <Modal show={this.state.showToReward} onHide={this.handleCloseToReward} centered>
@@ -993,11 +960,11 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                         </div>
                     </Modal.Body>
                     <Modal.Footer>
-                    <button className="btn btn-dark" onClick={this.reward}>
-                        Reward
+                    <button className="btn btn_primary btn_gray" onClick={this.handleCloseToReward}>
+                        Back
                     </button>
-                    <button className="btn btn-light" onClick={this.handleCloseToReward}>
-                        Cancel
+                    <button className="btn btn_primary btn_orange" onClick={this.reward}>
+                        Reward
                     </button>
                     </Modal.Footer>
                 </Modal>
@@ -1015,6 +982,13 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                             <div className="form__prompt" id="basic-addon4">Specify the user ID for API calls or it will be generated automatically</div>
                         </div>
                         <div className="mb-4">
+                            <label className="form__label">Profile image *</label>
+                            <div className="input-group">
+                                <FileUpload></FileUpload>
+                            </div>
+                            <div className="form__prompt" id="basic-addon4">File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>
+                        </div>
+                        <div className="mb-4">
                             <label className="form__label">Wallet: <img src={info} /></label>
                             <div className="input-group">
                                 <input placeholder="0xhjfg7...9fdf" type="text" value={this.state.edit_user.wallet} onChange={this.changeEditWallet} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
@@ -1024,8 +998,7 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                         <div className="mb-4">
                             <label className="form__label">Notes: <img className="form__icon-info" src={info} /></label>
                             <div className="input-group">
-                                <textarea value={this.state.edit_user.notes} onChange={this.changeEditNotes} placeholder="User notes available to system administrators and 
-moderators" type="text" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
+                                <textarea value={this.state.edit_user.notes} onChange={this.changeEditNotes} placeholder="User notes available to system administrators and moderators" type="text" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
                             </div>
                             <div className="form-text" id="basic-addon4">The user does not see this text. <a href="https://www.markdownguide.org/cheat-sheet/" target="blank">Markdown</a> syntax is supported.</div>
                         </div>
@@ -1037,10 +1010,14 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                                         <img src={drug_drop}></img>
                                         <div>
                                         <label className="form__label_group form__label">Properties:  <img className="form__icon-info" src={info} />
-                                        { /*<button type="button" className="btn btn-dark" onClick={this.addEditPropertyInput}>+</button> */}
                                         </label>
-                                        {
-                                            /*
+                                        <div className="form__prompt" id="basic-addon4">Textual parameters of user</div>
+                                    </div>
+                                </div>
+                                <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={this.addEditPropertyInput}>+</button>
+                            </div>
+                            <div className="form__group_bottom-row">
+                            {
                                             <div id="user-properties">
                                             {
                                                 this.state.editPropertiesElements ?
@@ -1048,56 +1025,50 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                                                 null
                                             }
                                         </div>
-                                        */
                                         }
-                                        <div className="form__prompt" id="basic-addon4">Textual parameters of user</div>
+                                <div className="form__group_bottom-row-last">
+                                    <div className="input-group">
+                                        <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                    <div className="input-group">
+                                        <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                     </div>
                                 </div>
-                            <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={this.addEditPropertyInput}>+</button>
-                            </div>
-                            <div className="form__group_bottom-row">
-                                <div className="input-group">
-                                    <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                </div>
-                                <div className="input-group">
-                                    <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                </div>
-                                <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={this.addEditPropertyInput}>-</button>
                             </div>
                             
                         </div>
                         <div className="form__group mb-4">
                             <div className="form__group_top-row">
-                                <div className="form__group_top-row-left">
-                                    <img src={drug_drop}></img>
-                                    <div>
-                                        <label className="form__label_group form__label">Stats: <img className="form__icon-info" src={info} />
-                                        {/*<button type="button" className="btn btn-dark" onClick={this.addEditStatInput}>+</button>*/}
-                                        </label>
-                                        {
-                                            /*
-                                            <div id="user-stats">
-                                            {
-                                                this.state.editStatsElements ?
-                                                this.state.editStatsElements.map(v => v.work ? v.element : null) :
-                                                null
-                                            }
+                                <div className="form__group_top-row-left">         
+                                        <img src={drug_drop}></img>
+                                        <div>
+                                            <label className="form__label_group form__label">
+                                                Stats: <img className="form__icon-info" src={info} />
+                                            </label>
+                                            <div className="form__prompt" id="basic-addon4">Numerical parameters of user</div>
                                         </div>
-                                        */
-                                        }
-                                        <div className="form__prompt" id="basic-addon4">Numerical parameters of user</div>
-                                    </div>
                                 </div>
-                                <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={this.addEditPropertyInput}>+</button>
+                                <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={this.addEditStatInput}>+</button>
                             </div>
                             <div className="form__group_bottom-row">
+                            {
+                                        
+                                        <div id="user-stats">
+                                        {
+                                            this.state.editStatsElements ?
+                                            this.state.editStatsElements.map(v => v.work ? v.element : null) :
+                                            null
+                                        }
+                                    </div>
+                                    }
+                            <div className="form__group_bottom-row-last">
                                 <div className="input-group">
-                                    <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                </div>
-                                <div className="input-group">
-                                    <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                </div>
-                                <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={this.addEditPropertyInput}>-</button>
+                                        <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                    <div className="input-group">
+                                        <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                            </div>
                             </div>
                             
                         </div>
@@ -1107,13 +1078,20 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                                 <input onChange={this.changeEditEmail} value={this.state.edit_user.email}  placeholder="example@gmail.com" type="email" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
                         </div>
+                        <div className="mb-4">
+                            <label className="form__label">Log:</label>
+                            <div className="input-group">
+                                <textarea value={this.state.edit_user.notes} onChange={this.changeEditNotes}  type="text" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
+                            </div>
+                            <div className="form-text" id="basic-addon4">The user does not see this text. Markdown syntax is supported.</div>
+                        </div>
                     </Modal.Body>
                     <Modal.Footer>
-                    <button className="btn btn-dark" onClick={this.edit}>
-                        Edit
+                    <button className="btn btn_primary btn_gray" onClick={this.handleCloseEdit}>
+                        Back
                     </button>
-                    <button className="btn btn-light" onClick={this.handleCloseEdit}>
-                        Cancel
+                    <button className="btn btn_primary btn_orange" onClick={this.edit}>
+                        Edit
                     </button>
                     </Modal.Footer>
                 </Modal>

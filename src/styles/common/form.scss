@@ -36,6 +36,11 @@
 .form__group_bottom-row{
     display: flex;
     gap: 12px;
+    flex-direction: column;
+}
+.form__group_bottom-row-last {
+    display: flex;
+    gap: 12px;
 }
 
 .input-group{
