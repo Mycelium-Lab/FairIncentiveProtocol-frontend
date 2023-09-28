@@ -7,3 +7,10 @@
     justify-content: space-between;
     margin-bottom: 10px;
 }
+
+.modal-newuser__title{
+    line-height: 27px;
+    font-weight: 700;
+    font-size: map-get($theme-fontSize, "smTitile");
+    color: map-get($theme-colors, "primary");
+}

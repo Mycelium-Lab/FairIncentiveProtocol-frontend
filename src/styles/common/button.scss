@@ -7,10 +7,20 @@
     }
 }
 
+.btn_gray{
+    background: map-get($theme-colors, "back");
+    color: map-get($theme-colors, "white");
+}
+
 .btn_primary{
     border-radius: 4px;
     font-weight: 700;
     line-height: 21px;
     font-size: map-get($theme-fontSize, "primary");
+}
+
+.btn__counter{
+    width: 37px;
+    height: 36px;
 }
 
