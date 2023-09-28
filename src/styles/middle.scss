@@ -127,6 +127,9 @@ height: 100%;
 }
 
 .middle-info {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
     padding: 24px 32px 0px;
     width: 100%;
 }

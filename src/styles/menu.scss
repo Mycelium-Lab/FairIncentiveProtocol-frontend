@@ -1,14 +1,10 @@
-.main-menu {
-    left: 0%;
-    right: 0%;
-    top: 0%;
-    bottom: 0%;
-
-    background: #585858;
-}
-
 .menu__title{
     font-weight: 600;
     line-height: 33px;
     font-size: map-get($theme-fontSize, "mdTitile");
+}
+
+.title-header{
+    display: flex;
+    justify-content: space-between;
 }

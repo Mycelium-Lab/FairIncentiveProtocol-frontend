@@ -1,0 +1,16 @@
+.btn_orange{
+    background: map-get($theme-colors, "warning");
+    color: map-get($theme-colors, "white");
+    &:hover{
+        background: map-get($theme-colors, "hoverWarning");
+        color: map-get($theme-colors, "white");
+    }
+}
+
+.btn_primary{
+    border-radius: 4px;
+    font-weight: 700;
+    line-height: 21px;
+    font-size: map-get($theme-fontSize, "primary");
+}
+
