@@ -63,4 +63,23 @@ const tokenTable = [
         },
     ]
 
-export {userTable, tokenTable, blacklistTable}
+   const  nftsTable = [
+        {
+            id: 1,
+            name: 'Name',
+        },
+        {
+            id: 2,
+            name: 'NFT items',
+        },
+        {
+            id: 3,
+            name: 'Info',
+        },
+        {
+            id: 6,
+            name: 'Actions',
+        },
+    ]
+
+export {userTable, tokenTable, blacklistTable, nftsTable}

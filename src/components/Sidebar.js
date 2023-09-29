@@ -85,7 +85,7 @@ class Sidebar extends Component {
 </svg>
                     <span className="menu-list__item-name">Tokens</span>
                 </li>
-                <li onClick={(event) => this.handleSwitch(event, switcher.nft)} className={ activeTab === 'nft' ? "menu-list__item_active menu-list__item" : 'menu-list__item'}>
+                <li onClick={(event) => this.handleSwitch(event, switcher.nftcollection)} className={ activeTab === 'nftcollection' ? "menu-list__item_active menu-list__item" : 'menu-list__item'}>
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <mask id="mask0_492_6115" style={{"mask-type": "alpha"}} maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
 <rect width="24" height="24" fill="#D9D9D9"/>

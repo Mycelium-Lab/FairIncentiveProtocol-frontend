@@ -1,6 +1,8 @@
 import { Component } from "react";
 import { getBearerHeader } from "../../utils/getBearerHeader";
 import { config } from "../../utils/config";
+import FPTable from "../common/FPTable";
+import { nftsTable } from "../../data/tables";
 
 class NFTs extends Component {
 
@@ -78,9 +80,16 @@ class NFTs extends Component {
 
     render() {
         return (
-            <div>
-                <h3>NFTs</h3>
-                    <table className="table table-bordered border-dark">
+            <>
+                <div className="title-header">
+                <h3 className="menu__title">NFTs</h3>
+                </div>
+                <div className="content__wrap">
+                    <FPTable data={nftsTable}>
+
+                    </FPTable>
+                </div>
+                   {/* <table className="table table-bordered border-dark">
                         <thead>
                             <tr className="table-secondary" >
                             <th className="table-secondary" scope="col">Collection name</th>
@@ -126,7 +135,8 @@ class NFTs extends Component {
                             }
                         </tbody>
                     </table>
-            </div>
+                        */}
+            </>
         )
     }
 }

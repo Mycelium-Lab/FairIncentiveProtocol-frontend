@@ -34,6 +34,10 @@
     gap: 10px;
     flex-direction: column;
 }
+.form__group_row{
+    flex-direction: row;
+}
+
 .form__groups{
     display: flex;
     flex-direction: column;
@@ -66,6 +70,9 @@
 }
 .input-group_full{
     width: 100%;
+}
+.input-group_wide{
+    flex: 1;
 }
 .fp-userid-row{
     display: flex;
@@ -157,4 +164,8 @@ input[type="checkbox"] {
 }
 .form__textarea_add-blacklist{
     height: 204px;
+}
+
+.form__textarea_desct-nft-collection{
+    height: 102px;
 }
