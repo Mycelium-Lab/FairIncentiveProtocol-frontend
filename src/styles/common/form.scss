@@ -46,3 +46,14 @@
 .input-group{
     width: inherit;
 }
+
+.fp-userid-row{
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    align-items: flex-end;
+}
+
+.fp-userid-row_left{
+    width: 100%;
+}

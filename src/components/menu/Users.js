@@ -11,6 +11,8 @@ import { userTable } from "../../data/tables";
 import info from '../../media/common/info-small.svg'
 import drug_drop from '../../media/common/drug&drop.svg'
 import FileUpload from "../FileUpload";
+import BarChart from "../charts/BarChart";
+import LineChart from "../charts/LineChart";
 
 
 let propertiesElementsLength = 0
@@ -35,10 +37,10 @@ class Users extends Component {
             showAdd: false,
             showToReward: false,
             showEdit: false,
+            showStats: false,
             showDelete: false,
             chosen_user_external_id: null,
             chosen_user_id: null,
-            // Демонстрационные данные
             users: [],
             propertiesElements: [],
             statsElements: [],
@@ -485,7 +487,16 @@ class Users extends Component {
             editStatsElements: statsElements
         })
     }
+    handleShowStats = (user) => {
+        this.getTokenRewards()
+        this.setState({
+            showStats: true,
+            edit_user: {...user} 
+        })
+    }
+
     handleCloseEdit = () => this.setState({showEdit: false, edit_user: {}, basic_edit_user: {}, editPropertiesElements: [], editStatsElements: []})
+    handleCloseStats = () => this.setState({showStats: false, edit_user: {}, basic_edit_user: {}, editPropertiesElements: [], editStatsElements: []})
     handleShowDelete = (chosen_user_external_id, chosen_user_id) => this.setState({showDelete: true, chosen_user_external_id, chosen_user_id})
     handleCloseDelete = () => this.setState({showDelete: false, chosen_user_external_id: null, chosen_user_id: null})
 
@@ -659,6 +670,8 @@ class Users extends Component {
     handleCloseToReward = this.handleCloseToReward.bind(this)
     handleShowEdit = this.handleShowEdit.bind(this)
     handleCloseEdit = this.handleCloseEdit.bind(this)
+    handleShowStats = this.handleShowStats.bind(this)
+    handleCloseStats = this.handleCloseStats.bind(this)
     handleShowDelete = this.handleShowDelete.bind(this)
     handleCloseDelete = this.handleCloseDelete.bind(this)
     addPropertyInput = this.addPropertyInput.bind(this)
@@ -868,6 +881,7 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                     </table>
                     */
                     }
+                    <div className="table-wrap">
                     <FPTable data={this.state.tabelData}>
                     {
                                 this.state.users.map(v =>
@@ -898,7 +912,7 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                                     </td>
                                     <td>
                                         <FPDropdown icon={more}>
-                                            <Dropdown.Item className="dropdown__menu-item">Stat</Dropdown.Item>
+                                            <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowStats(v)}>Stat</Dropdown.Item>
                                             <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowEdit(v)}>Edit</Dropdown.Item>
                                             <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowToReward(v.external_id, v.id)}>To reward</Dropdown.Item>
                                             <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowDelete(v.external_id, v.id)}>Delete</Dropdown.Item>
@@ -915,14 +929,17 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                                 )
                             }
                 </FPTable>
+                    </div>
                 </div>
                 <Modal show={this.state.showToReward} onHide={this.handleCloseToReward} centered>
                     <Modal.Header closeButton>
-                        Reward {this.state.chosen_user_external_id} (FAIR id: {createLongStrView(this.state.chosen_user_id ? this.state.chosen_user_id : '')})
+                        <div className="modal-newuser__title modal-title h4">
+                            Reward {this.state.chosen_user_external_id} (FAIR id: {createLongStrView(this.state.chosen_user_id ? this.state.chosen_user_id : '')})
+                        </div>
                     </Modal.Header>
                     <Modal.Body>
-                    <label className="form__label">Choose a reward mode:</label>
-                        <div className="choose-reward-node">
+                    {/*<label className="form__label">Choose a reward mode:</label>*/}
+                        {/*<div className="choose-reward-node">
                             <div className="form-check">
                                 <input 
                                     className="form-check-input" value={types.token} type="radio" name="flexRadioDefault" id="flexRadioDefault1" 
@@ -940,8 +957,8 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                                     NFTs
                                 </label>
                             </div>
-                        </div>
-                        <label className="form__label">Select reward:</label>
+                        </div>*/}
+                        <label className="form__label">Select reward: <img className="form__icon-info" src={info}></img></label>
                         <div className="input-group mb-4">
                             <select onChange={this.state.chosen_type === types.token ? this.changeRewardToken : this.changeRewardNFT} disabled={this.state.chosen_type ? false : true} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
                                 {
@@ -954,7 +971,7 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                             </select>
                         </div>
                         <div className="mb-4">
-                            <label className="form__label">Comment:</label>
+                            <label className="form__label">Comment: <img className="form__icon-info" src={info}></img></label>
                             <textarea onChange={this.changeComment} className="form-control" placeholder="Reward comment(optional)" aria-label="With textarea"></textarea>
                             <div className="form-text" id="basic-addon4">The user does not see this text. <a href="https://www.markdownguide.org/cheat-sheet/" className="link__form-prompt" target="blank">Markdown</a> syntax is supported.</div>
                         </div>
@@ -970,10 +987,21 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                 </Modal>
                 <Modal show={this.state.showEdit} onHide={this.handleCloseEdit} centered>
                     <Modal.Header closeButton>
-                        Edit {this.state.edit_user.external_id} (FAIR id: {createLongStrView(this.state.edit_user.id)})
+                        <div className="modal-newuser__title modal-title">
+                            Edit {this.state.edit_user.external_id}
+                        </div>
                     </Modal.Header>
 
                     <Modal.Body>
+                        <div className="fp-userid-row mb-4">
+                            <div className="fp-userid-row_left">
+                                <label className="form__label">FAIR protocol user ID:</label>
+                                <div className="input-group">
+                                    <input type="text" value={createLongStrView(this.state.edit_user.id)} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                </div>
+                            </div>
+                            <button className="btn btn__copy btn_primary btn_orange">Copy</button>
+                        </div>
                         <div className="mb-4">
                             <label className="form__label">Username or external ID:</label>
                             <div className="input-group">
@@ -1095,13 +1123,53 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                     </button>
                     </Modal.Footer>
                 </Modal>
-                <Modal show={this.state.showDelete} onHide={this.handleCloseDelete} centered>
+                <Modal show={this.state.showStats} onHide={this.handleCloseStats} centered>
                     <Modal.Header closeButton>
+                        <div className="modal-newuser__title modal-title">
+                            {this.state.edit_user.external_id} stats (FAIR id: {createLongStrView(this.state.edit_user.id)})
+                        </div>
+                    </Modal.Header>
+
+                    <Modal.Body>
+                        <div className="fp-userid-row mb-4">
+                            <div className="fp-userid-row_left">
+                                <label className="form__label">FAIR protocol user ID:</label>
+                                <div className="input-group">
+                                    <input type="text" value={createLongStrView(this.state.edit_user.id)} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                </div>
+                            </div>
+                            <button className="btn btn__copy btn_primary btn_orange">Copy</button>
+                        </div>
+                        <div className="mb-4">
+                            <label className="form__label_group form__label">
+                                Rewarded: <img className="form__icon-info" src={info} />
+                            </label>
+                            <div className="form__prompt" id="basic-addon4">Total number of distributed rewards</div>
+                        </div>
+                        <div className="mb-4">
+                            <FPTable>
+                                    {/* Добавить поле создания токена и nft*/}
+                            </FPTable>
+                        </div>
+                        <div className="mb-4">
+                           <BarChart>
+                              {/* Добавить поле создания токена */}
+                           </BarChart>
+                        </div>
+                        <div className="mb-4">
+                           <LineChart>
+                              {/* Добавить поле создания nft */}
+                           </LineChart>
+                        </div>
+                    </Modal.Body>
+                </Modal>
+                <Modal show={this.state.showDelete} onHide={this.handleCloseDelete} centered>
+                    <Modal.Header className="modal-newuser__title modal-title h4 mb-4" closeButton>
                         Delete {this.state.chosen_user_external_id} (FAIR id: {createLongStrView(this.state.chosen_user_id ? this.state.chosen_user_id : '')})?
                     </Modal.Header>
                     <Modal.Footer>
-                        <button className="btn btn-danger" onClick={() => this.deleteUser(this.state.chosen_user_id)}>Delete</button>
-                        <button className="btn btn-light" onClick={this.handleCloseDelete}>Cancel</button>
+                    <button className="btn btn_primary btn_gray" onClick={this.handleCloseDelete}>Back</button>
+                        <button className="btn btn_primary btn_orange" onClick={() => this.deleteUser(this.state.chosen_user_id)}>Delete</button>
                     </Modal.Footer>
                 </Modal>
             </>
