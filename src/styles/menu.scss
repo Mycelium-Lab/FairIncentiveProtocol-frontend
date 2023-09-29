@@ -3,8 +3,47 @@
     line-height: 33px;
     font-size: map-get($theme-fontSize, "mdTitile");
 }
+.menu__title-secondary{
+    font-weight: 700;
+    line-height: 27px;
+    font-size: map-get($theme-fontSize, "smTitile");
+}
+
+.menu__subtitle{
+    font-size: map-get($theme-fontSize, "primary");
+    line-height: 21px;
+    color: map-get($theme-colors, "subtitle");
+}
 
 .title-header{
     display: flex;
     justify-content: space-between;
+}
+
+.empty{
+    height: 840px;
+    display: flex;
+    justify-content: center;
+}
+
+.empty__wrapper{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 25px
+}
+
+.empty__desc{
+    font-weight: 500;
+    line-height: 24px;
+    font-size: map-get($theme-fontSize, "smTitileSecondary");
+}
+
+.content__wrap{
+    background: map-get($theme-colors, "white");
+    padding: 24px 23px 0px;
+    border: 2px solid rgba(232, 235, 237, 1);
+    border-radius: 20px;
+    box-shadow: 5px 5px 30px 0px rgba(0, 0, 0, 0.05);
 }

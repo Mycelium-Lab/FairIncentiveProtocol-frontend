@@ -14,6 +14,19 @@ import ConfirmModal from "../common/modals/confirm";
 import ProgressModal from "../common/modals/progress";
 import SuccessModal from "../common/modals/success";
 import ErrorModal from "../common/modals/error";
+import empty from "../../media/common/empty_icon.svg"
+import info from '../../media/common/info-small.svg'
+import infoRed from '../../media/common/info-red.svg'
+import more from '../../media/common/more.svg'
+import copy from '../../media/common/copy.svg'
+import search from '../../media/common/search.svg'
+import down from '../../media/common/arrow_drop_down.svg'
+import customTokeSymbol from '../../media/common/custom_toke_symbol.svg'
+import FileUpload from "../FileUpload";
+import { tokenTable, blacklistTable } from "../../data/tables";
+import FPTable from "../common/FPTable";
+import FPDropdown from "../common/FPDropdown";
+import { Dropdown } from "react-bootstrap";
 
 //TODO: Как-то добавлять провайдера и signer сразу
 
@@ -37,6 +50,8 @@ const burnAddressType = {
     other: 'other'
 }
 
+let editMintingManagersElementsLength = 0
+
 class Tokens extends Component {
 
     constructor(props) {
@@ -51,6 +66,8 @@ class Tokens extends Component {
             showCreate: false,
             showMint: false,
             showBlacklist: false,
+            showRoles: false,
+            showInfo: false,
             showLoading: false,
             showBlacklistAdd: false,
             showPause: false,
@@ -88,7 +105,9 @@ class Tokens extends Component {
             currentTokenBlacklistRemove: [],
             currentBurnAddressType: burnAddressType.current,
             burnAmount: null,
-            otherBurnAddress: null
+            otherBurnAddress: null,
+            stageOfCreateToken: 1,
+            editMintingManagersElements: []
         }
     }
 
@@ -188,6 +207,13 @@ class Tokens extends Component {
 
     onChangeBurnAmount(event) {
         this.setState({burnAmount: event.target.value})
+    }
+
+    nextStage () {
+        this.setState({stageOfCreateToken: this.state.stageOfCreateToken + 1 })
+    }
+    prevStage () {
+        this.setState({stageOfCreateToken: this.state.stageOfCreateToken - 1 })
     }
 
     async connect() {
@@ -332,7 +358,7 @@ class Tokens extends Component {
             const res = await fetch(`${config.api}/tokens/add`, requestOptions)
             if (res.status === 200) {
                 const token = (await res.json()).body.data
-                const _tokens = this.state.tokens
+                const _tokens = this.tokens
                 _tokens.push(token)
                 this.setState({
                     tokens: _tokens
@@ -460,7 +486,13 @@ class Tokens extends Component {
                 v.paused = data.paused
             })
             this.setState({
-                tokens: json.body.data
+
+                //tokens: json.body.data
+                tokens: [
+                    {
+                        id: 1
+                    }
+                ]
             })
         } catch (error) {
             alert(error)
@@ -648,6 +680,38 @@ class Tokens extends Component {
     handleShowBlacklistAdd = () => this.setState({showBlacklistAdd: true, showBlacklist: false, currentTokenBlacklistRemove: []})
     handleCloseBlacklistAdd = () => this.setState({showBlacklistAdd: false, showBlacklist: true})
 
+    handleShowRoles = (token) => {
+        const mintingManagers = []
+        // Добавить на реально созданном токене
+        /*token.minting.forEach(v => {
+            const mintingId = editMintingManagersElementsLength
+            mintingManagers.push(
+                {
+                    id: mintingId,
+                    element: 
+                    <div className="user-custom-params">
+                        <div className="input-group">
+                            <input type="text" id={`edit-property-name-${mintingId}`} defaultValue={v.name} className="form-control" placeholder="Property name"/>
+                        </div>
+                        <div className="input-group">
+                            <input type="text" id={`edit-property-value-${mintingId}`} defaultValue={v.value} className="form-control" placeholder="Property value"/>
+                        </div>
+                    <button type="button" className="btn btn_primary btn_orange">Revoke</button>
+                    </div>,
+                    name: v.name,
+                    value: v.value,
+                    work: true
+                }
+            )
+            editMintingManagersElementsLength += 1
+        })*/
+        this.setState({showRoles: true})
+    }
+    handleCloseRoles = () => this.setState({showRoles: false})
+
+    handleShowInfo = () =>  this.setState({showInfo: true})
+    handleCloseInfo = () =>  this.setState({showInfo: false})
+
     handleShowPause = async (currentTokenSymbol, currentTokenAddress, currentTokenChainid) => {
         let provider = new ethers.providers.Web3Provider(window.ethereum)
         const chainid = (await provider.getNetwork()).chainId
@@ -698,7 +762,11 @@ class Tokens extends Component {
     handleShowMint = this.handleShowMint.bind(this)
     handleCloseMint = this.handleCloseMint.bind(this)
     handleShowBlacklist = this.handleShowBlacklist.bind(this)
+    handleShowRoles = this.handleShowRoles.bind(this)
+    handleShowInfo = this.handleShowInfo.bind(this)
     handleCloseBlacklist = this.handleCloseBlacklist.bind(this)
+    handleCloseRoles = this.handleCloseRoles.bind(this)
+    handleCloseInfo = this.handleCloseInfo.bind(this)
     handleShowPause = this.handleShowPause.bind(this)
     handleClosePause = this.handleClosePause.bind(this)
     onChangeInitialSupply = this.onChangeInitialSupply.bind(this)
@@ -710,6 +778,8 @@ class Tokens extends Component {
     onChangeRecoverable = this.onChangeRecoverable.bind(this)
     changeNetwork = this.changeNetwork.bind(this)
     onChangeMintTokenAmount = this.onChangeMintTokenAmount.bind(this)
+    nextStage = this.nextStage.bind(this)
+    prevStage = this.prevStage.bind(this)
     mint = this.mint.bind(this)
     pause = this.pause.bind(this)
     handleShowConfirm = this.handleShowConfirm.bind(this)
@@ -735,12 +805,248 @@ class Tokens extends Component {
 
     render() {
         return (
-            <div>
+            <>
                 <div className="title-header">
-                    <h3>Tokens</h3>
-                    <button onClick={this.handleShowCreate} type="button" className="btn btn-dark">Create new token</button>
+                    <div>
+                        <h3 className="menu__title">{this.state.stageOfCreateToken === 4 ? 'Congratulations!' : 'Tokens'}</h3>
+                        {
+                            this.state.showCreate && this.state.stageOfCreateToken !== 4 ? <span className="menu__subtitle">Creating new token: {
+                                this.state.stageOfCreateToken === 1 
+                                ? 'parameters and settings' :
+                                this.state.stageOfCreateToken === 2
+                                ? 'wallet connection' :
+                                this.state.stageOfCreateToken === 3
+                                ? 'roles and privileges'
+                                : ''
+                            }
+                                </span> 
+                                : null
+                        }
+                    </div>
+                    {
+                        this.state.tokens?.length ? <button onClick={this.handleShowCreate} type="button" className="btn btn_orange btn_primary">Create new token</button> : null
+                    }
                 </div>
-                <Modal show={this.state.showCreate} onHide={this.handleCloseCreate} centered>
+
+                {
+                    this.state.showCreate && this.state.stageOfCreateToken === 1 ?
+                    <div className="content__wrap">
+                        <h4 className="menu__title-secondary mb-4">Specify the parameters of the new token</h4>
+                        <div className="form__groups">
+
+                            <div className="form_row mb-4">
+                                <div className="form_col">
+                                    <label className="form__label">Token name * <img src={info} className="form__icon-info"/></label>
+                                    <div className="input-group">
+                                        <input type="text" placeholder="e.g. Bitcoin" onChange={this.onChangeName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                    <div className="form__prompt" id="basic-addon4">Choose a name for your token</div>
+                                </div>
+                                <div className="form_col_last form_col">
+                                    <label className="form__label">Symbol * <img src={info} className="form__icon-info"/></label>
+                                    <div className="input-group">
+                                    <input type="text" placeholder="e.g. BTC" onChange={this.onChangeSymbol} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                    <div className="form__prompt" id="basic-addon4">Choose a symbol for your token</div>
+                                </div>
+                            </div>
+
+                            <div className="form_row mb-4">
+                                <div className="form_col">
+                                    <label className="form__label">Supply type * <img src={info} className="form__icon-info"/></label>
+                                    <div className="input-group">
+                                        <select onChange={this.onChangeEmissionType} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                            {
+                                                emissionTypes.map(v => {
+                                                    return <option value={v.value} selected={this.state.emissionType === v.value}>
+                                                        {v.name}
+                                                    </option>
+                                                })
+                                            }
+                                        </select>
+                                    </div>
+                                    <div className="form__prompt" id="basic-addon4">Choose a symbol for your token</div>
+                                </div>
+                                <div className="form_col_last form_col">
+                                    <label className="form__label">Initial supply {this.state.emissionType === "1" ? "*" : null}<img src={info} /></label>
+                                    <div className="input-group">
+                                    <input onChange={this.onChangeInitialSupply} type="number" placeholder="1 000 000" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                    <div className="form__prompt" id="basic-addon4">The number of coins minted during the creation of the contrac</div>
+                                </div>
+                            </div>
+
+                            <div className="form_row mb-4">
+                                <div className="form_col">
+                                    <label className="form__label">Maximum supply * <img src={info} className="form__icon-info" /></label>
+                                    <div className="input-group">
+                                        <input onChange={this.onChangeMaxSupply} type="text" placeholder="1 000 000" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                    <div className="form__prompt" id="basic-addon4">The maximum number of coins ever minted</div>
+                                </div>
+                                <div className="form_col_last form_col">
+                                    <label className="form__label">Blockchain * <img src={info} className="form__icon-info" /></label>
+                                    <div className="input-group">
+                                        <select onChange={e => this.changeNetwork(e.target.value)} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                            <option value={config.status === "test" ? '5' : '1'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '5' : '1')) : false}>{networks[config.status === "test" ? '5' : '1'].name}</option>
+                                            <option value={config.status === "test" ? '97' : '56'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '97' : '56')) : false}>{networks[config.status === "test" ? '97' : '56'].name}</option>
+                                            <option value={config.status === "test" ? '80001' : '137'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '80001' : '137')) : false}>{networks[config.status === "test" ? '80001' : '137'].name}</option>
+                                            <option value={config.status === "test" ? '420' : '10'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '420' : '10')) : false} disabled={config.status === "test" ? true : false} >{networks[config.status === "test" ? '420' : '10'].name}</option>
+                                            <option value={config.status === "test" ? '43113' : '43114'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '43113' : '43114')) : false}>{networks[config.status === "test" ? '43113' : '43114'].name}</option>
+                                            <option value={config.status === "test" ? '421613' : '42161'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '421613' : '42161')) : false}>{networks[config.status === "test" ? '421613' : '42161'].name}</option>
+                                        </select>
+                                    </div>
+                                    <div className="form__prompt" id="basic-addon4">Choose what emission limit your token will have</div>
+                                </div>
+                            </div>
+
+                            <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                    <FileUpload></FileUpload>
+                                </div>
+                            </div>
+                        </div>
+                        <h4 className="menu__title-secondary mb-4">Advanced settings</h4>
+                        <div className="form__groups">
+
+                            <div className="form_row">
+                                <div className="form_col_last form_col">
+                                    <label className="form__label">Decimals * <img src={info} className="form__icon-info"/></label>
+                                        <div className="input-group">
+                                            <select onChange={e => this.changeNetwork(e.target.value)} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                                <option value={config.status === "test" ? '5' : '1'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '5' : '1')) : false}>{networks[config.status === "test" ? '5' : '1'].name}</option>
+                                                <option value={config.status === "test" ? '97' : '56'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '97' : '56')) : false}>{networks[config.status === "test" ? '97' : '56'].name}</option>
+                                                <option value={config.status === "test" ? '80001' : '137'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '80001' : '137')) : false}>{networks[config.status === "test" ? '80001' : '137'].name}</option>
+                                                <option value={config.status === "test" ? '420' : '10'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '420' : '10')) : false} disabled={config.status === "test" ? true : false} >{networks[config.status === "test" ? '420' : '10'].name}</option>
+                                                <option value={config.status === "test" ? '43113' : '43114'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '43113' : '43114')) : false}>{networks[config.status === "test" ? '43113' : '43114'].name}</option>
+                                                <option value={config.status === "test" ? '421613' : '42161'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '421613' : '42161')) : false}>{networks[config.status === "test" ? '421613' : '42161'].name}</option>
+                                            </select>
+                                        </div>
+                                    <div className="form__prompt" id="basic-addon4">Insert the decimals precision of your token</div>
+                                </div>
+                            </div>
+
+                            <div className="form_row mb-4">
+                                <div className="form_col_flex form_col">
+                                    <div className="form-check">
+                                        <input onChange={() => this.onChangePausable(this.state.pausable ? false : true)} checked={this.state.pausable} type="checkbox" value="" id="flexCheckDefault"/>
+                                        <label className="form-check-label" for="flexCheckDefault">
+                                            Pausable <img src={info} className="form__icon-info"/>
+                                        </label>
+                                    </div>
+                                    <div className="form-check">
+                                        <input onChange={() => this.onChangeBurnable(this.state.burnable ? false : true)} checked={this.state.burnable} type="checkbox" value="" id="flexCheckDefault"/>
+                                        <label className="form-check-label" for="flexCheckDefault">
+                                            Burnable <img src={info} className="form__icon-info"/>
+                                        </label>
+                                    </div>
+                                    <div className="form-check">
+                                        <input onChange={() => this.onChangeBlacklist(this.state.blacklist ? false : true)} checked={this.state.blacklist} type="checkbox" value="" id="flexCheckChecked"/>
+                                        <label className="form-check-label" for="flexCheckChecked">
+                                            Blacklist <img src={info} className="form__icon-info" />
+                                        </label>
+                                    </div>
+                                    <div className="form-check">
+                                        <input onChange={() => this.onChangeVerified(this.state.verified ? false : true)} checked={this.state.verified}  type="checkbox" value="" id="flexCheckChecked"/>
+                                        <label className="form-check-label" for="flexCheckChecked">
+                                            Verified on Etherscan <img src={info} className="form__icon-info"/>
+                                        </label>
+                                    </div>
+                                    <div className="form-check">
+                                        <input onChange={() => this.onChangeRecoverable(this.state.recoverable ? false : true)} checked={this.state.recoverable} type="checkbox" value="" id="flexCheckChecked"/>
+                                        <label className="form-check-label" for="flexCheckChecked">
+                                            Recoverable <img src={info} className="form__icon-info"/>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="form_row mb-4">
+                                <div className="form_col_action_left form_col_last form_col">
+                                    <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.nextStage}>
+                                        Next
+                                    </button>
+                                </div>
+                        </div>
+                    </div> : null
+                }
+                {
+                    this.state.showCreate && this.state.stageOfCreateToken === 2 
+                    ?  <div className="content__wrap">
+                         <h4 className="menu__title-secondary">Choose a wallet connection method</h4>
+                         <span className="menu__subtitle">To create a token, you need to complete a transaction using a cryptocurrency wallet</span>
+                         <div className="form_row mb-4">
+                            <div className="form_col_action_left form_col_last form_col">
+                            <button className="btn btn_pre-sm  btn_primary btn_gray" onClick={this.prevStage}>
+                                    Back
+                                </button>
+                                <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.nextStage}>
+                                    Next
+                                </button>
+                            </div>
+                         </div>
+                        </div> 
+                    : null
+                }
+                {
+                    this.state.showCreate && this.state.stageOfCreateToken === 3
+                    ?  <div className="content__wrap">
+                         <h4 className="menu__title-secondary mb-4">Configure access settings for token management</h4>
+
+                         <div className="form__groups">
+                            <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                    <label className="form__label">Chief administrator of the token (owner) * <img src={info} className="form__icon-info"/></label>
+                                    <div className="input-group">
+                                        <input type="text" placeholder="e.g. Bitcoin" onChange={this.onChangeName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                    <div className="form__prompt_warning form__prompt" id="basic-addon4">Choose a name for your token</div>
+                                </div>
+                            </div>
+                        </div>
+                         
+                        <div className="form_row mb-4">
+                            <div className="form_col_action_left form_col_last form_col">
+                                <button className="btn btn_pre-sm  btn_primary btn_gray" onClick={this.prevStage}>
+                                    Back
+                                </button>
+                                <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.nextStage}>
+                                    Create Token
+                                </button>
+                            </div>
+                        </div>
+                        </div> 
+                    : null
+                }
+                   {
+                    this.state.showCreate && this.state.stageOfCreateToken === 4
+                    ?  <div className="content__wrap">
+                         <h4 className="menu__title-secondary mb-4">Token successfully created!</h4>
+                         <div className="form__groups">
+                            <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                    <label className="form__label">Your token address * <img src={info} className="form__icon-info"/></label>
+                                    <div className="input-group">
+                                        <input type="text" value={'0xE8D562606F35CB14dA3E8faB1174F9B5AE8319c4'}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        <button className="btn btn__copy btn_primary btn_orange ms-3">Copy</button>
+                                    </div>
+                                    <div className="form__prompt_warning form__prompt" id="basic-addon4"><a className="link__form-prompt link__primary">Show on etherscan</a></div>
+                                </div>
+                            </div>
+                            <div className="form_row mb-4">
+                            <div className="form_col_action_left form_col_last form_col">
+                                <button className="btn btn_pre-sm  btn_primary btn_orange">
+                                    Done
+                                </button>
+                            </div>
+                         </div>
+                        </div>
+                        </div> 
+                    : null
+                }
+                {
+                    /*
+                    <Modal show={this.state.showCreate} onHide={this.handleCloseCreate} centered>
                     <Modal.Header closeButton>
                     <Modal.Title>Creating new token</Modal.Title>
                     </Modal.Header>
@@ -748,21 +1054,21 @@ class Tokens extends Component {
                         <button onClick={this.connect} type="button" className="btn btn-dark">{this.state.address ? createLongStrView(this.state.address) : 'Connect'}</button>
                         <h4>Specify the parameters of the new token</h4>
                         <div className="mb-3">
-                            <label className="form-label">Token name *</label>
+                            <label className="form__label">Token name *</label>
                             <div className="input-group">
                                 <input type="text" placeholder="e.g. Bitcoin" onChange={this.onChangeName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
                             <div className="form-text" id="basic-addon4">Choose a name for your token</div>
                         </div>
                         <div className="mb-3">
-                            <label className="form-label">Symbol *</label>
+                            <label className="form__label">Symbol *</label>
                             <div className="input-group">
                                 <input type="text" placeholder="e.g. BTC" onChange={this.onChangeSymbol} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
                             <div className="form-text" id="basic-addon4">Choose a symbol for your token</div>
                         </div>
                         <div className="mb-3">
-                            <label className="form-label">Supply type *</label>
+                            <label className="form__label">Supply type *</label>
                             <div className="input-group">
                                 <select onChange={this.onChangeEmissionType} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
                                     {
@@ -777,7 +1083,7 @@ class Tokens extends Component {
                             <div className="form-text" id="basic-addon4">Choose what emission limit your token will have</div>
                         </div>
                         <div className="mb-3">
-                            <label className="form-label">Initial supply {this.state.emissionType === "1" ? "*" : null}</label>
+                            <label className="form__label">Initial supply {this.state.emissionType === "1" ? "*" : null}</label>
                             <div className="input-group">
                                 <input onChange={this.onChangeInitialSupply} type="number" placeholder="1 000 000" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
@@ -787,7 +1093,7 @@ class Tokens extends Component {
                             this.state.emissionType === "0" 
                             ?
                             <div className="mb-3">
-                                <label className="form-label">Maximum supply *</label>
+                                <label className="form__label">Maximum supply *</label>
                                 <input onChange={this.onChangeMaxSupply} type="text" placeholder="1 000 000" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                 <div className="form-text" id="basic-addon4">The maximum number of coins ever minted</div>
                             </div>
@@ -795,7 +1101,7 @@ class Tokens extends Component {
                             null
                         }
                         <div className="mb-3">
-                            <label className="form-labelerc20_tokens_supply_types">Blockchain</label>
+                            <label className="form__labelerc20_tokens_supply_types">Blockchain</label>
                             <div className="input-group">
                                 <select onChange={e => this.changeNetwork(e.target.value)} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
                                     <option value={config.status === "test" ? '5' : '1'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '5' : '1')) : false}>{networks[config.status === "test" ? '5' : '1'].name}</option>
@@ -808,7 +1114,7 @@ class Tokens extends Component {
                             </div>
                         </div>
                         <div className="mb-3">
-                            <label className="form-label">Upload a picture of the token</label>
+                            <label className="form__label">Upload a picture of the token</label>
                             <div className="input-group">
                                 <div className="input-image">
                                     <div className="input-image-button">(soon)</div>
@@ -858,100 +1164,152 @@ class Tokens extends Component {
                     </button>
                     </Modal.Footer>
                 </Modal>
-                <div>
-                    <table className="table table-bordered border-dark">
-                        <thead>
-                            <tr className="table-secondary" >
-                            <th className="table-secondary" scope="col">Token</th>
-                            <th className="table-secondary" scope="col">Balance</th>
-                            <th className="table-secondary" scope="col">Price</th>
-                            <th className="table-secondary" scope="col">Supply</th>
-                            <th className="table-secondary" scope="col">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                this.state.tokens.map(v =>{
-                                    return <tr className="table-secondary">
-                                        <td className="table-secondary">
-                                            <div>
-                                                {v.symbol}
-                                            </div>
-                                            <div>
-                                                {v.name}
-                                            </div>
-                                        </td>
-                                        <td className="table-secondary">
-                                            (soon)
-                                        </td>
-                                        <td className="table-secondary">
-                                            (soon)
-                                        </td>
-                                        <td className="table-secondary">
-                                            (soon)
-                                        </td>
-                                        <td className="table-secondary">
-                                            <button className="btn btn-dark" onClick={() => this.handleShowMint(v.symbol, v.address, v.chainid)} disabled={v.supply_type == 1 ? true : false}>Mint</button>
-                                            <button className="btn btn-dark" disabled>Roles control</button>
-                                            <button className="btn btn-dark" onClick={() => this.handleShowPause(v.symbol, v.address, v.chainid)} disabled={!v.pausable}>{v.paused ? "Unpause" : "Pause"}</button>
-                                            <button className="btn btn-dark" onClick={() => this.handleShowBlacklist(v.symbol, v.address, v.chainid)} disabled={!v.blacklist}>Blacklist</button>
-                                            <button className="btn btn-dark" onClick={() => this.handleShowBurn(v.symbol, v.address, v.chainid)} disabled={!v.burnable}>Burn</button>
-                                            <button className="btn btn-dark" disabled>Token info</button>
-                                        </td>
-                                    </tr>
-                                })
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                */
+                    }
+                {
+                        this.state.tokens && !this.state.showCreate ? 
+                        <div className="content__wrap">
+                            <FPTable data={tokenTable}>
+                                {
+                                  this.state.tokens.map(v =>{
+                                      return <tr>
+                                          <td>
+                                            <img src={customTokeSymbol}></img>
+                                              <div>
+                                                  {v.symbol}
+                                              </div>
+                                              <div>
+                                                  {v.name}
+                                              </div>
+                                          </td>
+                                          <td>
+                                              (soon)
+                                              <a className="info__content-mint_medium info__content-mint">{'[mint]'}</a>
+                                          </td>
+                                          <td>
+                                              (soon)
+                                              {/* Найти и добавить виждет графика цен */}
+                                          </td>
+                                          <td>
+                                              (soon)
+                                          </td>
+                                          <td>
+                                            <FPDropdown icon={more}>
+                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowMint(v.symbol, v.address, v.chainid)} disabled={v.supply_type == 1 ? true : false}>Mint</Dropdown.Item>
+                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowPause(v.symbol, v.address, v.chainid)} disabled={!v.pausable}>Pause</Dropdown.Item>
+                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowRoles(v.symbol, v.address, v.chainid)}>Roles control</Dropdown.Item>
+                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowBlacklist(v.symbol, v.address, v.chainid)}>Blacklist</Dropdown.Item>
+                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowInfo(v.symbol, v.address, v.chainid)}>Token info</Dropdown.Item>
+                                            </FPDropdown>
+                                              {/*
+                                              <button className="btn btn-dark" onClick={() => this.handleShowMint(v.symbol, v.address, v.chainid)} disabled={v.supply_type == 1 ? true : false}>Mint</button>
+                                              <button className="btn btn-dark" disabled>Roles control</button>
+                                              <button className="btn btn-dark" onClick={() => this.handleShowPause(v.symbol, v.address, v.chainid)} disabled={!v.pausable}>{v.paused ? "Unpause" : "Pause"}</button>
+                                              <button className="btn btn-dark" onClick={() => this.handleShowBlacklist(v.symbol, v.address, v.chainid)} disabled={!v.blacklist}>Blacklist</button>
+                                              <button className="btn btn-dark" onClick={() => this.handleShowBurn(v.symbol, v.address, v.chainid)} disabled={!v.burnable}>Burn</button>
+                                              <button className="btn btn-dark" disabled>Token info</button>
+                                            */}
+                                          </td>
+                                      </tr>
+                                  })
+                              }
+                            </FPTable>
+                        </div>
+                  : !this.state.tokens?.length && !this.state.showCreate ?
+                  <div className="empty">
+                    <div className="empty__wrapper">
+                        <img src={empty}></img>
+                        <span className="empty__desc">You don't have any tokens yet</span>
+                        <button onClick={this.handleShowCreate} type="button" className="btn btn_rounded btn_orange btn_sm">Create new token</button>
+                    </div>
+                  </div>
+                  : null   
+                }
+              
                 <Modal show={this.state.showMint} onHide={this.handleCloseMint} centered>
-                    <Modal.Header closeButton>
+                    <Modal.Header  className="modal-newuser__title modal-title" closeButton>
                             Mint new {this.state.currentTokenSymbol} tokens
                     </Modal.Header>
                     <Modal.Body>
                         {
-                            this.state.showLoading
+                           /* this.state.showLoading
                             ?
                             <div className="spinner-border" role="status"></div>
-                            :
+                            : */
+                            
                             <>
                             <div>
                                 <ol className="mint-token-info-list">
-                                    <li>
-                                        Total supply: {this.state.mintTokenTotalSupply} {this.state.currentTokenSymbol} 
+                                    <li className="modal-text">
+                                        The contract balance: 11 <img src={info} className="form__icon-info"/>
                                     </li>
-                                    <li>
+                                    <li className="modal-text">
+                                        Total supply: 11 <img src={info} className="form__icon-info"/>
+                                    </li>
+                                    <li className="modal-text">
                                         Max supply: {
                                             this.state.mintTokenMaxSupply === '0.0'
                                             ?
                                             `Infinity`
                                             :
-                                            `${this.state.mintTokenMaxSupply} ${this.state.currentTokenSymbol}`
-                                        } 
+                                          11 
+                                        } <img src={info} className="form__icon-info"/>
                                     </li>
-                                    <li>
+                                    <li className="modal-text">
                                         Available to mint: {
                                             this.state.mintTokenMaxSupply === '0.0'
                                             ?
                                             `Infinity`
                                             :
-                                            `${this.state.mintTokenAvailableToMint} ${this.state.currentTokenSymbol}`
-                                        }
+                                           11
+                                        } <img src={info} className="form__icon-info"/>
                                     </li>
                                 </ol>
                             </div>
-                            <div className="mb-3">
-                                <label className="form-label">Amount to mint *</label>
-                                <div className="input-group">
-                                    <input type="number" onChange={this.onChangeMintTokenAmount} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                            <div className="form_row mb-4">
+                            <div className="form_col_last form_col">
+                                <label className="form__label">Amount to mint * <img src={info} className="form__icon-info"/></label>
+                                    <div className="input-group">
+                                        <input type="number" onChange={this.onChangeMintTokenAmount} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                    <div className="form__prompt" id="basic-addon4">Enter the number of the ABC tokens you want to create</div>
+                            </div>
+                            </div>
+                            <div className="form_row">
+                                <div className="form_col">
+                                    <label className="form__label">Destination to send:</label>
                                 </div>
-                                <div className="form-text" id="basic-addon4">Enter the number of the ABC tokens you want to create</div>
+                            </div>
+                            <div className="form_row mb-4">
+                                <div className="form_col_flex form_col">
+                                    <div className="form-check custom-control custom-radio custom-control-inline">
+                                            <input type="radio" id="rd_1" name="rd" value="Contract balance"/>
+                                            <label className="form-check-label custom-control-label green" for="rd_1">
+                                                Contract balance <img src={info} className="form__icon-info"/>
+                                            </label>
+                                        </div>
+                                        <div className="form-check custom-control custom-radio custom-control-inline">
+                                            <input type="radio" id="rd_2" name="rd" value="External wallet" />
+                                            <label className="form-check-label custom-control-label red" for="rd_2">
+                                                External wallet <img src={info} className="form__icon-info"/>
+                                            </label>
+                                        </div>
+                                </div>
+                            </div>
+                            <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                    <label className="form__label">Send to:</label>
+                                    <div className="input-group">
+                                        <input type="text" placeholder="Address" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                    <div className="form__prompt" id="basic-addon4">Enter a wallet to deliver the tokens to</div>
+                                </div>
                             </div>
                             </>
                         }
                     </Modal.Body>
                     <Modal.Footer>
-                        <button onClick={this.mint} type="button" className="btn btn-dark">Mint</button>
+                        <button onClick={this.mint} type="button" className="btn btn_secondary btn_orange">Mint</button>
                     </Modal.Footer>
                 </Modal>
                 <Modal show={this.state.showPause} onHide={this.handleClosePause} centered>
@@ -963,19 +1321,24 @@ class Tokens extends Component {
                     </Modal.Footer>
                 </Modal>
                 <Modal show={this.state.showBlacklist} onHide={this.handleCloseBlacklist} centered>
-                    <Modal.Header closeButton>
-                        <Modal.Title>
+                    <Modal.Header className="modal-newuser__title modal-title modal-header"closeButton>
                             {this.state.currentTokenSymbol} token blacklist 
-                        </Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
+                            <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                            <div className="input-group search-input">
+                                                <input type="text" placeholder="Search..." className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                            </div>
+                                </div>
+                            </div>
                         {
                             this.state.showLoading
                             ?
                             <div className="spinner-border" role="status"></div>
                             :
                             (
-                                <table className="table table-bordered border-dark">
+                                /*<table className="table table-bordered border-dark">
                                 <thead>
                                     <tr className="table-secondary" >
                                     <th className="table-secondary" scope="col">Select</th>
@@ -1009,29 +1372,186 @@ class Tokens extends Component {
                                         )
                                     }
                                 </tbody>
-                                </table>
+                                </table>*/
+                                <FPTable data={blacklistTable}>
+                                    <td>
+                                        <input  className="form-checkbox" type="checkbox" value="" id="flexCheckChecked"/>
+                                    </td>
+                                    <td>
+                                        <span className="table-text">0xE8265C...F98319c4</span>
+                                    </td>
+                                    <td>
+                                        <span className="table-text">22.08.2023 22:11</span>
+                                    </td>
+                                </FPTable>
                             )
                         }
                     </Modal.Body>
                     <Modal.Footer>
-                        <button className="btn btn-dark" onClick={this.removeFromBlacklist}>Remove</button>
-                        <button className="btn btn-light" onClick={this.handleShowBlacklistAdd}>Add new</button>
+                        <button className="btn btn_primary btn_gray" onClick={this.removeFromBlacklist}>Remove</button>
+                        <button className="btn btn_primary btn_orange" onClick={this.handleShowBlacklistAdd}>Add new</button>
                     </Modal.Footer>
                 </Modal>
                 <Modal show={this.state.showBlacklistAdd} onHide={this.handleCloseBlacklistAdd} centered>
-                        <Modal.Header closeButton>
-                            <Modal.Title>Add to blacklist</Modal.Title>
+                        <Modal.Header className="modal-newuser__title modal-title modal-header" closeButton>
+                            Add to blacklist
                         </Modal.Header>
                         <Modal.Body>
-                            <div>
+                            <div className="modal-text mb-4">
                             {this.state.currentTokenSymbol} tokens on blacklisted users' wallets will be frozen and cannot be sent from them. Add list of wallets to the text box. Each wallet on a new line.
                             </div>
-                            <div>
-                                <textarea onChange={this.onChangeBlacklistAddText}></textarea>
+                            <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                    <textarea className="form__textarea form__textarea_add-blacklist" onChange={this.onChangeBlacklistAddText}></textarea>
+                                </div>
                             </div>
+                           
                         </Modal.Body>
                         <Modal.Footer>
-                            <button className="btn btn-dark" onClick={this.addToBlacklist}>Add</button>
+                            <button className="btn btn_secondary btn_orange" onClick={this.addToBlacklist}>Add</button>
+                        </Modal.Footer>
+                </Modal>
+                <Modal show={this.state.showRoles} onHide={this.handleCloseRoles} centered>
+                        <Modal.Header className="modal-newuser__title modal-title modal-header" closeButton>
+                            Roles
+                        </Modal.Header>
+                        <Modal.Body>
+                        <div className="form__groups">
+                            <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                    <label className="form__label"><img src={infoRed} className="form__icon-info_left form__icon-info"/> Transfer ownership * <img src={info} className="form__icon-info"/></label>
+                                    <div className="input-group">
+                                        <input type="text"placeholder="Address" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        <button className="btn btn_primary btn_orange ms-2">Transfer ownership</button>
+                                    </div>
+                                    <div className="form__prompt" id="basic-addon4">Enter a wallet to transfer ownership of the contract</div>
+                                </div>
+                            </div>
+
+                            <div className="form__group mb-4">
+                            <div className="form__group_top-row">
+                                <div className="form__group_top-row-left">
+                                        <div>
+                                        <label className="form__label_group form__label">Minting managers: <img className="form__icon-info" src={info} />
+                                        </label>
+                                        <div className="form__prompt" id="basic-addon4">Textual traits that show up as rectangles</div>
+                                    </div>
+                                </div>
+                                <button type="button" className="btn btn_primary btn_orange btn__add-form">Add</button>
+                            </div>
+                            <div className="form__group_bottom-row">
+                            {
+                                            /* Добавить на созданном токене
+                                            <div id="user-properties">
+                                            {
+                                                this.state.editPropertiesElements ?
+                                                this.state.editPropertiesElements.map(v => v.work ? v.element : null) :
+                                                null
+                                            }
+                                        </div>*/
+                                        }
+                                <div className="form__group_bottom-row-last">
+                                    <div className="input-group_full input-group">
+                                        <input type="text" placeholder="Address" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+
+                        <div className="form__group mb-4">
+                            <div className="form__group_top-row">
+                                <div className="form__group_top-row-left">
+                                        <div>
+                                        <label className="form__label_group form__label"><img src={infoRed} className="form__icon-info_left form__icon-info"/> Financial managers: <img className="form__icon-info" src={info} />
+                                        </label>
+                                        <div className="form__prompt" id="basic-addon4">Textual traits that show up as rectangles</div>
+                                    </div>
+                                </div>
+                                <button type="button" className="btn btn_primary btn_orange btn__add-form">Add</button>
+                            </div>
+                            <div className="form__group_bottom-row">
+                            {
+                                            /* Добавить на созданном токене
+                                            <div id="user-properties">
+                                            {
+                                                this.state.editPropertiesElements ?
+                                                this.state.editPropertiesElements.map(v => v.work ? v.element : null) :
+                                                null
+                                            }
+                                        </div>*/
+                                        }
+                                <div className="form__group_bottom-row-last">
+                                    <div className="input-group_full input-group">
+                                        <input type="text" placeholder="Address" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                         </div>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <button className="btn btn_secondary btn_disabled" onClick={this.addToBlacklist}>Save</button>
+                        </Modal.Footer>
+                </Modal>
+                <Modal show={this.state.showInfo} onHide={this.handleCloseInfo} centered>
+                        <Modal.Header className="modal-newuser__title modal-title modal-header" closeButton>
+                            token info
+                        </Modal.Header>
+                        <Modal.Body>
+                        <div className="form_row mb-4">
+                            <div className="form__group_top-row-left">
+                                            <img src={customTokeSymbol}></img>
+                                            <div>
+                                            <div className="form__label_group form__label">ABC
+                                            </div>
+                                            <div className="modal-text modal-text__caption">
+                                                Token name
+                                            </div>
+                                        </div>
+                            </div>
+                            <div className="info__group-price info__group">
+                                <span className="form__label_group form__label">Price: ~ 11.7 USD</span>
+                                <span className="info__group-price_red info__group-price"> <img src={down} /> <span className="modal-text modal-text__caption">15.4%</span></span>
+                            </div>
+                        </div>
+                            <div className="modal-text mb-4">
+                                
+                            <ol className="mint-token-info-list">
+                                    <li className="modal-text">
+                                        Contracts: 11 <img src={info} className="form__icon-info"/>
+                                        <ul className="unlist">
+                                            <li className="custom-marker_circle_black"><a className="link__primary">0x2170ed0880ac9a755fd29b2688956bd959f933f8</a> <img src={copy} className="form__icon-info"></img></li>
+                                        </ul>
+                                    </li>
+                                    <li className="modal-text">
+                                        Holders: 11 <img src={info} className="form__icon-info"/>
+                                    </li>
+                                    <li className="modal-text">
+                                        Decimals: 11 <img src={info} className="form__icon-info"/>
+                                    </li>
+                                    <li className="modal-text">
+                                        The contract balance: 11<img src={info} className="form__icon-info"/>
+                                    </li>
+                                    <li className="modal-text">
+                                        Total supply: 11<img src={info} className="form__icon-info"/>
+                                    </li>
+                                    <li className="modal-text">
+                                        Max supply: 2 000 000 <img src={info} className="form__icon-info"/>
+                                    </li>
+                                    <li className="modal-text">
+                                        Circulating Supply: 500 000 ABC <img src={info} className="form__icon-info"/>
+                                    </li>
+                                    <li className="modal-text">
+                                        Available to mint: 1 000 000 ABC <a className="info__content-mint_medium info__content-mint">{'[mint]'}</a> <img src={info} className="form__icon-info"/>
+                                    </li>
+                                </ol>
+                            </div>
+                           
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <button className="btn btn_secondary btn_orange" onClick={this.addToBlacklist}>Add</button>
                         </Modal.Footer>
                 </Modal>
                 <Modal show={this.state.showBurn} onHide={this.handleCloseBurn} centered>
@@ -1039,11 +1559,11 @@ class Tokens extends Component {
                         <Modal.Title>Burn {this.state.currentTokenSymbol} token</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <label className="form-label">From who:</label>
+                        <label className="form__label">From who:</label>
                         <div className="choose-reward-node">
                             <div className="form-check">
                                 <input 
-                                    className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1"
+                                     type="radio" name="flexRadioDefault" id="flexRadioDefault1"
                                     value={burnAddressType.current} checked={this.state.currentBurnAddressType === burnAddressType.current}
                                     onChange={this.onChangeCurrentBurnType}
                                 />
@@ -1053,7 +1573,7 @@ class Tokens extends Component {
                             </div>
                             <div className="form-check">
                                 <input 
-                                    className="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2"
+                                    type="radio" name="flexRadioDefault" id="flexRadioDefault2"
                                     value={burnAddressType.other} checked={this.state.currentBurnAddressType === burnAddressType.other}
                                     onChange={this.onChangeCurrentBurnType}
                                 />
@@ -1066,7 +1586,7 @@ class Tokens extends Component {
                             this.state.currentBurnAddressType === burnAddressType.other
                             ?
                             <div className="mb-3">
-                                <label className="form-label">Other address:</label>
+                                <label className="form__label">Other address:</label>
                                 <div className="input-group">
                                     <input onChange={this.onChangeOtherBurnAddress} type="text" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                 </div>
@@ -1075,7 +1595,7 @@ class Tokens extends Component {
                             null
                         }
                         <div className="mb-3">
-                            <label className="form-label">Burn amount:</label>
+                            <label className="form__label">Burn amount:</label>
                             <div className="input-group">
                                 <input onChange={this.onChangeBurnAmount} type="number" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
@@ -1104,7 +1624,7 @@ class Tokens extends Component {
                     handleCloseError={this.handleCloseError}
                     errorText={this.state.errorText}
                 />
-            </div>
+            </>
         )
     }
 }

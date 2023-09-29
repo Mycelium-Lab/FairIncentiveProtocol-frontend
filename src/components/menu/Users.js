@@ -448,7 +448,7 @@ class Users extends Component {
                         <div className="input-group">
                             <input type="text" id={`edit-property-value-${propertyId}`} onChange={(event) => this.changeEditPropertyValue(propertyId, event.target.value)} defaultValue={v.value} className="form-control" placeholder="Property value"/>
                         </div>
-                    <button type="button" className="btn btn-dark" onClick={() => this.deleteEditPropertyInput(propertyId)}>-</button>
+                    <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={() => this.deleteEditPropertyInput(propertyId)}>-</button>
                     </div>,
                     name: v.name,
                     value: v.value,
@@ -470,7 +470,7 @@ class Users extends Component {
                         <div className="user-custom-params">
                             <input type="number" id={`edit-stat-value-${statId}`} onChange={this.changeEditStatValue} defaultValue={v.value} className="form-control" placeholder="Stat value"/>
                         </div>
-                        <button type="button" className="btn btn-dark" onClick={() => this.deleteEditStatInput(statId)}>-</button>
+                        <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={() => this.deleteEditStatInput(statId)}>-</button>
                     </div>,
                     name: v.name,
                     value: v.value,
@@ -707,7 +707,7 @@ class Users extends Component {
         return (
             <>
                 <div className="title-header">
-                    <h3>Users</h3>
+                    <h3 className="menu__title">Users</h3>
                     <button onClick={this.handleShowAdd} type="button" className="btn btn_primary btn_orange">Add new user</button>
                 </div>
                 <Modal show={this.state.showAdd} onHide={this.handleCloseAdd} centered>
@@ -881,7 +881,7 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                     </table>
                     */
                     }
-                    <div className="table-wrap">
+                    <div className="content__wrap">
                     <FPTable data={this.state.tabelData}>
                     {
                                 this.state.users.map(v =>

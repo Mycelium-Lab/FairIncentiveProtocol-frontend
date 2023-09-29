@@ -1,5 +1,9 @@
 .btn-close{
     opacity: 1;
+    width: 15px !important;
+    height: 15px !important;
+    padding: 0px !important;
+    margin-bottom: 1px !important;
 }
 .modal-header{
     border-bottom: none;
@@ -12,4 +16,17 @@
 
 .modal-body{
     padding: 24px 24px 0px;
+}
+
+.modal-text{
+    font-weight: 600;
+    line-height: 21px;
+    font-size: map-get($theme-fontSize, "primary");
+    color: map-get($theme-colors, "primary");
+    padding: 0px !important;
+}
+
+.modal-text__caption{
+    font-weight: 500;
+    font-size: map-get($theme-fontSize, "caption");
 }

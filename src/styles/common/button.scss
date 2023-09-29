@@ -13,10 +13,18 @@
 }
 
 .btn_primary{
+    border-radius: 4px !important;
+    font-weight: 700;
+    line-height: 21px;
+    font-size: map-get($theme-fontSize, "primary");
+}
+
+.btn_secondary{
     border-radius: 4px;
     font-weight: 700;
     line-height: 21px;
     font-size: map-get($theme-fontSize, "primary");
+    width: 90px;
 }
 
 .btn__counter{
@@ -29,3 +37,33 @@
     height: 38px;
 }
 
+.btn__add-form{
+    width: 70px;
+    height: 36px;
+}
+
+.btn_rounded{
+    border-radius: 50px;
+    padding: 10px 42.52px 12px 41.48px;
+}
+
+.btn_pre-sm {
+    height: 51px;
+    padding: 15px 36.3px 15px 36.7px;
+}
+.btn_sm{
+    font-weight: 600;
+    padding: 10px 42.52px 12px 41.48px;
+    font-size: map-get($theme-fontSize, "smTitile");
+    line-height: 27px;
+}
+
+.btn_disabled{
+    cursor: not-allowed !important;
+    background: map-get($theme-colors, "disabled");   
+    color: map-get($theme-colors, "white");
+    &:hover{
+        background: map-get($theme-colors, "disabled");
+        color: map-get($theme-colors, "white");
+    }
+}

@@ -1,5 +1,6 @@
 import { Component } from "react";
 import { Table } from "react-bootstrap";
+import info from '../../media/common/info-small.svg'
 
 
 class FPTable extends Component {
@@ -15,7 +16,10 @@ class FPTable extends Component {
                          <tr>
                              {
                                  data.map(d => (
-                                     <th key={d.key}>{d.name}</th>
+                                     <th key={d.key}>
+                                        {d.name}
+                                        {d.name === 'Balance' || d.name === 'Price' ? <img className="form__icon-info" src={info}/> : null}
+                                    </th>
                                  ))
                              }
                          </tr>

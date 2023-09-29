@@ -14,10 +14,19 @@
     color: rgba(108, 117, 125, 1);
 }
 
+.form__prompt_warning{
+    color: map-get($theme-colors, "warning");
+}
+
 .form__icon-info{
     margin-left: 6px;
     margin-bottom: 2px;
     cursor: pointer;
+}
+
+.form__icon-info_left{
+    margin-left: 0px;
+    margin-right: 6px;
 }
 
 .form__group{
@@ -25,6 +34,15 @@
     gap: 10px;
     flex-direction: column;
 }
+.form__groups{
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+.form-control{
+    border-radius: 4px !important;
+}
+
 .form__group_top-row{
     display: flex;
     justify-content: space-between;
@@ -46,7 +64,9 @@
 .input-group{
     width: inherit;
 }
-
+.input-group_full{
+    width: 100%;
+}
 .fp-userid-row{
     display: flex;
     gap: 12px;
@@ -56,4 +76,85 @@
 
 .fp-userid-row_left{
     width: 100%;
+}
+
+.form_row{
+    display: flex;
+    justify-content: space-between;
+}
+.form_col{
+    flex: 1;
+    margin-right: 24px;
+}
+.form_col_last{
+    margin-right: 0px;
+}
+.form_col_flex{
+    display: flex;
+    gap: 24px;
+}
+.form_col_action_left{
+    display: flex;
+    justify-content: end;
+    gap: 16px;
+}
+
+input[type=radio]#rd_1 {
+    accent-color: #cf7f17;
+}
+
+
+input[type=radio]#rd_2 {
+    accent-color: #cf7f17;
+}
+
+.form-check{
+    padding: 0px;
+    margin: 0px;
+    display: flex;
+    gap: 8px;
+}
+.form-check-label{
+    margin-top: 2px;
+    font-size: map-get($theme-fontSize, "primary");
+    font-weight: 500;
+    line-height: 21px;
+}
+
+.search-input{
+    position: relative;
+    &:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left:  8px;
+      margin: auto 0;
+      width: 20px;
+      height: 21px;
+      background: url('../../media/common/search.svg') no-repeat;
+      background-size: 100% 100%;
+      z-index: 10;
+    }
+}
+
+.search-input input{
+    padding-left: 30px;
+}
+
+.form-checkbox{
+    width: 16px;
+    height: 16px;
+}
+
+input[type="checkbox"] {
+    accent-color:  map-get($theme-colors, "warning");
+}
+
+.form__textarea{
+    width: 100%;
+    resize: none;
+}
+.form__textarea_add-blacklist{
+    height: 204px;
 }
