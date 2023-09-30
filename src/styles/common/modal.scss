@@ -26,7 +26,13 @@
     padding: 0px !important;
 }
 
+.modal-text_regular{
+    font-weight: 400;
+}
 .modal-text__caption{
     font-weight: 500;
     font-size: map-get($theme-fontSize, "caption");
+}
+.modal__nft-text {
+    margin-bottom: 0px;
 }

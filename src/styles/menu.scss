@@ -47,3 +47,38 @@
     border-radius: 20px;
     box-shadow: 5px 5px 30px 0px rgba(0, 0, 0, 0.05);
 }
+
+.text_primary{
+    font-size: map-get($theme-fontSize, "primary");
+    line-height: 21px;
+}
+
+.text_gray{
+    color: rgba(119, 119, 119, 1) !important;
+}
+
+.text_card{
+    line-height: 19.1px;
+    margin-top: 8px;
+}
+
+.title_secondary {
+    font-size: map-get($theme-fontSize, "secondary");
+    line-height: 21px;
+    font-weight: 600;
+    margin-bottom: 0px;
+}
+
+.title_primary {
+    font-size: map-get($theme-fontSize, "primary");
+    line-height: 21px;
+    font-weight: 600;
+    margin-bottom: 0px;
+}
+
+.title_preLgTitile {
+    font-size: map-get($theme-fontSize, "secondary");
+    line-height: 30px;
+    font-weight: 700;
+    margin-bottom: 0px;
+}
