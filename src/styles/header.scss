@@ -11,10 +11,19 @@ header {
     box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.05);
 }
 
+.header-left{
+    display: flex;
+    gap: 29.5px
+}
+
 .header-right {
     display: flex;    
     align-items: center;
     gap: 24px;
+}
+
+.header-right__more, .menu-burger, .menu-close{
+    display: none;
 }
 
 .header-right__user{

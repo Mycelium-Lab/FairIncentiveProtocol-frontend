@@ -7,6 +7,16 @@ import { getBearerHeader } from "../../utils/getBearerHeader";
 import { config } from "../../utils/config";
 import ERC20Mintable from '../../contracts/erc20/ERC20Mintable.json'
 import ERC721Mintable from '../../contracts/erc721/ERC721Mintable.json'
+import filter from '../../media/common/filter.svg'
+import close from '../../media/common/close.svg'
+import more from '../../media/common/more.svg'
+import info from '../../media/common/info-small.svg'
+import drug_drop from '../../media/common/drug&drop.svg'
+import { rewardsTable } from "../../data/tables";
+import FPTable from "../common/FPTable";
+import FPDropdown from "../common/FPDropdown";
+import { Dropdown } from "react-bootstrap";
+import RewardsInfo from "../dashboardInfo/RewardsInfo";
 
 const types = {
     token: 'token',
@@ -52,7 +62,9 @@ class Rewards extends Component {
             reward_token: null,
             reward_nft_id: null,
             reward_symbol: null,
-            reward_nft_name: null
+            reward_nft_name: null,
+            showFilter: false,
+            isActive: false
         }
     }
 
@@ -672,16 +684,20 @@ class Rewards extends Component {
         }
     }
 
+    handleCloseStats = () => this.setState({showStats: false});
+    handleShowStats = () => this.setState({showStats: true});
+
     handleClose = () => this.setState({show: false});
     handleShow = () => this.setState({show: true});
     handleCloseReward = () => this.setState({showReward: false})
-    handleShowReward = (reward_name, reward_id) => this.setState({showReward: true, reward_name, reward_id})
+    //handleShowReward = (reward_name, reward_id) => this.setState({showReward: true, reward_name, reward_id})
+    handleShowReward = () => this.setState({showReward: true})
     handleShowEditReward = (
         reward_name, reward_id, reward_count, 
         reward_description, reward_amount, reward_type, 
         reward_token, reward_nft_id, reward_symbol,
         reward_nft_name) => {
-        let current_nfts = {}
+       /* let current_nfts = {}
         if (reward_type === types.nft) {
             current_nfts = {
                 current_nfts: this.state.nfts.find(v => v.collection_address === reward_token).nfts
@@ -702,11 +718,16 @@ class Rewards extends Component {
                 reward_nft_name,
                 ...current_nfts
             }
-        )
+        )*/
+        this.setState(
+            {   
+                showEditReward: true, 
+            })
     }
     handleCloseEditReward = () => this.setState({showEditReward: false})
 
-    handleShowDelete = (reward_type, reward_id, reward_name) => this.setState({showDelete: true, reward_id, reward_name, reward_type})
+    //handleShowDelete = (reward_type, reward_id, reward_name) => this.setState({showDelete: true, reward_id, reward_name, reward_type})
+    handleShowDelete = () => this.setState({showDelete: true})
     handleCloseDelete = () => this.setState({showDelete: false, reward_name: null, reward_id: null, reward_type: null})
 
     connect = this.connect.bind(this)
@@ -749,100 +770,253 @@ class Rewards extends Component {
 
     render() {
         return (
-            <div>
+            <>
                 <div className="title-header">
-                    <h3>Rewards</h3>
-                    <button type="button" className="btn btn-dark" onClick={this.handleShow}>Create new reward</button>
+                    <h3 className="menu__title">Rewards</h3>
+                    <button  type="button" className="btn btn_orange btn_primary" onClick={this.handleShow}>Create new reward</button>
                 </div>
-                <div>
+                <div className="input-group__serach">
+                    <button  type="button" className="btn btn_orange btn_image btn_primary" onClick={() => this.setState({showFilter: !this.state.showFilter})}>
+                        {
+                            this.state.showFilter 
+                            ? <img className="close__image" src={close} ></img>
+                            : <img className="filter__image" src={filter} ></img>
+                        }
+                    </button>
+                    <div className="input-group search-input_rewards search-input">
+                        <input type="text" placeholder="Search..." className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                    </div>
+                </div>
+                {
+                    this.state.showFilter 
+                    ? <div>
+                            <div className="input-group_filter input-group">
+                                <input type="text" placeholder="Name" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                <input type="text" placeholder="Name" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                <select className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                    <option value='Status'>Status</option>
+                                    <option value='Name'>Name</option>
+                                    <option value='Reward'>Reward</option>
+                                </select>
+                            </div>
+                        </div>
+                    : null
+                }
+                <div className="content__wrap">
+                            <FPTable data={rewardsTable}>
+                                {
+                                 <tr>
+                                          <td>   
+                                                <label className="switch">
+                                                    <input type="checkbox" onChange={() => this.setState({isActive: !this.state.isActive}) }></input>
+                                                    <span className="slider round"></span>
+                                                </label>  
+                                          </td>
+                                          <td>
+                                               -
+                                          </td>
+                                          <td>
+                                                0x12c4...32f7
+                                          </td>
+                                          <td>
+                                              <ol className="table-rewards__list">
+                                                <li className="table-rewards__list-item">345 ABC</li>
+                                                <li className="table-rewards__list-item">105 545 CBA</li>
+                                                <li className="table-rewards__list-item">5 NFTs from ABC collection</li>
+                                              </ol>
+                                          </td>
+                                          <td>
+                                          5 from ABC collection
+                                          </td>
+                                          <td>
+                                            <FPDropdown icon={more}>
+                                                <Dropdown.Item className="dropdown__menu-item" onClick={this.handleShowStats}>Stat</Dropdown.Item>
+                                                <Dropdown.Item className="dropdown__menu-item" onClick={this.handleShowEditReward}>Edit</Dropdown.Item>
+                                                <Dropdown.Item className="dropdown__menu-item" onClick={this.handleShowReward}>To reward</Dropdown.Item>
+                                                <Dropdown.Item className="dropdown__menu-item" onClick={this.handleShowDelete}>Delete</Dropdown.Item>
+                                            </FPDropdown>
+                                              {/*
+                                              <button className="btn btn-dark" onClick={() => this.handleShowMint(v.symbol, v.address, v.chainid)} disabled={v.supply_type == 1 ? true : false}>Mint</button>
+                                              <button className="btn btn-dark" disabled>Roles control</button>
+                                              <button className="btn btn-dark" onClick={() => this.handleShowPause(v.symbol, v.address, v.chainid)} disabled={!v.pausable}>{v.paused ? "Unpause" : "Pause"}</button>
+                                              <button className="btn btn-dark" onClick={() => this.handleShowBlacklist(v.symbol, v.address, v.chainid)} disabled={!v.blacklist}>Blacklist</button>
+                                              <button className="btn btn-dark" onClick={() => this.handleShowBurn(v.symbol, v.address, v.chainid)} disabled={!v.burnable}>Burn</button>
+                                              <button className="btn btn-dark" disabled>Token info</button>
+                                            */}
+                                          </td>
+                                      </tr>
+                              }
+                            </FPTable>
+                </div>
+
+              
+                {/*<div>
                     <button type="button" className={this.state.switcher === types.token ? "btn btn-dark" : "btn btn-light"} onClick={() => this.setState({switcher: types.token})}>Token rewards</button>
                     <button type="button" className={this.state.switcher === types.nft ? "btn btn-dark" : "btn btn-light"} onClick={() => this.setState({switcher: types.nft})}>NFT rewards</button>
-                </div>
+                </div>*/}
+
+
+
                 <Modal show={this.state.show} onHide={this.handleClose} centered>
-                    <Modal.Header closeButton>
-                    <Modal.Title>Create new reward</Modal.Title>
+                <Modal.Header  className="modal-newuser__title modal-title" closeButton>
+                        Create new reward
                     </Modal.Header>
                     <Modal.Body>
-                        <div className="mb-3">
-                            <label className="form-label">Name</label>
-                            <div className="input-group">
-                                <input type="text" placeholder="My first reward" onChange={this.changeName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                            </div>
-                            <div className="form-text" id="basic-addon4">Specify the name of your reward. <b>User will see this</b></div>
-                        </div>
-                        <div className="mb-3">
-                            <label className="form-label">Description</label>
-                            <div className="input-group">
-                                <textarea placeholder="Reward description" type="text" onChange={this.changeDescription} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
-                            </div>
-                            <div className="form-text" id="basic-addon4"><b>User will see this.</b> <a href="https://www.markdownguide.org/cheat-sheet/" target="blank">Markdown</a> syntax is supported.</div>
-                        </div>
-                        <label className="form-label">Choose a reward mode:</label>
-                        <div className="choose-reward-node">
-                            <div className="form-check">
-                                <input 
-                                    className="form-check-input" value={types.token} type="radio" name="flexRadioDefault" id="flexRadioDefault1" 
-                                    onChange={this.changeType} checked={this.state.chosen_type === types.token ? true : false}/>
-                                <label className="form-check-label" for="flexRadioDefault1">
-                                    Tokens
-                                </label>
-                            </div>
-                            <div className="form-check">
-                                <input 
-                                    className="form-check-input" value={types.nft} type="radio" name="flexRadioDefault" id="flexRadioDefault2" 
-                                    onChange={this.changeType} checked={this.state.chosen_type === types.nft ? true : false}
-                                />
-                                <label className="form-check-label" for="flexRadioDefault2">
-                                    NFTs
-                                </label>
-                            </div>
-                        </div>
-                        <label className="form-label">Select {this.state.chosen_type === types.token ? 'token' : 'NFT collection'}:</label>
-                        <div className="input-group mb-3">
-                            <select onChange={this.state.chosen_type === types.token ? this.changeToken : this.changeNFTCollection} disabled={this.state.chosen_type ? false : true} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                {
-                                    this.state.chosen_type === types.token
-                                    ?
-                                    this.state.tokens.map(v => <option value={v.address}>{v.symbol}</option>)
-                                    :
-                                    this.state.nftCollections.map(v => <option value={v.address}>{v.symbol}</option>)
-                                }
-                            </select>
-                        </div>
+                
+
+                    <div className="form_row  mb-4">
+                     <div className="form_col_last form_col">
+                        <label className="form__label">Name:</label>
+                                <div className="input-group">
+                                    <input type="text" value={this.state.reward_name} placeholder={this.state.reward_name} onChange={this.changeRewardName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                </div>
+                                <div className="form__prompt" id="basic-addon4">Specify the name of your reward. <b>User will see this</b></div>
+                     </div>
+                           
+                    </div>
+
+                    <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                <label className="form__label">Description: <img className="form__icon-info" src={info}/></label>
+                                    <div className="input-group">
+                                    <textarea value={this.state.reward_description} placeholder={this.state.reward_description} type="text" onChange={this.changeRewardDescription} id="basic-url" aria-describedby="basic-addon3 basic-addon4"  className="form__textarea form__textarea_desct-nft-collection"  aria-label="With textarea"></textarea>
+                                    </div>
+                                    <div className="form__prompt" id="basic-addon4"><b>User will see this.</b> <a className="link__form-prompt" href="https://www.markdownguide.org/cheat-sheet/" target="blank">Markdown</a> syntax is supported.</div>
+                                </div>
+                    </div>
+
+                
+                    <div className="form_row  mb-4">
+                                    <div className="form_col">
+                                    <label className="form__label">Choose a reward mode:</label>
+                                        <div className="input-group">
+                                        <div className="form-check custom-control custom-radio custom-control-inline">
+                                            <input  
+                                            onChange={this.changeType} 
+                                            type="radio" id="rd_1" name="rd" value={types.token}/>
+                                            <label className="form-check-label custom-control-label green" for="rd_1">
+                                            Tokens <img src={info} className="form__icon-info"/>
+                                            </label>
+                                        </div>
+                                        <div className="form-check custom-control custom-radio custom-control-inline ms-3">
+                                            <input 
+                                              onChange={this.changeType} 
+                                            type="radio" id="rd_2" name="rd" value={types.nft} />
+                                            <label className="form-check-label custom-control-label red" for="rd_2">
+                                            NFTs <img src={info} className="form__icon-info"/>
+                                            </label>
+                                        </div>
+                                        </div>   
+                                    </div>
+                    </div>   
+
+
+                     <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                    <label  className="form__label">Select {this.state.chosen_type === types.token ? 'token' : 'NFT collection'}:<img className="form__icon-info" src={info}/> </label>
+                                    <div className="input-group ">
+                                        <select onChange={this.changeRewardToken} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                        {
+                                            this.state.reward_type === types.token
+                                            ?
+                                            this.state.tokens.map(v => {
+                                                if (v.address === this.state.reward_token) {
+                                                    return <option value={v.address} selected>{v.symbol}</option>
+                                                }
+                                                return <option value={v.address}>{v.symbol}</option>
+                                            })
+                                            :
+                                            this.state.nftCollections.map(v => {
+                                                if (v.address === this.state.reward_token) {
+                                                    return <option value={v.address} selected>{v.symbol}</option>
+                                                }
+                                                return <option value={v.address}>{v.symbol}</option>
+                                            })
+                                        }
+                                        </select>
+                                    </div>
+                                    <div className="form__prompt" id="basic-addon4">Select the user you would like to reward</div>
+                                </div>
+                         </div>                             
                         {
-                            this.state.chosen_type === types.token
+                            this.state.reward_type === types.token
                             ?
-                            <div>
-                                <label className="form-label">Amount</label>
-                                <div className="input-group mb-3">
-                                    <input type="number" className="form-control" onChange={this.changeAmount} aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default"/>
+                            <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                    <label className="form__label" style={this.state.reward_count != 0 ? {color: "grey"}: null}>Amount: <img className="form__icon-info" src={info}/> </label>
+                                    <div className="input-group">
+                                        <input style={this.state.reward_count != 0 ? {color: "grey"}: null } type="number" defaultValue={this.state.reward_amount ? this.state.reward_amount : '0'} disabled={this.state.reward_count != 0 ? true : false} className="form-control" onChange={this.changeRewardAmount} aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default"/>
+                                    </div>
+                                    <div className="form__prompt" id="basic-addon4">Enter the amount of tokens for each reward</div>
                                 </div>
                             </div>
                             :
-                            <div>
-                                <label className="form-label">NFT</label>
-                                <select onChange={this.changeChosenNFT} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                    {
-                                        this.state.current_nfts 
-                                        ?
-                                        this.state.current_nfts.map(v => <option value={v.id}>{v.name}</option>)
-                                        :
-                                        null
-                                    }
-                                </select>
+                            <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                    <label className="form__label" style={this.state.reward_count != 0 ? {color: "grey"} : null}>Select token from collection: <img className="form__icon-info" src={info}/></label>
+                                        <select style={this.state.reward_count != 0 ? {color: "grey"} : null} disabled={this.state.reward_count != 0 ? true : false} onChange={this.changeChosenRewardNFT} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                         {
+                                            this.state.current_nfts 
+                                            ?
+                                            this.state.current_nfts.map(v => {
+                                                if (v.id === this.state.reward_nft_id) {
+                                                    return <option value={v.id} selected>{v.name}</option>
+                                                }
+                                                return <option value={v.id}>{v.name}</option>
+                                            }
+                                            )
+                                            :
+                                            null
+                                        }
+                                        </select>
+                                </div>
                             </div>
                         }
+
+                        <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                <div className="form__group_top-row-left">
+                                        <img src={drug_drop}></img>
+                                            <div>
+                                                <label className="form__label_group form__label">Allow a repeat reward::  <img className="form__icon-info" src={info} />
+                                                </label>
+                                                <div className="form__prompt" id="basic-addon4">If activated, this award can be given to each user only once</div>
+                                                        </div>
+                                    </div>
+                                </div>
+                                <label className="switch_center switch">
+                                        <input type="checkbox" onChange={() => this.setState({isActive: !this.state.isActive}) }></input>
+                                        <span className="slider round"></span>
+                                    </label>  
+                        </div>
+                        <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                    <div className="form__group_top-row-left">
+                                        <img src={drug_drop}></img>
+                                            <div>
+                                                <label className="form__label_group form__label">Limit the total number of rewards:  <img className="form__icon-info" src={info} />
+                                                </label>
+                                                <div className="form__prompt" id="basic-addon4">You can set a limit of total number of awards</div>
+                                                        </div>
+                                    </div>
+                                </div>
+                                <label className="switch_center switch">
+                                            <input type="checkbox" onChange={() => this.setState({isActive: !this.state.isActive}) }></input>
+                                            <span className="slider round"></span>
+                                    </label>  
+                        </div>
                     </Modal.Body>
                     <Modal.Footer>
-                    <button className="btn btn-dark" onClick={this.state.chosen_type === types.token ? this.rewardToken : this.createNFTReward}>
-                        Create
-                    </button>
-                    <button className="btn btn-light" onClick={this.handleClose}>
+                    <button className="btn btn_primary btn_gray" onClick={this.handleClose}>
                         Cancel
+                    </button>
+                    <button className="btn btn_primary btn_orange" onClick={this.saveEdit}>
+                        Create
                     </button>
                     </Modal.Footer>
                 </Modal>
-                <div>
+
+                {/*<div>
                 <table className="table table-bordered border-dark">
                     <thead>
                         <tr className="table-secondary" >
@@ -916,149 +1090,226 @@ class Rewards extends Component {
                         }
                     </tbody>
                 </table>
-                </div>
+                    </div>*/}
                 <Modal show={this.state.showReward} onHide={this.handleCloseReward} centered>
-                    <Modal.Header closeButton>
-                    <Modal.Title>Rewarding {this.state.reward_name}</Modal.Title>
+                    <Modal.Header  className="modal-newuser__title modal-title" closeButton>
+                        Rewarding {this.state.reward_name}
                     </Modal.Header>
                     <Modal.Body>
-                        <div className="mb-3">
-                            <label className="form-label">Select user</label>
-                            <select onChange={this.changeUser} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                {
-                                    this.state.users
-                                }
-                            </select>
-                            <div className="form-text" id="basic-addon4">Select the user you would like to reward</div>
-                        </div>
-                        <div className="mb-3">
-                            <label className="form-label">Comment:</label>
-                            <textarea onChange={this.changeComment} className="form-control" placeholder="Reward comment(optional)" aria-label="With textarea"></textarea>
-                            <div className="form-text" id="basic-addon4">The user does not see this text. <a href="https://www.markdownguide.org/cheat-sheet/" target="blank">Markdown</a> syntax is supported.</div>
-                        </div>
+                        <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                <label className="form__label">Select user: <img className="form__icon-info" src={info}/></label>
+                                    <div className="input-group ">
+                                        <select onChange={this.changeUser} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                            {
+                                                this.state.users
+                                            }
+                                        </select>
+                                    </div>
+                                    <div className="form__prompt" id="basic-addon4">Select the user you would like to reward</div>
+                                </div>
+                         </div>
+
+                         <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                <label className="form__label">Comment: <img className="form__icon-info" src={info}/></label>
+                                    <div className="input-group ">
+                                    <textarea onChange={this.changeComment} className="form__textarea form__textarea_desct-nft-collection" placeholder="Reward comment(optional)" aria-label="With textarea"></textarea>
+                                    </div>
+                                    <div className="form__prompt" id="basic-addon4">The user does not see this text. <a className="link__form-prompt" href="https://www.markdownguide.org/cheat-sheet/" target="blank">Markdown</a> syntax is supported.</div>
+                                </div>
+                         </div>
+
                     </Modal.Body>
                     <Modal.Footer>
-                    <button className="btn btn-dark" onClick={this.state.switcher === types.token ? this.rewardWithToken : this.rewardWithNFT}>
-                        Reward
-                    </button>
-                    <button className="btn btn-light" onClick={this.handleCloseReward}>
+                    <button className="btn btn_primary btn_gray" onClick={this.handleCloseReward}>
                         Cancel
+                    </button>
+                    <button className="btn btn_primary btn_orange" onClick={this.state.switcher === types.token ? this.rewardWithToken : this.rewardWithNFT}>
+                        Reward
                     </button>
                     </Modal.Footer>
                 </Modal>
                 <Modal show={this.state.showEditReward} onHide={this.handleCloseEditReward} centered>
-                    <Modal.Header closeButton>
+                <Modal.Header  className="modal-newuser__title modal-title" closeButton>
                         Edit "{this.state.reward_name}" reward
                     </Modal.Header>
                     <Modal.Body>
-                        <div className="mb-3">
-                            <label className="form-label">Name</label>
-                            <div className="input-group">
-                                <input type="text" value={this.state.reward_name} placeholder={this.state.reward_name} onChange={this.changeRewardName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                            </div>
-                            <div className="form-text" id="basic-addon4">Specify the name of your reward. <b>User will see this</b></div>
-                        </div>
-                        <div className="mb-3">
-                            <label className="form-label">Description</label>
-                            <div className="input-group">
-                                <textarea value={this.state.reward_description} placeholder={this.state.reward_description} type="text" onChange={this.changeRewardDescription} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
-                            </div>
-                            <div className="form-text" id="basic-addon4"><b>User will see this.</b> <a href="https://www.markdownguide.org/cheat-sheet/" target="blank">Markdown</a> syntax is supported.</div>
-                        </div>
-                        <label style={this.state.reward_count != 0 ? {color: "grey"} : null} className="form-label">Choose a reward mode:</label>
-                        <div className="choose-reward-node">
-                            <div className="form-check">
-                                <input 
-                                    className="form-check-input" value={types.token} type="radio" name="flexRadioDefault" id="flexRadioDefault1" 
-                                    onChange={this.changeType} checked={this.state.reward_type === types.token ? true : false}
-                                    disabled={this.state.reward_count != 0 || this.state.reward_type === types.nft ? true : false}
-                                    />
-                                <label className="form-check-label" for="flexRadioDefault1">
-                                    Tokens
-                                </label>
-                            </div>
-                            <div className="form-check">
-                                <input 
-                                    className="form-check-input" value={types.nft} type="radio" name="flexRadioDefault" id="flexRadioDefault2" 
-                                    onChange={this.changeType} checked={this.state.reward_type === types.nft ? true : false}
-                                    disabled={this.state.reward_count != 0 || this.state.reward_type === types.token ? true : false}
-                                />
-                                <label className="form-check-label" for="flexRadioDefault2">
-                                    NFTs
-                                </label>
-                            </div>
-                        </div>
-                        <label style={this.state.reward_count != 0 ? {color: "grey"} : null} className="form-label">Select {this.state.chosen_type === types.token ? 'token' : 'NFT collection'}:</label>
-                        <div className="input-group mb-3">
-                            <select style={this.state.reward_count != 0 ? {color: "grey"} : null} onChange={this.changeRewardToken} disabled={this.state.reward_count != 0 ? true : false} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                {
-                                    this.state.reward_type === types.token
-                                    ?
-                                    this.state.tokens.map(v => {
-                                        if (v.address === this.state.reward_token) {
-                                            return <option value={v.address} selected>{v.symbol}</option>
+                
+
+                    <div className="form_row  mb-4">
+                     <div className="form_col_last form_col">
+                        <label className="form__label">Name:</label>
+                                <div className="input-group">
+                                    <input type="text" value={this.state.reward_name} placeholder={this.state.reward_name} onChange={this.changeRewardName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                </div>
+                                <div className="form__prompt" id="basic-addon4">Specify the name of your reward. <b>User will see this</b></div>
+                     </div>
+                           
+                    </div>
+
+                    <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                <label className="form__label">Description: <img className="form__icon-info" src={info}/></label>
+                                    <div className="input-group">
+                                    <textarea value={this.state.reward_description} placeholder={this.state.reward_description} type="text" onChange={this.changeRewardDescription} id="basic-url" aria-describedby="basic-addon3 basic-addon4"  className="form__textarea form__textarea_desct-nft-collection"  aria-label="With textarea"></textarea>
+                                    </div>
+                                    <div className="form__prompt" id="basic-addon4"><b>User will see this.</b> <a className="link__form-prompt" href="https://www.markdownguide.org/cheat-sheet/" target="blank">Markdown</a> syntax is supported.</div>
+                                </div>
+                    </div>
+
+                
+                    <div className="form_row  mb-4">
+                                    <div className="form_col">
+                                    <label className="form__label" style={this.state.reward_count != 0 ? {color: "grey"} : null}>Choose a reward mode:</label>
+                                        <div className="input-group">
+                                        <div className="form-check custom-control custom-radio custom-control-inline">
+                                            <input  
+                                            onChange={this.changeType} checked={this.state.reward_type === types.token ? true : false}
+                                            disabled={this.state.reward_count != 0 || this.state.reward_type === types.nft ? true : false} 
+                                            type="radio" id="rd_1" name="rd" value={types.token}/>
+                                            <label className="form-check-label custom-control-label green" for="rd_1">
+                                            Tokens <img src={info} className="form__icon-info"/>
+                                            </label>
+                                        </div>
+                                        <div className="form-check custom-control custom-radio custom-control-inline ms-3">
+                                            <input 
+                                              onChange={this.changeType} checked={this.state.reward_type === types.nft ? true : false}
+                                              disabled={this.state.reward_count != 0 || this.state.reward_type === types.token ? true : false}
+                                            type="radio" id="rd_2" name="rd" value={types.nft} />
+                                            <label className="form-check-label custom-control-label red" for="rd_2">
+                                            NFTs <img src={info} className="form__icon-info"/>
+                                            </label>
+                                        </div>
+                                        </div>   
+                                    </div>
+                    </div>   
+
+
+                     <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                    <label style={this.state.reward_count != 0 ? {color: "grey"} : null} className="form__label">Select {this.state.chosen_type === types.token ? 'token' : 'NFT collection'}:<img className="form__icon-info" src={info}/> </label>
+                                    <div className="input-group ">
+                                        <select style={this.state.reward_count != 0 ? {color: "grey"} : null} onChange={this.changeRewardToken} disabled={this.state.reward_count != 0 ? true : false} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                        {
+                                            this.state.reward_type === types.token
+                                            ?
+                                            this.state.tokens.map(v => {
+                                                if (v.address === this.state.reward_token) {
+                                                    return <option value={v.address} selected>{v.symbol}</option>
+                                                }
+                                                return <option value={v.address}>{v.symbol}</option>
+                                            })
+                                            :
+                                            this.state.nftCollections.map(v => {
+                                                if (v.address === this.state.reward_token) {
+                                                    return <option value={v.address} selected>{v.symbol}</option>
+                                                }
+                                                return <option value={v.address}>{v.symbol}</option>
+                                            })
                                         }
-                                        return <option value={v.address}>{v.symbol}</option>
-                                    })
-                                    :
-                                    this.state.nftCollections.map(v => {
-                                        if (v.address === this.state.reward_token) {
-                                            return <option value={v.address} selected>{v.symbol}</option>
-                                        }
-                                        return <option value={v.address}>{v.symbol}</option>
-                                    })
-                                }
-                            </select>
-                        </div>
+                                        </select>
+                                    </div>
+                                    <div className="form__prompt" id="basic-addon4">Select the user you would like to reward</div>
+                                </div>
+                         </div>                             
                         {
                             this.state.reward_type === types.token
                             ?
-                            <div>
-                                <label style={this.state.reward_count != 0 ? {color: "grey"}: null} className="form-label">Amount</label>
-                                <div className="input-group mb-3">
-                                    <input style={this.state.reward_count != 0 ? {color: "grey"}: null } type="number" defaultValue={this.state.reward_amount ? this.state.reward_amount : '0'} disabled={this.state.reward_count != 0 ? true : false} className="form-control" onChange={this.changeRewardAmount} aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default"/>
+                            <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                    <label className="form__label" style={this.state.reward_count != 0 ? {color: "grey"}: null}>Amount: <img className="form__icon-info" src={info}/> </label>
+                                    <div className="input-group">
+                                        <input style={this.state.reward_count != 0 ? {color: "grey"}: null } type="number" defaultValue={this.state.reward_amount ? this.state.reward_amount : '0'} disabled={this.state.reward_count != 0 ? true : false} className="form-control" onChange={this.changeRewardAmount} aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default"/>
+                                    </div>
+                                    <div className="form__prompt" id="basic-addon4">Enter the amount of tokens for each reward</div>
                                 </div>
                             </div>
                             :
-                            <div>
-                                <label style={this.state.reward_count != 0 ? {color: "grey"} : null} className="form-label">NFT</label>
-                                <select style={this.state.reward_count != 0 ? {color: "grey"} : null} disabled={this.state.reward_count != 0 ? true : false} onChange={this.changeChosenRewardNFT} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                    {
-                                        this.state.current_nfts 
-                                        ?
-                                        this.state.current_nfts.map(v => {
-                                            if (v.id === this.state.reward_nft_id) {
-                                                return <option value={v.id} selected>{v.name}</option>
+                            <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                    <label className="form__label" style={this.state.reward_count != 0 ? {color: "grey"} : null}>NFT</label>
+                                        <select style={this.state.reward_count != 0 ? {color: "grey"} : null} disabled={this.state.reward_count != 0 ? true : false} onChange={this.changeChosenRewardNFT} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                         {
+                                            this.state.current_nfts 
+                                            ?
+                                            this.state.current_nfts.map(v => {
+                                                if (v.id === this.state.reward_nft_id) {
+                                                    return <option value={v.id} selected>{v.name}</option>
+                                                }
+                                                return <option value={v.id}>{v.name}</option>
                                             }
-                                            return <option value={v.id}>{v.name}</option>
+                                            )
+                                            :
+                                            null
                                         }
-                                        )
-                                        :
-                                        null
-                                    }
-                                </select>
+                                        </select>
+                                </div>
                             </div>
                         }
+
+                        <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                <div className="form__group_top-row-left">
+                                        <img src={drug_drop}></img>
+                                            <div>
+                                                <label className="form__label_group form__label">Allow a repeat reward::  <img className="form__icon-info" src={info} />
+                                                </label>
+                                                <div className="form__prompt" id="basic-addon4">If activated, this award can be given to each user only once</div>
+                                                        </div>
+                                    </div>
+                                </div>
+                                <label className="switch_center switch">
+                                        <input type="checkbox" onChange={() => this.setState({isActive: !this.state.isActive}) }></input>
+                                        <span className="slider round"></span>
+                                    </label>  
+                        </div>
+                        <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                    <div className="form__group_top-row-left">
+                                        <img src={drug_drop}></img>
+                                            <div>
+                                                <label className="form__label_group form__label">Limit the total number of rewards:  <img className="form__icon-info" src={info} />
+                                                </label>
+                                                <div className="form__prompt" id="basic-addon4">You can set a limit of total number of awards</div>
+                                                        </div>
+                                    </div>
+                                </div>
+                                <label className="switch_center switch">
+                                            <input type="checkbox" onChange={() => this.setState({isActive: !this.state.isActive}) }></input>
+                                            <span className="slider round"></span>
+                                    </label>  
+                        </div>
                     </Modal.Body>
                     <Modal.Footer>
-                    <button className="btn btn-dark" onClick={this.saveEdit}>
-                        Save
-                    </button>
-                    <button className="btn btn-light" onClick={this.handleClose}>
+                    <button className="btn btn_primary btn_gray" onClick={this.handleClose}>
                         Cancel
                     </button>
+                    <button className="btn btn_primary btn_orange" onClick={this.saveEdit}>
+                        Save
+                    </button>
                     </Modal.Footer>
                 </Modal>
+
+                <Modal show={this.state.showStats} onHide={this.handleCloseStats} centered>
+                    <Modal.Header  className="modal-newuser__title modal-title" closeButton>
+                        ”First 100 purchases made” reward statistics
+                    </Modal.Header>
+                    <Modal.Body>
+                        <RewardsInfo></RewardsInfo>
+                    </Modal.Body>
+                </Modal >
+
                 <Modal show={this.state.showDelete} onHide={this.handleCloseDelete} centered>
-                    <Modal.Header closeButton>
-                    <Modal.Title>Delete {this.state.reward_name}?</Modal.Title>
+                <Modal.Header  className="modal-newuser__title modal-title" closeButton>
+                        Delete {this.state.reward_name}?
                     </Modal.Header>
                     <Modal.Footer>
-                        <button onClick={() => this.state.reward_type === types.token ? this.deleteReward(this.state.reward_id) : this.deleteNFTReward(this.state.reward_id)} className="btn btn-danger">Delete</button>
-                        <button onClick={this.handleCloseDelete} className="btn btn-light">Cancel</button>
+                        <button onClick={this.handleCloseDelete} className="btn btn_primary btn_gray">Cancel</button>
+                        <button onClick={() => this.state.reward_type === types.token ? this.deleteReward(this.state.reward_id) : this.deleteNFTReward(this.state.reward_id)} className="btn btn_primary btn_orange">Delete</button>
                     </Modal.Footer>
                 </Modal>
-            </div>
+            </>
         )
     }
 }

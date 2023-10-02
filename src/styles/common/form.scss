@@ -74,6 +74,10 @@
 .input-group_wide{
     flex: 1;
 }
+.input-group__serach{
+    display: flex;
+    gap: 10px
+}
 .fp-userid-row{
     display: flex;
     gap: 12px;
@@ -162,10 +166,21 @@ input[type="checkbox"] {
     width: 100%;
     resize: none;
 }
+.form__textarea{
+  border: 1px solid rgba(206, 212, 218, 1);
+  border-radius: 5px;
+}
+
 .form__textarea_add-blacklist{
     height: 204px;
 }
 
 .form__textarea_desct-nft-collection{
     height: 102px;
+}
+
+
+.input-group_filter{
+    width: 708px;
+    gap: 24px;
 }

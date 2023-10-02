@@ -1,0 +1,17 @@
+@media (max-width: map-get($breakpoints, "md")) {
+    .header-right__user{
+        display: none;
+    }
+    .devider{
+        display: none;
+    }
+    .header-right__more, .menu-burger, .menu-close{
+        display: block;
+    }
+    .header{
+        padding: 18.5px 16px;
+    }
+    .menu-burger, .menu-close{
+        cursor: pointer;
+    }
+}

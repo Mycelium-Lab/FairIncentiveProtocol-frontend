@@ -82,4 +82,31 @@ const tokenTable = [
         },
     ]
 
-export {userTable, tokenTable, blacklistTable, nftsTable}
+    const rewardsTable = [
+        {
+            id: 1,
+            name: 'Status',
+        },
+        {
+            id: 2,
+            name: 'Name',
+        },
+        {
+            id: 3,
+            name: 'Reward',
+        },
+        {
+            id: 3,
+            name: 'Description',
+        },
+        {
+            id: 4,
+            name: 'Rewarded'
+        },
+        {
+            id: 5,
+            name: 'Actions',
+        },
+    ]
+
+export {userTable, tokenTable, blacklistTable, nftsTable, rewardsTable}

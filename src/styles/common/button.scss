@@ -68,3 +68,16 @@
         color: map-get($theme-colors, "white");
     }
 }
+
+.close__image{
+    width: 20px;
+}
+.filter__image{
+    cursor: pointer;
+   
+    height: 100%;
+}
+
+.btn_image{
+    width: 53px;
+}

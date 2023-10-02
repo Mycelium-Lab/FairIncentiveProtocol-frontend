@@ -1,5 +1,8 @@
 import { Component } from "react";
 import logo from '../media/header/logo.svg'
+import more from '../media/header/more_header.svg'
+import burger from '../media/header/menu_burger.svg'
+import close from '../media/header/menu_close.svg'
 import notification from '../media/common/notification.svg'
 import user from '../media/common/user.svg'
 import chevron from '../media/common/chevron.svg'
@@ -22,19 +25,34 @@ class Header extends Component {
         window.location.reload()
     }
 
+    handleShowSidebar() {
+        this.props.changeShowSidebar(!this.props.showSidebar)
+    }
+
     logout = this.logout.bind(this)
+    handleShowSidebar = this.handleShowSidebar.bind(this)
 
     render() {
-        const {userName} = this.props
+        const {userName, showSidebar} = this.props
         return (
-            <header>
+            <header className="header">
                     <div className="header-left">
+                        {
+                            showSidebar 
+                            ?
+                            <img className="menu-close" src={close} onClick={this.handleShowSidebar}></img>
+                            :
+                            <img className="menu-burger" src={burger} onClick={this.handleShowSidebar}></img>
+                        }
                         <img src={logo}></img>
                     </div>
                     <div className="header-right">
                         <div>
                             <img src={notification}></img>
                         </div>
+                        {
+                            window.innerWidth < 769  ? <img sclassName="header-right__more" src={more}></img> :  null
+                        }
                         <span className="devider"></span>
                         <div className="header-right__user">
                             <img src={user}></img>

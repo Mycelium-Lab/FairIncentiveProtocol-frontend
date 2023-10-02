@@ -16,6 +16,9 @@ class Sidebar extends Component {
             activeTab: active
         })
         this.props.onSwitch(active)
+        if(window.innerWidth < 769){
+            this.props.changeShowSidebar()
+        }
     }
 
     handleSwitch = this.handleSwitch.bind(this)
@@ -24,7 +27,7 @@ class Sidebar extends Component {
         const {switcher} = this.props
         const {activeTab} = this.state
         return (
-            <nav id="sidebar">
+            <nav className="sidebar">
         
             <ul className="list-unstyled menu-list">
                 <li onClick={(event) => this.handleSwitch(event, switcher.dashboard)} className={ activeTab === 'dashboard' ? "menu-list__item_active menu-list__item" : 'menu-list__item'}>

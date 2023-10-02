@@ -30,7 +30,17 @@ class MainScreen extends Component {
         super(props)
         this.state = {
             switcher: switcher.dashboard,
-            auth: props.auth
+            auth: props.auth,
+            showSidebar: true,
+        }
+    }
+
+    componentDidMount() {
+        console.log(window.innerWidth)
+        if(window.innerWidth < 769) {
+            this.setState({
+                showSidebar: false
+            })
         }
     }
 
@@ -51,19 +61,35 @@ class MainScreen extends Component {
         if (this.state.switcher === switcher.settings) return <Settings auth={this.state.auth}/>
     }
 
+    changeShowSidebar() {
+        this.setState({
+            showSidebar: !this.state.showSidebar
+        })
+    }
+
 
     onSwitch = this.onSwitch.bind(this)
     renderInfo = this.renderInfo.bind(this)
+    changeShowSidebar = this.changeShowSidebar.bind(this)
 
     render() {
         return (
             <div>
-                <Header userName={this.state.auth.name}></Header>
+                <Header userName={this.state.auth.name} showSidebar={this.state.showSidebar} changeShowSidebar={this.changeShowSidebar}></Header>
                 <div className="middle">
-                <Sidebar switcher={switcher} onSwitch={this.onSwitch}></Sidebar>
+                {
+                    this.state.showSidebar ? <Sidebar switcher={switcher} onSwitch={this.onSwitch} changeShowSidebar={this.changeShowSidebar}></Sidebar>  : null  
+                }
+                {
+                    !this.state.showSidebar &&  window.innerWidth < 769 ? 
                     <div className="middle-info">
                         {this.renderInfo()}
                     </div>
+                    : this.state.showSidebar &&  window.innerWidth < 769 ? null 
+                    :  <div className="middle-info">
+                            {this.renderInfo()}
+                        </div>
+                }
                 </div>
             </div>
         )

@@ -1,8 +1,6 @@
 @import './styles/system';
 @import './App.scss';
 
-@import './styles/media/auth/auth.scss';
-
 @import './styles/auth/auth.scss';
 @import './styles/auth/signIn.scss';
 @import './styles/header.scss';
@@ -11,6 +9,8 @@
 @import './styles/users.scss';
 @import './styles/dashboard.scss';
 @import './styles/collectionDetail.scss';
+@import './styles/rewards.scss';
+@import './styles/_custom.scss';
 
 @import './styles/common/dropdown.scss';
 @import './styles/common/accordion.scss';
@@ -21,6 +21,10 @@
 @import './styles/common/modal.scss';
 @import './styles/common/form.scss';
 @import './styles/common/fileupload.scss';
+
+@import './styles/media/auth/auth.scss';
+@import './styles/media/sidebar.scss';
+@import './styles/media/header.scss';
 
 body {
   margin: 0;
