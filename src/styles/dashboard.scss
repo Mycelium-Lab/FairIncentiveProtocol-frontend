@@ -25,6 +25,9 @@
 
 .dashboard .nav-tabs{
     margin: 24px 0px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 .dashboard .nav-item{

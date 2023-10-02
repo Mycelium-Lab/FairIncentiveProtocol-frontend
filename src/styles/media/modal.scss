@@ -1,0 +1,5 @@
+@media (max-width: map-get($breakpoints, "md")) {
+    .modal-header{
+        gap: 15px
+    }    
+}

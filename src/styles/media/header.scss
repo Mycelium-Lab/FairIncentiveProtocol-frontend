@@ -1,5 +1,5 @@
 @media (max-width: map-get($breakpoints, "md")) {
-    .header-right__user{
+    .header-right__user_avatar{
         display: none;
     }
     .devider{
@@ -9,9 +9,15 @@
         display: block;
     }
     .header{
-        padding: 18.5px 16px;
+        padding: 10px 16px;
     }
     .menu-burger, .menu-close{
         cursor: pointer;
+    }
+    .logo{
+        width: 169px;
+    }
+    .header-right{
+        gap: 0px;
     }
 }

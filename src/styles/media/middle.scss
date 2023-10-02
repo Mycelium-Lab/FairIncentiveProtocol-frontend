@@ -1,0 +1,34 @@
+@media (max-width: map-get($breakpoints, "md")) {
+    .middle-info{
+        padding: 24px 16px 32px;
+    }
+    .content__wrap{
+        background: white;
+        padding: 0px; 
+         border: none;
+        border-radius: 0px;
+        box-shadow: none;
+    }
+    .modal-content{
+        border-radius: 0px;
+        border: 0px;    
+        //height: 100vh;
+    }
+    .modal.show .modal-dialog{
+        margin: 0px;
+    }
+    .modal-backdrop.show{
+        opacity: 0;
+        //height: 90vh;
+        top: 70px;
+    }
+    .modal{
+        top: 70px;
+        bottom: 0px;
+        height: auto;
+        background: white;
+    }
+    .modal-dialog-centered {
+        align-items: flex-start;
+    }
+}

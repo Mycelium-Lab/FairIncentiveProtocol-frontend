@@ -20,6 +20,7 @@
 .dropdown__menu{
     margin-top: 8px;
     box-shadow: 0 0 24px 0 rgba(0, 0, 0, 0.08);
+    z-index: 10000;
 }
 .dropdown__menu-item{
     font-size: map-get($theme-fontSize, "lgCaption");

@@ -106,7 +106,7 @@ class Tokens extends Component {
             currentBurnAddressType: burnAddressType.current,
             burnAmount: null,
             otherBurnAddress: null,
-            stageOfCreateToken: 1,
+            stageOfCreateToken: 0,
             editMintingManagersElements: []
         }
     }
@@ -597,7 +597,9 @@ class Tokens extends Component {
     } 
 
     handleCloseCreate = () => this.setState({showCreate: false})
-    handleShowCreate = () => this.setState({showCreate: true})
+    handleShowCreate = () => {
+        this.setState({showCreate: true, stageOfCreateToken: 1})
+    }
     handleShowMint = async (currentTokenSymbol, currentTokenAddress, currentTokenChainid) => {
         this.setState({showMint: true, showLoading: true})
         let provider = new ethers.providers.Web3Provider(window.ethereum)
@@ -824,7 +826,7 @@ class Tokens extends Component {
                         }
                     </div>
                     {
-                        this.state.tokens?.length ? <button onClick={this.handleShowCreate} type="button" className="btn btn_orange btn_primary">Create new token</button> : null
+                        this.state.tokens?.length && !this.state.stageOfCreateToken ? <button onClick={this.handleShowCreate} type="button" className="btn btn_orange btn_primary">Create new token</button> : null
                     }
                 </div>
 
@@ -902,6 +904,7 @@ class Tokens extends Component {
 
                             <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
+                                <label className="form__label">Upload a picture of the token </label>
                                     <FileUpload></FileUpload>
                                 </div>
                             </div>
@@ -1420,11 +1423,11 @@ class Tokens extends Component {
                             <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
                                     <label className="form__label"><img src={infoRed} className="form__icon-info_left form__icon-info"/> Transfer ownership * <img src={info} className="form__icon-info"/></label>
-                                    <div className="input-group">
+                                    <div className="input-group_absolute input-group">
                                         <input type="text"placeholder="Address" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                        <button className="btn btn_primary btn_orange ms-2">Transfer ownership</button>
+                                        <button className="btn_wide btn btn_primary btn_orange ms-2">Transfer ownership</button>
                                     </div>
-                                    <div className="form__prompt" id="basic-addon4">Enter a wallet to transfer ownership of the contract</div>
+                                    <div className="form__prompt form__prompt_absolute" id="basic-addon4">Enter a wallet to transfer ownership of the contract</div>
                                 </div>
                             </div>
 

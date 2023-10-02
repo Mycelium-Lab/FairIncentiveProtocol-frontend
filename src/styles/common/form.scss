@@ -103,6 +103,7 @@
 .form_col_flex{
     display: flex;
     gap: 24px;
+    flex-wrap: wrap;
 }
 .form_col_action_left{
     display: flex;

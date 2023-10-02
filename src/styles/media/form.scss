@@ -1,0 +1,38 @@
+@media (max-width: map-get($breakpoints, "md")) {
+   
+    .form_row{
+        flex-direction: column;
+        gap: 24px;
+    }
+    .form_col{
+        margin-right: 0px;
+        position: relative;
+    }
+    .input-group{
+        width: 100%;
+        gap: 24px;
+    }
+    .input-group_absolute{
+        gap: 30px;
+    }
+    .input-group>.form-control{
+        width: 100%;
+    }
+    .btn_wide{
+        margin: 0px !important;
+        width: 100%;
+    }
+    .form__prompt_absolute{
+        position: absolute;
+        top: 70px;
+    }
+    .form__group_row{
+        flex-direction: column;
+    }
+    .input-group_wide{
+        flex: initial;
+    }
+    .form__groups{
+        gap: 0px;
+    }
+}

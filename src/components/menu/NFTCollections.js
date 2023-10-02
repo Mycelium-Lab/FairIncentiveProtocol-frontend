@@ -74,7 +74,7 @@ class NFTCollections extends Component {
             discord: null,
             other: null,
             stageOfCreateNftCollection: 1,
-            stageOfAddNft: 1,
+            stageOfAddNft: 0,
         }
     }
 
@@ -372,7 +372,9 @@ class NFTCollections extends Component {
     }
 
     handleCloseCreate = () => this.setState({showCreate: false})
-    handleShowCreate = () => this.setState({showCreate: true})
+    handleShowCreate = () => {
+        this.setState({showCreate: true, stageOfAddNft: 1})
+    }
 
     handleCloseCreateImagesPage = () => this.setState({showCreateImagesPage: false})
     handleShowCreateImagesPage = () => this.setState({showCreateImagesPage: true})
@@ -454,7 +456,7 @@ class NFTCollections extends Component {
                         <span className="menu__subtitle">Creating new collection </span> 
                     </div>
                     {
-                        this.state.nftCollections.length ? <button onClick={this.handleShowCreate} type="button" className="btn btn_orange btn_primary">Create new collection</button> : null
+                        this.state.nftCollections.length && !this.state.stageOfAddNft ? <button onClick={this.handleShowCreate} type="button" className="btn btn_orange btn_primary">Create new collection</button> : null
                     }
                 </div>
                 {

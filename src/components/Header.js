@@ -44,19 +44,16 @@ class Header extends Component {
                             :
                             <img className="menu-burger" src={burger} onClick={this.handleShowSidebar}></img>
                         }
-                        <img src={logo}></img>
+                        <img className="logo" src={logo}></img>
                     </div>
                     <div className="header-right">
                         <div>
                             <img src={notification}></img>
                         </div>
-                        {
-                            window.innerWidth < 769  ? <img sclassName="header-right__more" src={more}></img> :  null
-                        }
                         <span className="devider"></span>
                         <div className="header-right__user">
-                            <img src={user}></img>
-                            <FPDropdown label={userName} icon={chevron} isTransformIcon={true}>
+                            <img className="header-right__user_avatar" src={user}></img>
+                            <FPDropdown label={window.innerWidth < 769 ? null : userName} icon={window.innerWidth < 769 ? more  : chevron} isTransformIcon={true}>
                                 <Dropdown.Item className="dropdown__menu-item_profile dropdown__menu-iten">                                
                                     <img src={user}></img>
                                     <div className="dropdown__menu-item_profile-info">

@@ -31,6 +31,10 @@ header {
     align-items: center;
     gap: 16px;
 }
+
+.header-right__user_avatar{
+    display: block;
+}
 .user__control{
     display: flex;
     gap: 8px;
