@@ -21,6 +21,7 @@
     margin-top: 8px;
     box-shadow: 0 0 24px 0 rgba(0, 0, 0, 0.08);
     z-index: 10000;
+    border-color: transparent;
 }
 .dropdown__menu-item{
     font-size: map-get($theme-fontSize, "lgCaption");
@@ -29,9 +30,16 @@
     line-height: 22.5px;
     border-bottom: 1px solid rgba(232, 235, 237, 1);
 }
-.dropdown__menu-item_logout{
+.dropdown__menu-item:last-child{
+    border-bottom: 0px;
+}
+.dropdown__menu-item_logout, .dropdown__menu-item_clear{
     color: map-get($theme-colors, "errorSecondary");
     border-bottom: none;
+    cursor: pointer;
+}
+.dropdown__menu-item_clear{
+    font-size: 11px;
 }
 .dropdown__menu-item_profile{
     display: flex;

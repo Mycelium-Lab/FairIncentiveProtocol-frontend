@@ -10,6 +10,7 @@ import RewardEvents from "./components/menu/RewardEvents";
 import NFTs from "./components/menu/NFTs";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
+import Notifications from "./components/Notifications";
 
 const switcher = {
     dashboard: 'dashboard',
@@ -19,7 +20,8 @@ const switcher = {
     tokens: 'tokens',
     nftcollection: 'nftcollection',
     nft: 'nft',
-    settings: 'settings'
+    settings: 'settings',
+    notifications: 'notifications'
 }
 
 class MainScreen extends Component {
@@ -57,6 +59,7 @@ class MainScreen extends Component {
         if (this.state.switcher === switcher.nftcollection) return <NFTCollections auth={this.state.auth} switcher={switcher} onSwitch={this.onSwitch}/>
         if (this.state.switcher === switcher.nft) return <NFTs/>
         if (this.state.switcher === switcher.settings) return <Settings auth={this.state.auth}/>
+        if (this.state.switcher === switcher.notifications) return <Notifications/>
     }
 
     changeShowSidebar() {
@@ -73,7 +76,13 @@ class MainScreen extends Component {
     render() {
         return (
             <div>
-                <Header userName={this.state.auth.name} showSidebar={this.state.showSidebar} changeShowSidebar={this.changeShowSidebar}></Header>
+                <Header 
+                    userName={this.state.auth.name} 
+                    showSidebar={this.state.showSidebar} 
+                    changeShowSidebar={this.changeShowSidebar}
+                    notifications={switcher.notifications} onSwitch={this.onSwitch}
+                    >
+                    </Header>
                 <div className="middle">
                 {
                     this.state.showSidebar ? <Sidebar switcher={switcher} onSwitch={this.onSwitch} changeShowSidebar={this.changeShowSidebar}></Sidebar>  : null  
