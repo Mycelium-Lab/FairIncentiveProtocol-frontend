@@ -772,7 +772,6 @@ class Rewards extends Component {
             <>
                 <div className="title-header">
                     <h3 className="menu__title">Rewards</h3>
-                    <button  type="button" className="btn btn_orange btn_primary" onClick={this.handleShow}>Create new reward</button>
                 </div>
                 <div className="input-group__serach">
                     <button  type="button" className="btn btn_orange btn_image btn_primary" onClick={() => this.setState({showFilter: !this.state.showFilter})}>

@@ -1,0 +1,8 @@
+@media (max-width: map-get($breakpoints, "md")) {
+    .btn__reset{
+        margin-left: 0px !important;
+    }
+    .btn__copy{
+       margin-left: 0px !important; 
+    }
+}

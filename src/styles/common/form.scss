@@ -189,3 +189,7 @@ input[type="checkbox"] {
 .input-group>:not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
     border-radius: 3.2px;
 }
+
+.form__textarea_email{
+    height: 102px;
+}

@@ -3,6 +3,16 @@ import { config } from "../../utils/config";
 import { getBearerHeader } from "../../utils/getBearerHeader";
 import ErrorModal from "../common/modals/error";
 import SuccessModal from "../common/modals/success";
+import { Dropdown, Modal, Tab, Tabs } from "react-bootstrap";
+import FileUpload from "../FileUpload";
+import drug_drop from '../../media/settings/drug_drop.svg'
+import attraction from '../../media/settings/attraction.svg'
+import info from '../../media/settings/info_small_gray.svg'
+import info_black from '../../media/common/info-small.svg'
+import FPTable from "../common/FPTable";
+import more from '../../media/common/more.svg'
+import { billingHistoryTable, paymentMethodsTable, teamTable } from "../../data/tables";
+import FPDropdown from "../common/FPDropdown";
 
 class Settings extends Component {
 
@@ -15,7 +25,11 @@ class Settings extends Component {
             wallet: props.auth.wallet,
             password: '',
             showSuccess: false,
-            showError: false
+            showError: false,
+            showMakePayment: false,
+            showInvite: false,
+            changeMemberRole: false,
+            removeFromTeam: false
         }
     }
 
@@ -189,11 +203,47 @@ class Settings extends Component {
         }
     }
 
+    handleShowMakePayment() {
+        this.setState({showMakePayment: true})
+    }
+    handleCloseMakePayment() {
+        this.setState({showMakePayment: false})
+    }
+
+    handleShowInvite() {
+        this.setState({showInvite: true})
+    }
+    handleCloseInvite() {
+        this.setState({showInvite: false})
+    }
+
+    handleCloseChangeMemeberRole() {
+        this.setState({changeMemberRole: false})
+    }
+    handleShowChangeMemeberRole() {
+        this.setState({changeMemberRole: true})
+    }
+    
+    handleShowRemoveFromTeam() {
+        this.setState({removeFromTeam: true})
+    }
+    handleCloseRemoveFromTeam() {
+        this.setState({removeFromTeam: false})
+    }
+
     handleShowSuccess = (successName, successText) => this.setState({showSuccess: true, successName, successText})
     handleCloseSuccess = () => this.setState({showSuccess: false, successName: null, successText: null})
     handleShowError = (errorText) => this.setState({showError: true, errorText})
     handleCloseError = () => this.setState({showError: false})
 
+    handleCloseRemoveFromTeam = this.handleCloseRemoveFromTeam.bind(this)
+    handleShowRemoveFromTeam = this.handleShowRemoveFromTeam.bind(this)
+    handleCloseChangeMemeberRole = this.handleCloseChangeMemeberRole.bind(this)
+    handleShowChangeMemeberRole = this.handleShowChangeMemeberRole.bind(this)
+    handleCloseInvite = this.handleCloseInvite.bind(this)
+    handleShowInvite = this.handleShowInvite.bind(this)
+    handleShowMakePayment = this.handleShowMakePayment.bind(this)
+    handleCloseMakePayment = this.handleCloseMakePayment.bind(this)
     onChangeName = this.onChangeName.bind(this)
     onChangeEmail = this.onChangeEmail.bind(this)
     onChangePhone = this.onChangePhone.bind(this)
@@ -211,9 +261,262 @@ class Settings extends Component {
 
     render() {
         return (
-            <div>
-                <h3>Settings</h3>
-                <div>
+            <div className="settings">
+               <div className="title-header">
+                    <h3 className="menu__title">Settings</h3>
+                </div>
+                <div className="setting__tab">
+                    <Tabs defaultActiveKey="profile">
+                        <Tab eventKey="profile" title="Profile">
+                                <div className="content__wrap">
+                                <h4 className="menu__title-secondary mb-4">Personal information</h4>
+                                <div className="form__groups">
+
+                                    <div className="form_row mb-4">
+                                        <div className="form_col">
+                                            <label className="form__label">Name: </label>
+                                            <div className="input-group">
+                                                <input type="text" placeholder="Mike Jackson" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                            </div>
+                                        </div>
+                                        <div className="form_col_last form_col">
+                                            <label className="form__label">Email:</label>
+                                            <div className="input-group">
+                                            <input type="text" placeholder="mj@gmail.com"  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                               
+                                    <div className="form_row mb-4">
+                                        <div className="form_col">
+                                            <label className="form__label">Phone:</label>
+                                            <div className="input-group">
+                                                <input type="text" placeholder="+7 999 202 77 77" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="form_row mb-4">
+                                        <div className="form_col_last form_col">
+                                        <label className="form__label">Profile image *</label>
+                                            <FileUpload></FileUpload>
+                                        </div>
+                                    </div>
+                                </div>
+                               
+
+                                <h4 className="menu__title-secondary mb-4">Security</h4>
+                                <div className="form__groups_adaptive form__groups">
+                                    <div className="form_row mb-4">
+                                        <div className="form_col_last form_col">
+                                            <label className="form__label">Password</label>
+                                            <div className="input-group">
+                                                <input type="text"  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                <button className="btn btn__reset btn_primary btn_orange ms-3">Reset</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="form_row-switch form_row mb-4">
+                                <div className="form_col_last form_col">
+                                <div className="form__group_top-row-left">
+                                        <img src={drug_drop}></img>
+                                            <div>
+                                                <label className="form__label_group form__label">Two-factor authentication:
+                                                </label>
+                                                <div className="form__prompt" id="basic-addon4">Add an extra layer of security to your account. To sign in, you'll need to provide a code along with your username and password.</div>
+                                                        </div>
+                                    </div>
+                                </div>
+                                <label className="switch_center switch">
+                                        <input type="checkbox" onChange={() => this.setState({isActive: !this.state.isActive}) }></input>
+                                        <span className="slider round"></span>
+                                    </label>  
+                        </div>
+
+
+                                
+                                <div className="form_row mb-4">
+                                        <div className="form_col_action_left form_col_last form_col">
+                                            <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.nextStage}>
+                                                Save
+                                            </button>
+                                        </div>
+                                </div>
+                            </div>
+                        </Tab>
+
+                        <Tab eventKey="api" title="API">
+                        <div className="content__wrap">
+                         <h4 className="menu__title-secondary mb-4">API Token</h4>
+                         <div className="form__groups">
+                            <div className="form_row-switch form_row mb-4">
+                                    <div className="form_col_last form_col">
+                                        <div className="form__group_top-row-left">
+                                                <img src={attraction}></img>
+                                                    <div>
+                                                        <label className="form__label_group form__label">Attention:
+                                                        </label>
+                                                        <div className="form__prompt" id="basic-addon4">Someone who has the API key of your account can use its capabilities (including distribution of rewards). Please be careful not to let your API key fall into the wrong hands.</div>
+                                                                </div>
+                                        </div>
+                                    </div>
+                                    <button className="btn btn_primary btn_orange">Create</button>
+                            </div>
+                            <div className="form__groups_adaptive_secondary form__groups_adaptive form_row mb-4">
+                                <div className="form_col_last form_col">
+                                    <label className="form__label">API key #1: </label>
+                                    <div className="input-group">
+                                        <input type="text" value={'0xE8D562606F35CB14dA3E8faB1174F9B5AE8319c4'}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        <button className="btn btn__copy btn_primary btn_orange ms-3">Copy</button>
+                                        <button className="btn btn__copy btn_primary btn_orange ms-3">Revoke</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="form__groups_adaptive_secondary form__groups_adaptive form_row mb-4">
+                                <div className="form_col_last form_col">
+                                    <label className="form__label">API key #2: </label>
+                                    <div className="input-group">
+                                        <input type="text" value={'0xE8D562606F35CB14dA3E8faB1174F9B5AE8319c4'}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        <button className="btn btn__copy btn_primary btn_orange ms-3">Copy</button>
+                                        <button className="btn btn__copy btn_primary btn_orange ms-3">Revoke</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="form__groups_adaptive_secondary form__groups_adaptive form_row mb-4">
+                                <div className="form_col_last form_col">
+                                    <label className="form__label">API key #3: </label>
+                                    <div className="input-group">
+                                        <input type="text" value={'0xE8D562606F35CB14dA3E8faB1174F9B5AE8319c4'}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        <button className="btn btn__copy btn_primary btn_orange ms-3">Copy</button>
+                                        <button className="btn btn__copy btn_primary btn_orange ms-3">Revoke</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="form_row mb-4">
+                            <div className="form_col_action_left form_col_last form_col">
+                                <button className="btn btn_pre-sm  btn_primary btn_orange">
+                                    Save
+                                </button>
+                            </div>
+                         </div>
+                        </div>
+                        </div> 
+                        </Tab>
+
+                        <Tab eventKey="billing" title="Billing">
+                            <div className="content__wrap-main">
+                                <div className="content__wrap">
+                                    <h4 className="menu__title-secondary mb-4">Estimate Due</h4>
+                                    <div className="form__groups mb-4">
+                                        <p>ABC tokens on blacklisted users' wallets will be frozen and cannot be sent from them. Add list of wallets to the text box. Each wallet on a new line.</p>
+                                    </div>
+                                    <div className="form__groups mb-4">
+                                        <b className="settings__bulling_value">$0.00</b>
+                                    </div>
+                                    <div className="form_row-marke-payments form_row mb-4">
+                                        <div className="settings__payment">
+                                            <div>
+                                                <p>$0.00</p>
+                                                <div className="settings__payment_bottom">
+                                                    <span>Prepayments</span> <img src={info}/>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <p>$0.00</p>
+                                                <div className="settings__payment_bottom">
+                                                    <span>Total usage</span> <img src={info}/>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <p>$0.00</p>
+                                                <div className="settings__payment_bottom">
+                                                    <span>Estimated due</span> <img src={info}/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="form_col_action_payment form_col_action_left form_col_last form_col">
+                                            <button className="btn btn_primary btn_orange" onClick={this.handleShowMakePayment}>
+                                                Make a payment
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="content__wrap">
+                                    <div className="title-header mb-4">
+                                        <h4 className="menu__title-secondary-payment menu__title-secondary mb-4">Payment methods</h4>
+                                        <button type="button" className="btn btn_orange btn_primary">Add a payment method </button>
+                                    </div>
+                                    <FPTable data={paymentMethodsTable}>
+                                            <tr>
+                                                <td>Visa ending in 6967</td>
+                                                <td>Expires 02/2026</td>
+                                                <td>Default</td>
+                                                <td>
+                                                    <FPDropdown icon={more}>
+                                                        <Dropdown.Item className="dropdown__menu-item">Make a payment</Dropdown.Item>
+                                                        <Dropdown.Item className="dropdown__menu-item">Delete</Dropdown.Item>
+                                                    </FPDropdown>
+                                                </td>
+                                            </tr>
+                                    </FPTable>
+                                </div>
+
+                                <div className="content__wrap">                                
+                                    <h4 className="menu__title-secondary mb-4">Billing history</h4>
+                                    <FPTable data={billingHistoryTable}>
+                                            <tr>
+                                                <td>March 31, 2023</td>
+                                                <td>Expires 02/2026</td>
+                                                <td>Default</td>
+                                                <td>
+                                                    <FPDropdown icon={more}>
+                                                        <Dropdown.Item className="dropdown__menu-item">Make default</Dropdown.Item>
+                                                        <Dropdown.Item className="dropdown__menu-item">Download PDF</Dropdown.Item>
+                                                        <Dropdown.Item className="dropdown__menu-item">Delete</Dropdown.Item>
+                                                    </FPDropdown>
+                                                </td>
+                                            </tr>
+                                    </FPTable>
+                                </div>
+
+                            </div>
+                        </Tab>
+                        <Tab eventKey="team" title="Team">
+                            <div className="content__wrap">
+                                    <div className="title-header_adaptive title-header mb-4">
+                                        <div className="input-group search-input_rewards search-input">
+                                            <input type="text" placeholder="Search..." className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        </div>
+                                        <button type="button" className="btn btn_orange btn_primary" onClick={this.handleShowInvite}>Invite member</button>
+                                    </div>
+                                    <FPTable data={teamTable}>
+                                            <tr>
+                                                <td>
+                                                    <p>Mike Thompson</p>
+                                                    <p>mike@gmail.com</p>
+                                                </td>
+                                                <td>Owner</td>
+                                                <td>Joined</td>
+                                                <td>
+                                                    <FPDropdown icon={more}>
+                                                        <Dropdown.Item className="dropdown__menu-item">Leave team</Dropdown.Item>
+                                                        <Dropdown.Item className="dropdown__menu-item" onClick={this.handleShowChangeMemeberRole}>Change role</Dropdown.Item>
+                                                        <Dropdown.Item className="dropdown__menu-item" onClick={this.handleShowRemoveFromTeam}>Remove from team</Dropdown.Item>
+                                                        <Dropdown.Item className="dropdown__menu-item">Resend email</Dropdown.Item>
+                                                        <Dropdown.Item className="dropdown__menu-item">Cancel invite</Dropdown.Item>
+                                                    </FPDropdown>
+                                                </td>
+                                            </tr>
+                                    </FPTable>
+                                </div>
+                        </Tab>
+                    </Tabs>
+                </div>
+                {/*<div>
                     Information
                     <ul className="list-group list-group-flush">
                         <li className="list-group-item"> 
@@ -272,7 +575,175 @@ class Settings extends Component {
                             </div>
                         </li>
                     </ul>
-                </div>
+        </div>*/}
+                  <Modal show={this.state.showMakePayment} onHide={this.handleCloseMakePayment} centered>
+                    <Modal.Header  className="modal-newuser__title modal-title" closeButton>
+                        Make a payment
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div className="form_row mb-4">
+                            <span className="form__label">Your current estimated costs for this billing period are $0.00.</span>
+                        </div>
+                        <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                <label className="form__label">Payment amount:</label>
+                                    <div className="input-group ">
+                                    <input type="number" placeholder="0" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                    <div className="form__prompt" id="basic-addon4">Amount must be at least $1.00</div>
+                                </div>
+                         </div>
+
+                         <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                <label className="form__label">Saved payment methods:</label>
+                                    <div className="input-group ">
+                                        <select onChange={this.changeUser} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                            {
+                                                this.state.users
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                         </div>
+
+                    </Modal.Body>
+                    <Modal.Footer>
+                    <button className="btn btn_primary btn_gray" onClick={this.handleCloseMakePayment}>
+                        Cancel
+                    </button>
+                    <button className="btn btn_primary btn_orange">
+                        Submit Payment
+                    </button>
+                    </Modal.Footer>
+                </Modal>
+                <Modal show={this.state.showInvite} onHide={this.handleCloseInvite} centered>
+                    <Modal.Header  className="modal-newuser__title modal-title" closeButton>
+                    Invite team members
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div className="form_row mb-4">
+                            <span className="form__label">Just enter the addresses of the people you'd like to invite and we'll send them an email.</span>
+                        </div>
+                        <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                <label className="form__label">Enter email addresses: <img className="form__icon-info" src={info_black} /></label>
+                                <div className="form_col_last form_col">
+                                    <textarea className="form__textarea form__textarea_email" onChange={this.onChangeBlacklistAddText}></textarea>
+                                </div>
+                                </div>
+                         </div>
+                        
+                         <div className="form_row">
+                                <div className="form_col">
+                                    <label className="form__label">Choose role:</label>
+                                </div>
+                            </div>
+                         <div className="form_row mb-4">
+                                <div className="form_col_flex form_col">
+                                    <div className="form-check custom-control custom-radio custom-control-inline">
+                                            <input type="radio" id="rd_1" name="rd" value="Contract balance"/>
+                                            <label className="form-check-label custom-control-label green" for="rd_1">
+                                            Member <img src={info_black} className="form__icon-info"/>
+                                            </label>
+                                        </div>
+                                        <div className="form-check custom-control custom-radio custom-control-inline">
+                                            <input type="radio" id="rd_2" name="rd" value="External wallet" />
+                                            <label className="form-check-label custom-control-label red" for="rd_2">
+                                                Owner <img src={info_black} className="form__icon-info"/>
+                                            </label>
+                                        </div>
+                                </div>
+                            </div>
+
+                    </Modal.Body>
+                    <Modal.Footer>
+                    <button className="btn btn_primary btn_gray" onClick={this.handleCloseInvite}>
+                        Cancel
+                    </button>
+                    <button className="btn btn_primary btn_orange">
+                    Invite team members
+                    </button>
+                    </Modal.Footer>
+                </Modal>
+                <Modal show={this.state.changeMemberRole} onHide={this.handleCloseChangeMemeberRole} centered>
+                    <Modal.Header  className="modal-newuser__title modal-title" closeButton>
+                    Change member’s role
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div className="form_row mb-4">
+                            <div className="form_col">
+                                <label className="form__label">Name:</label>
+                                            <div className="input-group">
+                                                <input type="number" placeholder="Mike Thompson" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                            </div>
+                            </div>
+                        </div>
+        
+                         <div className="form_row mb-4">
+                            <div className="form_col">
+                            <label className="form__label">Email:</label>
+                                        <div className="input-group">
+                                            <input type="number" placeholder="mike@gmail.com" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        </div>
+                            </div>
+                        </div>
+
+                        <div className="form_row">
+                                <div className="form_col">
+                                    <label className="form__label">Choose role:</label>
+                                </div>
+                            </div>
+                         <div className="form_row mb-4">
+                                <div className="form_col_flex form_col">
+                                    <div className="form-check custom-control custom-radio custom-control-inline">
+                                            <input type="radio" id="rd_1" name="rd" value="Contract balance"/>
+                                            <label className="form-check-label custom-control-label green" for="rd_1">
+                                            Member <img src={info_black} className="form__icon-info"/>
+                                            </label>
+                                        </div>
+                                        <div className="form-check custom-control custom-radio custom-control-inline">
+                                            <input type="radio" id="rd_2" name="rd" value="External wallet" />
+                                            <label className="form-check-label custom-control-label red" for="rd_2">
+                                                Owner <img src={info_black} className="form__icon-info"/>
+                                            </label>
+                                        </div>
+                                        <div className="form-check custom-control custom-radio custom-control-inline">
+                                            <input type="radio" id="rd_2" name="rd" value="External wallet" />
+                                            <label className="form-check-label custom-control-label red" for="rd_2">
+                                                Admin <img src={info_black} className="form__icon-info"/>
+                                            </label>
+                                        </div>
+                                </div>
+                            </div>
+
+                    </Modal.Body>
+                    <Modal.Footer>
+                    <button className="btn btn_primary btn_gray" onClick={this.handleCloseChangeMemeberRole}>
+                        Cancel
+                    </button>
+                    <button className="btn btn_primary btn_orange">
+                        Save
+                    </button>
+                    </Modal.Footer>
+                </Modal>
+                <Modal show={this.state.removeFromTeam} onHide={this.handleCloseRemoveFromTeam} centered>
+                    <Modal.Header  className="modal-newuser__title modal-title" closeButton>
+                    Remove confirmation
+                    </Modal.Header>
+                    <Modal.Body>
+                       <p className="modal-text_center modal-text_bold modal-text_smTitile modal-text">Delete Mike Thompson from team?</p>
+                       <p className="modal-text_center modal-text mb-4">You won't be able to revert this</p>
+                    </Modal.Body>
+                    <Modal.Footer>
+                    <button className="btn btn_primary btn_gray" onClick={this.handleCloseRemoveFromTeam}>
+                        Cancel
+                    </button>
+                    <button className="btn btn_primary btn_orange">
+                        Delete
+                    </button>
+                    </Modal.Footer>
+                </Modal>
                 <SuccessModal 
                     showSuccess={this.state.showSuccess} 
                     handleCloseSuccess={this.handleCloseSuccess}

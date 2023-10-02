@@ -136,4 +136,65 @@ const tokenTable = [
         },
     ]
 
-export {userTable, tokenTable, blacklistTable, nftsTable, rewardsTable, rewardEventsTable}
+    const paymentMethodsTable = [
+        {
+            id: 1,
+            name: 'Card',
+        },
+        {
+            id: 2,
+            name: 'Expire date',
+        },
+        {
+            id: 3,
+            name: 'Status',
+        },
+        {
+            id: 4,
+            name: 'Actions',
+        },
+    ]
+
+    const billingHistoryTable = [
+        {
+            id: 1,
+            name: 'Date',
+        },
+        {
+            id: 2,
+            name: 'Description',
+        },
+        {
+            id: 3,
+            name: 'Amount',
+        },
+        {
+            id: 4,
+            name: 'Actions',
+        },
+    ]
+
+    const teamTable = [
+        {
+            id: 1,
+            name: 'Name',
+        },
+        {
+            id: 2,
+            name: 'Role',
+        },
+        {
+            id: 3,
+            name: 'Status',
+        },
+        {
+            id: 4,
+            name: 'Actions',
+        },
+    ]
+
+export {
+    userTable, tokenTable, blacklistTable, nftsTable, 
+    rewardsTable, rewardEventsTable, paymentMethodsTable, billingHistoryTable,
+    teamTable
+}

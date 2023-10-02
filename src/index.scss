@@ -11,6 +11,7 @@
 @import './styles/dashboard.scss';
 @import './styles/collectionDetail.scss';
 @import './styles/rewards.scss';
+@import './styles/settings.scss';
 @import './styles/_custom.scss';
 
 @import './styles/common/dropdown.scss';
@@ -30,6 +31,8 @@
 @import './styles/media/modal.scss';
 @import './styles/media/form.scss';
 @import './styles/media/rewards.scss';
+@import './styles/media/button.scss';
+@import './styles/media/settings.scss';
 
 body {
   margin: 0;
@@ -76,8 +79,6 @@ h1, h2, h3, h4, h5, h6 {
   margin-right: 10px;
 }
 
-
-
 .info__group-price{
   margin-left: 8px;
 }
@@ -90,6 +91,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .info__group-price_red span{
   color: map-get($theme-colors, "white")
+}
+
+p{
+  margin: 0px;
 }
 
 

@@ -38,4 +38,25 @@
     .input-group_filter{
         gap: 16px;
     }
+    .form__groups_adaptive input{
+        width: 50% !important;
+    }
+    .form__groups_adaptive_secondary input{
+        width: 20% !important;
+    }
+    .form__groups_adaptive .input-group{
+        gap: 10px
+    }
+    .form__group_top-row-left{
+        align-items: flex-start;
+    }
+    .form_row-switch{
+        flex-direction: row;
+        gap: 10px;
+    }
+    .form_col_action_payment{
+        position: absolute;
+        right: 0;
+        top: 80px;
+    }
 }

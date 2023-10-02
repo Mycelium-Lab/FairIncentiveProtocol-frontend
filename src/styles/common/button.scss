@@ -18,6 +18,9 @@
     line-height: 21px;
     font-size: map-get($theme-fontSize, "primary");
     height: 41px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn_secondary{
@@ -33,7 +36,7 @@
     height: 36px;
 }
 
-.btn__copy{
+.btn__copy, .btn__reset{
     width: 62px;
     height: 38px;
 }
