@@ -16,9 +16,10 @@ class Sidebar extends Component {
             activeTab: active
         })
         this.props.onSwitch(active)
-        if(window.innerWidth < 769){
+        // TODO: Закрывать sidebar при выборе пункта из меню 
+        /*if(window.innerWidth < 769){
             this.props.changeShowSidebar()
-        }
+        }*/
     }
 
     handleSwitch = this.handleSwitch.bind(this)

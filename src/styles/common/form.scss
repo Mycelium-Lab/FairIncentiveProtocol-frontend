@@ -185,3 +185,7 @@ input[type="checkbox"] {
     width: 708px;
     gap: 24px;
 }
+
+.input-group>:not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
+    border-radius: 3.2px;
+}

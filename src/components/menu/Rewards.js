@@ -1,6 +1,5 @@
 import { Component } from "react";
 import Modal from 'react-bootstrap/Modal';
-import '../../styles/rewards.scss'
 import { ethers, utils } from "ethers";
 import { createLongStrView } from "../../utils/longStrView";
 import { getBearerHeader } from "../../utils/getBearerHeader";
@@ -816,14 +815,10 @@ class Rewards extends Component {
                                                -
                                           </td>
                                           <td>
-                                                0x12c4...32f7
+                                          First 100 purchases made
                                           </td>
                                           <td>
-                                              <ol className="table-rewards__list">
-                                                <li className="table-rewards__list-item">345 ABC</li>
-                                                <li className="table-rewards__list-item">105 545 CBA</li>
-                                                <li className="table-rewards__list-item">5 NFTs from ABC collection</li>
-                                              </ol>
+                                          1 NFT from ABC collection
                                           </td>
                                           <td>
                                           5 from ABC collection
