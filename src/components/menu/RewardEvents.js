@@ -34,12 +34,16 @@ class RewardEvents extends Component {
             reward_name: null,
             chosen_user: null,
             comment: null, 
+            users: [],
+            reward_id: null,
+            reward_nft_id: null,
         }
     }
 
     async componentDidMount() {
         await this.getRewardTokenEvents()
         await this.getRewardNFTEvents()
+        await this.getUsers()
     }
 
     async getRewardTokenEvents() {
@@ -78,6 +82,28 @@ class RewardEvents extends Component {
             const rewardEvents = json.body.data
             this.setState({
                 rewardNFTEvents: rewardEvents
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async getUsers() {
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/users`, requestOptions)
+            const json = await res.json()
+            const users = json.body.data.map(v => <option value={v.id}>{v.external_id}</option>)
+            this.setState({
+                users,
+                chosen_user: json.body.data.length > 0 ? json.body.data[0].id : null
             })
         } catch (error) {
             console.log(error)
@@ -146,6 +172,75 @@ class RewardEvents extends Component {
         }
     }
 
+    async rewardWithToken() {
+        try {
+            const headers = new Headers();
+            headers.append("Content-Type", "application/json");
+            headers.append("Authorization", getBearerHeader())
+
+            const raw = JSON.stringify(
+                {
+                    reward_id: this.state.reward_id,
+                    user_id: this.state.chosen_user,
+                    comment: this.state.comment
+                }
+            );
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                body: raw,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/rewards/reward/token`, requestOptions)
+            const json = await res.json()
+            if (res.status === 200) {
+                let tokenRewards = this.state.tokenRewards
+                tokenRewards.forEach(v => {if (v.id == this.state.reward_id) v.count = parseInt(v.count) + 1})
+                alert('Done')
+                this.setState({
+                    showReward: false
+                })
+            }
+            else alert('Something went wrong')
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async rewardWithNFT() {
+        try {
+            const headers = new Headers();
+            headers.append("Content-Type", "application/json");
+            headers.append("Authorization", getBearerHeader())
+            const raw = JSON.stringify(
+                {
+                    reward_id: this.state.reward_id,
+                    user_id: this.state.chosen_user,
+                    comment: this.state.comment
+                }
+            );
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                body: raw,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/rewards/reward/nft`, requestOptions)
+            const json = await res.json()
+            if (res.status === 200) {
+                let nftRewards = this.state.nftRewards
+                nftRewards.forEach(v => {if (v.id == this.state.reward_id) v.count = parseInt(v.count) + 1})
+                alert('Done')
+                this.setState({
+                    showReward: false
+                })
+            }
+            else alert('Something went wrong')
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     changeUser(event) {
         this.setState({
             chosen_user: event.target.value
@@ -165,6 +260,9 @@ class RewardEvents extends Component {
     handleCloseReward = () => this.setState({showReward: false})
     changeUser = this.changeUser.bind(this)
     changeComment = this.changeComment.bind(this)
+    getUsers = this.getUsers.bind(this)
+    rewardWithToken = this.rewardWithToken.bind(this)
+    rewardWithNFT = this.rewardWithNFT.bind(this)
 
     deleteTokenRewardEvent = this.deleteTokenRewardEvent.bind(this)
     deleteNFTRewardEvent = this.deleteNFTRewardEvent.bind(this)
@@ -210,39 +308,40 @@ class RewardEvents extends Component {
                         <div className="content__wrap">
                             <FPTable data={rewardEventsTable}>
                                 {
+                                     this.state.switcher === types.token 
+                                    ?  this.state.rewardTokenEvents.map(v =>
                                  <tr>
                                           <td>   
-                                              22
+                                          {createLongStrView(v.event_id)}
                                           </td>
                                           <td>
-                                                Accrued
+                                          {v.status}
                                           </td>
                                           <td>
-                                          First 100 purchases made
+                                          {v.reward_name}
                                           </td>
                                           <td>
-                                          1 NFT from ABC collection
+                                          {ethers.utils.formatEther(v.token_amount)} {v.token_symbol} from collection
                                           </td>
                                           <td>
-                                          user2134439 (FAIR id: 123321) 
+                                            <div>
+                                                {v.user_external_id}
+                                            </div>
+                                            <div>
+                                                (FAIR id: {createLongStrView(v.user_id)})
+                                            </div>
                                           </td>
                                           <td>
                                             <FPDropdown icon={more}>
-                                                {
-                                                    // Аквтивировать при получении данных } - onClick={this.handleShowRevoke(v.event_id, types.token)} 
-                                                }
-                                                <Dropdown.Item className="dropdown__menu-item">Revoke</Dropdown.Item>
+                                            {
+                                                v.status === 'Accrued'
+                                                ?  <Dropdown.Item className="dropdown__menu-item" onClick={this.handleShowRevoke(v.event_id, types.token)} >Revoke</Dropdown.Item>
+                                                : null
+                                            }
                                             </FPDropdown>
-                                              {/*
-                                              <button className="btn btn-dark" onClick={() => this.handleShowMint(v.symbol, v.address, v.chainid)} disabled={v.supply_type == 1 ? true : false}>Mint</button>
-                                              <button className="btn btn-dark" disabled>Roles control</button>
-                                              <button className="btn btn-dark" onClick={() => this.handleShowPause(v.symbol, v.address, v.chainid)} disabled={!v.pausable}>{v.paused ? "Unpause" : "Pause"}</button>
-                                              <button className="btn btn-dark" onClick={() => this.handleShowBlacklist(v.symbol, v.address, v.chainid)} disabled={!v.blacklist}>Blacklist</button>
-                                              <button className="btn btn-dark" onClick={() => this.handleShowBurn(v.symbol, v.address, v.chainid)} disabled={!v.burnable}>Burn</button>
-                                              <button className="btn btn-dark" disabled>Token info</button>
-                                            */}
                                           </td>
-                                      </tr>
+                                      </tr>)
+                                      : null
                               }
                             </FPTable>
                         </div>
@@ -356,6 +455,18 @@ class RewardEvents extends Component {
                         Rewarding {this.state.reward_name}
                     </Modal.Header>
                     <Modal.Body>
+                    <div className="form_row ">
+                                <div className="form_col_last form_col">
+                                <label className="form__label">Select reward: <img className="form__icon-info" src={info}></img></label>
+                                <div className="input-group mb-4">
+                                    <select onChange={this.state.chosen_type === types.token ? this.changeRewardToken : this.changeRewardNFT} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                        {
+                                            this.state.rewardTokenEvents
+                                        }                                          
+                                    </select>
+                                </div>
+                         </div>
+                        </div>
                         <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
                                 <label className="form__label">Select user: <img className="form__icon-info" src={info}/></label>

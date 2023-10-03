@@ -63,12 +63,10 @@ class Rewards extends Component {
             reward_symbol: null,
             reward_nft_name: null,
             showFilter: false,
-            isActive: false
         }
     }
 
     async componentDidMount() {
-        
         await this.getTokens()
         await this.getUsers()
         await this.getTokenRewards()
@@ -689,19 +687,19 @@ class Rewards extends Component {
     handleClose = () => this.setState({show: false});
     handleShow = () => this.setState({show: true});
     handleCloseReward = () => this.setState({showReward: false})
-    //handleShowReward = (reward_name, reward_id) => this.setState({showReward: true, reward_name, reward_id})
-    handleShowReward = () => this.setState({showReward: true})
+    handleShowReward = (reward_name, reward_id) => this.setState({showReward: true, reward_name, reward_id})
     handleShowEditReward = (
         reward_name, reward_id, reward_count, 
         reward_description, reward_amount, reward_type, 
         reward_token, reward_nft_id, reward_symbol,
         reward_nft_name) => {
-       /* let current_nfts = {}
+        let current_nfts = {}
         if (reward_type === types.nft) {
             current_nfts = {
                 current_nfts: this.state.nfts.find(v => v.collection_address === reward_token).nfts
             }
         }
+        console.log(reward_name,  reward_description)
         this.setState(
             {   
                 showEditReward: true, 
@@ -717,16 +715,11 @@ class Rewards extends Component {
                 reward_nft_name,
                 ...current_nfts
             }
-        )*/
-        this.setState(
-            {   
-                showEditReward: true, 
-            })
+        )
     }
     handleCloseEditReward = () => this.setState({showEditReward: false})
 
-    //handleShowDelete = (reward_type, reward_id, reward_name) => this.setState({showDelete: true, reward_id, reward_name, reward_type})
-    handleShowDelete = () => this.setState({showDelete: true})
+    handleShowDelete = (reward_type, reward_id, reward_name) => this.setState({showDelete: true, reward_id, reward_name, reward_type})
     handleCloseDelete = () => this.setState({showDelete: false, reward_name: null, reward_id: null, reward_type: null})
 
     connect = this.connect.bind(this)
@@ -772,6 +765,7 @@ class Rewards extends Component {
             <>
                 <div className="title-header">
                     <h3 className="menu__title">Rewards</h3>
+                    <button  type="button" className="btn btn_orange btn_primary" onClick={this.handleShow}>Create new reward</button>
                 </div>
                 <div className="input-group__serach">
                     <button  type="button" className="btn btn_orange btn_image btn_primary" onClick={() => this.setState({showFilter: !this.state.showFilter})}>
@@ -803,31 +797,34 @@ class Rewards extends Component {
                 <div className="content__wrap">
                             <FPTable data={rewardsTable}>
                                 {
+                                      this.state.switcher === types.token
+                                      ?
+                                    this.state.tokenRewards.map(v =>
                                  <tr>
                                           <td>   
                                                 <label className="switch">
-                                                    <input type="checkbox" onChange={() => this.setState({isActive: !this.state.isActive}) }></input>
+                                                    <input type="checkbox" onChange={() => this.changeTokenRewardStatus(v.id, v.status)} role="switch"></input>
                                                     <span className="slider round"></span>
                                                 </label>  
                                           </td>
                                           <td>
-                                               -
+                                            {v.name}
                                           </td>
                                           <td>
-                                          First 100 purchases made
+                                            {ethers.utils.formatEther(v.amount)} {v.symbol}
                                           </td>
                                           <td>
-                                          1 NFT from ABC collection
+                                            {v.description}
                                           </td>
                                           <td>
-                                          5 from ABC collection
+                                          {v.count} from ABC collection
                                           </td>
                                           <td>
                                             <FPDropdown icon={more}>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={this.handleShowStats}>Stat</Dropdown.Item>
-                                                <Dropdown.Item className="dropdown__menu-item" onClick={this.handleShowEditReward}>Edit</Dropdown.Item>
-                                                <Dropdown.Item className="dropdown__menu-item" onClick={this.handleShowReward}>To reward</Dropdown.Item>
-                                                <Dropdown.Item className="dropdown__menu-item" onClick={this.handleShowDelete}>Delete</Dropdown.Item>
+                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowEditReward(v.name, v.id, v.count, v.description, v.amount, types.token, v.address, undefined, v.symbol)}>Edit</Dropdown.Item>
+                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowReward(v.name, v.id)} disabled={v.status}>To reward</Dropdown.Item>
+                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowDelete(types.token, v.id, v.name)}>Delete</Dropdown.Item>
                                             </FPDropdown>
                                               {/*
                                               <button className="btn btn-dark" onClick={() => this.handleShowMint(v.symbol, v.address, v.chainid)} disabled={v.supply_type == 1 ? true : false}>Mint</button>
@@ -839,6 +836,9 @@ class Rewards extends Component {
                                             */}
                                           </td>
                                       </tr>
+                                    )
+                                    :
+                                    null
                               }
                             </FPTable>
                 </div>
@@ -862,7 +862,7 @@ class Rewards extends Component {
                      <div className="form_col_last form_col">
                         <label className="form__label">Name:</label>
                                 <div className="input-group">
-                                    <input type="text" value={this.state.reward_name} placeholder={this.state.reward_name} onChange={this.changeRewardName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    <input type="text" value={this.state.reward_name} placeholder="e.g. My fisrt reward" onChange={this.changeName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                 </div>
                                 <div className="form__prompt" id="basic-addon4">Specify the name of your reward. <b>User will see this</b></div>
                      </div>
@@ -873,7 +873,7 @@ class Rewards extends Component {
                                 <div className="form_col_last form_col">
                                 <label className="form__label">Description: <img className="form__icon-info" src={info}/></label>
                                     <div className="input-group">
-                                    <textarea value={this.state.reward_description} placeholder={this.state.reward_description} type="text" onChange={this.changeRewardDescription} id="basic-url" aria-describedby="basic-addon3 basic-addon4"  className="form__textarea form__textarea_desct-nft-collection"  aria-label="With textarea"></textarea>
+                                    <textarea placeholder="Reward description" type="text" onChange={this.changeDescription} id="basic-url" aria-describedby="basic-addon3 basic-addon4"  className="form__textarea form__textarea_desct-nft-collection"  aria-label="With textarea"></textarea>
                                     </div>
                                     <div className="form__prompt" id="basic-addon4"><b>User will see this.</b> <a className="link__form-prompt" href="https://www.markdownguide.org/cheat-sheet/" target="blank">Markdown</a> syntax is supported.</div>
                                 </div>
@@ -886,6 +886,7 @@ class Rewards extends Component {
                                         <div className="input-group">
                                         <div className="form-check custom-control custom-radio custom-control-inline">
                                             <input  
+                                            checked={this.state.chosen_type === types.token ? true : false}
                                             onChange={this.changeType} 
                                             type="radio" id="rd_1" name="rd" value={types.token}/>
                                             <label className="form-check-label custom-control-label green" for="rd_1">
@@ -894,6 +895,7 @@ class Rewards extends Component {
                                         </div>
                                         <div className="form-check custom-control custom-radio custom-control-inline ms-3">
                                             <input 
+                                                checked={this.state.chosen_type === types.nft ? true : false}
                                               onChange={this.changeType} 
                                             type="radio" id="rd_2" name="rd" value={types.nft} />
                                             <label className="form-check-label custom-control-label red" for="rd_2">
@@ -908,10 +910,10 @@ class Rewards extends Component {
                      <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
                                     <label  className="form__label">Select {this.state.chosen_type === types.token ? 'token' : 'NFT collection'}:<img className="form__icon-info" src={info}/> </label>
-                                    <div className="input-group ">
+                                    <div className="input-group">
                                         <select onChange={this.changeRewardToken} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
                                         {
-                                            this.state.reward_type === types.token
+                                            this.state.chosen_type === types.token
                                             ?
                                             this.state.tokens.map(v => {
                                                 if (v.address === this.state.reward_token) {
@@ -933,13 +935,13 @@ class Rewards extends Component {
                                 </div>
                          </div>                             
                         {
-                            this.state.reward_type === types.token
+                           this.state.chosen_type === types.token
                             ?
                             <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
                                     <label className="form__label" style={this.state.reward_count != 0 ? {color: "grey"}: null}>Amount: <img className="form__icon-info" src={info}/> </label>
                                     <div className="input-group">
-                                        <input style={this.state.reward_count != 0 ? {color: "grey"}: null } type="number" defaultValue={this.state.reward_amount ? this.state.reward_amount : '0'} disabled={this.state.reward_count != 0 ? true : false} className="form-control" onChange={this.changeRewardAmount} aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default"/>
+                                        <input type="number" className="form-control" onChange={this.changeAmount} placeholder="e.g. 5" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default"/>
                                     </div>
                                     <div className="form__prompt" id="basic-addon4">Enter the amount of tokens for each reward</div>
                                 </div>
@@ -947,8 +949,8 @@ class Rewards extends Component {
                             :
                             <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
-                                    <label className="form__label" style={this.state.reward_count != 0 ? {color: "grey"} : null}>Select token from collection: <img className="form__icon-info" src={info}/></label>
-                                        <select style={this.state.reward_count != 0 ? {color: "grey"} : null} disabled={this.state.reward_count != 0 ? true : false} onChange={this.changeChosenRewardNFT} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                    <label className="form__label">Select token from collection: <img className="form__icon-info" src={info}/></label>
+                                        <select onChange={this.changeChosenRewardNFT} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
                                          {
                                             this.state.current_nfts 
                                             ?
@@ -963,6 +965,7 @@ class Rewards extends Component {
                                             null
                                         }
                                         </select>
+                                        <div className="form__prompt" id="basic-addon4">Select the NFT to reward users with</div>
                                 </div>
                             </div>
                         }
@@ -972,14 +975,14 @@ class Rewards extends Component {
                                 <div className="form__group_top-row-left">
                                         <img src={drug_drop}></img>
                                             <div>
-                                                <label className="form__label_group form__label">Allow a repeat reward::  <img className="form__icon-info" src={info} />
+                                                <label className="form__label_group form__label">Allow a repeat reward:  <img className="form__icon-info" src={info} />
                                                 </label>
                                                 <div className="form__prompt" id="basic-addon4">If activated, this award can be given to each user only once</div>
                                                         </div>
                                     </div>
                                 </div>
                                 <label className="switch_center switch">
-                                        <input type="checkbox" onChange={() => this.setState({isActive: !this.state.isActive}) }></input>
+                                        <input type="checkbox"></input>
                                         <span className="slider round"></span>
                                     </label>  
                         </div>
@@ -995,7 +998,7 @@ class Rewards extends Component {
                                     </div>
                                 </div>
                                 <label className="switch_center switch">
-                                            <input type="checkbox" onChange={() => this.setState({isActive: !this.state.isActive}) }></input>
+                                            <input type="checkbox"></input>
                                             <span className="slider round"></span>
                                     </label>  
                         </div>
@@ -1004,7 +1007,7 @@ class Rewards extends Component {
                     <button className="btn btn_primary btn_gray" onClick={this.handleClose}>
                         Cancel
                     </button>
-                    <button className="btn btn_primary btn_orange" onClick={this.saveEdit}>
+                    <button className="btn btn_primary btn_orange" onClick={this.state.chosen_type === types.token ? this.rewardToken : this.createNFTReward}>
                         Create
                     </button>
                     </Modal.Footer>
@@ -1247,14 +1250,14 @@ class Rewards extends Component {
                                 <div className="form__group_top-row-left">
                                         <img src={drug_drop}></img>
                                             <div>
-                                                <label className="form__label_group form__label">Allow a repeat reward::  <img className="form__icon-info" src={info} />
+                                                <label className="form__label_group form__label">Allow a repeat reward:  <img className="form__icon-info" src={info} />
                                                 </label>
                                                 <div className="form__prompt" id="basic-addon4">If activated, this award can be given to each user only once</div>
                                                         </div>
                                     </div>
                                 </div>
                                 <label className="switch_center switch">
-                                        <input type="checkbox" onChange={() => this.setState({isActive: !this.state.isActive}) }></input>
+                                        <input type="checkbox"></input>
                                         <span className="slider round"></span>
                                     </label>  
                         </div>
@@ -1270,7 +1273,7 @@ class Rewards extends Component {
                                     </div>
                                 </div>
                                 <label className="switch_center switch">
-                                            <input type="checkbox" onChange={() => this.setState({isActive: !this.state.isActive}) }></input>
+                                            <input type="checkbox"></input>
                                             <span className="slider round"></span>
                                     </label>  
                         </div>

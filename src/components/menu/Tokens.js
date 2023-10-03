@@ -9,7 +9,6 @@ import { getBearerHeader } from "../../utils/getBearerHeader";
 import { config } from "../../utils/config";
 import Modal from 'react-bootstrap/Modal';
 import { networks } from "../../utils/networks";
-import '../../styles/tokens.scss'
 import ConfirmModal from "../common/modals/confirm";
 import ProgressModal from "../common/modals/progress";
 import SuccessModal from "../common/modals/success";
@@ -20,6 +19,8 @@ import infoRed from '../../media/common/info-red.svg'
 import more from '../../media/common/more.svg'
 import copy from '../../media/common/copy.svg'
 import search from '../../media/common/search.svg'
+import metamask from '../../media/common/metamask.svg'
+import walletconnect from '../../media/common/walletconnect.svg'
 import down from '../../media/common/arrow_drop_down.svg'
 import customTokeSymbol from '../../media/common/custom_toke_symbol.svg'
 import FileUpload from "../FileUpload";
@@ -486,13 +487,7 @@ class Tokens extends Component {
                 v.paused = data.paused
             })
             this.setState({
-
-                //tokens: json.body.data
-                tokens: [
-                    {
-                        id: 1
-                    }
-                ]
+                tokens: json.body.data
             })
         } catch (error) {
             alert(error)
@@ -904,7 +899,7 @@ class Tokens extends Component {
 
                             <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
-                                <label className="form__label">Upload a picture of the token </label>
+                                <label className="form__label">Upload a picture of the token (soon) </label>
                                     <FileUpload></FileUpload>
                                 </div>
                             </div>
@@ -914,16 +909,9 @@ class Tokens extends Component {
 
                             <div className="form_row">
                                 <div className="form_col_last form_col">
-                                    <label className="form__label">Decimals * <img src={info} className="form__icon-info"/></label>
+                                    <label className="form__label">Decimals * (soon) <img src={info} className="form__icon-info"/></label>
                                         <div className="input-group">
-                                            <select onChange={e => this.changeNetwork(e.target.value)} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                                <option value={config.status === "test" ? '5' : '1'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '5' : '1')) : false}>{networks[config.status === "test" ? '5' : '1'].name}</option>
-                                                <option value={config.status === "test" ? '97' : '56'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '97' : '56')) : false}>{networks[config.status === "test" ? '97' : '56'].name}</option>
-                                                <option value={config.status === "test" ? '80001' : '137'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '80001' : '137')) : false}>{networks[config.status === "test" ? '80001' : '137'].name}</option>
-                                                <option value={config.status === "test" ? '420' : '10'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '420' : '10')) : false} disabled={config.status === "test" ? true : false} >{networks[config.status === "test" ? '420' : '10'].name}</option>
-                                                <option value={config.status === "test" ? '43113' : '43114'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '43113' : '43114')) : false}>{networks[config.status === "test" ? '43113' : '43114'].name}</option>
-                                                <option value={config.status === "test" ? '421613' : '42161'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '421613' : '42161')) : false}>{networks[config.status === "test" ? '421613' : '42161'].name}</option>
-                                            </select>
+                                        <input onChange={this.onChangeMaxSupply} type="number" placeholder="1 000 000" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                         </div>
                                     <div className="form__prompt" id="basic-addon4">Insert the decimals precision of your token</div>
                                 </div>
@@ -978,6 +966,20 @@ class Tokens extends Component {
                     ?  <div className="content__wrap">
                          <h4 className="menu__title-secondary">Choose a wallet connection method</h4>
                          <span className="menu__subtitle">To create a token, you need to complete a transaction using a cryptocurrency wallet</span>
+                         <ul className="walletl__list unlist">
+                            <li className="walletl__list-item" onClick={this.connect}>
+                                <div>
+                                     <img src={metamask}></img>
+                                </div>
+                                <p  className="walletl__list-item-name">MetaMask</p>
+                            </li>
+                            <li className="walletl__list-item">
+                                <div>
+                                    <img src={walletconnect}></img>
+                                </div>
+                                <p className="walletl__list-item-name">WalletConnect</p>
+                            </li>
+                         </ul>
                          <div className="form_row mb-4">
                             <div className="form_col_action_left form_col_last form_col">
                             <button className="btn btn_pre-sm  btn_primary btn_gray" onClick={this.prevStage}>
@@ -1001,9 +1003,9 @@ class Tokens extends Component {
                                 <div className="form_col_last form_col">
                                     <label className="form__label">Chief administrator of the token (owner) * <img src={info} className="form__icon-info"/></label>
                                     <div className="input-group">
-                                        <input type="text" placeholder="e.g. Bitcoin" onChange={this.onChangeName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        <input type="text" value={this.state.address} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                     </div>
-                                    <div className="form__prompt_warning form__prompt" id="basic-addon4">Choose a name for your token</div>
+                                    <div className="form__prompt_warning form__prompt" id="basic-addon4">Attention: the wallet with this role has the right to carry out any actions</div>
                                 </div>
                             </div>
                         </div>
@@ -1013,7 +1015,7 @@ class Tokens extends Component {
                                 <button className="btn btn_pre-sm  btn_primary btn_gray" onClick={this.prevStage}>
                                     Back
                                 </button>
-                                <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.nextStage}>
+                                <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.createToken}>
                                     Create Token
                                 </button>
                             </div>
@@ -1177,17 +1179,21 @@ class Tokens extends Component {
                                   this.state.tokens.map(v =>{
                                       return <tr>
                                           <td>
-                                            <img src={customTokeSymbol}></img>
-                                              <div>
-                                                  {v.symbol}
-                                              </div>
-                                              <div>
-                                                  {v.name}
-                                              </div>
+                                            <div className="token-name">
+                                                <img src={customTokeSymbol}></img>
+                                                <div>
+                                                    <div>
+                                                        {v.symbol}
+                                                    </div>
+                                                    <div>
+                                                        {v.name}
+                                                    </div>
+                                                </div>
+                                            </div>
                                           </td>
                                           <td>
                                               (soon)
-                                              <a className="info__content-mint_medium info__content-mint">{'[mint]'}</a>
+                                              {/* <a className="info__content-mint_medium info__content-mint">{'[mint]'}</a> */}
                                           </td>
                                           <td>
                                               (soon)
@@ -1201,7 +1207,7 @@ class Tokens extends Component {
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowMint(v.symbol, v.address, v.chainid)} disabled={v.supply_type == 1 ? true : false}>Mint</Dropdown.Item>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowPause(v.symbol, v.address, v.chainid)} disabled={!v.pausable}>Pause</Dropdown.Item>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowRoles(v.symbol, v.address, v.chainid)}>Roles control</Dropdown.Item>
-                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowBlacklist(v.symbol, v.address, v.chainid)}>Blacklist</Dropdown.Item>
+                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowBlacklist(v.symbol, v.address, v.chainid)} disabled={!v.blacklist}>Blacklist</Dropdown.Item>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowInfo(v.symbol, v.address, v.chainid)}>Token info</Dropdown.Item>
                                             </FPDropdown>
                                               {/*
@@ -1229,42 +1235,41 @@ class Tokens extends Component {
                   : null   
                 }
               
-                <Modal show={this.state.showMint} onHide={this.handleCloseMint} centered>
+                <Modal id="mint" show={this.state.showMint} onHide={this.handleCloseMint} centered>
                     <Modal.Header  className="modal-newuser__title modal-title" closeButton>
                             Mint new {this.state.currentTokenSymbol} tokens
                     </Modal.Header>
                     <Modal.Body>
                         {
-                           /* this.state.showLoading
-                            ?
-                            <div className="spinner-border" role="status"></div>
-                            : */
-                            
-                            <>
+                           this.state.showLoading
+                           ?
+                           <div className="spinner-border" role="status"></div>
+                           :
+                           <>
                             <div>
                                 <ol className="mint-token-info-list">
                                     <li className="modal-text">
-                                        The contract balance: 11 <img src={info} className="form__icon-info"/>
+                                        The contract balance: soon <img src={info} className="form__icon-info"/>
                                     </li>
                                     <li className="modal-text">
-                                        Total supply: 11 <img src={info} className="form__icon-info"/>
+                                        Total supply: {this.state.mintTokenTotalSupply} {this.state.currentTokenSymbol}  <img src={info} className="form__icon-info"/>
                                     </li>
                                     <li className="modal-text">
-                                        Max supply: {
+                                    Max supply: {
                                             this.state.mintTokenMaxSupply === '0.0'
                                             ?
                                             `Infinity`
                                             :
-                                          11 
-                                        } <img src={info} className="form__icon-info"/>
+                                            `${this.state.mintTokenMaxSupply} ${this.state.currentTokenSymbol}`
+                                        }  <img src={info} className="form__icon-info"/>
                                     </li>
                                     <li className="modal-text">
-                                        Available to mint: {
+                                    Available to mint: {
                                             this.state.mintTokenMaxSupply === '0.0'
                                             ?
                                             `Infinity`
                                             :
-                                           11
+                                            `${this.state.mintTokenAvailableToMint} ${this.state.currentTokenSymbol}`
                                         } <img src={info} className="form__icon-info"/>
                                     </li>
                                 </ol>
@@ -1320,7 +1325,7 @@ class Tokens extends Component {
                         {this.state.isCurrentTokenPaused ? "Unpause" : "Pause"} {this.state.currentTokenSymbol} token
                     </Modal.Header>
                     <Modal.Footer>
-                        <button type="button" className="btn btn-dark" onClick={this.pause}>{this.state.isCurrentTokenPaused ? "Unpause" : "Pause"}</button>
+                        <button type="button" className="btn btn_orange" onClick={this.pause}>{this.state.isCurrentTokenPaused ? "Unpause" : "Pause"}</button>
                     </Modal.Footer>
                 </Modal>
                 <Modal show={this.state.showBlacklist} onHide={this.handleCloseBlacklist} centered>

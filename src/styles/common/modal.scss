@@ -47,3 +47,52 @@
 .modal-text_center{
     text-align: center;
 }
+
+.confirm__name{
+    font-size: map-get($theme-fontSize, "smTitile");
+    color: #212B36;
+    line-height: 27px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.confirm__text{
+    font-size: map-get($theme-fontSize, "primary");
+    color: #212B36;
+    line-height: 27px;
+    font-weight: 600;
+    padding-bottom: 40px;
+}
+
+.confirm__body{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+}
+
+
+.modal__loader {
+    margin-top: 28px;
+    display: flex;
+    justify-content: center;
+    animation: 1s linear 0s normal none infinite running loader;
+    -webkit-animation: 1s linear 0s normal none infinite running loader;
+  }
+  
+  @keyframes loader {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  @-webkit-keyframes loader {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }

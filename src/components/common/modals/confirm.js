@@ -1,6 +1,6 @@
 import { Component } from "react";
 import { Modal } from "react-bootstrap";
-
+import loader from '../../../media/common/loader.svg'
 class ConfirmModal extends Component {
     constructor(props) {
         super(props)
@@ -8,13 +8,14 @@ class ConfirmModal extends Component {
 
     render() {
         return <Modal show={this.props.showConfirm} onHide={this.props.handleCloseConfirm} centered>
-            <Modal.Header closeButton>
-                <Modal.Title>Purchace</Modal.Title>
+             <Modal.Header  className="modal-newuser__title modal-title" closeButton>
+                 Purchace
             </Modal.Header>
             <Modal.Body>
-                <div>
-                    <div>{this.props.confirmName}</div>
-                    <div>{this.props.confirmText}</div>
+                <div className="confirm__body">
+                    <img className="modal__loader" src={loader}></img>
+                    <div className="confirm__name">{this.props.confirmName}</div>
+                    <div className="confirm__text">{this.props.confirmText}</div>
                 </div>
             </Modal.Body>
         </Modal>

@@ -312,7 +312,7 @@ class NFTCollections extends Component {
                 this.handleShowSuccess(`${symbol} collection created`, `The contract creation was successful`)
             })
         } catch (error) {
-            alert(error)
+            alert(error) 
         }
     }
 
@@ -359,12 +359,7 @@ class NFTCollections extends Component {
             const res = await fetch(`${config.api}/nfts/collections`, requestOptions)
             const json = await res.json()
             this.setState({
-                //nftCollections: json.body.data
-                nftCollections: [
-                    {
-                        id: 1
-                    }
-                ]
+                nftCollections: json.body.data
             })
         } catch (error) {
             alert(error)
@@ -392,7 +387,7 @@ class NFTCollections extends Component {
     }
 
     handleCloseAddNFT = () => this.setState({showAddNFT: false})
-    handleShowAddNFT = (addNFTAddress) => this.setState({showAddNFT: true, addNFTAddress})
+    handleShowAddNFT = (addNFTAddress) => this.setState({showAddNFT: true, stageOfAddNft: 1, stageOfCreateNftCollection: 0, addNFTAddress,})
     handleShowConfirm = (confirmName, confirmText) => this.setState({showConfirm: true, confirmName, confirmText})
     handleCloseConfirm = () => this.setState({showConfirm: false, confirmName: null, confirmText: null})
     handleShowProgress = () => this.setState({showProgress: true})
@@ -456,12 +451,13 @@ class NFTCollections extends Component {
                         <span className="menu__subtitle">Creating new collection </span> 
                     </div>
                     {
-                        this.state.nftCollections.length && !this.state.stageOfAddNft ? <button onClick={this.handleShowCreate} type="button" className="btn btn_orange btn_primary">Create new collection</button> : null
+                        this.state.nftCollections?.length && !this.state.stageOfAddNft ? <button onClick={this.handleShowCreate} type="button" className="btn btn_orange btn_primary">Create new collection</button> : null
                     }
                 </div>
                 {
                      this.state.showCreate && this.state.stageOfCreateNftCollection === 1 
                     ?   <div className="content__wrap">
+                         <button onClick={this.connect} type="button" className="btn btn-dark">{this.state.address ? createLongStrView(this.state.address) : 'Connect'}</button>
                         <h4 className="menu__title-secondary mb-4">Specify the parameters of the new token</h4>
                             <div className="form__groups"> 
 
@@ -472,6 +468,15 @@ class NFTCollections extends Component {
                                             <input type="text" value={this.state.name} placeholder="Example: Treasures of the sea" onChange={this.onChangeName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                         </div>
                                     </div>
+                                    <div className="form_col_last form_col">
+                                        <label className="form-label">Symbol</label>
+                                        <div className="input-group">
+                                            <input type="text" value={this.state.symbol} placeholder="Example: TOS" onChange={this.onChangeSymbol} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="form_row">
                                     <div className="form_col_last form_col">
                                     <label className="form-label">Blockchain *</label>
                                     <div className="input-group">
@@ -500,9 +505,21 @@ class NFTCollections extends Component {
 
                                 <div className="form_row mb-4">
                                 <div className="form_col_action_left form_col_last form_col">
+                                {
+                                    (
+                                        !this.state.address
+                                        ||
+                                        this.state.name === null
+                                        ||
+                                        this.state.name === ''
+                                    )
+                                    ?
+                                    null
+                                    :
                                     <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.nextStage}>
                                         Next
                                     </button>
+                                }
                                 </div>
                         </div>
                             
@@ -562,13 +579,17 @@ class NFTCollections extends Component {
                                         <label className="form-label">Beneficial recipient:</label> 
                                         <div className="input-group">
                                         <div className="form-check custom-control custom-radio custom-control-inline">
-                                            <input type="radio" id="rd_1" name="rd" value="The company"/>
+                                            <input type="radio" name="rd" id="rd_1"  
+                                                value={beneficialTypes.company} checked={this.state.beneficialType === beneficialTypes.company}
+                                                onChange={this.onChangeBeneficialType}/>
                                             <label className="form-check-label custom-control-label green" for="rd_1">
                                             The company <img src={info} className="form__icon-info"/>
                                             </label>
                                         </div>
                                         <div className="form-check custom-control custom-radio custom-control-inline ms-3">
-                                            <input type="radio" id="rd_2" name="rd" value="First owner of a NFT" />
+                                            <input type="radio" name="rd" id="rd_2"
+                                                value={beneficialTypes.owner} checked={this.state.beneficialType === beneficialTypes.owner}
+                                                onChange={this.onChangeBeneficialType}   />
                                             <label className="form-check-label custom-control-label red" for="rd_2">
                                             First owner of a NFT <img src={info} className="form__icon-info"/>
                                             </label>
@@ -577,6 +598,31 @@ class NFTCollections extends Component {
                                     </div>
                                 </div>
                                 <div className="form_row mb-4">
+                              
+                                        {
+                                            this.state.beneficialType === beneficialTypes.company
+                                            ?
+                                            <div className="form_col">
+                                            <label className="form__label">Beneficiary address:</label>
+                                            <div className="input-group">
+                                                <input type="text" placeholder="Address" onChange={this.onChangeName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                            </div>
+                                            <div className="form__prompt" id="basic-addon4">Wallet for receiving commissions from re-sales of the collection items</div>
+                                        </div>
+                                            :
+                                            null
+                                        }
+                                     <div className="form_col_last form_col">
+                                    <label className="form__label">Resale royalties: <img src={info} className="form__icon-info"/></label>
+                                    <div className="input-group">
+                                    <input type="text" placeholder="20%" onChange={this.onChangeRoyalties} value={this.state.royalties}  min={0.5} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                    <div className="form__prompt" id="basic-addon4">Total creator earnings must be between 0.5% and 10%</div>
+                                </div>
+                                </div>
+                                {
+                                    /*
+                                    <div className="form_row mb-4">
                                 <div className="form_col">
                                     <label className="form__label">Beneficiary address:</label>
                                     <div className="input-group">
@@ -592,14 +638,30 @@ class NFTCollections extends Component {
                                     <div className="form__prompt" id="basic-addon4">Total creator earnings must be between 0.5% and 10%</div>
                                 </div>
                             </div>
+                                */}
                             <div className="form_row mb-4">
                             <div className="form_col_action_left form_col_last form_col">
                             <button className="btn btn_pre-sm  btn_primary btn_gray" onClick={this.prevStage}>
                                     Back
                                 </button>
-                                <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.nextStage}>
-                                    Next
-                                </button>
+
+                                {
+                                    (
+                                        this.state.royalties === null
+                                        ||
+                                        this.state.royalties === ''
+                                        ||
+                                        (
+                                            this.state.beneficialType === beneficialTypes.company ? 
+                                            !ethers.utils.isAddress(this.state.beneficialAddress) 
+                                            : false
+                                        )
+                                    )
+                                    ?
+                                    null
+                                    :
+                                    <button type="button" className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.nextStage}>Next</button>
+                                }
                             </div>
                          </div>
                             </div>
@@ -616,7 +678,7 @@ class NFTCollections extends Component {
                                         <div className="form_col_last form_col">
                                         <label className="form__label">Website</label>
                                         <div className="input-group">
-                                            <input type="text" placeholder="yourwebsite.io" onChange={this.onChangeSymbol} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                            <input type="text" placeholder="yourwebsite.io" value={this.state.website} onChange={this.onChangeWebsite} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                         </div>
                                         </div>
                             </div>
@@ -629,14 +691,14 @@ class NFTCollections extends Component {
                                             <div className="form_col">
                                         
                                                 <div className="input-group">
-                                                    <input type="text" placeholder="instagram" onChange={this.onChangeName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                    <input type="text" placeholder="instagram" value={this.state.instagram} onChange={this.onChangeInstagram}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                 </div>
                                         
                                             </div>
                                             <div className="form_col_last form_col">
                                             
                                                 <div className="input-group">
-                                                <input type="text" placeholder="Facebook" onChange={this.onChangeSymbol} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                <input type="text" placeholder="Facebook" value={this.state.facebook} onChange={this.onChangeFacebook} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                 </div>
                                             
                                             </div>
@@ -645,14 +707,14 @@ class NFTCollections extends Component {
                                             <div className="form_col">
                                         
                                                 <div className="input-group">
-                                                    <input type="text" placeholder="Telegram" onChange={this.onChangeName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                    <input type="text" placeholder="Telegram" value={this.state.telegram} onChange={this.onChangeTelegram} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                 </div>
                                         
                                             </div>
                                             <div className="form_col_last form_col">
                                             
                                                 <div className="input-group">
-                                                <input type="text" placeholder="Discord" onChange={this.onChangeSymbol} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                <input type="text" placeholder="Discord" alue={this.state.discord} onChange={this.onChangeDiscord} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                 </div>
                                             
                                             </div>
@@ -661,14 +723,14 @@ class NFTCollections extends Component {
                                             <div className="form_col">
                                         
                                                 <div className="input-group">
-                                                    <input type="text" placeholder="Medium" onChange={this.onChangeName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                    <input type="text" placeholder="Medium" value={this.state.medium} onChange={this.onChangeMedium} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                 </div>
                                         
                                             </div>
                                             <div className="form_col_last form_col">
                                             
                                                 <div className="input-group">
-                                                <input type="text" placeholder="Other" onChange={this.onChangeSymbol} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                <input type="text" placeholder="Other" value={this.state.other} onChange={this.onChangeOther} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                 </div>
                                             
                                             </div>
@@ -680,9 +742,7 @@ class NFTCollections extends Component {
                             <button className="btn btn_pre-sm  btn_primary btn_gray" onClick={this.prevStage}>
                                     Back
                                 </button>
-                                <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={() => {
-                                    this.createNFTCollection()
-                                    }}>
+                                <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.createNFTCollection}>
                                     Create
                                 </button>
                             </div>
@@ -759,7 +819,7 @@ class NFTCollections extends Component {
                     </button>
                     </Modal.Footer>
                 </Modal>*/}
-                <Modal show={this.state.showCreateImagesPage} onHide={this.handleCloseCreateImagesPage}>
+                {/*<Modal show={this.state.showCreateImagesPage} onHide={this.handleCloseCreateImagesPage}>
                     <Modal.Header closeButton>
                         <Modal.Title>Collection graphics</Modal.Title>
                     </Modal.Header>
@@ -802,8 +862,8 @@ class NFTCollections extends Component {
                             this.handleShowCreate()
                         }}>Back</button>
                     </Modal.Footer>
-                </Modal>
-                <Modal show={this.state.showCreateBeneficialPage} onHide={this.handleCloseCreateBeneficialPage}>
+                    </Modal>*/}
+                {/*<Modal show={this.state.showCreateBeneficialPage} onHide={this.handleCloseCreateBeneficialPage}>
                     <Modal.Header closeButton>
                         <Modal.Title>
                             Beneficial owner
@@ -935,7 +995,7 @@ class NFTCollections extends Component {
                         }}>Back</button>
                     </Modal.Footer>
                 </Modal>
-                {/*<Modal show={this.state.showAddNFT} onHide={this.handleCloseAddNFT} centered>
+                <Modal show={this.state.showAddNFT} onHide={this.handleCloseAddNFT} centered>
                     <Modal.Header closeButton>
                     <Modal.Title>Add NFT</Modal.Title>
                     </Modal.Header>
@@ -1009,20 +1069,19 @@ class NFTCollections extends Component {
                     </table>
                         </div>*/}
                         {
-                            this.state.nftCollections.length && !this.state.showAddNFT && !this.state.showCreate ?  
+                            this.state.nftCollections?.length && !this.state.showAddNFT && !this.state.showCreate ?  
                             <div className="content__wrap">
                             <FPTable data={nftsTable}>
                                 {
                                     this.state.nftCollections.map(v => {
                                         return<tr>
                                             <td>
-                                            <img src={customTokeSymbol}></img>
-                                              <div>
-                                                  {v.symbol}
-                                              </div>
-                                              <div>
-                                                  {v.name}
-                                              </div>
+                                            <div className="nft__collection-name">
+                                                <img src={customTokeSymbol}></img>
+                                                <span>
+                                                    {v.symbol} collection
+                                                </span>
+                                            </div>
                                             </td>
                                             <td>
                                                 (soon)
@@ -1050,12 +1109,12 @@ class NFTCollections extends Component {
                                             <label className="form-label">Collection:</label>
                                             <div className="input-group">
                                                 <select onChange={this.changeNetwork} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                                    <option value={config.status === "test" ? '5' : '1'} selected={this.state.network.chainid === (config.status === "test" ? '5' : '1')}>{networks[config.status === "test" ? '5' : '1'].name}</option>
-                                                    <option value={config.status === "test" ? '97' : '56'} selected={this.state.network.chainid === (config.status === "test" ? '97' : '56')}>{networks[config.status === "test" ? '97' : '56'].name}</option>
-                                                    <option value={config.status === "test" ? '80001' : '137'} selected={this.state.network.chainid === (config.status === "test" ? '80001' : '137')}>{networks[config.status === "test" ? '80001' : '137'].name}</option>
-                                                    <option value={config.status === "test" ? '420' : '10'} selected={this.state.network.chainid === (config.status === "test" ? '420' : '10')} disabled={config.status === "test" ? true : false} >{networks[config.status === "test" ? '420' : '10'].name}</option>
-                                                    <option value={config.status === "test" ? '43113' : '43114'} selected={this.state.network.chainid === (config.status === "test" ? '43113' : '43114')}>{networks[config.status === "test" ? '43113' : '43114'].name}</option>
-                                                    <option value={config.status === "test" ? '421613' : '42161'} selected={this.state.network.chainid === (config.status === "test" ? '421613' : '42161')}>{networks[config.status === "test" ? '421613' : '42161'].name}</option>
+                                                    {
+                                                        this.state.nftCollections.map(v => {
+                                                            return <option value={v.symbol} selected>{v.symbol}</option>
+                                                        })
+                                                    }
+                                                   
                                                 </select>
                                             </div>
                                             <div className="form__prompt" id="basic-addon4">This is the collection where your item will appear</div>
@@ -1115,7 +1174,7 @@ class NFTCollections extends Component {
                                                 <div className="form_col">
                                                     <label className="form__label">Name *:</label>
                                                     <div className="input-group">
-                                                        <input type="text" placeholder="Item name" onChange={this.onChangeName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                        <input type="text" placeholder="Item name" onChange={this.onChangeAddNFTName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                     </div>
                                                 </div>
                                                 <div className="form_col_last form_col">
@@ -1131,7 +1190,7 @@ class NFTCollections extends Component {
                                                 <div className="form_col_last form_col">
                                                     <label className="form-label">Description: </label>
                                                     <div className="input-group">
-                                                        <textarea type="text" value={this.state.description} onChange={this.onChangeDescription} className="form__textarea form__textarea_desct-nft-collection" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
+                                                        <textarea type="text" value={this.state.description} onChange={this.onChangeAddNFTDescription} className="form__textarea form__textarea_desct-nft-collection" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
                                                     </div>
                                                     <div className="form__prompt" id="basic-addon4"> 
                                                         The description will be included on the item's detail page underneath its image. <a className="link__form-prompt" href="https://www.markdownguide.org/cheat-sheet/" target="blank">Markdown</a> syntax is supported.
@@ -1274,7 +1333,7 @@ class NFTCollections extends Component {
                                             <button className="btn btn_pre-sm  btn_primary btn_gray" onClick={this.prevStageAddNft}>
                                                     Back
                                                 </button>
-                                                <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.nextStage}>
+                                                <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.createNFT}>
                                                     Create
                                                 </button>
                                             </div>

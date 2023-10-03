@@ -6,15 +6,24 @@ class ErrorModal extends Component {
         super(props)
     }
 
+    entering() {
+        const mint = document.getElementById('mint')
+        const modal = mint.parentElement
+        modal.style.zIndex = '1049'
+        console.log('test', mint.parentElement)
+    }
+
+    entering = this.entering.bind(this)
+
     render() {
-        return <Modal show={this.props.showError} onHide={this.props.handleCloseError} centered>
-            <Modal.Header closeButton>
-                <Modal.Title>Purchace</Modal.Title>
+        return <Modal onEntering={this.entering} show={this.props.showError} onHide={this.props.handleCloseError} centered>
+             <Modal.Header  className="modal-newuser__title modal-title" closeButton>
+                 Purchace
             </Modal.Header>
             <Modal.Body>
-                <div>
-                    <div>Error</div>
-                    <div>{this.props.errorText}</div>
+                <div className="confirm__body">
+                    <div className="confirm__name">Error</div>
+                    <div className="confirm__text">{this.props.errorText}</div>
                 </div>
             </Modal.Body>
         </Modal>

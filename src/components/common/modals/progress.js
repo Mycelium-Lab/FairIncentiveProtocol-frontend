@@ -8,8 +8,8 @@ class ProgressModal extends Component {
 
     render() {
         return <Modal show={this.props.showProgress} onHide={this.props.handleCloseProgress} centered>
-            <Modal.Header closeButton>
-                <Modal.Title>Purchace</Modal.Title>
+             <Modal.Header  className="modal-newuser__title modal-title" closeButton>
+                 Purchace
             </Modal.Header>
             <Modal.Body>
                 <div>

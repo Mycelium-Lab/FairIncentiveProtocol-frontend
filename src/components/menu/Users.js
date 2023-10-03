@@ -718,7 +718,7 @@ class Users extends Component {
                         <div className="mb-4">
                             <label className="form__label">Username or external ID:</label>
                             <div className="input-group">
-                                <input type="text" placeholder="Username" onChange={this.onChangeExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                <input type="text" placeholder="e.g. Joe" onChange={this.onChangeExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
                             <div className="form__prompt" id="basic-addon4">Specify the user ID for API calls or it will be generated automatically</div>
                         </div>
@@ -732,7 +732,7 @@ class Users extends Component {
                         <div className="mb-4">
                             <label className="form__label">Wallet: <img className="form__icon-info" src={info} /></label>
                             <div className="input-group">
-                                <input placeholder="0xhjfg7...9fdf" type="text" onChange={this.onChangeWallet} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                <input placeholder="0x0000000000000000000000000000000000000000" type="text" onChange={this.onChangeWallet} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
                             <div className="form__prompt" id="basic-addon4">Specify ethereum wallet to receive rewards</div>
                         </div>
@@ -899,16 +899,22 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                                         (soon)
                                     </td>
                                     <td>
-                                        <div>
-                                            NFTs: {v.nft_rewards ? v.nft_rewards.map((reward, i, arr) => 
-                                                `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
-                                            ): null}
-                                        </div>
-                                        <div>
-                                            Tokens: {v.token_rewards ? v.token_rewards.map((reward, i, arr) => 
-                                                `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
-                                            ): null}
-                                        </div>
+                                        {
+                                            v.nft_rewards?.length && v.token_rewards?.length 
+                                            ? <>
+                                                <div>
+                                                    {v.nft_rewards?.length ? v.nft_rewards.map((reward, i, arr) => 
+                                                    `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
+                                                        ): null}
+                                                    </div>
+                                                    <div>
+                                                        Tokens: {v.token_rewards?.length ? v.token_rewards.map((reward, i, arr) => 
+                                                            `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
+                                                        ): null}
+                                                    </div>
+                                                </>
+                                        : '-'
+                                        }
                                     </td>
                                     <td>
                                         <FPDropdown icon={more}>
