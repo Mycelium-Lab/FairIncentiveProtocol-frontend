@@ -5,7 +5,7 @@ class FPDropdown extends Component {
     constructor(props) {
         super(props)
     }
-    componentDidMount(){
+    /*componentDidMount(){
         if(this.props.isTransformIcon) {
             document.addEventListener('click', this.handleDocumnet)
         }
@@ -36,15 +36,15 @@ class FPDropdown extends Component {
         else {
             chevron.style.transform = `rotate(180deg)`
         }
-    }
+    }*/
 
     handleLogout() {
         this.props.emit.logout()
     }
     
-    rotateChevron = this.rotateChevron.bind(this)
-    handleDocumnet = this.handleDocumnet.bind(this)
-    handleLogout = this.handleLogout.bind(this)
+    //rotateChevron = this.rotateChevron.bind(this)
+    //handleDocumnet = this.handleDocumnet.bind(this)
+    //handleLogout = this.handleLogout.bind(this)
 
     render() {
         const {label, children, icon} = this.props
