@@ -918,7 +918,7 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                                     </td>
                                     <td>
                                         <FPDropdown icon={more}>
-                                            <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowStats(v)}>Stat</Dropdown.Item>
+                                            <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowStats(v)} disabled>Stat</Dropdown.Item>
                                             <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowEdit(v)}>Edit</Dropdown.Item>
                                             <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowToReward(v.external_id, v.id)}>To reward</Dropdown.Item>
                                             <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowDelete(v.external_id, v.id)}>Delete</Dropdown.Item>
