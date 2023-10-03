@@ -50,11 +50,11 @@
 }
 
 .menu-list__item:hover path{
-    fill: map-get($theme-colors, "activeTab") !important;   
+    fill: map-get($theme-colors, "activeTab");   
 }
 
 .menu-list__item:hover .menu-list__item-name{
-    color: map-get($theme-colors, "activeTab") !important;   
+    color: map-get($theme-colors, "activeTab");   
 }
 
 .menu-list__item-name{
@@ -63,7 +63,7 @@
 
 .menu-list__item_active{
     background: map-get($theme-colors, "activeTab");
-    color: map-get($theme-colors, "white") !important;
+    color: map-get($theme-colors, "white") ;
 }
 
 .menu-list__item_active svg path {
