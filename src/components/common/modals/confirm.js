@@ -14,8 +14,10 @@ class ConfirmModal extends Component {
             <Modal.Body>
                 <div className="confirm__body">
                     <img className="modal__loader" src={loader}></img>
-                    <div className="confirm__name">{this.props.confirmName}</div>
-                    <div className="confirm__text">{this.props.confirmText}</div>
+                    <div>
+                        <div className="confirm__name">{this.props.confirmName}</div>
+                        <div className="confirm__text">{this.props.confirmText}</div>
+                    </div>
                 </div>
             </Modal.Body>
         </Modal>

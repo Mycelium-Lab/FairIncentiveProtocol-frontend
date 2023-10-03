@@ -15,8 +15,10 @@ class SuccessModal extends Component {
             <Modal.Body>
                 <div className="confirm__body">
                     <img src={success}></img>
-                    <div className="confirm__name">{this.props.successName}</div>
-                    <div className="confirm__text">{this.props.successText}</div>
+                    <div>
+                        <div className="confirm__name">{this.props.successName}</div>
+                        <div className="confirm__text">{this.props.successText}</div>
+                    </div>
                 </div>
             </Modal.Body>
         </Modal>

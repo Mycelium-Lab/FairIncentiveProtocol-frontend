@@ -64,6 +64,10 @@
     padding-bottom: 40px;
 }
 
+.confirm__text_red{
+    color: map-get($theme-colors, "errorSecondary");
+}
+
 .confirm__body{
     display: flex;
     flex-direction: column;
