@@ -18,6 +18,9 @@
     color: map-get($theme-colors, "warning");
 }
 
+.form__prompt_error{
+    color: map-get($theme-colors, "errorSecondary");
+}
 .form__icon-info{
     margin-left: 6px;
     margin-bottom: 2px;
@@ -193,4 +196,31 @@ input[type="checkbox"] {
 
 .form__textarea_email{
     height: 102px;
+}
+
+.input-group_card{
+    gap: 8px;
+}
+
+.form_row_relative{
+    position: relative;
+}
+
+.form-control_wide{
+    flex: 3 !important;
+}
+
+.form-control_with_image{
+    padding-left: 50px !important;
+}
+
+.credit-card__image, .cardholder__image{
+    position: absolute;
+    top: calc(18%);
+    left: 1rem;
+    z-index: 10;
+}
+
+.cardholder__image{
+    top: calc(20%);
 }

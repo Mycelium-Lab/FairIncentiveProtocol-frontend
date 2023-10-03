@@ -9,11 +9,13 @@ import { checkAuth } from './utils/checkAuth';
 import MainScreen from './MainScreen';
 import splitText from './utils/textFormatting/splitText';
 import capitalize from './utils/textFormatting/capitalize';
+import Forgot from './components/auth/forgot';
 
 const switcher = {
   signup: 'signup',
   signin: 'signin',
-  signed: 'signed'
+  signed: 'signed',
+  forgot: 'forgot'
 }
 
 class App extends Component {
@@ -31,22 +33,23 @@ class App extends Component {
     if (checker) this.setState({switcher: switcher.signed, auth: checker.body.data})
   }
 
-  switch(event) {
+  switch(event, value) {
       this.setState({
-          switcher: this.state.switcher === switcher.signup ? switcher.signin : switcher.signup
+          switcher: value
       })
       event.target.textContent = this.state.switcher.toUpperCase()
   }
 
   switch = this.switch.bind(this)
 
-      formatText() {
-        const splited = splitText(this.state.switcher, 'sign')
+      formatText(text) {
+        const splited = splitText(text, 'sign')
         return capitalize(splited)
       }
       getWindow() {
-      if (this.state.switcher === switcher.signin) return <SignIn switcher={switcher.signup} switcherText={this.formatText()} switch={this.switch}/>
-      if (this.state.switcher === switcher.signup) return <SignUp switcher={switcher.signup} switcherText={this.formatText()} switch={this.switch}/>
+      if (this.state.switcher === switcher.signin) return <SignIn switcher={{signup: switcher.signup, forgot: switcher.forgot}} switcherText={this.formatText(switcher.signup)} switch={this.switch}/>
+      if (this.state.switcher === switcher.signup) return <SignUp switcher={switcher.signin} switcherText={this.formatText(switcher.signin)} switch={this.switch}/>
+      if (this.state.switcher === switcher.forgot) return <Forgot/>
       return <MainScreen auth={this.state.auth}/>
   }
 

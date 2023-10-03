@@ -2,7 +2,7 @@ import { Component } from "react";
 import { config } from "../../utils/config";
 import { getBearerHeader } from "../../utils/getBearerHeader";
 import ErrorModal from "../common/modals/error";
-import SuccessModal from "../common/modals/success";
+import SuccessModal from "../common/modals/updateCard";
 import { Dropdown, Modal, Tab, Tabs } from "react-bootstrap";
 import FileUpload from "../FileUpload";
 import drug_drop from '../../media/settings/drug_drop.svg'
@@ -11,8 +11,11 @@ import info from '../../media/settings/info_small_gray.svg'
 import info_black from '../../media/common/info-small.svg'
 import FPTable from "../common/FPTable";
 import more from '../../media/common/more.svg'
+import creditCard from '../../media/common/credit-card.svg'
+import cardholder from '../../media/common/cardholder.svg'
 import { billingHistoryTable, paymentMethodsTable, teamTable } from "../../data/tables";
 import FPDropdown from "../common/FPDropdown";
+import countries from "../../data/countries";
 
 class Settings extends Component {
 
@@ -29,7 +32,8 @@ class Settings extends Component {
             showMakePayment: false,
             showInvite: false,
             changeMemberRole: false,
-            removeFromTeam: false
+            removeFromTeam: false,
+            showAddPaymentMethod: false
         }
     }
 
@@ -203,11 +207,22 @@ class Settings extends Component {
         }
     }
 
+    handleAddNewPayment() {
+        this.setState({showAddPaymentMethod: false})
+        this.handleShowSuccess('The default card has been changed', 'We will automatically charge your default card at the close of the current billing period.')
+    }
     handleShowMakePayment() {
         this.setState({showMakePayment: true})
     }
     handleCloseMakePayment() {
         this.setState({showMakePayment: false})
+    }
+
+     handleShowAddPaymentMethod() {
+        this.setState({showAddPaymentMethod: true})
+    }
+    handleCloseAddPaymentMethod() {
+        this.setState({showAddPaymentMethod: false})
     }
 
     handleShowInvite() {
@@ -236,6 +251,9 @@ class Settings extends Component {
     handleShowError = (errorText) => this.setState({showError: true, errorText})
     handleCloseError = () => this.setState({showError: false})
 
+    handleAddNewPayment  = this.handleAddNewPayment.bind(this)
+    handleShowAddPaymentMethod = this.handleShowAddPaymentMethod.bind(this)
+    handleCloseAddPaymentMethod = this.handleCloseAddPaymentMethod.bind(this)
     handleCloseRemoveFromTeam = this.handleCloseRemoveFromTeam.bind(this)
     handleShowRemoveFromTeam = this.handleShowRemoveFromTeam.bind(this)
     handleCloseChangeMemeberRole = this.handleCloseChangeMemeberRole.bind(this)
@@ -448,7 +466,7 @@ class Settings extends Component {
                                 <div className="content__wrap">
                                     <div className="title-header mb-4">
                                         <h4 className="menu__title-secondary-payment menu__title-secondary mb-4">Payment methods</h4>
-                                        <button type="button" className="btn btn_orange btn_primary">Add a payment method </button>
+                                        <button type="button" onClick={this.handleShowAddPaymentMethod} className="btn btn_orange btn_primary">Add a payment method </button>
                                     </div>
                                     <FPTable data={paymentMethodsTable}>
                                             <tr>
@@ -613,10 +631,76 @@ class Settings extends Component {
                         Cancel
                     </button>
                     <button className="btn btn_primary btn_orange">
-                        Submit Payment
+                        Submit payment
                     </button>
                     </Modal.Footer>
                 </Modal>
+
+                <Modal show={this.state.showAddPaymentMethod} onHide={this.handleCloseAddPaymentMethod} centered>
+                    <Modal.Header  className="modal-newuser__title modal-title" closeButton>
+                    Add a new payment method
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div className="modal-subtitle mb-4">
+                        We accept Visa, Mastercard, American Express, UnionPay, MIR, and Discover credit cards.
+                        </div>
+                        <div className="modal-subtitle mb-4">
+                        You may see a temporary authorization hold on your card, which your bank should release soon. Digital Ocean does not charge you until you start using paid services.
+                        </div>
+                        <div className="form_row_relative form_row mb-2">
+                                <div className="form_col_last form_col">
+                                <label className="form__label">Card</label>
+                                    <div className="input-group__add_payment input-group_card input-group">
+                                    <img className="credit-card__image" src={creditCard}></img>
+                                    <input type="text" placeholder="Card number" className="form-control_with_image form-control_wide form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    <input type="text" placeholder="MM/YY" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    <input type="number" placeholder="CVC" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                </div>
+                         </div>
+
+                         <div className="form_row_relative form_row mb-4">
+                         <div className="form_col_last form_col">
+                                    <img className="cardholder__image" src={cardholder}></img>
+                                    <div className="input-group">
+                                    <input type="number" placeholder="Cardholder name" className="form-control_with_image form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                </div>
+                         </div>
+
+                         <div className="form_row_relative form_row mb-4">
+                                <div className="form_col_last form_col">
+                                <div className="input-group__add_payment input-group mb-2">
+                                                    <label className="form__label">Billing address</label>
+
+                    <label className="modal-subtitle mb-3">Please provide the billing address associated with the card you've provided.</label>
+                    <select className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                {
+                                                countries.map(v => {
+                                                    return <option value={v.name} selected={v.name === 'Thailand'}>
+                                                        {v.name}
+                                                    </option>
+                                                })
+                                            }
+                            </select>
+                                </div>
+                                    <div className="input-group__add_payment input-group">
+                                    <input type="text" placeholder="Street name" className="form-control_wide form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                </div>
+                         </div>
+
+                    </Modal.Body>
+                    <Modal.Footer>
+                    <button className="btn btn_primary btn_gray" onClick={this.handleCloseAddPaymentMethod}>
+                        Cancel
+                    </button>
+                    <button onClick={this.handleAddNewPayment} className="btn btn_primary btn_orange">
+                        Submit payment
+                    </button>
+                    </Modal.Footer>
+                </Modal>
+                
                 <Modal show={this.state.showInvite} onHide={this.handleCloseInvite} centered>
                     <Modal.Header  className="modal-newuser__title modal-title" closeButton>
                     Invite team members

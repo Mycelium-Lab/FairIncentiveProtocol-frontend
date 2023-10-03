@@ -63,4 +63,16 @@
     .auth__form-action-group-text, .auth-switcher{
         font-size: map-get($theme-fontSize-mobile, "subtitle") !important;
     }
+    .auth__form-subtitle_forgot{
+        width: 316px;
+    }
+    .auth__form-title_sent {
+        width: 205.04px;
+        text-align: center;
+        line-height: 36px;
+        margin-bottom: 17px !important;
+    }
+    .auth__form-subtitle_forgot{
+        margin-bottom: 17px !important;
+    }
 }
