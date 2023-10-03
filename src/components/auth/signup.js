@@ -2,6 +2,8 @@ import { Component } from "react";
 import { Button, Container, Form, FormGroup } from "react-bootstrap";
 import DefaultAuth from "../../layouts/defaultAuth";
 import { config } from "../../utils/config"
+import email from "../../media/common/email.svg";
+import passwordHide from "../../media/common/password_hide.svg";
 
 const steps = {
     step1: "1",
@@ -19,7 +21,10 @@ class SignUp extends Component {
             phone: '',
             country: '',
             repname: '',
-            current_step: steps.step1
+            current_step: steps.step1,
+            isInvalidEmail: false,
+            isInvalidPassword: false,
+            isInvalidRepeatPassword: false
         }
     }
 
@@ -94,21 +99,56 @@ class SignUp extends Component {
     }
 
     onChangeEmail(event) {
-        this.setState({
-            email: event.target.value
-        })
+        const validateEmail = (email) => {
+            if(!email) {
+                return true
+            }
+            return email.match(
+              /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+            );
+          };
+        
+        if(validateEmail(event.target.value)) {
+            this.setState({
+                email: event.target.value,
+                isInvalidEmail: false
+            })
+        }
+        else{
+            this.setState({
+                isInvalidEmail: true
+            })
+        }
     }
 
     onChangePassword(event) {
-        this.setState({
-            password: event.target.value
-        })
+        if(event.target.value.length < 8 && event.target.value.length) {
+            this.setState({
+                password: event.target.value,
+                isInvalidPassword: true
+            })
+        }
+        else {
+            this.setState({
+                password: event.target.value,
+                isInvalidPassword: false
+            })
+        }
     }
 
     onChangeRepeatPassword(event) {
-        this.setState({
-            repeat_password: event.target.value
-        })
+        if(event.target.value.length < 8 && event.target.value.length) {
+            this.setState({
+               repeat_password: event.target.value,
+               isInvalidRepeatPassword: true
+            })
+        }
+        else {
+            this.setState({
+                repeat_password: event.target.value,
+                isInvalidRepeatPassword: false
+            })
+        }
     }
 
     onChangePhone(event) {
@@ -117,8 +157,8 @@ class SignUp extends Component {
         })
     }
 
-    handleSwitch(event) {
-        this.props.switch(event)
+    handleSwitch(event, value) {
+        this.props.switch(event, value)
     }
 
     handleSwitch = this.handleSwitch.bind(this)
@@ -180,19 +220,58 @@ class SignUp extends Component {
                                     <Form.Control className='auth__form-fields-input' value={this.state.phone} id="companyphone-input-signup" onChange={this.onChangePhone} placeholder="Enter your phone number" />
                                 </FormGroup>
 
-                                <FormGroup>
-                                    <Form.Label className='auth__form-fields-label'>Email</Form.Label>
-                                    <Form.Control className='auth__form-fields-input' value={this.state.email} id="companyemail-input-signup" onChange={this.onChangeEmail} type='email' placeholder='Email' />
+                                <FormGroup className="form__signin">
+                                {
+                                        this.state.isInvalidEmail ? 
+                                        <>
+                                            <Form.Label className='auth__form-fields-label'>Email</Form.Label>
+                                                <img className="form__signin-icon-email_error form__signin-icon-email" src={email}></img>
+                                            <Form.Control className='auth__form-fields-input_error auth__form-fields-input' onChange={this.onChangeEmail} type="email" placeholder="Email" />
+                                            <span className="form__prompt_error form__prompt" id="basic-addon4">Invalid email format. Example: example@gmail.com</span>
+                                        </>
+                                        : 
+                                        <>
+                                            <Form.Label className='auth__form-fields-label'>Email</Form.Label>
+                                                <img className="form__signin-icon-email" src={email}></img>
+                                                <Form.Control className='auth__form-fields-input' onChange={this.onChangeEmail} type="email" placeholder="Email" />
+                                        </> 
+                                }
                                 </FormGroup>
 
-                                <FormGroup>
-                                    <Form.Label className='auth__form-fields-label'>Password</Form.Label>
-                                    <Form.Control className='auth__form-fields-input' value={this.state.password} id="companypassword-input-signup" onChange={this.onChangePassword} type='password' placeholder='Enter your password' />
+                                <FormGroup className="form__signin">
+                                    {
+                                        this.state.isInvalidPassword ?
+                                        <>
+                                            <Form.Label className='auth__form-fields-label'>Password</Form.Label>
+                                            <img className="form__signin-icon-password_error form__signin-icon-password" src={passwordHide}></img>
+                                            <Form.Control className='auth__form-fields-input_error auth__form-fields-input' value={this.state.password} id="companypassword-input-signup" onChange={this.onChangePassword} type='password' placeholder='Enter your password' />
+                                            <span className="form__prompt_error form__prompt" id="basic-addon4">Wrong password</span>
+                                        </> 
+                                        : 
+                                        <>
+                                        <Form.Label className='auth__form-fields-label'>Password</Form.Label>
+                                        <img className="form__signin-icon-password" src={passwordHide}></img>
+                                        <Form.Control className='auth__form-fields-input' value={this.state.password} id="companypassword-input-signup" onChange={this.onChangePassword} type='password' placeholder='Enter your password' />
+                                        </>
+                                    }
                                 </FormGroup>
 
-                                <FormGroup>
-                                    <Form.Label className='auth__form-fields-label'>Repeat password</Form.Label>
-                                    <Form.Control className='auth__form-fields-input' value={this.state.repeat_password} id="companyreppassword-input-signup" onChange={this.onChangeRepeatPassword} type='password' placeholder='Repeat your password' />
+                                <FormGroup className="form__signin">
+                                {
+                                        this.state.isInvalidRepeatPassword ?
+                                        <>
+                                            <Form.Label className='auth__form-fields-label'>Repeat password</Form.Label>
+                                            <img className="form__signin-icon-password_error form__signin-icon-password" src={passwordHide}></img>
+                                            <Form.Control className='auth__form-fields-input_error auth__form-fields-input' value={this.state.repeat_password} id="companyreppassword-input-signup" onChange={this.onChangeRepeatPassword} type='password' placeholder='Repeat your password' />
+                                            <span className="form__prompt_error form__prompt" id="basic-addon4">Wrong password</span>
+                                        </> 
+                                        : 
+                                        <>
+                                        <Form.Label className='auth__form-fields-label'>Password</Form.Label>
+                                        <img className="form__signin-icon-password" src={passwordHide}></img>
+                                        <Form.Control className='auth__form-fields-input' value={this.state.repeat_password} id="companyreppassword-input-signup" onChange={this.onChangeRepeatPassword} type='password' placeholder='Repeat your password' />
+                                        </>
+                                    }
                                 </FormGroup>
 
                                 </Form>
@@ -203,18 +282,22 @@ class SignUp extends Component {
                                 this.state.current_step === steps.step1
                                 ?
                                 <div className="auth__form-action-group-btn">
-                                    <Button onClick={this.goToStep1} className='auth__form-action-btn_back auth__form-action-btn w-50'>Back</Button>
+                                    <Button onClick={(ev) => this.handleSwitch(ev, switcher)} className='auth__form-action-btn_back auth__form-action-btn w-50'>Back</Button>
                                     <Button onClick={this.goToStep2} className="auth__form-action-btn w-50">Next</Button>
                                 </div>
                                 :
+                                
                                 <div className="auth__form-action-group-btn">
                                     <Button onClick={this.goToStep1} className='auth__form-action-btn_back auth__form-action-btn w-50'>Back</Button>
-                                    <Button onClick={this.createAccount} className="auth__form-action-btn w-50">Sign Up</Button>
+                                    {
+                                     this.state.isInvalidEmail || this.state.isInvalidPassword || this.state.isInvalidRepeatPassword || !this.state.repeat_password || !this.state.email.length || !this.state.password.length ?  <Button disabled onClick={this.createAccount}  className='auth__form-action-btn_disabled auth__form-action-btn w-50'>Sign Up</Button>
+                                     : <Button  onClick={this.createAccount}  className='auth__form-action-btn w-50'>Sign Up</Button>
+                                    }
                                 </div>
                             }
                             <div className="auth__form-action-group">
                                 <span className="auth__form-action-group-text">Don't have an account?</span>
-                                <Button onClick={this.handleSwitch} value={switcher} className="auth-switcher">{switcherText}</Button>
+                                <Button onClick={(ev) => this.handleSwitch(ev, switcher)} value={switcher} className="auth-switcher">{switcherText}</Button>
                             </div>
                         </div>
                     </div>
