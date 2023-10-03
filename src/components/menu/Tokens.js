@@ -926,26 +926,26 @@ class Tokens extends Component {
                                         </label>
                                     </div>
                                     <div className="form-check">
-                                        <input onChange={() => this.onChangeBurnable(this.state.burnable ? false : true)} checked={this.state.burnable} type="checkbox" value="" id="flexCheckDefault"/>
-                                        <label className="form-check-label" for="flexCheckDefault">
+                                        <input onChange={() => this.onChangeBurnable(this.state.burnable ? false : true)} checked={this.state.burnable} type="checkbox" value="" id="burnable"/>
+                                        <label className="form-check-label" for="burnable">
                                             Burnable <img src={info} className="form__icon-info"/>
                                         </label>
                                     </div>
                                     <div className="form-check">
-                                        <input onChange={() => this.onChangeBlacklist(this.state.blacklist ? false : true)} checked={this.state.blacklist} type="checkbox" value="" id="flexCheckChecked"/>
-                                        <label className="form-check-label" for="flexCheckChecked">
+                                        <input onChange={() => this.onChangeBlacklist(this.state.blacklist ? false : true)} checked={this.state.blacklist} type="checkbox" value="" id="blacklist"/>
+                                        <label className="form-check-label" for="blacklist">
                                             Blacklist <img src={info} className="form__icon-info" />
                                         </label>
                                     </div>
                                     <div className="form-check">
-                                        <input onChange={() => this.onChangeVerified(this.state.verified ? false : true)} checked={this.state.verified}  type="checkbox" value="" id="flexCheckChecked"/>
-                                        <label className="form-check-label" for="flexCheckChecked">
+                                        <input onChange={() => this.onChangeVerified(this.state.verified ? false : true)} checked={this.state.verified}  type="checkbox" value="" id="verifiedOnEtherscan"/>
+                                        <label className="form-check-label" for="verifiedOnEtherscan">
                                             Verified on Etherscan <img src={info} className="form__icon-info"/>
                                         </label>
                                     </div>
                                     <div className="form-check">
-                                        <input onChange={() => this.onChangeRecoverable(this.state.recoverable ? false : true)} checked={this.state.recoverable} type="checkbox" value="" id="flexCheckChecked"/>
-                                        <label className="form-check-label" for="flexCheckChecked">
+                                        <input onChange={() => this.onChangeRecoverable(this.state.recoverable ? false : true)} checked={this.state.recoverable} type="checkbox" value="" id="recoverable"/>
+                                        <label className="form-check-label" for="recoverable">
                                             Recoverable <img src={info} className="form__icon-info"/>
                                         </label>
                                     </div>
