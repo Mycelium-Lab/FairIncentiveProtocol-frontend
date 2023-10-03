@@ -1,0 +1,69 @@
+.notification__item{
+    border: 1px solid #E7E7E7;
+    border-radius: 8px;
+    display: flex;
+    gap: 12px;
+    padding: 8px 9px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.notification__item-desc{
+    display: flex;
+    flex-direction: column;
+}
+
+.notification__item-time{
+    color: #BDBDBD;
+    font-size: map-get($theme-fontSize, "caption");
+    line-height: 16.2px;
+}
+
+.notification__item-message{
+    color: #000000;
+    font-size: 15px;
+    word-wrap: break-word;
+}
+.notification__item-message_semimedium{
+    font-weight: 600;
+}
+
+.notification__item-message_primary{
+    font-size: map-get($theme-fontSize, "primary");
+    color: #333333;
+    font-weight: 400;
+}
+.notification__item-messag_gray{
+    color: #989C9E;
+    font-weight: 400;
+}
+
+.dropdown__menu-item-notification-img{
+    width: 34px;
+    height: 34px;
+}
+
+.dropdown__notification__item {
+    border: none;
+    border-radius: 0px;
+}
+
+.dropdown__notification_top{
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+}
+.dropdown__notification__item{
+    padding: 12px;
+}
+
+.dropdown__menu-item_view{
+    text-align: center;
+    color: #333333;
+    border-bottom: 0px;
+}
+
+.dropdown__menu-item-notification-name{
+    font-size: map-get($theme-fontSize, "primary");
+    color: #212B36;
+}

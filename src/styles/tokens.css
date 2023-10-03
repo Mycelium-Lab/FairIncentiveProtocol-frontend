@@ -1,9 +1,0 @@
-.checks-contracts-types {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-
-.mint-token-info-list li {
-    margin-bottom: 4px;
-}

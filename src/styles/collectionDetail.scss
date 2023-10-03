@@ -1,0 +1,104 @@
+.collection-detail__wrap{
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.profile__cover{
+    position: relative;
+    background-image: url('../media/collectionDetail/default-profile-head.png');
+    height: 200px;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.profile__photo{
+    top: 50%;
+    left: 24px;
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+    background-color: map-get($theme-colors, "white");;
+}
+
+.profile__social{
+    padding-top: 53px;
+}
+.profile__social-list{
+    display: flex;
+    justify-content: end;
+    gap: 24px;
+    margin-bottom: 0px;
+}
+.profile__social-item{
+    cursor: pointer;
+}
+
+.profile__decs{
+   max-width: 765px;
+}
+
+.profile__decs_stats{
+    display: flex;
+    margin: 8px 0px;
+    gap: 8px;
+}
+.profile__decs_stats-item{
+    margin: 0px;
+    position: relative;
+}
+
+.profile__decs_stats-item_decor::before{
+    content: '\2022';
+    display: block;
+    font-size: 8px;
+    color: rgba(119, 119, 119, 1);
+    line-height: 18px;        
+    position: absolute;
+    top: 4px;
+    left: -6px;
+}
+
+.profile__nfts-list{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.profile__nfts-list-item{
+    width: 230px;
+    cursor: pointer;
+}
+
+.profile__nfts-card{
+    border: 1px solid rgba(232, 235, 237, 1);
+    box-shadow: 0px 4px 4px 0px rgba(237, 237, 237, 0.25);
+}
+.modal__nft .modal-content{
+    width: 618px;
+}
+.modal__nft-body{
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 24px !important;
+    width: 618px;
+}
+
+.modal__nft-top{
+    display: flex;
+    gap: 24px;
+    border: 1px solid rgba(232, 235, 237, 1);
+    box-shadow: 0px 4px 4px 0px rgba(237, 237, 237, 0.25);
+    border-radius: 5px;
+    width: 570px;
+}
+.modal__nft-top-left{
+    padding-top: 12px;
+    padding-bottom: 51.47px;
+}
+.modal__nft-img{
+    width: 300px;
+}

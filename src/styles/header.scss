@@ -1,0 +1,57 @@
+header {
+    display: flex;
+    background: map-get($theme-colors, "white");
+    color: map-get($theme-colors, "back");
+    justify-content: space-between;
+    align-items: center;
+    padding: 11px 24px;
+    border: 2px solid rgba(232, 235, 237, 1);
+    border-bottom-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.05);
+}
+
+.header-left{
+    display: flex;
+    gap: 29.5px
+}
+
+.header-right {
+    display: flex;    
+    align-items: center;
+    gap: 24px;
+}
+
+.header-right__more, .menu-burger, .menu-close{
+    display: none;
+}
+
+.header-right__user{
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.header-right__user_avatar{
+    display: block;
+}
+.user__control{
+    display: flex;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.user__name{
+    font-weight: 500;
+    font-size: map-get($theme-fontSize, "smTitile");
+    line-height: 24.55px;
+    color: map-get($theme-colors, "back");
+}
+
+.devider{
+    height: 33.8px;
+    border: 1px solid rgba(232, 235, 237, 1);
+}
+.header-right__notification{
+    cursor: pointer;
+}

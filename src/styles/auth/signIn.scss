@@ -1,0 +1,136 @@
+.auth{
+    display: flex;
+    justify-content: center;
+    padding: 48px;
+    border: 2px solid map-get($theme-colors, "text");
+    border-radius: 20px;
+    box-shadow: 5px 5px 30px 0px rgba(0, 0, 0, 0.05);
+    position: relative;
+    background: map-get($theme-colors, "white");
+}
+
+.auth__form{
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    width: 100%;
+}
+
+.auth__form-header{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.auth__form-title{
+    font-size: map-get($theme-fontSize, "lgTitle");
+    line-height: 45.51px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.auth__form-subtitle{
+    font-size: map-get($theme-fontSize, "subtitle");
+    line-height: 24.78px;
+    text-align: center;
+}
+.auth__form-subtitle_forgot_warning{
+    color: map-get($theme-colors, "warning");   
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.auth__form-subtitle_forgot{
+    width: 402px;
+}
+
+.auth__form-fields{
+    display: flex;
+    flex-direction: column;
+    gap: 19px;
+}
+
+.auth__form-fields-label {
+    font-weight: 500;
+    font-size: map-get($theme-fontSize, "subtitle");
+    margin-bottom: 14px;
+}
+
+.auth__form-fields-input{
+    border-color: rgba(206, 212, 218, 1) !important;
+    color: map-get($theme-colors, "primary");
+    height: 43px;
+}
+
+.auth__form-fields-input_error{
+    border-color: map-get($theme-colors, "errorPrimary") !important;
+}
+
+.auth__form-forgotpassword{
+    font-weight: 600;
+    color: map-get($theme-colors, "warning");
+    font-size: map-get($theme-fontSize, "subtitle");
+    text-decoration: none;
+    cursor: pointer;
+    //width: 145px;
+}
+
+.auth__form-forgotpassword:hover{
+    color: map-get($theme-colors, "hoverWarning") !important;
+}
+
+.auth__form-action{
+    display: flex;
+    flex-direction: column;
+    gap: 20.26px
+}
+.auth__form-action-btn{
+    font-weight: 700;
+    background-color: map-get($theme-colors, "warning") !important;
+    border: none;
+    font-size: map-get($theme-fontSize, "preMdTitile");
+    line-height: 30.34px;
+}
+
+.auth__form-action-btn:hover{
+    background-color: map-get($theme-colors, "hoverWarning") !important; 
+}
+
+
+.auth__form-action-btn_back {
+    background-color: map-get($theme-colors, "back") !important;
+}
+
+.auth__form-action-btn_back:hover {
+    background-color: map-get($theme-colors, "hoverBack") !important;
+}
+
+.auth__form-action-btn_disabled{
+    background-color: map-get($theme-colors, "disabled") !important; 
+    cursor: not-allowed;
+}
+
+.auth__form-action-group{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth__form-action-group-btn{
+    display: flex;
+    gap: 16px;
+}
+
+.form__signin{
+    position: relative;
+}
+
+.form__signin-icon-email, .form__signin-icon-password{
+    position: absolute;
+    top: calc(66%);
+    right: 1rem;
+}
+
+.form__signin-icon-password_error, .form__signin-icon-email_error{
+    top: calc(51%);
+}

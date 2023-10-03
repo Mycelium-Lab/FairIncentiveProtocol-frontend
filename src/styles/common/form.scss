@@ -1,0 +1,226 @@
+.form__label{
+    font-weight: 500;
+    font-size: map-get($theme-fontSize, "primary");
+    line-height: 21px;
+    margin-bottom: 9px;
+}
+.form__label_group{
+    margin-bottom: 0px;
+}
+
+.form__prompt{
+    font-size: map-get($theme-fontSize, "caption");
+    line-height: 18.38px;
+    color: rgba(108, 117, 125, 1);
+}
+
+.form__prompt_warning{
+    color: map-get($theme-colors, "warning");
+}
+
+.form__prompt_error{
+    color: map-get($theme-colors, "errorSecondary");
+}
+.form__icon-info{
+    margin-left: 6px;
+    margin-bottom: 2px;
+    cursor: pointer;
+}
+
+.form__icon-info_left{
+    margin-left: 0px;
+    margin-right: 6px;
+}
+
+.form__group{
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+}
+.form__group_row{
+    flex-direction: row;
+}
+
+.form__groups{
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+.form-control{
+    border-radius: 4px !important;
+}
+
+.form__group_top-row{
+    display: flex;
+    justify-content: space-between;
+}
+.form__group_top-row-left{
+    display: flex;
+    gap: 10px;
+}
+.form__group_bottom-row{
+    display: flex;
+    gap: 12px;
+    flex-direction: column;
+}
+.form__group_bottom-row-last {
+    display: flex;
+    gap: 12px;
+}
+
+.input-group{
+    width: inherit;
+}
+.input-group_full{
+    width: 100%;
+}
+.input-group_wide{
+    flex: 1;
+}
+.input-group__serach{
+    display: flex;
+    gap: 10px
+}
+.fp-userid-row{
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    align-items: flex-end;
+}
+
+.fp-userid-row_left{
+    width: 100%;
+}
+
+.form_row{
+    display: flex;
+    justify-content: space-between;
+}
+.form_col{
+    flex: 1;
+    margin-right: 24px;
+}
+.form_col_last{
+    margin-right: 0px;
+}
+.form_col_flex{
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+.form_col_action_left{
+    display: flex;
+    justify-content: end;
+    gap: 16px;
+}
+
+input[type=radio]#rd_1 {
+    accent-color: #cf7f17;
+}
+
+
+input[type=radio]#rd_2 {
+    accent-color: #cf7f17;
+}
+
+.form-check{
+    padding: 0px;
+    margin: 0px;
+    display: flex;
+    gap: 8px;
+}
+.form-check-label{
+    margin-top: 2px;
+    font-size: map-get($theme-fontSize, "primary");
+    font-weight: 500;
+    line-height: 21px;
+}
+
+.search-input{
+    position: relative;
+    &:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left:  8px;
+      margin: auto 0;
+      width: 20px;
+      height: 21px;
+      background: url('../../media/common/search.svg') no-repeat;
+      background-size: 100% 100%;
+      z-index: 10;
+    }
+}
+
+.search-input input{
+    padding-left: 30px;
+}
+
+.form-checkbox{
+    width: 16px;
+    height: 16px;
+}
+
+input[type="checkbox"] {
+    accent-color:  map-get($theme-colors, "warning");
+}
+
+.form__textarea{
+    width: 100%;
+    resize: none;
+}
+.form__textarea{
+  border: 1px solid rgba(206, 212, 218, 1);
+  border-radius: 5px;
+  padding: 6px 12px;
+}
+
+.form__textarea_add-blacklist{
+    height: 204px;
+}
+
+.form__textarea_desct-nft-collection{
+    height: 102px;
+}
+
+
+.input-group_filter{
+    width: 708px;
+    gap: 24px;
+}
+
+.input-group>:not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
+    border-radius: 3.2px;
+}
+
+.form__textarea_email{
+    height: 102px;
+}
+
+.input-group_card{
+    gap: 8px;
+}
+
+.form_row_relative{
+    position: relative;
+}
+
+.form-control_wide{
+    flex: 3 !important;
+}
+
+.form-control_with_image{
+    padding-left: 50px !important;
+}
+
+.credit-card__image, .cardholder__image{
+    position: absolute;
+    top: calc(18%);
+    left: 1rem;
+    z-index: 10;
+}
+
+.cardholder__image{
+    top: calc(20%);
+}

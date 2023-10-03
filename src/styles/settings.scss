@@ -1,0 +1,105 @@
+li {
+    margin-bottom: 20px;
+}
+
+.settings .nav-link{ 
+    color: rgba(136, 136, 136, 1);
+    line-height: 21px;
+    font-weight: 400;
+    font-size: map-get($theme-fontSize, "primary");
+    padding: 10px 24px 10px 40px;
+    height: 42px;
+}
+
+.settings .nav-tabs .nav-link{
+    border: none;
+}
+
+.settings .nav-tabs .nav-link.active{
+    color: map-get($theme-colors, "white");
+    background: map-get($theme-colors, "warning");
+    border: none;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+.settings .nav-tabs .nav-link:hover{
+    border: none;
+}
+
+.settings .nav-tabs{
+    margin: 24px 0px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.settings .nav-item{
+    margin-bottom: 0px;
+}
+
+.settings .nav-item:first-child button, .settings .nav-item:first-child .nav-link.active{
+    background-image: url('../media/settings/account_circle.svg');
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    background-position: 20px;
+    width: 109px;
+}
+
+.settings .nav-item:first-child .nav-link.active{
+    background-image: url('../media/settings/active/account_circle.svg');
+}
+
+.settings .nav-item:nth-child(2) button, .settings .nav-item:nth-child(2) .nav-link.active{
+    background-image: url('../media/settings/api.svg');
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    background-position: 20px;
+    width: 128px;
+}
+.settings .nav-item:nth-child(2) .nav-link.active{
+    background-image: url('../media/settings/active/api.svg');
+}
+
+.settings .nav-item:nth-child(3) button, .settings .nav-item:nth-child(3) .nav-link.active{
+    background-image: url('../media/settings/billing.svg');
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    background-position: 20px;
+    width: 128px;
+}
+.settings .nav-item:nth-child(3) .nav-link.active{
+    background-image: url('../media/settings/active/billing.svg');
+}
+
+.settings .nav-item:nth-child(4) button, .settings .nav-item:nth-child(4) .nav-link.active{
+    background-image: url('../media/settings/team.svg');
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    background-position: 20px;
+    width: 128px;
+}
+.settings .nav-item:nth-child(4) .nav-link.active{
+    background-image: url('../media/settings/active/team.svg');
+}
+
+.settings__bulling_value{
+    font-size: map-get($theme-fontSize, "preLgTitile");
+}
+
+.settings__payment{
+    display: flex;
+    gap: 56px;
+    color: #6C757D;
+    flex-wrap: wrap;
+}
+
+.form_row-marke-payments{
+    position: relative;
+}
+
+.settings__payment_bottom{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}

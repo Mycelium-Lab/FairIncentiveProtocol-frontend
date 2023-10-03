@@ -1,0 +1,8 @@
+@media (max-width: map-get($breakpoints, "md")) {
+    .settings__payment{
+        gap: 16px;
+    }
+    .menu__title-secondary-payment{
+        width: 77px;
+    }
+}

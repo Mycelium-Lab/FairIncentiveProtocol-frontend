@@ -1,0 +1,121 @@
+@import './styles/system';
+@import './App.scss';
+
+@import './styles/auth/auth.scss';
+@import './styles/auth/signIn.scss';
+@import './styles/header.scss';
+@import './styles/sidebar.scss';
+@import './styles/menu.scss';
+@import './styles/middle.scss';
+@import './styles/users.scss';
+@import './styles/dashboard.scss';
+@import './styles/tokens.scss';
+@import './styles/collectionDetail.scss';
+@import './styles/rewards.scss';
+@import './styles/settings.scss';
+@import './styles/_custom.scss';
+@import './styles/notifications.scss';
+
+@import './styles/common/dropdown.scss';
+@import './styles/common/accordion.scss';
+@import './styles/dasboardInfo/dashboardInfo.scss';
+@import './styles/common/table.scss';
+@import './styles/common/button.scss';
+@import './styles/common/link.scss';
+@import './styles/common/modal.scss';
+@import './styles/common/form.scss';
+@import './styles/common/fileupload.scss';
+
+@import './styles/media/auth/auth.scss';
+@import './styles/media/sidebar.scss';
+@import './styles/media/header.scss';
+@import './styles/media/middle.scss';
+@import './styles/media/modal.scss';
+@import './styles/media/form.scss';
+@import './styles/media/rewards.scss';
+@import './styles/media/button.scss';
+@import './styles/media/settings.scss';
+@import './styles/media/dashboard.scss';
+
+body {
+  margin: 0;
+  font-family: map-get($theme-family, "primary"), -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0px;
+}
+
+.form-control:focus{
+  color: inherit;
+  background-color: inherit;
+  border-color: inherit;
+  box-shadow: none;
+}
+
+.unlist{
+  list-style: none;
+  padding-left: 0px;
+}
+
+.customlist{
+  padding-left: 0px; 
+}
+
+.custom-marker_circle_black::before{
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: black;
+  border-radius: 50%;
+  vertical-align: middle;
+  margin-right: 10px;
+}
+
+.info__group-price{
+  margin-left: 8px;
+}
+
+.info__group-price_red{
+  background-color:  map-get($theme-colors, "errorSecondary");
+  border-radius: 5px;
+  padding: 2px 9.2px 2px 10px;
+}
+
+.info__group-price_red span{
+  color: map-get($theme-colors, "white")
+}
+
+p{
+  margin: 0px;
+}
+
+
+::-moz-placeholder {
+  color: rgba(108, 117, 125, 1) !important;
+  font-weight: 19.1px !important;
+  font-weight: 500 !important;
+  font-size: map-get($theme-fontSize, "primary") !important;
+} /* Firefox 19+ */
+:-moz-placeholder {
+  color: rgba(108, 117, 125, 1) !important;
+  font-weight: 19.1px !important;
+  font-weight: 500 !important;
+  font-size: map-get($theme-fontSize, "primary") !important;
+}  /* Firefox 18- */
+:-ms-input-placeholder {
+  color: rgba(108, 117, 125, 1) !important;
+  font-weight: 19.1px !important;
+  font-weight: 500 !important;
+  font-size: map-get($theme-fontSize, "primary") !important;
+} /* IE */

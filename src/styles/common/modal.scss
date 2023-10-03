@@ -1,0 +1,111 @@
+.btn-close{
+    opacity: 1;
+    width: 15px !important;
+    height: 15px !important;
+    padding: 0px !important;
+    margin-bottom: 1px !important;
+}
+.modal-header{
+    border-bottom: none;
+    padding: 24px 24px 0px;
+}
+.modal-footer{
+    border-top: none;
+    padding: 0px 24px 24px;
+}
+
+.modal-body{
+    padding: 24px 24px 0px;
+}
+
+.modal-text{
+    font-weight: 600;
+    line-height: 21px;
+    font-size: map-get($theme-fontSize, "primary");
+    color: map-get($theme-colors, "primary");
+    padding: 0px !important;
+}
+
+.modal-text_smTitile{
+    font-size: map-get($theme-fontSize, "smTitile");
+}
+
+.modal-text_regular{
+    font-weight: 400;
+}
+
+.modal-text_bold{
+    font-weight: 700;
+}
+.modal-text__caption{
+    font-weight: 500;
+    font-size: map-get($theme-fontSize, "caption");
+}
+.modal__nft-text {
+    margin-bottom: 0px;
+}
+.modal-text_center{
+    text-align: center;
+}
+
+.confirm__name{
+    font-size: map-get($theme-fontSize, "smTitile");
+    color: #212B36;
+    line-height: 27px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.confirm__text{
+    font-size: map-get($theme-fontSize, "primary");
+    color: #212B36;
+    line-height: 27px;
+    font-weight: 600;
+    padding-bottom: 40px;
+    text-align: center;
+}
+
+.confirm__text_red{
+    color: map-get($theme-colors, "errorSecondary");
+}
+
+.confirm__body{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+}
+
+
+.modal__loader {
+    margin-top: 28px;
+    display: flex;
+    justify-content: center;
+    animation: 1s linear 0s normal none infinite running loader;
+    -webkit-animation: 1s linear 0s normal none infinite running loader;
+  }
+  
+  @keyframes loader {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  @-webkit-keyframes loader {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+
+.modal-subtitle{
+    font-size: map-get($theme-fontSize, "primary");
+    font-weight: 600;
+    line-height: 21px;
+    color: rgba(108, 117, 125, 1);
+}

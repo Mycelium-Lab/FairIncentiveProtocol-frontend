@@ -1,0 +1,12 @@
+.link__primary{
+    cursor: pointer;
+    color: map-get($theme-colors, "primary");
+    line-height: 21px;
+    font-size: map-get($theme-fontSize, "primary");
+    font-weight: 500;
+}
+
+.link__form-prompt{
+    color: rgba(108, 117, 125, 1);
+    text-decoration: underline;
+}

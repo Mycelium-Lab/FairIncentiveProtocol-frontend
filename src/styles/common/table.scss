@@ -1,0 +1,42 @@
+.table{
+    font-size: map-get($theme-fontSize, "primary");
+    line-height: 21px;
+    font-weight: 500;
+    border-collapse:collapse !important;
+}
+
+.table__head{
+    background: rgba(255, 243, 231, 1);
+    font-weight: 600;
+    height: 41px;
+}
+
+.table>:not(caption)>*>*{
+    border: none;
+    vertical-align: middle;
+    padding: .5rem 24px;
+}
+
+.table__body td{
+    padding: .5rem 24px;
+}
+
+.table__body tr:nth-child(even) {
+    background: rgba(255, 243, 231, 1);
+}
+
+.tokens-list__item{
+    margin: 0px;
+}
+
+.table-text{
+    padding: 0px !important;
+}
+
+.table-rewards__list{
+    padding: 16px;
+}
+
+.table-rewards__list-item{
+    margin-bottom: 0px;
+}
