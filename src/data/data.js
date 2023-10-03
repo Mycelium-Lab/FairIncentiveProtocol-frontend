@@ -176,4 +176,123 @@ const newUser = [
     }
 ]
 
-export {newUser}
+
+const distributionOfRewards = [
+    {
+        id: '1',
+        name: 'Reward #1',
+        value: '17',
+        color: 'rgba(255, 159, 64, 1)'
+    },
+    {
+        id: '2',
+        name: 'Reward #2',
+        value: '17',
+        color: 'rgba(244, 190, 55, 1)'
+    },
+    {
+        id: '3',
+        name: 'Reward #3',
+        value: '28',
+        color: 'rgba(83, 136, 216, 1)'
+    },
+
+    {
+        id: '4',
+        name: 'Reward #4',
+        value: '32',
+        color: 'rgba(13, 37, 53, 1)'
+    },
+]
+
+const typeOfRewards = [
+    {
+        id: '1',
+        name: 'Tokens',
+        value: '30',
+        color: 'rgba(244, 190, 55, 1)',
+    },
+    {
+        id: '2',
+        name: 'NFTs',
+        value: '70',
+        color: 'rgba(255, 159, 64, 1)'
+    },
+]
+
+const tokensIssue = [
+    {
+        id: '1',
+        name: 'Claimed',
+        value: '17',
+        color: 'rgba(255, 159, 64, 1)'
+    },
+    {
+        id: '2',
+        name: 'Distributed',
+        value: '17',
+        color: 'rgba(244, 190, 55, 1)'
+    },
+    {
+        id: '3',
+        name: 'Available',
+        value: '18',
+        color: 'rgba(83, 136, 216, 1)'
+    },
+]
+
+const tokensSupply = [
+    {
+        id: '1',
+        name: 'Available to mint',
+        value: '70',
+        color: 'rgba(244, 190, 55, 1)',
+    },
+    {
+        id: '2',
+        name: 'Minted',
+        value: '30',
+        color: 'rgba(255, 159, 64, 1)'
+    },
+]
+
+const collectionIssue = [
+    {
+        id: '1',
+        name: 'Claimed',
+        value: '17',
+        color: 'rgba(255, 159, 64, 1)'
+    },
+    {
+        id: '2',
+        name: 'Distributed',
+        value: '17',
+        color: 'rgba(244, 190, 55, 1)'
+    },
+    {
+        id: '3',
+        name: 'Available',
+        value: '18',
+        color: 'rgba(83, 136, 216, 1)'
+    },
+]
+
+const collectionSupply = [
+    {
+        id: '1',
+        name: 'Available to mint',
+        value: '70',
+        color: 'rgba(244, 190, 55, 1)',
+    },
+    {
+        id: '2',
+        name: 'Minted',
+        value: '30',
+        color: 'rgba(255, 159, 64, 1)'
+    },
+]
+
+export {
+    newUser, distributionOfRewards, typeOfRewards, 
+    tokensIssue, tokensSupply, collectionIssue, collectionSupply
+}

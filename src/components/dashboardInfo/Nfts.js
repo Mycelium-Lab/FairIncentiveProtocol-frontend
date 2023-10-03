@@ -43,10 +43,6 @@ class NftsInfo extends Component {
                     </div>
                 </li>
             </ul>
-
-            <div className="dashboard__chart">
-            
-            </div>
             </>
         )
     }

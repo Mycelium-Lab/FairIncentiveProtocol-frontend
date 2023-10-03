@@ -1,0 +1,15 @@
+@media (max-width: map-get($breakpoints, "md")) {
+    .dashboard__chart{
+        width: auto !important;
+        height: 343px !important;
+        align-items: center;
+    }
+    .chart__group{
+        flex-direction: column;
+        width: auto !important;
+        gap: 0px;
+    }
+    .chart__label{
+        top: 20px;
+    }
+}

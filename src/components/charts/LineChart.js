@@ -10,7 +10,13 @@ class LineChart extends Component {
     render() {
         const {chartData} = this.props
         return (
-            <Line data={chartData}></Line>
+            <Line data={chartData} options={{
+                plugins: {
+                  legend: {
+                    display: false,
+                  },           
+                }
+              }}></Line>
         )
     }
 }

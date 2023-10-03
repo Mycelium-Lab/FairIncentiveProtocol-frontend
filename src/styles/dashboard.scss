@@ -83,4 +83,30 @@
     background: map-get($theme-colors, "white");
     border-radius: 20px;
     box-shadow: 5px 5px 30px 0px rgba(0, 0, 0, 0.05);
+   padding:  24px;
 }
+
+.chart__label{
+    font-size: 14px;
+    color: rgba(33, 43, 54, 1);
+    font-weight: 700;
+    line-height: 27px;
+    position: absolute;
+    left: 20px;
+}
+
+.chart__group{
+    display: flex;
+    gap: 24px;
+    width: 73vw;
+}
+
+.chart__group .dashboard__chart{
+    flex: 1;
+}
+
+/*.dashboard__chart canvas{
+    margin: 0 auto;
+    height: 286px;
+    width: 80%;
+}*/

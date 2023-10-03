@@ -9,8 +9,16 @@ class DonutChart extends Component {
     }
     render() {
         const {chartData} = this.props
+        const options = {
+            plugins: {
+                legend: {
+                  position: 'right',
+                  align: 'center'
+                }
+              }
+            }
         return (
-            <Doughnut data={chartData}></Doughnut>
+            <Doughnut data={chartData} options={options}></Doughnut>
         )
     }
 }
