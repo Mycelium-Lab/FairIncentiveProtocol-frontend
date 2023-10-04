@@ -13,6 +13,8 @@ import drug_drop from '../../media/common/drug&drop.svg'
 import FileUpload from "../FileUpload";
 import BarChart from "../charts/BarChart";
 import LineChart from "../charts/LineChart";
+import { newUser } from "../../data/data";
+import customTokeSymbol from '../../media/common/custom_toke_symbol.svg'
 
 
 let propertiesElementsLength = 0
@@ -58,7 +60,21 @@ class Users extends Component {
             current_nfts: [],
             comment: null,
             tabelData: userTable,
-            showEditUser: false
+            showEditUser: false,
+            newUserData: {
+                labels: newUser.map(data => data.time),
+                datasets: [{
+                    data: newUser.map(data => data.amount),
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)'],
+                }]
+            },
+            totalUserData: {
+                labels: newUser.map(data => data.time),
+                datasets: [{
+                    data: newUser.map(data => data.amount),
+                    borderColor: ['rgba(255, 159, 67, 0.85)'],
+                }]
+            },
         }
     }
 
@@ -918,7 +934,7 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                                     </td>
                                     <td>
                                         <FPDropdown icon={more}>
-                                            <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowStats(v)} disabled>Stat</Dropdown.Item>
+                                            <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowStats(v)}>Stat</Dropdown.Item>
                                             <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowEdit(v)}>Edit</Dropdown.Item>
                                             <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowToReward(v.external_id, v.id)}>To reward</Dropdown.Item>
                                             <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowDelete(v.external_id, v.id)}>Delete</Dropdown.Item>
@@ -1153,19 +1169,88 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                             <div className="form__prompt" id="basic-addon4">Total number of distributed rewards</div>
                         </div>
                         <div className="mb-4">
-                            <FPTable>
-                                    {/* Добавить поле создания токена и nft*/}
+                            <FPTable notHead={true}>
+                                <tr>
+                                    <td>
+                                            <div className="token-name">
+                                                <img src={customTokeSymbol}></img>
+                                                <div>
+                                                    <div>
+                                                        ABC
+                                                    </div>
+                                                    <div>
+                                                        Token name
+                                                    </div>
+                                                </div>
+                                            </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            1000 received
+                                        </div>
+                                        <div>
+                                            520 available
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                    <div className="token-name">
+                                                <img src={customTokeSymbol}></img>
+                                                <div>
+                                                    <div>
+                                                        ABC
+                                                    </div>
+                                                    <div>
+                                                        Token name
+                                                    </div>
+                                                </div>
+                                            </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                                1000 received
+                                        </div>
+                                        <div>
+                                                520 available
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                    <div className="token-name">
+                                                <img src={customTokeSymbol}></img>
+                                                <div>
+                                                    <div>
+                                                        NFT name
+                                                    </div>
+                                                    <div>
+                                                        Collection name
+                                                    </div>
+                                                </div>
+                                            </div>
+                                    </td>
+                                    <td>
+                                        <div>Received</div>
+                                    </td>
+                                </tr>
                             </FPTable>
                         </div>
-                        <div className="mb-4">
-                           <BarChart>
-                              {/* Добавить поле создания токена */}
-                           </BarChart>
-                        </div>
-                        <div className="mb-4">
-                           <LineChart>
-                              {/* Добавить поле создания nft */}
-                           </LineChart>
+
+
+                        <div className="dashboard__chart mb-4">
+                            <div className="dashboard__chart_reward">
+                                <label className="chart__label">Token distribution statistic</label>
+                                <div className="mb-4" style={{position: 'relative', width:'100%', display: 'flex', justifyContent: 'center', padding: '0 24px'}}>
+                                <BarChart chartData={this.state.newUserData}></BarChart>
+                                </div>
+                            </div>
+                            <div className="dashboard__chart_reward">
+                                <label className="chart__label">Statistics of the amount of awards</label>
+                                <div className="mb-4" style={{position: 'relative', width:'100%', display: 'flex', justifyContent: 'center', padding: '0 24px'}}>
+                                <LineChart chartData={this.state.totalUserData}></LineChart>
+                                </div>
+                            </div>
                         </div>
                     </Modal.Body>
                 </Modal>

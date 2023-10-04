@@ -25,6 +25,13 @@
     background: rgba(255, 243, 231, 1);
 }
 
+.table__body_nothead tr:nth-child(even){
+    background: transparent;
+}
+.table__body_nothead tr:nth-child(odd) {
+    background: rgba(255, 243, 231, 1);
+}
+
 .tokens-list__item{
     margin: 0px;
 }
