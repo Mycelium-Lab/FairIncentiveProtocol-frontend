@@ -123,6 +123,11 @@
     padding: 0 40px;
 }
 
+.tab-content>.active{
+    display: flex;
+    flex-direction: column;
+}
+
 /*.dashboard__chart canvas{
     margin: 0 auto;
     height: 286px;

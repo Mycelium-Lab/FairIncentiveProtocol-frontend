@@ -8,6 +8,7 @@ import UserInfo from "../dashboardInfo/UserInfo";
 import { collectionIssue, collectionSupply, distributionOfRewards, newUser , tokensIssue, tokensSupply, typeOfRewards} from "../../data/data";
 import LineChart from "../charts/LineChart";
 import DonutChart from "../charts/DonutChart";
+import DatePicker from "../DatePicker";
 
 class Dashboard extends Component {
     constructor(props) {
@@ -78,6 +79,7 @@ class Dashboard extends Component {
                 <div className="dashboard__tab">
                     <Tabs defaultActiveKey="users">
                         <Tab eventKey="users" title="Users">
+                            <DatePicker></DatePicker>
                             <UserInfo></UserInfo>
                             <div className="dashboard__chart mb-4">
                                 <div className="dashboard__chart_dashboard-info">
@@ -95,6 +97,7 @@ class Dashboard extends Component {
                             </div>
                         </Tab>
                         <Tab eventKey="rewards" title="Rewards">
+                            <DatePicker></DatePicker>
                             <RewardsInfo></RewardsInfo>
                             <div className="dashboard__chart_dashboard-info  mb-4">
                             <label className="chart__label">Rewards</label>
@@ -119,6 +122,7 @@ class Dashboard extends Component {
             
                         </Tab>
                         <Tab eventKey="tokens" title="Tokens">
+                            <DatePicker></DatePicker>
                             <TokensInfo></TokensInfo>
                             <div className="dashboard__chart_dashboard-info  mb-4">
                                 <label className="chart__label">                Token distribution </label>
@@ -142,6 +146,7 @@ class Dashboard extends Component {
                             </div>
                         </Tab>
                         <Tab eventKey="NFTs" title="NFTs">
+                            <DatePicker></DatePicker>
                             <NftsInfo></NftsInfo>
                             <div className="dashboard__chart_dashboard-info  mb-4">
                             <label className="chart__label">NFTs distribution </label>
