@@ -10,3 +10,22 @@
 .search-input_rewards{
     width: 213px;
 }
+.info__list-item_rewards{
+    border-radius: 6px;
+}
+
+.info__list_rewards{
+    flex-wrap: nowrap;
+    margin-bottom: 24px;
+    gap: 24px;
+    justify-content: space-between;
+}
+
+.dashboard__chart_reward{
+    box-shadow: none;
+    border: 1px solid #E8EBED;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}

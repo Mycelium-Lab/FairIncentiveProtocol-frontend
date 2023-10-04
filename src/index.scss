@@ -9,6 +9,7 @@
 @import './styles/middle.scss';
 @import './styles/users.scss';
 @import './styles/dashboard.scss';
+@import './styles/dasboardInfo/dashboardInfo.scss';
 @import './styles/tokens.scss';
 @import './styles/collectionDetail.scss';
 @import './styles/rewards.scss';
@@ -18,7 +19,6 @@
 
 @import './styles/common/dropdown.scss';
 @import './styles/common/accordion.scss';
-@import './styles/dasboardInfo/dashboardInfo.scss';
 @import './styles/common/table.scss';
 @import './styles/common/button.scss';
 @import './styles/common/link.scss';
@@ -32,10 +32,10 @@
 @import './styles/media/middle.scss';
 @import './styles/media/modal.scss';
 @import './styles/media/form.scss';
-@import './styles/media/rewards.scss';
 @import './styles/media/button.scss';
 @import './styles/media/settings.scss';
 @import './styles/media/dashboard.scss';
+@import './styles/media/rewards.scss';
 
 body {
   margin: 0;

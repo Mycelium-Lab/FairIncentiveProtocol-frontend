@@ -24,7 +24,7 @@ class Dashboard extends Component {
                 labels: newUser.map(data => data.time),
                 datasets: [{
                     data: newUser.map(data => data.amount),
-                    backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                    borderColor: ['rgba(255, 159, 67, 0.85)'],
                 }]
             },
             distributionOfRewardsData: {
@@ -79,27 +79,35 @@ class Dashboard extends Component {
                     <Tabs defaultActiveKey="users">
                         <Tab eventKey="users" title="Users">
                             <UserInfo></UserInfo>
-                            <div className="dashboard__chart mb-4" style={{position: 'relative', height:'40vh', width:'73vw', display: 'flex', justifyContent: 'center'}}>
-                            <label className="chart__label">New Users</label>
-                                <BarChart chartData={this.state.newUserData}></BarChart>
-                            </div>
-                            <div className="dashboard__chart  mb-4" style={{position: 'relative', height:'40vh', width:'73vw', display: 'flex', justifyContent: 'center'}}>
-                            <label className="chart__label">Total Users</label>
-                                <LineChart chartData={this.state.totalUserData}></LineChart>
+                            <div className="dashboard__chart mb-4">
+                                <div className="dashboard__chart_dashboard-info mb-4">
+                                    <label className="chart__label">New Users</label>
+                                    <div style={{position: 'relative', height:'40vh', width:'73vw', display: 'flex', justifyContent: 'center'}}>
+                                        <BarChart chartData={this.state.newUserData}></BarChart>
+                                    </div>
+                                </div>
+                                <div className="dashboard__chart_dashboard-info  mb-4">
+                                    <label className="chart__label">Total Users</label>
+                                    <div style={{position: 'relative', height:'40vh', width:'73vw', display: 'flex', justifyContent: 'center'}}>
+                                        <LineChart chartData={this.state.totalUserData}></LineChart>
+                                    </div>
+                                </div>
                             </div>
                         </Tab>
                         <Tab eventKey="rewards" title="Rewards">
                             <RewardsInfo></RewardsInfo>
-                            <div className="dashboard__chart  mb-4" style={{position: 'relative', height:'40vh', width:'73vw', display: 'flex', justifyContent: 'center'}}>
+                            <div className="dashboard__chart_dashboard-info  mb-4">
                             <label className="chart__label">Rewards</label>
-                                <BarChart chartData={this.state.newUserData}></BarChart>
+                                <div style={{position: 'relative', height:'40vh', width:'73vw', display: 'flex', justifyContent: 'center'}}>
+                                    <BarChart chartData={this.state.newUserData}></BarChart>
+                                </div>
                             </div>
                             <div className="chart__group">
-                                <div className="dashboard__chart  mb-4" style={{position: 'relative', height:'40vh', width:'50vw', display: 'flex', justifyContent: 'center'}}>
+                                <div className="dashboard__chart_dashboard-info  mb-4" style={{position: 'relative', height:'40vh', width:'50vw', display: 'flex', justifyContent: 'center'}}>
                                     <label className="chart__label">Distribution of rewards</label>
                                     <DonutChart chartData={this.state.distributionOfRewardsData}></DonutChart>
                                 </div>
-                                <div className="dashboard__chart  mb-4" style={{position: 'relative', height:'40vh', width:'50vw', display: 'flex', justifyContent: 'center'}}>
+                                <div className="dashboard__chart_dashboard-info  mb-4" style={{position: 'relative', height:'40vh', width:'50vw', display: 'flex', justifyContent: 'center'}}>
                                 <label className="chart__label">Type of rewards</label>
                                 <DonutChart chartData={this.state.typeOfRewardsData}></DonutChart>
                             </div>
@@ -108,16 +116,18 @@ class Dashboard extends Component {
                         </Tab>
                         <Tab eventKey="tokens" title="Tokens">
                             <TokensInfo></TokensInfo>
-                            <div className="dashboard__chart  mb-4" style={{position: 'relative', height:'40vh', width:'73vw', display: 'flex', justifyContent: 'center'}}>
+                            <div className="dashboard__chart_dashboard-info  mb-4">
                                 <label className="chart__label">                Token distribution </label>
-                                <BarChart chartData={this.state.newUserData}></BarChart>
+                                <div  style={{position: 'relative', height:'40vh', width:'73vw', display: 'flex', justifyContent: 'center'}}>
+                                    <BarChart chartData={this.state.newUserData}></BarChart>
+                                </div>
                             </div>
                             <div className="chart__group">
-                                <div className="dashboard__chart  mb-4" style={{position: 'relative', height:'40vh', width:'50vw', display: 'flex', justifyContent: 'center'}}>
+                                <div className="dashboard__chart_dashboard-info  mb-4" style={{position: 'relative', height:'40vh', width:'50vw', display: 'flex', justifyContent: 'center'}}>
                                     <label className="chart__label">Tokens issue</label>
                                     <DonutChart chartData={this.state.tokensIssuesData}></DonutChart>
                                 </div>
-                                <div className="dashboard__chart  mb-4" style={{position: 'relative', height:'40vh', width:'50vw', display: 'flex', justifyContent: 'center'}}>
+                                <div className="dashboard__chart_dashboard-info  mb-4" style={{position: 'relative', height:'40vh', width:'50vw', display: 'flex', justifyContent: 'center'}}>
                                     <label className="chart__label">Tokens supply</label>
                                     <DonutChart chartData={this.state.tokensSupplyData}></DonutChart>
                                 </div>
@@ -125,16 +135,18 @@ class Dashboard extends Component {
                         </Tab>
                         <Tab eventKey="NFTs" title="NFTs">
                             <NftsInfo></NftsInfo>
-                            <div className="dashboard__chart  mb-4" style={{position: 'relative', height:'40vh', width:'73vw', display: 'flex', justifyContent: 'center'}}>
+                            <div className="dashboard__chart_dashboard-info  mb-4">
                             <label className="chart__label">NFTs distribution </label>
+                            <div style={{position: 'relative', height:'40vh', width:'73vw', display: 'flex', justifyContent: 'center'}}>
                                 <BarChart chartData={this.state.newUserData}></BarChart>
                             </div>
+                            </div>
                             <div className="chart__group">
-                                <div className="dashboard__chart  mb-4" style={{position: 'relative', height:'40vh', width:'50vw', display: 'flex', justifyContent: 'center'}}>
+                                <div className="dashboard__chart_dashboard-info  mb-4" style={{position: 'relative', height:'40vh', width:'50vw', display: 'flex', justifyContent: 'center'}}>
                                     <label className="chart__label">Collection issue</label>
                                     <DonutChart chartData={this.state.collectionIssueData}></DonutChart>
                                 </div>
-                                <div className="dashboard__chart  mb-4" style={{position: 'relative', height:'40vh', width:'50vw', display: 'flex', justifyContent: 'center'}}>
+                                <div className="dashboard__chart_dashboard-info  mb-4" style={{position: 'relative', height:'40vh', width:'50vw', display: 'flex', justifyContent: 'center'}}>
                                     <label className="chart__label">Collection supply</label>
                                     <DonutChart chartData={this.state.collectionSupply}></DonutChart>
                                 </div>

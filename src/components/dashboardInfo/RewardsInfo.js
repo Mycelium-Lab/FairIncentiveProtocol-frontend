@@ -10,8 +10,8 @@ class RewardsInfo extends Component {
     render() {
         return (
             <>
-             <ul className="info__list unlist">
-                <li className="info__list-item_blue info__list-item">
+             <ul className="info__list_rewards info__list unlist">
+                <li className="info__list-item_rewards info__list-item_blue info__list-item">
                     <div className="info__content_left">
                         <span className="info__content-amount">125 576</span>
                         <span className="info__content-desc">The total number of rewards</span>
@@ -20,7 +20,7 @@ class RewardsInfo extends Component {
                         <img src={total}></img>
                     </div>
                 </li>
-                <li className="info__list-item_light-blue info__list-item">
+                <li className="info__list-item_rewards info__list-item_light-blue info__list-item">
                     <div className="info__content_left">
                         <span className="info__content-amount">9 867</span>
                         <span className="info__content-desc">Users rewarded</span>
@@ -29,7 +29,7 @@ class RewardsInfo extends Component {
                         <img src={rewarded}></img>
                     </div>
                 </li>
-                <li className="info__list-item_dark-blue info__list-item">
+                <li className="info__list-item_rewards info__list-item_dark-blue info__list-item">
                     <div className="info__content_left">
                         <span className="info__content-amount">7 824</span>
                         <span className="info__content-desc">Rewards in the last 24 hours</span>
