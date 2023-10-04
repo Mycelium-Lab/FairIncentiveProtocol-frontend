@@ -13,10 +13,11 @@ class LineChart extends Component {
           plugins: {
             legend: {
               display: false,
-            },        
-           maintainAspectRatio : false,
-           responsive: false,
+            },       
           },
+          maintainAspectRatio : false,
+          responsive: true,
+          aspectRatio: 1, 
           scales: {
             x: {
                grid: {

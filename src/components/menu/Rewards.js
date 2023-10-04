@@ -15,10 +15,13 @@ import { rewardsTable } from "../../data/tables";
 import FPTable from "../common/FPTable";
 import FPDropdown from "../common/FPDropdown";
 import { Dropdown } from "react-bootstrap";
-import RewardsInfo from "../dashboardInfo/RewardsInfo";
 import LineChart from "../charts/LineChart";
 import BarChart from "../charts/BarChart";
 import { newUser } from "../../data/data";
+
+import total from '../../media/dashboard/total_rewards.svg'
+import rewarded from '../../media/dashboard/rewarded.svg'
+import newRewards from '../../media/dashboard/new_rewards.svg'
 
 const types = {
     token: 'token',
@@ -1310,17 +1313,45 @@ class Rewards extends Component {
                         {`"${this.state.reward_name}" reward statistics`}
                     </Modal.Header>
                     <Modal.Body>
-                        <RewardsInfo></RewardsInfo>
+                    <ul className="info__list_rewards info__list unlist">
+                        <li className="info__list-item_rewards info__list-item_blue info__list-item">
+                            <div className="info__content_left">
+                                <span className="info__content-amount">125 576</span>
+                                <span className="info__content-desc">The total number of rewards</span>
+                            </div>
+                            <div className="info__content_right">
+                                <img src={total}></img>
+                            </div>
+                        </li>
+                        <li className="info__list-item_rewards info__list-item_light-blue info__list-item">
+                            <div className="info__content_left">
+                                <span className="info__content-amount">9 867</span>
+                                <span className="info__content-desc">Users rewarded</span>
+                            </div>
+                            <div className="info__content_right">
+                                <img src={rewarded}></img>
+                            </div>
+                        </li>
+                        <li className="info__list-item_rewards info__list-item_dark-blue info__list-item">
+                            <div className="info__content_left">
+                                <span className="info__content-amount">7 824</span>
+                                <span className="info__content-desc">Rewards in the last 24 hours</span>
+                            </div>
+                            <div className="info__content_right">
+                            <img src={newRewards}></img>
+                            </div>
+                        </li>
+                    </ul>
                         <div className="dashboard__chart mb-4">
                             <div className="dashboard__chart_reward">
                                 <label className="chart__label">Token distribution statistic</label>
-                                <div className="mb-4" style={{position: 'relative', height:'356px', width:'100%', display: 'flex', justifyContent: 'center'}}>
+                                <div className="dashboard__chart_reward_wrapper mb-4" style={{position: 'relative', height:'356px', display: 'flex', justifyContent: 'center'}}>
                                     <LineChart chartData={this.state.totalUserData}></LineChart>
                                 </div>
                             </div>
                             <div className="dashboard__chart_reward">
                                 <label className="chart__label">Statistics of the amount of awards</label>
-                                <div className="mb-4" style={{position: 'relative', height:'356px', width:'100%', display: 'flex', justifyContent: 'center'}}>
+                                <div className="dashboard__chart_reward_wrapper mb-4" style={{position: 'relative', height:'356px', display: 'flex', justifyContent: 'center'}}>
                                         <BarChart chartData={this.state.newUserData}></BarChart>
                                 </div>
                             </div>

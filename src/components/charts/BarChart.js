@@ -18,8 +18,10 @@ class BarChart extends Component {
                   legend: {
                     display: false,
                   },     
-                  maintainAspectRatio : false
                 },
+                maintainAspectRatio : false,
+                responsive: true,
+                aspectRatio: 1, 
                 scales: {
                   x: {
                      grid: {

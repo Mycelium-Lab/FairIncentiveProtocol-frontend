@@ -1240,13 +1240,13 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
 
                         <div className="dashboard__chart mb-4">
                             <div className="dashboard__chart_reward">
-                                <label className="chart__label">Token distribution statistic</label>
+                                <label className="chart__label">Token reward statistic</label>
                                 <div className="mb-4" style={{position: 'relative', width:'100%', display: 'flex', justifyContent: 'center', padding: '0 24px'}}>
                                 <BarChart chartData={this.state.newUserData}></BarChart>
                                 </div>
                             </div>
                             <div className="dashboard__chart_reward">
-                                <label className="chart__label">Statistics of the amount of awards</label>
+                                <label className="chart__label">NFT reward statistic</label>
                                 <div className="mb-4" style={{position: 'relative', width:'100%', display: 'flex', justifyContent: 'center', padding: '0 24px'}}>
                                 <LineChart chartData={this.state.totalUserData}></LineChart>
                                 </div>
