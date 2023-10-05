@@ -16,6 +16,12 @@ import ErrorModal from "../common/modals/error";
 import empty from "../../media/common/empty_icon.svg"
 import info from '../../media/common/info-small.svg'
 import more from '../../media/common/more.svg'
+import webicon from '../../media/common/web-icon.svg'
+import instagram from '../../media/common/instagram-icon.svg'
+import telegram from '../../media/common/telegram-icon.svg'
+import medium from '../../media/common/medium-icon.svg'
+import facebook from '../../media/common/facebook-icon.svg'
+import discord from '../../media/common/discord-icon.svg'
 import drug_drop from '../../media/common/drug&drop.svg'
 import customTokeSymbol from '../../media/common/custom_toke_symbol.svg'
 import FPTable from "../common/FPTable";
@@ -577,7 +583,7 @@ class NFTCollections extends Component {
                                 <div className="form_row">
                                     <div className="form_col">
                                         <label className="form-label">Beneficial recipient:</label> 
-                                        <div className="input-group">
+                                        <div className="input-group mb-4">
                                         <div className="form-check custom-control custom-radio custom-control-inline">
                                             <input type="radio" name="rd" id="rd_1"  
                                                 value={beneficialTypes.company} checked={this.state.beneficialType === beneficialTypes.company}
@@ -674,11 +680,12 @@ class NFTCollections extends Component {
                  ?  <div className="content__wrap">
                          <h4 className="menu__title-secondary mb-4">Links</h4>
                         <div className="form__groups">
-                            <div className="form_row mb-4">
+                            <div className="form_row_relative form_row mb-4">
                                         <div className="form_col_last form_col">
                                         <label className="form__label">Website</label>
+                                        <img className="website-icon" src={webicon}></img>
                                         <div className="input-group">
-                                            <input type="text" placeholder="yourwebsite.io" value={this.state.website} onChange={this.onChangeWebsite} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                            <input type="text" placeholder="yourwebsite.io" value={this.state.website} onChange={this.onChangeWebsite} className="form-control_with_image form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                         </div>
                                         </div>
                             </div>
@@ -687,50 +694,50 @@ class NFTCollections extends Component {
                         <div className="form_row">
                                     <div className="form_col_last form_col">
                                         <label className="form-label">Socials:</label> 
-                                        <div className="form_row mb-4">
+                                        <div className="form_row_relative form_row mb-4">
                                             <div className="form_col">
-                                        
+                                                <img className="instagram-icon" src={instagram}></img>
                                                 <div className="input-group">
-                                                    <input type="text" placeholder="instagram" value={this.state.instagram} onChange={this.onChangeInstagram}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                    <input type="text" placeholder="instagram" value={this.state.instagram} onChange={this.onChangeInstagram}  className="form-control_with_image form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                 </div>
                                         
                                             </div>
-                                            <div className="form_col_last form_col">
-                                            
+                                            <div className="form_row_relative form_col_last form_col">
+                                            <img className="facebook-icon" src={facebook}></img>
                                                 <div className="input-group">
-                                                <input type="text" placeholder="Facebook" value={this.state.facebook} onChange={this.onChangeFacebook} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                <input type="text" placeholder="Facebook" value={this.state.facebook} onChange={this.onChangeFacebook} className="form-control_with_image form-control form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                 </div>
                                             
                                             </div>
                                         </div>
-                                        <div className="form_row mb-4">
+                                        <div className="form_row_relative form_row mb-4">
                                             <div className="form_col">
-                                        
+                                            <img className="telegram-icon" src={telegram}></img>
                                                 <div className="input-group">
-                                                    <input type="text" placeholder="Telegram" value={this.state.telegram} onChange={this.onChangeTelegram} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                    <input type="text" placeholder="Telegram" value={this.state.telegram} onChange={this.onChangeTelegram} className="form-control_with_image form-control form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                 </div>
                                         
                                             </div>
-                                            <div className="form_col_last form_col">
-                                            
+                                            <div className="form_row_relative form_col_last form_col">
+                                            <img className="discord-icon" src={discord}></img>
                                                 <div className="input-group">
-                                                <input type="text" placeholder="Discord" alue={this.state.discord} onChange={this.onChangeDiscord} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                <input type="text" placeholder="Discord" alue={this.state.discord} onChange={this.onChangeDiscord} className="form-control_with_image form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                 </div>
                                             
                                             </div>
                                         </div>
-                                        <div className="form_row mb-4">
+                                        <div className="form_row_relative form_row mb-4">
                                             <div className="form_col">
-                                        
+                                            <img className="medium-icon" src={medium}></img>
                                                 <div className="input-group">
-                                                    <input type="text" placeholder="Medium" value={this.state.medium} onChange={this.onChangeMedium} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                    <input type="text" placeholder="Medium" value={this.state.medium} onChange={this.onChangeMedium} className="form-control_with_image form-control form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                 </div>
                                         
                                             </div>
-                                            <div className="form_col_last form_col">
-                                            
+                                            <div className="form_row_relative form_col_last form_col">
+                                            <img className="other-icon" src={webicon}></img>
                                                 <div className="input-group">
-                                                <input type="text" placeholder="Other" value={this.state.other} onChange={this.onChangeOther} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                <input type="text" placeholder="Other" value={this.state.other} onChange={this.onChangeOther} className="form-control_with_image form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                 </div>
                                             
                                             </div>

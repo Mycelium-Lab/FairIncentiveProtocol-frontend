@@ -65,4 +65,10 @@
     .input-group__add_payment{
         gap: 15px;
     }
+    .title-header_adaptive{
+        flex-direction: column;
+    }
+    .input-group > :not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
+        margin: 0px !important;
+    }
 }

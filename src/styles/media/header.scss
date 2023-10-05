@@ -10,6 +10,10 @@
     }
     .header{
         padding: 10px 16px;
+        position: fixed;
+        z-index: 100000;
+        top: -1px;
+        width: 100vw;
     }
     .menu-burger, .menu-close{
         cursor: pointer;

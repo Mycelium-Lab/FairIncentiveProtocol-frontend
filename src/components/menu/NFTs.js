@@ -130,6 +130,9 @@ class NFTs extends Component {
                                     <img src={twitter}></img>
                                 </a>
                             </li>
+                            <li className="profile__social-item_devider profile__social-item">
+                               <span></span>
+                            </li>
                             <li className="profile__social-item">
                                 <a>
                                     <img src={stars}></img>

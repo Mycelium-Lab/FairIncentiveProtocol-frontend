@@ -21,3 +21,24 @@
     align-items: center;
     gap: 8px;
 }
+
+.website-icon, .instagram-icon, .telegram-icon, 
+.medium-icon, .facebook-icon, .discord-icon,
+.other-icon{
+    position: absolute;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+    z-index: 1;
+    height: 38px;
+    top: 32px;
+    left: 0px;
+}
+.instagram-icon, .facebook-icon, .telegram-icon, 
+.medium-icon, .other-icon,
+.discord-icon, iscord-icon{
+    top: 0px; 
+}
+
+.facebook-icon, .discord-icon, .other-icon{
+    right: 0px
+}
