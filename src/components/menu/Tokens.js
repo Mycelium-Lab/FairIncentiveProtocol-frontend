@@ -997,9 +997,15 @@ class Tokens extends Component {
                                 <button className="btn btn_pre-sm  btn_primary btn_gray" onClick={this.prevStage}>
                                     Back
                                 </button>
-                                <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.nextStage}>
-                                    Next
-                                </button>
+                                {
+                                    this.state.provider && this.state.signer && this.state.address && this.state.chainid ? 
+                                    <button className="btn btn_pre-sm btn_primary btn_orange" onClick={this.nextStage}>
+                                        Next
+                                    </button>
+                                  :   <button disabled className="btn btn_pre-sm  btn_primary btn_orange btn_disabled">
+                                        Next
+                                        </button>
+                                }
                             </div>
                          </div>
                         </div> 

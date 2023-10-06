@@ -851,7 +851,7 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                      <div className="empty">
                        <div className="empty__wrapper">
                            <img src={empty}></img>
-                           <span className="empty__desc">You don't have any tokens yet</span>
+                           <span className="empty__desc">Not any users yet</span>
                            <button onClick={this.handleShowAdd} type="button" className="btn btn_rounded btn_orange btn_sm">Add new user</button>
                        </div>
                      </div>
