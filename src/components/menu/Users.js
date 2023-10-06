@@ -14,6 +14,7 @@ import FileUpload from "../FileUpload";
 import BarChart from "../charts/BarChart";
 import LineChart from "../charts/LineChart";
 import { newUser } from "../../data/data";
+import empty from "../../media/common/empty_icon.svg"
 import customTokeSymbol from '../../media/common/custom_toke_symbol.svg'
 
 
@@ -724,7 +725,9 @@ class Users extends Component {
             <>
                 <div className="title-header">
                     <h3 className="menu__title">Users</h3>
-                    <button onClick={this.handleShowAdd} type="button" className="btn btn_primary btn_orange">Add new user</button>
+                    {
+                        this.state.users?.length ? <button onClick={this.handleShowAdd} type="button" className="btn btn_primary btn_orange">Add new user</button> : null
+                    }
                 </div>
                 <Modal show={this.state.showAdd} onHide={this.handleCloseAdd} centered>
                     <Modal.Header closeButton>
@@ -843,115 +846,76 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                     </Modal.Footer>
                 </Modal>
                 <div>
+                {
+                     !this.state.users?.length && !this.state.showCreate ?
+                     <div className="empty">
+                       <div className="empty__wrapper">
+                           <img src={empty}></img>
+                           <span className="empty__desc">You don't have any tokens yet</span>
+                           <button onClick={this.handleShowAdd} type="button" className="btn btn_rounded btn_orange btn_sm">Add new user</button>
+                       </div>
+                     </div>
+                     : null
+                }
                     {
-                        /*
-                    <table className="table table-bordered border-dark">
-                        <thead>
-                            <tr className="table-secondary" >
-                            <th className="table-secondary" scope="col">ID</th>
-                            <th className="table-secondary" scope="col">Name</th>
-                            <th className="table-secondary" scope="col">Wallet</th>
-                            <th className="table-secondary" scope="col">Tokens</th>
-                            <th className="table-secondary" scope="col">Rewards</th>
-                            <th className="table-secondary" scope="col">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                this.state.users.map(v =>
-                                <tr className="table-secondary">
-                                    <td className="table-secondary">
-                                        {createLongStrView(v.id)}
-                                    </td>
-                                    <td className="table-secondary">
-                                        {v.external_id}
-                                    </td>
-                                    <td className="table-secondary">
-                                        {createLongStrView(v.wallet)}
-                                    </td>
-                                    <td className="table-secondary">
-                                        (soon)
-                                    </td>
-                                    <td className="table-secondary">
-                                        <div>
-                                            NFTs: {v.nft_rewards ? v.nft_rewards.map((reward, i, arr) => 
-                                                `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
-                                            ): null}
-                                        </div>
-                                        <div>
-                                            Tokens: {v.token_rewards ? v.token_rewards.map((reward, i, arr) => 
-                                                `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
-                                            ): null}
-                                        </div>
-                                    </td>
-                                    <td className="table-secondary">
-                                        <button type="button" className="btn btn-dark" disabled>Stat</button>
-                                        <button type="button" className="btn btn-dark" onClick={() => this.handleShowEdit(v)}>Edit</button>
-                                        <button type="button" className="btn btn-dark" onClick={() => this.handleShowToReward(v.external_id, v.id)}>To reward</button>
-                                        <button onClick={() => this.handleShowDelete(v.external_id, v.id)} type="button" className="btn btn-danger">Delete</button>
-                                    </td>
-                                </tr>
-                                )
-                            }
-                        </tbody>
-                    </table>
-                    */
+                          this.state.users?.length && !this.state.showCreate ? 
+                          <div className="content__wrap">
+                          <FPTable data={this.state.tabelData}>
+                          {
+                                      this.state.users.map(v =>
+                                      <tr>
+                                          <td>
+                                              {createLongStrView(v.id)}
+                                          </td>
+                                          <td>
+                                              {v.external_id}
+                                          </td>
+                                          <td>
+                                          <a className="link__primary">{createLongStrView(v.wallet)}</a>
+                                          </td>
+                                          <td>
+                                              (soon)
+                                          </td>
+                                          <td>
+                                              {
+                                                  v.nft_rewards?.length && v.token_rewards?.length 
+                                                  ? <>
+                                                      <div>
+                                                          {v.nft_rewards?.length ? v.nft_rewards.map((reward, i, arr) => 
+                                                          `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
+                                                              ): null}
+                                                          </div>
+                                                          <div>
+                                                              Tokens: {v.token_rewards?.length ? v.token_rewards.map((reward, i, arr) => 
+                                                                  `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
+                                                              ): null}
+                                                          </div>
+                                                      </>
+                                              : '-'
+                                              }
+                                          </td>
+                                          <td>
+                                              <FPDropdown icon={more}>
+                                                  <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowStats(v)}>Stat</Dropdown.Item>
+                                                  <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowEdit(v)}>Edit</Dropdown.Item>
+                                                  <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowToReward(v.external_id, v.id)}>To reward</Dropdown.Item>
+                                                  <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowDelete(v.external_id, v.id)}>Delete</Dropdown.Item>
+                                              </FPDropdown>
+                                             {
+                                             /* <button type="button" className="btn btn-dark" disabled>Stat</button>
+                                              <button type="button" className="btn btn-dark" onClick={() => this.handleShowEdit(v)}>Edit</button>
+                                              <button type="button" className="btn btn-dark" onClick={() => this.handleShowToReward(v.external_id, v.id)}>To reward</button>
+                                              <button onClick={() => this.handleShowDelete(v.external_id, v.id)} type="button" className="btn btn-danger">Delete</button>
+                                              */
+                                                  }
+                                          </td>
+                                      </tr>
+                                      )
+                                  }
+                              </FPTable>
+                          </div>
+                          : null 
                     }
-                    <div className="content__wrap">
-                    <FPTable data={this.state.tabelData}>
-                    {
-                                this.state.users.map(v =>
-                                <tr>
-                                    <td>
-                                        {createLongStrView(v.id)}
-                                    </td>
-                                    <td>
-                                        {v.external_id}
-                                    </td>
-                                    <td>
-                                    <a className="link__primary">{createLongStrView(v.wallet)}</a>
-                                    </td>
-                                    <td>
-                                        (soon)
-                                    </td>
-                                    <td>
-                                        {
-                                            v.nft_rewards?.length && v.token_rewards?.length 
-                                            ? <>
-                                                <div>
-                                                    {v.nft_rewards?.length ? v.nft_rewards.map((reward, i, arr) => 
-                                                    `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
-                                                        ): null}
-                                                    </div>
-                                                    <div>
-                                                        Tokens: {v.token_rewards?.length ? v.token_rewards.map((reward, i, arr) => 
-                                                            `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
-                                                        ): null}
-                                                    </div>
-                                                </>
-                                        : '-'
-                                        }
-                                    </td>
-                                    <td>
-                                        <FPDropdown icon={more}>
-                                            <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowStats(v)}>Stat</Dropdown.Item>
-                                            <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowEdit(v)}>Edit</Dropdown.Item>
-                                            <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowToReward(v.external_id, v.id)}>To reward</Dropdown.Item>
-                                            <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowDelete(v.external_id, v.id)}>Delete</Dropdown.Item>
-                                        </FPDropdown>
-                                       {
-                                       /* <button type="button" className="btn btn-dark" disabled>Stat</button>
-                                        <button type="button" className="btn btn-dark" onClick={() => this.handleShowEdit(v)}>Edit</button>
-                                        <button type="button" className="btn btn-dark" onClick={() => this.handleShowToReward(v.external_id, v.id)}>To reward</button>
-                                        <button onClick={() => this.handleShowDelete(v.external_id, v.id)} type="button" className="btn btn-danger">Delete</button>
-                                        */
-                                            }
-                                    </td>
-                                </tr>
-                                )
-                            }
-                </FPTable>
-                    </div>
                 </div>
                 <Modal show={this.state.showToReward} onHide={this.handleCloseToReward} centered>
                     <Modal.Header closeButton>
