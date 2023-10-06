@@ -1,0 +1,97 @@
+.datepicker-wrapper{
+    position: relative;
+    align-self: flex-end;
+}
+.inputBox{
+    border: 1px solid rgba(206, 212, 218, 1);
+    border-radius: 5px;
+    padding: 4px 11px 4px 10px;
+    cursor: pointer;
+    outline:none;
+    width: 213px;
+}
+
+.rdrInRange{
+    background: #FBE7D1 !important;
+}
+
+.rdrDayNumber span{
+    color: #1d2429 !important
+}
+
+.rdrDayToday:not(.rdrDayPassive) .rdrInRange ~ .rdrDayNumber span:after, .rdrDayToday:not(.rdrDayPassive) .rdrStartEdge ~ .rdrDayNumber span:after, .rdrDayToday:not(.rdrDayPassive) .rdrEndEdge ~ .rdrDayNumber span:after, .rdrDayToday:not(.rdrDayPassive) .rdrSelected ~ .rdrDayNumber span:after {
+    background: transparent;
+}
+
+.rdrStartEdge, .rdrEndEdge{
+    background: #FF9F43 !important;
+}
+
+.rdrStartEdge ~ .rdrDayNumber span {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.rdrEndEdge ~ .rdrDayNumber span {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.rdrStartEdge, .rdrEndEdge{
+    border-radius: 4px !important;
+}
+.rdrDayEndOfWeek .rdrInRange{
+    border-top-right-radius: 4px !important;
+    border-bottom-right-radius: 4px !important;
+}
+.rdrDayStartOfWeek .rdrInRange{
+    border-top-left-radius: 4px !important;
+    border-bottom-left-radius: 4px !important;
+}
+
+.rdrDayToday .rdrDayNumber span:after{
+    background: #FF9F43 !important;
+}
+
+.rdrDateDisplayWrapper, .rdrInputRanges, 
+.rdrMonths .rdrMonth:last-child{
+    display: none !important;
+}
+
+.rdrNextPrevButton{
+    background: transparent !important;
+}
+
+.rdrStaticRange{
+    border-bottom: none !important;
+}
+
+.rdrDefinedRangesWrapper{
+    border-right: none !important;
+    width: 160px !important;
+    margin-top: 13px !important;
+}
+
+.rdrStaticRangeLabel{
+    color: #637381 !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    padding: 10px 0px 10px 20px !important;
+}
+
+.rdrMonth{
+    width: auto !important;
+    padding: 16px !important;
+}
+
+.rdrDateRangePickerWrapper{
+    background: #FFFFFF !important;
+    border: 1px solid #E8EBED !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 4px 0px rgba(0, 0, 0, 0.25) !important;
+    position: absolute;
+    right: 0;
+    z-index: 10;
+}
+
+.rdrMonthAndYearWrapper{
+    height: auto;
+}

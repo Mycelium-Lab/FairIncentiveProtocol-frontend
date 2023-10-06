@@ -15,7 +15,13 @@ import { rewardsTable } from "../../data/tables";
 import FPTable from "../common/FPTable";
 import FPDropdown from "../common/FPDropdown";
 import { Dropdown } from "react-bootstrap";
-import RewardsInfo from "../dashboardInfo/RewardsInfo";
+import LineChart from "../charts/LineChart";
+import BarChart from "../charts/BarChart";
+import { newUser } from "../../data/data";
+
+import total from '../../media/dashboard/total_rewards.svg'
+import rewarded from '../../media/dashboard/rewarded.svg'
+import newRewards from '../../media/dashboard/new_rewards.svg'
 
 const types = {
     token: 'token',
@@ -63,6 +69,20 @@ class Rewards extends Component {
             reward_symbol: null,
             reward_nft_name: null,
             showFilter: false,
+            newUserData: {
+                    labels: newUser.map(data => data.time),
+                    datasets: [{
+                        data: newUser.map(data => data.amount),
+                        backgroundColor: ['rgba(255, 159, 67, 0.85)'],
+                    }]
+            },
+            totalUserData: {
+                    labels: newUser.map(data => data.time),
+                    datasets: [{
+                        data: newUser.map(data => data.amount),
+                        borderColor: ['rgba(255, 159, 67, 0.85)'],
+                    }]
+            },
         }
     }
 
@@ -682,7 +702,7 @@ class Rewards extends Component {
     }
 
     handleCloseStats = () => this.setState({showStats: false});
-    handleShowStats = () => this.setState({showStats: true});
+    handleShowStats = (reward_name) => this.setState({showStats: true, reward_name});
 
     handleClose = () => this.setState({show: false});
     handleShow = () => this.setState({show: true});
@@ -821,7 +841,7 @@ class Rewards extends Component {
                                           </td>
                                           <td>
                                             <FPDropdown icon={more}>
-                                                <Dropdown.Item className="dropdown__menu-item" onClick={this.handleShowStats} disabled>Stat</Dropdown.Item>
+                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowStats(v.name)}>Stat</Dropdown.Item>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowEditReward(v.name, v.id, v.count, v.description, v.amount, types.token, v.address, undefined, v.symbol)}>Edit</Dropdown.Item>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowReward(v.name, v.id)} disabled={v.status}>To reward</Dropdown.Item>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowDelete(types.token, v.id, v.name)}>Delete</Dropdown.Item>
@@ -1288,12 +1308,54 @@ class Rewards extends Component {
                     </Modal.Footer>
                 </Modal>
 
-                <Modal show={this.state.showStats} onHide={this.handleCloseStats} centered>
+                <Modal dialogClassName="modal__info-rewards" show={this.state.showStats} onHide={this.handleCloseStats} centered>
                     <Modal.Header  className="modal-newuser__title modal-title" closeButton>
-                        ”First 100 purchases made” reward statistics
+                        {`"${this.state.reward_name}" reward statistics`}
                     </Modal.Header>
                     <Modal.Body>
-                        <RewardsInfo></RewardsInfo>
+                    <ul className="info__list_rewards info__list unlist">
+                        <li className="info__list-item_rewards info__list-item_blue info__list-item">
+                            <div className="info__content_left">
+                                <span className="info__content-amount">125 576</span>
+                                <span className="info__content-desc">The total number of rewards</span>
+                            </div>
+                            <div className="info__content_right">
+                                <img src={total}></img>
+                            </div>
+                        </li>
+                        <li className="info__list-item_rewards info__list-item_light-blue info__list-item">
+                            <div className="info__content_left">
+                                <span className="info__content-amount">9 867</span>
+                                <span className="info__content-desc">Users rewarded</span>
+                            </div>
+                            <div className="info__content_right">
+                                <img src={rewarded}></img>
+                            </div>
+                        </li>
+                        <li className="info__list-item_rewards info__list-item_dark-blue info__list-item">
+                            <div className="info__content_left">
+                                <span className="info__content-amount">7 824</span>
+                                <span className="info__content-desc">Rewards in the last 24 hours</span>
+                            </div>
+                            <div className="info__content_right">
+                            <img src={newRewards}></img>
+                            </div>
+                        </li>
+                    </ul>
+                        <div className="dashboard__chart mb-4">
+                            <div className="dashboard__chart_reward">
+                                <label className="chart__label">Token distribution statistic</label>
+                                <div className="dashboard__chart_reward_wrapper mb-4" style={{position: 'relative', height:'356px', display: 'flex', justifyContent: 'center'}}>
+                                    <LineChart chartData={this.state.totalUserData}></LineChart>
+                                </div>
+                            </div>
+                            <div className="dashboard__chart_reward">
+                                <label className="chart__label">Statistics of the amount of awards</label>
+                                <div className="dashboard__chart_reward_wrapper mb-4" style={{position: 'relative', height:'356px', display: 'flex', justifyContent: 'center'}}>
+                                        <BarChart chartData={this.state.newUserData}></BarChart>
+                                </div>
+                            </div>
+                        </div>
                     </Modal.Body>
                 </Modal >
 

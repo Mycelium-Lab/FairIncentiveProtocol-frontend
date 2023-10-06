@@ -10,13 +10,25 @@ class BarChart extends Component {
     render() {
         const {chartData} = this.props
         return (
-            <Bar data={chartData} options={{
+            <Bar data={chartData} 
+            height="287px"
+            width="800px"
+            options={{
                 plugins: {
                   legend: {
                     display: false,
                   },     
-                    maintainAspectRatio : false
-                }
+                },
+                maintainAspectRatio : false,
+                responsive: true,
+                aspectRatio: 1, 
+                scales: {
+                  x: {
+                     grid: {
+                       display: false
+                     }
+                  }
+                  }
               }}
             ></Bar>
         )

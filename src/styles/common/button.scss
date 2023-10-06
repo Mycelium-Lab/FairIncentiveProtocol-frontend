@@ -12,6 +12,11 @@
     color: map-get($theme-colors, "white");
 }
 
+.btn_gray:hover{
+    background-color: rgba(99, 115, 129, 0.7) !important;
+    color: map-get($theme-colors, "white");
+}
+
 .btn_primary{
     border-radius: 4px !important;
     font-weight: 700;

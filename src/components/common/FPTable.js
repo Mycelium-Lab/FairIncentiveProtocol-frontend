@@ -8,7 +8,7 @@ class FPTable extends Component {
         super(props)
     }
     render() {
-        const {data, children} = this.props
+        const {data, notHead, children} = this.props
         return (
                 <Table responsive="sm">
                     { data ? 
@@ -26,9 +26,17 @@ class FPTable extends Component {
                          </thead>
                          : null
                     }
-                <tbody className="table__body">
-                    {children}
-                </tbody>
+
+                    {
+                        notHead ? 
+                        <tbody className="table__body_nothead">
+                            {children}
+                        </tbody>    
+                        :
+                        <tbody className="table__body">
+                            {children}
+                        </tbody>
+                    }
                 </Table>
         )
     }

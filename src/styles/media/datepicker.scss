@@ -1,0 +1,20 @@
+@media (max-width: map-get($breakpoints, "md")) {
+    .rdrDateRangePickerWrapper{
+        flex-direction: column;
+    }
+    .rdrDefinedRangesWrapper{
+        order: 1;
+        width: 100% !important;
+        margin-top: 0px !important;
+    }
+    .rdrCalendarWrapper{
+        order: 0;
+    }
+    .rdrStaticRanges{
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+    }
+    .rdrStaticRangeLabel{
+        padding: 10px 16px !important;
+    }
+}

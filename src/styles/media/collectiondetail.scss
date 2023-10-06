@@ -1,0 +1,28 @@
+@media (max-width: map-get($breakpoints, "md")) {
+    .profile__decs_stats{
+        flex-wrap: wrap;
+    }
+    .profile__photo {
+        left: 70px;
+    }
+    .profile__social{
+        padding-top: 110px;
+    }
+    .profile__nfts-list-item {
+        width: auto;
+    }
+    .profile__social-list{
+        justify-content: space-between;
+    }
+    .modal__nft-top{
+        flex-direction: column;
+        gap: 0px;
+    }
+    .modal__nft-body, .modal__nft-img,
+    .modal__nft-top, .modal__nft .modal-content{
+        width: 100%;
+    }
+    .modal__nft-top-left{
+        padding: 16px;
+    }
+}

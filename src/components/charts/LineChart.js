@@ -9,14 +9,33 @@ class LineChart extends Component {
     }
     render() {
         const {chartData} = this.props
+        const options = {
+          plugins: {
+            legend: {
+              display: false,
+            },       
+          },
+          maintainAspectRatio : false,
+          responsive: true,
+          aspectRatio: 1, 
+          scales: {
+            x: {
+               grid: {
+                 display: false
+               }
+            }
+            },
+            elements: {
+              point:{
+                  radius: 0
+              }
+          }
+        }
         return (
-            <Line data={chartData} options={{
-                plugins: {
-                  legend: {
-                    display: false,
-                  },           
-                }
-              }}></Line>
+            <Line data={chartData}
+            height="287px"
+            width="800px"
+            options={options}></Line>
         )
     }
 }

@@ -907,7 +907,7 @@ class Tokens extends Component {
                         <h4 className="menu__title-secondary mb-4">Advanced settings</h4>
                         <div className="form__groups">
 
-                            <div className="form_row">
+                            <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
                                     <label className="form__label">Decimals * (soon) <img src={info} className="form__icon-info"/></label>
                                         <div className="input-group">

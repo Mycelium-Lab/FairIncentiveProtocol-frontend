@@ -80,10 +80,25 @@
 }
 
 .dashboard__chart{
+    //background: map-get($theme-colors, "white");
+    //border-radius: 20px;
+    //box-shadow: 5px 5px 30px 0px rgba(0, 0, 0, 0.05);
+    //padding: 0px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+
+.dashboard__chart_dashboard-info{
     background: map-get($theme-colors, "white");
     border-radius: 20px;
     box-shadow: 5px 5px 30px 0px rgba(0, 0, 0, 0.05);
-   padding:  24px;
+    padding: 0px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    flex: 1;
 }
 
 .chart__label{
@@ -91,18 +106,26 @@
     color: rgba(33, 43, 54, 1);
     font-weight: 700;
     line-height: 27px;
-    position: absolute;
-    left: 20px;
+   padding: 20px 0px 0px 24px;
 }
 
 .chart__group{
     display: flex;
     gap: 24px;
-    width: 73vw;
+
 }
 
 .chart__group .dashboard__chart{
     flex: 1;
+}
+
+.dashboard__chart_wrapper{
+    padding: 0 40px;
+}
+
+.tab-content>.active{
+    display: flex;
+    flex-direction: column;
 }
 
 /*.dashboard__chart canvas{
