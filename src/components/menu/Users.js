@@ -360,9 +360,13 @@ class Users extends Component {
                 id,
                 element: 
                 <div className="user-custom-params">
-                    <input type="text" id={`property-name-${id}`} onChange={(event) => this.changePropertyName(id, event.target.value)} className="form-control" placeholder="Property name"/>
-                    <input type="text" id={`property-value-${id}`} onChange={(event) => this.changePropertyValue(id, event.target.value)} className="form-control" placeholder="Property value"/>
-                    <button type="button" className="btn btn-dark" onClick={() => this.deletePropertyInput(id)}>-</button>
+                            <div className="input-group">
+                                <input type="text" id={`property-name-${id}`} onChange={(event) => this.changePropertyName(id, event.target.value)} className="form-control" placeholder="Property name"/>
+                            </div>
+                            <div className="input-group">
+                                <input type="text" id={`property-value-${id}`} onChange={(event) => this.changePropertyValue(id, event.target.value)} className="form-control" placeholder="Property value"/>
+                            </div>
+                    <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={() => this.deletePropertyInput(id)}>-</button>
                 </div>,
                 name: undefined,
                 value: undefined,
@@ -408,15 +412,20 @@ class Users extends Component {
                 id,
                 element: 
                 <div className="user-custom-params">
-                    <input type="text" id={`stat-name-${id}`} onChange={this.changeStatName} className="form-control" placeholder="Stat name"/>
-                    <input type="number" id={`stat-value-${id}`} onChange={this.changeStatValue} className="form-control" placeholder="Stat value"/>
-                    <button type="button" className="btn btn-dark" onClick={() => this.deleteStatInput(id)}>-</button>
+                        <div className="input-group">
+                            <input type="text" id={`stat-name-${id}`} onChange={this.changeStatName} className="form-control" placeholder="Stat name"/>
+                        </div>
+                        <div className="input-group">
+                            <input type="number" id={`stat-value-${id}`} onChange={this.changeStatValue} className="form-control" placeholder="Stat value"/>
+                        </div>
+                    <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={() => this.deleteStatInput(id)}>-</button>
                 </div>,
                 name: undefined,
                 value: undefined,
                 work: true
             }
         )
+
         statsElementsLength += 1
         this.setState({statsElements})
     }
@@ -484,7 +493,7 @@ class Users extends Component {
                         <div className="input-group">
                             <input type="text" id={`edit-stat-name-${statId}`} onChange={this.changeEditStatName} defaultValue={v.name} className="form-control" placeholder="Stat name"/>
                         </div>
-                        <div className="user-custom-params">
+                        <div className="input-group">
                             <input type="number" id={`edit-stat-value-${statId}`} onChange={this.changeEditStatValue} defaultValue={v.value} className="form-control" placeholder="Stat value"/>
                         </div>
                         <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={() => this.deleteEditStatInput(statId)}>-</button>
@@ -773,26 +782,18 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                                         <div className="form__prompt" id="basic-addon4">Textual parameters of user</div>
                                     </div>
                                 </div>
-                                <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={this.addEditPropertyInput}>+</button> 
+                                <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={this.addPropertyInput}>+</button> 
                             </div>
                             <div className="form__group_bottom-row">
                                 {
                                             <div id="user-properties">
                                             {
-                                                this.state.editPropertiesElements ?
-                                                this.state.editPropertiesElements.map(v => v.work ? v.element : null) :
+                                                this.state.propertiesElements ?
+                                                this.state.propertiesElements.map(v => v.work ? v.element : null) :
                                                 null
                                             }
                                         </div>
                                 }
-                                <div className="form__group_bottom-row-last">
-                                    <div className="input-group">
-                                        <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                    </div>
-                                    <div className="input-group">
-                                        <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                    </div>
-                                </div>
                             </div>
                             
                         </div>
@@ -806,26 +807,18 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                                         <div className="form__prompt" id="basic-addon4">Numerical parameters of user</div>
                                     </div>
                                 </div>
-                                <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={this.addEditStatInput}>+</button>
+                                <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={this.addStatInput}>+</button>
                             </div>
                             <div className="form__group_bottom-row">
                             {
                                             <div id="user-stats">
                                             {
-                                                this.state.editStatsElements ?
-                                                this.state.editStatsElements.map(v => v.work ? v.element : null) :
+                                                this.state.statsElements ?
+                                                this.state.statsElements.map(v => v.work ? v.element : null) :
                                                 null
                                             }
                                         </div>
                                         }
-                                <div className="form__group_bottom-row-last">
-                                    <div className="input-group">
-                                        <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                    </div>
-                                    <div className="input-group">
-                                        <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                    </div>
-                                </div>
                             </div>
                             
                         </div>
@@ -1031,7 +1024,7 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                                 <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={this.addEditPropertyInput}>+</button>
                             </div>
                             <div className="form__group_bottom-row">
-                            {
+                            
                                             <div id="user-properties">
                                             {
                                                 this.state.editPropertiesElements ?
@@ -1039,15 +1032,7 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                                                 null
                                             }
                                         </div>
-                                        }
-                                <div className="form__group_bottom-row-last">
-                                    <div className="input-group">
-                                        <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                    </div>
-                                    <div className="input-group">
-                                        <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                    </div>
-                                </div>
+                            
                             </div>
                             
                         </div>
@@ -1075,14 +1060,6 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                                         }
                                     </div>
                                     }
-                            <div className="form__group_bottom-row-last">
-                                <div className="input-group">
-                                        <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                    </div>
-                                    <div className="input-group">
-                                        <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                    </div>
-                            </div>
                             </div>
                             
                         </div>
@@ -1095,7 +1072,7 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                         <div className="mb-4">
                             <label className="form__label">Log:</label>
                             <div className="input-group">
-                                <textarea value={this.state.edit_user.notes} onChange={this.changeEditNotes}  type="text" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
+                                <textarea type="text" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
                             </div>
                             <div className="form-text" id="basic-addon4">The user does not see this text. Markdown syntax is supported.</div>
                         </div>
