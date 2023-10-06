@@ -69,11 +69,11 @@
 
 .btn_disabled{
     cursor: not-allowed !important;
-    background: map-get($theme-colors, "disabled");   
-    color: map-get($theme-colors, "white");
+    background: map-get($theme-colors, "disabled") !important;   
+    color: map-get($theme-colors, "white") !important;
     &:hover{
-        background: map-get($theme-colors, "disabled");
-        color: map-get($theme-colors, "white");
+        background: map-get($theme-colors, "disabled") !important;
+        color: map-get($theme-colors, "white") !important;
     }
 }
 

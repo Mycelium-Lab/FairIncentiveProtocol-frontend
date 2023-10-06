@@ -826,6 +826,18 @@ class Tokens extends Component {
                 </div>
 
                 {
+                     !this.state.tokens?.length && !this.state.showCreate ?
+                     <div className="empty">
+                       <div className="empty__wrapper">
+                           <img src={empty}></img>
+                           <span className="empty__desc">You don't have any tokens yet</span>
+                           <button onClick={this.handleShowCreate} type="button" className="btn btn_rounded btn_orange btn_sm">Create new token</button>
+                       </div>
+                     </div>
+                     : null
+                }
+
+                {
                     this.state.showCreate && this.state.stageOfCreateToken === 1 ?
                     <div className="content__wrap">
                         <h4 className="menu__title-secondary mb-4">Specify the parameters of the new token</h4>
@@ -982,12 +994,18 @@ class Tokens extends Component {
                          </ul>
                          <div className="form_row mb-4">
                             <div className="form_col_action_left form_col_last form_col">
-                            <button className="btn btn_pre-sm  btn_primary btn_gray" onClick={this.prevStage}>
+                                <button className="btn btn_pre-sm  btn_primary btn_gray" onClick={this.prevStage}>
                                     Back
                                 </button>
-                                <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.nextStage}>
-                                    Next
-                                </button>
+                                {
+                                    this.state.provider && this.state.signer && this.state.address && this.state.chainid ? 
+                                    <button className="btn btn_pre-sm btn_primary btn_orange" onClick={this.nextStage}>
+                                        Next
+                                    </button>
+                                  :   <button disabled className="btn btn_pre-sm  btn_primary btn_orange btn_disabled">
+                                        Next
+                                        </button>
+                                }
                             </div>
                          </div>
                         </div> 
@@ -1050,129 +1068,7 @@ class Tokens extends Component {
                     : null
                 }
                 {
-                    /*
-                    <Modal show={this.state.showCreate} onHide={this.handleCloseCreate} centered>
-                    <Modal.Header closeButton>
-                    <Modal.Title>Creating new token</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <button onClick={this.connect} type="button" className="btn btn-dark">{this.state.address ? createLongStrView(this.state.address) : 'Connect'}</button>
-                        <h4>Specify the parameters of the new token</h4>
-                        <div className="mb-3">
-                            <label className="form__label">Token name *</label>
-                            <div className="input-group">
-                                <input type="text" placeholder="e.g. Bitcoin" onChange={this.onChangeName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                            </div>
-                            <div className="form-text" id="basic-addon4">Choose a name for your token</div>
-                        </div>
-                        <div className="mb-3">
-                            <label className="form__label">Symbol *</label>
-                            <div className="input-group">
-                                <input type="text" placeholder="e.g. BTC" onChange={this.onChangeSymbol} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                            </div>
-                            <div className="form-text" id="basic-addon4">Choose a symbol for your token</div>
-                        </div>
-                        <div className="mb-3">
-                            <label className="form__label">Supply type *</label>
-                            <div className="input-group">
-                                <select onChange={this.onChangeEmissionType} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                    {
-                                        emissionTypes.map(v => {
-                                            return <option value={v.value} selected={this.state.emissionType === v.value}>
-                                                {v.name}
-                                            </option>
-                                        })
-                                    }
-                                </select>
-                            </div>
-                            <div className="form-text" id="basic-addon4">Choose what emission limit your token will have</div>
-                        </div>
-                        <div className="mb-3">
-                            <label className="form__label">Initial supply {this.state.emissionType === "1" ? "*" : null}</label>
-                            <div className="input-group">
-                                <input onChange={this.onChangeInitialSupply} type="number" placeholder="1 000 000" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                            </div>
-                            <div className="form-text" id="basic-addon4">The number of coins minted during the creation of the contract</div>
-                        </div>
-                        {
-                            this.state.emissionType === "0" 
-                            ?
-                            <div className="mb-3">
-                                <label className="form__label">Maximum supply *</label>
-                                <input onChange={this.onChangeMaxSupply} type="text" placeholder="1 000 000" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                <div className="form-text" id="basic-addon4">The maximum number of coins ever minted</div>
-                            </div>
-                            :
-                            null
-                        }
-                        <div className="mb-3">
-                            <label className="form__labelerc20_tokens_supply_types">Blockchain</label>
-                            <div className="input-group">
-                                <select onChange={e => this.changeNetwork(e.target.value)} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                    <option value={config.status === "test" ? '5' : '1'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '5' : '1')) : false}>{networks[config.status === "test" ? '5' : '1'].name}</option>
-                                    <option value={config.status === "test" ? '97' : '56'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '97' : '56')) : false}>{networks[config.status === "test" ? '97' : '56'].name}</option>
-                                    <option value={config.status === "test" ? '80001' : '137'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '80001' : '137')) : false}>{networks[config.status === "test" ? '80001' : '137'].name}</option>
-                                    <option value={config.status === "test" ? '420' : '10'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '420' : '10')) : false} disabled={config.status === "test" ? true : false} >{networks[config.status === "test" ? '420' : '10'].name}</option>
-                                    <option value={config.status === "test" ? '43113' : '43114'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '43113' : '43114')) : false}>{networks[config.status === "test" ? '43113' : '43114'].name}</option>
-                                    <option value={config.status === "test" ? '421613' : '42161'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '421613' : '42161')) : false}>{networks[config.status === "test" ? '421613' : '42161'].name}</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div className="mb-3">
-                            <label className="form__label">Upload a picture of the token</label>
-                            <div className="input-group">
-                                <div className="input-image">
-                                    <div className="input-image-button">(soon)</div>
-                                </div>
-                            </div>
-                        </div>
-                        <h4>Advanced settings</h4>
-                        <div className="checks-contracts-types">
-                            <div className="form-check">
-                                <input onChange={() => this.onChangePausable(this.state.pausable ? false : true)} checked={this.state.pausable} className="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
-                                <label className="form-check-label" for="flexCheckDefault">
-                                    Pausable
-                                </label>
-                            </div>
-                            <div className="form-check">
-                                <input onChange={() => this.onChangeBurnable(this.state.burnable ? false : true)} checked={this.state.burnable} className="form-check-input" type="checkbox" value="" id="flexCheckDefault"/>
-                                <label className="form-check-label" for="flexCheckDefault">
-                                    Burnable
-                                </label>
-                            </div>
-                            <div className="form-check">
-                                <input onChange={() => this.onChangeBlacklist(this.state.blacklist ? false : true)} checked={this.state.blacklist} className="form-check-input" type="checkbox" value="" id="flexCheckChecked"/>
-                                <label className="form-check-label" for="flexCheckChecked">
-                                    Blacklist
-                                </label>
-                            </div>
-                            <div className="form-check">
-                                <input onChange={() => this.onChangeVerified(this.state.verified ? false : true)} checked={this.state.verified} className="form-check-input" type="checkbox" value="" id="flexCheckChecked"/>
-                                <label className="form-check-label" for="flexCheckChecked">
-                                    Verified on Etherscan
-                                </label>
-                            </div>
-                            <div className="form-check">
-                                <input onChange={() => this.onChangeRecoverable(this.state.recoverable ? false : true)} checked={this.state.recoverable} className="form-check-input" type="checkbox" value="" id="flexCheckChecked"/>
-                                <label className="form-check-label" for="flexCheckChecked">
-                                    Recoverable
-                                </label>
-                            </div>
-                        </div>
-                    </Modal.Body>
-                    <Modal.Footer>
-                    <button className="btn btn-dark" onClick={this.createToken}>
-                        Create
-                    </button>
-                    <button className="btn btn-light" onClick={this.handleCloseCreate}>
-                        Cancel
-                    </button>
-                    </Modal.Footer>
-                </Modal>
-                */
-                    }
-                {
-                        this.state.tokens && !this.state.showCreate ? 
+                        this.state.tokens?.length && !this.state.showCreate ? 
                         <div className="content__wrap">
                             <FPTable data={tokenTable}>
                                 {
@@ -1210,28 +1106,12 @@ class Tokens extends Component {
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowBlacklist(v.symbol, v.address, v.chainid)} disabled={!v.blacklist}>Blacklist</Dropdown.Item>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowInfo(v.symbol, v.address, v.chainid)}>Token info</Dropdown.Item>
                                             </FPDropdown>
-                                              {/*
-                                              <button className="btn btn-dark" onClick={() => this.handleShowMint(v.symbol, v.address, v.chainid)} disabled={v.supply_type == 1 ? true : false}>Mint</button>
-                                              <button className="btn btn-dark" disabled>Roles control</button>
-                                              <button className="btn btn-dark" onClick={() => this.handleShowPause(v.symbol, v.address, v.chainid)} disabled={!v.pausable}>{v.paused ? "Unpause" : "Pause"}</button>
-                                              <button className="btn btn-dark" onClick={() => this.handleShowBlacklist(v.symbol, v.address, v.chainid)} disabled={!v.blacklist}>Blacklist</button>
-                                              <button className="btn btn-dark" onClick={() => this.handleShowBurn(v.symbol, v.address, v.chainid)} disabled={!v.burnable}>Burn</button>
-                                              <button className="btn btn-dark" disabled>Token info</button>
-                                            */}
                                           </td>
                                       </tr>
                                   })
                               }
                             </FPTable>
                         </div>
-                  : !this.state.tokens?.length && !this.state.showCreate ?
-                  <div className="empty">
-                    <div className="empty__wrapper">
-                        <img src={empty}></img>
-                        <span className="empty__desc">You don't have any tokens yet</span>
-                        <button onClick={this.handleShowCreate} type="button" className="btn btn_rounded btn_orange btn_sm">Create new token</button>
-                    </div>
-                  </div>
                   : null   
                 }
               

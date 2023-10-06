@@ -1,7 +1,12 @@
 {
   "files": {
+<<<<<<< Updated upstream
     "main.css": "/static/css/main.7006fe06.css",
     "main.js": "/static/js/main.00ae9667.js",
+=======
+    "main.css": "/static/css/main.4d05bc19.css",
+    "main.js": "/static/js/main.fdbec788.js",
+>>>>>>> Stashed changes
     "static/js/787.7f12cb2c.chunk.js": "/static/js/787.7f12cb2c.chunk.js",
     "static/media/default-profile-head.png": "/static/media/default-profile-head.c7e30a2985877160826c.png",
     "static/media/default_nft_3.png": "/static/media/default_nft_3.19c51275bdb83bab937e.png",
@@ -57,6 +62,7 @@
     "static/media/upload_icon.svg": "/static/media/upload_icon.50327e141d310465b0688a348aac0504.svg",
     "static/media/info.svg": "/static/media/info.c8f1f72a26bedd7c2f92d0911fa84040.svg",
     "index.html": "/index.html",
+<<<<<<< Updated upstream
     "static/media/search.svg": "/static/media/search.bf69531f3cbd33e62a95375079cecda1.svg",
     "static/media/more_header.svg": "/static/media/more_header.1595d721090a2f6503d3cb5d50d60bf2.svg",
     "static/media/email.svg": "/static/media/email.d4e6bdfb81a25c4ea48c2b57db784038.svg",
@@ -78,5 +84,14 @@
   "entrypoints": [
     "static/css/main.7006fe06.css",
     "static/js/main.00ae9667.js"
+=======
+    "main.4d05bc19.css.map": "/static/css/main.4d05bc19.css.map",
+    "main.fdbec788.js.map": "/static/js/main.fdbec788.js.map",
+    "787.7f12cb2c.chunk.js.map": "/static/js/787.7f12cb2c.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.4d05bc19.css",
+    "static/js/main.fdbec788.js"
+>>>>>>> Stashed changes
   ]
 }

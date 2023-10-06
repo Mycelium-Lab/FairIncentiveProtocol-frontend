@@ -11,8 +11,8 @@ const steps = {
 }
 
 class SignUp extends Component {
-    constructor() {
-        super()
+    constructor(props) {
+        super(props)
         this.state = {
             companyName: '',
             email: '',
@@ -28,7 +28,7 @@ class SignUp extends Component {
         }
     }
 
-    async createAccount() {
+    async createAccount(ev) {
         try {
             const headers = new Headers();
             headers.append("Content-Type", "application/json");
@@ -58,8 +58,9 @@ class SignUp extends Component {
                 //     repeat_password: '',
                 //     wallet: ''
                 // })
-                console.log(json)
+                //console.log(json)
                 // alert(`${json.message}. Now you can signin.`)
+                this.handleSwitch(ev, this.props.switcher)
             } else {
                 alert(json.error.message)
             }
