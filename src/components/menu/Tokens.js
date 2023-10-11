@@ -362,7 +362,9 @@ class Tokens extends Component {
                 const _tokens = this.tokens
                 _tokens.push(token)
                 this.setState({
-                    tokens: _tokens
+                    tokens: _tokens,
+                    showCreate: false,
+                    stageOfCreateToken: 0,
                 })
             } else {
                 alert('Something went wrong')
