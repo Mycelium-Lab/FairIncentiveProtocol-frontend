@@ -51,7 +51,7 @@ class FileUpload extends Component {
     };
 
     handleFile(files) {
-        ///
+        this.props.getImage(files)
     }
 
     handleDrag = this.handleDrop.bind(this)

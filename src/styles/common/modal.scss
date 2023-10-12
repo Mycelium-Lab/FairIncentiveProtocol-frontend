@@ -114,3 +114,8 @@
     width: 90vw;    /* Occupy the 90% of the screen width */
     max-width: 1164px;
 }
+
+.loader-wrapper{
+    display: flex;
+    justify-content: center;
+}

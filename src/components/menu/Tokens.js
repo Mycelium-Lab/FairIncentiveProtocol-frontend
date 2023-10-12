@@ -28,6 +28,7 @@ import { tokenTable, blacklistTable } from "../../data/tables";
 import FPTable from "../common/FPTable";
 import FPDropdown from "../common/FPDropdown";
 import { Dropdown } from "react-bootstrap";
+import loader from '../../media/common/loader.svg'
 
 //TODO: Как-то добавлять провайдера и signer сразу
 
@@ -1125,7 +1126,9 @@ class Tokens extends Component {
                         {
                            this.state.showLoading
                            ?
-                           <div className="spinner-border" role="status"></div>
+                           <div className="loader-wrapper">
+                              <img className="modal__loader" src={loader}></img>
+                           </div>
                            :
                            <>
                             <div>
@@ -1225,7 +1228,9 @@ class Tokens extends Component {
                         {
                             this.state.showLoading
                             ?
-                            <div className="spinner-border" role="status"></div>
+                            <div className="loader-wrapper">
+                                   <img className="modal__loader" src={loader}></img>
+                            </div>
                             :
                             (
                                 /*<table className="table table-bordered border-dark">
