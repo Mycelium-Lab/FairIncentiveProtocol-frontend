@@ -13,6 +13,7 @@ import FPDropdown from "../common/FPDropdown";
 import FPTable from "../common/FPTable";
 import { rewardEventsTable } from "../../data/tables";
 import SuccessModal from "../common/modals/success";
+import loader from '../../media/common/loader.svg'
 
 const types = {
     token: 'token',
@@ -42,15 +43,29 @@ class RewardEvents extends Component {
             tokenRewards: [],
             showSuccess: false,
             successName: null,
+            hasLoad: false,
         }
     }
 
     async componentDidMount() {
-        await this.getRewardTokenEvents()
-        await this.getRewardNFTEvents()
-        await this.getTokenRewardsName()
-        await this.getTokenRewards()
-        await this.getUsers()
+        this.setState({
+            hasLoad: true
+        })
+        try{
+            await this.getRewardTokenEvents()
+            await this.getRewardNFTEvents()
+            await this.getTokenRewardsName()
+            await this.getTokenRewards()
+            await this.getUsers()
+        }
+        catch(e) {
+            console.error(e)
+        }
+        finally{ 
+            this.setState({
+                hasLoad: false
+            })
+        }
     }
 
     async getRewardTokenEvents() {
@@ -322,7 +337,12 @@ class RewardEvents extends Component {
                         <input type="text" placeholder="Search..." className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                     </div>
                 </div>
+
                 {
+                     this.state.hasLoad ?  <img className="modal__loader_view modal__loader" src={loader}></img>
+                     :
+                     <>
+                        {
                     this.state.showFilter 
                     ? <div>
                             <div className="input-group_filter input-group">
@@ -554,6 +574,8 @@ class RewardEvents extends Component {
                     handleCloseSuccess={this.handleCloseSuccess}
                     successName={this.state.successName} 
                 />
+                     </>
+                }
             </>
         )
     }

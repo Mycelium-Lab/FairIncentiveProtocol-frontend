@@ -17,6 +17,7 @@ import { newUser } from "../../data/data";
 import empty from "../../media/common/empty_icon.svg"
 import customTokeSymbol from '../../media/common/custom_toke_symbol.svg'
 import SuccessModal from "../common/modals/success";
+import loader from '../../media/common/loader.svg'
 
 let propertiesElementsLength = 0
 let statsElementsLength = 0
@@ -64,6 +65,7 @@ class Users extends Component {
             showEditUser: false,
             showSuccess: false,
             successName: null,
+            hasLoad: false,
             newUserData: {
                 labels: newUser.map(data => data.time),
                 datasets: [{
@@ -82,9 +84,22 @@ class Users extends Component {
     }
 
     async componentDidMount() {
-        await this.getUsers()
-        await this.getTokenRewards()
-        await this.getNFTRewards()
+        this.setState({
+            hasLoad: true
+        })
+        try{
+            await this.getUsers()
+            await this.getTokenRewards()
+            await this.getNFTRewards()
+        }
+        catch(e) {
+            console.error(e)
+        }
+        finally{ 
+            this.setState({
+                hasLoad: false
+            })
+        }
     }
 
     onChangeExternalID(event) {
@@ -755,7 +770,11 @@ class Users extends Component {
                         this.state.users?.length ? <button onClick={this.handleShowAdd} type="button" className="btn btn_primary btn_orange">Add new user</button> : null
                     }
                 </div>
-                <Modal show={this.state.showAdd} onHide={this.handleCloseAdd} centered>
+                {
+                    this.state.hasLoad ?  <img className="modal__loader_view modal__loader" src={loader}></img>
+                    : 
+                    <>
+                    <Modal show={this.state.showAdd} onHide={this.handleCloseAdd} centered>
                     <Modal.Header closeButton>
                     <Modal.Title className="modal-newuser__title">Add new user</Modal.Title>
                     </Modal.Header>
@@ -1226,6 +1245,8 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                     handleCloseSuccess={this.handleCloseSuccess}
                     successName={this.state.successName} 
                 />
+                </>
+                }
             </>
         )
     }

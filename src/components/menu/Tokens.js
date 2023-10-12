@@ -113,6 +113,7 @@ class Tokens extends Component {
             stageOfCreateToken: 0,
             editMintingManagersElements: [],
             tokenInfo: {},
+            hasLoad: false,
             totalUserData: {
                 labels: newUser.map(data => data.time),
                 datasets: [{
@@ -124,7 +125,20 @@ class Tokens extends Component {
     }
 
     async componentDidMount() {
-        await this.getTokens()
+        this.setState({
+            hasLoad: true
+        })
+        try{
+            await this.getTokens()
+        }
+        catch(e) {
+            console.error(e)
+        }
+        finally{ 
+            this.setState({
+                hasLoad: false
+            })
+        }
     }
 
     onChangeName(event) {
@@ -846,6 +860,10 @@ class Tokens extends Component {
                 </div>
 
                 {
+                           this.state.hasLoad ?  <img className="modal__loader_view modal__loader" src={loader}></img>
+                           :
+                           <>
+ {
                      !this.state.tokens?.length && !this.state.showCreate ?
                      <div className="empty">
                        <div className="empty__wrapper">
@@ -1551,6 +1569,8 @@ class Tokens extends Component {
                     handleCloseError={this.handleCloseError}
                     errorText={this.state.errorText}
                 />
+                           </>
+                }
             </>
         )
     }
