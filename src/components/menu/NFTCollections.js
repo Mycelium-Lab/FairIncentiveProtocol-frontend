@@ -234,7 +234,12 @@ class NFTCollections extends Component {
         this.setState({stageOfCreateNftCollection: this.state.stageOfCreateNftCollection + 1 })
     }
     prevStage () {
-        this.setState({stageOfCreateNftCollection: this.state.stageOfCreateNftCollection - 1 })
+        if(this.state.stageOfCreateNftCollection === 1) {
+            this.setState({stageOfCreateNftCollection: this.state.stageOfCreateToken - 1, showCreate: false  })
+        }
+        else {
+            this.setState({stageOfCreateNftCollection: this.state.stageOfCreateToken - 1 })
+        }
     }
 
     nextStageAddNft() {
@@ -516,6 +521,9 @@ class NFTCollections extends Component {
 
                                 <div className="form_row mb-4">
                                 <div className="form_col_action_left form_col_last form_col">
+                                <button className="btn btn_pre-sm  btn_primary btn_gray" onClick={this.prevStage}>
+                                    Back
+                                </button>
                                 {
                                     (
                                         !this.state.address
