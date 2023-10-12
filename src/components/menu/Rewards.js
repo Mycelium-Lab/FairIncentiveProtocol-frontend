@@ -22,6 +22,7 @@ import { newUser } from "../../data/data";
 import total from '../../media/dashboard/total_rewards.svg'
 import rewarded from '../../media/dashboard/rewarded.svg'
 import newRewards from '../../media/dashboard/new_rewards.svg'
+import SuccessModal from "../common/modals/success";
 
 const types = {
     token: 'token',
@@ -69,6 +70,8 @@ class Rewards extends Component {
             reward_symbol: null,
             reward_nft_name: null,
             showFilter: false,
+            showSuccess: false,
+            successName: null,
             newUserData: {
                     labels: newUser.map(data => data.time),
                     datasets: [{
@@ -523,7 +526,11 @@ class Rewards extends Component {
                             v.address = reward_token
                         }}
                     )
-                    alert('Done')
+                    this.setState({
+                        showEditReward: false,
+                        showSuccess: true,
+                        successName: `The "${this.state.tokenRewards.find(v => v.id === reward_id).name}" event was successfully edited`
+                    })
                 } else {
                     let nftRewards = this.state.nftRewards
                     nftRewards.forEach(v => {
@@ -536,7 +543,11 @@ class Rewards extends Component {
                             v.nft_id = reward_nft_id
                         }
                     })
-                    alert('Done')
+                    this.setState({
+                        showEditReward: false,
+                        showSuccess: true,
+                        successName: `The "${this.state.nftRewards.find(v => v.id === reward_id).name}" event was successfully edited`
+                    })
                 }
             }
         } catch (error) {
@@ -719,7 +730,6 @@ class Rewards extends Component {
                 current_nfts: this.state.nfts.find(v => v.collection_address === reward_token).nfts
             }
         }
-        console.log(reward_name,  reward_description)
         this.setState(
             {   
                 showEditReward: true, 
@@ -738,6 +748,7 @@ class Rewards extends Component {
         )
     }
     handleCloseEditReward = () => this.setState({showEditReward: false})
+    handleCloseSuccess = () => this.setState({showSuccess: false})
 
     handleShowDelete = (reward_type, reward_id, reward_name) => this.setState({showDelete: true, reward_id, reward_name, reward_type})
     handleCloseDelete = () => this.setState({showDelete: false, reward_name: null, reward_id: null, reward_type: null})
@@ -779,6 +790,7 @@ class Rewards extends Component {
     changeTokenRewardStatus = this.changeTokenRewardStatus.bind(this)
     changeNFTRewardStatus = this.changeNFTRewardStatus.bind(this)
     saveEdit = this.saveEdit.bind(this)
+    handleCloseSuccess = this.handleCloseSuccess.bind(this)
 
     render() {
         return (
@@ -834,7 +846,7 @@ class Rewards extends Component {
                                             {ethers.utils.formatEther(v.amount)} {v.symbol}
                                           </td>
                                           <td>
-                                            {v.description}
+                                            {v.description ? v.description : '-'}
                                           </td>
                                           <td>
                                           {v.count} from ABC collection
@@ -951,7 +963,11 @@ class Rewards extends Component {
                                         }
                                         </select>
                                     </div>
-                                    <div className="form__prompt" id="basic-addon4">Select the user you would like to reward</div>
+                                    {
+                                        this.state.chosen_type === types.token
+                                        ? <div className="form__prompt" id="basic-addon4">Select the token to reward users with</div>
+                                        : <div className="form__prompt" id="basic-addon4">Select the NFT collection to reward users with</div>
+                                    }
                                 </div>
                          </div>                             
                         {
@@ -1368,6 +1384,11 @@ class Rewards extends Component {
                         <button onClick={() => this.state.reward_type === types.token ? this.deleteReward(this.state.reward_id) : this.deleteNFTReward(this.state.reward_id)} className="btn btn_primary btn_orange">Delete</button>
                     </Modal.Footer>
                 </Modal>
+                <SuccessModal 
+                    showSuccess={this.state.showSuccess} 
+                    handleCloseSuccess={this.handleCloseSuccess}
+                    successName={this.state.successName} 
+                />
             </>
         )
     }

@@ -16,7 +16,7 @@ import LineChart from "../charts/LineChart";
 import { newUser } from "../../data/data";
 import empty from "../../media/common/empty_icon.svg"
 import customTokeSymbol from '../../media/common/custom_toke_symbol.svg'
-
+import SuccessModal from "../common/modals/success";
 
 let propertiesElementsLength = 0
 let statsElementsLength = 0
@@ -62,6 +62,8 @@ class Users extends Component {
             comment: null,
             tabelData: userTable,
             showEditUser: false,
+            showSuccess: false,
+            successName: null,
             newUserData: {
                 labels: newUser.map(data => data.time),
                 datasets: [{
@@ -335,8 +337,12 @@ class Users extends Component {
                     }
                     return v
                 })
-                this.setState({users, showEdit: false})
-                alert('Done')
+                this.setState({
+                    users, showEdit: false,
+                    showSuccess: true,
+                    successName: `The user was successfully edited`
+                })
+                
             } else alert('Something went wrong')
         } catch (error) {
             console.log(error)
@@ -525,6 +531,7 @@ class Users extends Component {
     handleCloseStats = () => this.setState({showStats: false, edit_user: {}, basic_edit_user: {}, editPropertiesElements: [], editStatsElements: []})
     handleShowDelete = (chosen_user_external_id, chosen_user_id) => this.setState({showDelete: true, chosen_user_external_id, chosen_user_id})
     handleCloseDelete = () => this.setState({showDelete: false, chosen_user_external_id: null, chosen_user_id: null})
+    handleCloseSuccess = () => this.setState({showSuccess: false})
 
     deleteEditPropertyInput = (index) => {
         let propertiesElements = this.state.editPropertiesElements
@@ -668,6 +675,14 @@ class Users extends Component {
             edit_user
         })
     }
+    changeEditIage(event) {
+        console.log('changeEditIage', event)
+        let edit_user = this.state.edit_user
+        edit_user.image = event.name
+         this.setState({
+            edit_user
+        })
+    }
     changeEditNotes(event) {
         let edit_user = this.state.edit_user
         edit_user.notes = event.target.value
@@ -724,10 +739,12 @@ class Users extends Component {
     addEditPropertyInput = this.addEditPropertyInput.bind(this)
     changeEditPropertyName = this.changeEditPropertyName.bind(this)
     changeEditPropertyValue = this.changeEditPropertyValue.bind(this)
+    changeEditIage = this.changeEditIage.bind(this)
     deleteEditStatInput = this.deleteEditStatInput.bind(this)
     addEditStatInput = this.addEditStatInput.bind(this)
     changeEditStatName = this.changeEditStatName.bind(this)
     changeEditStatValue = this.changeEditStatValue.bind(this)
+    handleCloseSuccess = this.handleCloseSuccess.bind(this)
 
     render() {
         return (
@@ -991,7 +1008,7 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                         <div className="mb-4">
                             <label className="form__label">Profile image *</label>
                             <div className="input-group">
-                                <FileUpload></FileUpload>
+                                <FileUpload getImage={this.changeEditIage}></FileUpload>
                             </div>
                             <div className="form__prompt" id="basic-addon4">File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>
                         </div>
@@ -1204,6 +1221,11 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                         <button className="btn btn_primary btn_orange" onClick={() => this.deleteUser(this.state.chosen_user_id)}>Delete</button>
                     </Modal.Footer>
                 </Modal>
+                <SuccessModal 
+                    showSuccess={this.state.showSuccess} 
+                    handleCloseSuccess={this.handleCloseSuccess}
+                    successName={this.state.successName} 
+                />
             </>
         )
     }

@@ -16,7 +16,7 @@ class FPTable extends Component {
                          <tr>
                              {
                                  data.map(d => (
-                                     <th key={d.key}>
+                                     <th key={d.id}>
                                         {d.name}
                                         {d.name === 'Balance' || d.name === 'Price' ? <img className="form__icon-info" src={info}/> : null}
                                     </th>

@@ -1,194 +1,196 @@
+import { v4 as uuidv4 } from 'uuid';
+
 const userTable = [
         {
-            id: 1,
+            id: uuidv4(),
             name: 'ID',
         },
         {
-            id: 2,
+            id: uuidv4(),
             name: 'Name',
         },
         {
-            id: 3,
+            id: uuidv4(),
             name: 'Wallet',
         },
         {
-            id: 4,
+            id: uuidv4(),
             name: 'Tokens',
         },
         {
-            id: 5,
+            id: uuidv4(),
             name: 'Rewards',
         },
         {
-            id: 6,
+            id: uuidv4(),
             name: 'Actions',
         },
     ]
 
 const tokenTable = [
         {
-            id: 1,
+            id: uuidv4(),
             name: 'Token',
         },
         {
-            id: 2,
+            id: uuidv4(),
             name: 'Balance',
         },
         {
-            id: 3,
+            id: uuidv4(),
             name: 'Price',
         },
         {
-            id: 4,
+            id: uuidv4(),
             name: 'Supply',
         },
         {
-            id: 6,
+            id: uuidv4(),
             name: 'Actions',
         },
     ]
 
     const blacklistTable = [
         {
-            id: 1,
+            id: uuidv4(),
             name: 'Select',
         },
         {
-            id: 2,
+            id: uuidv4(),
             name: 'Wallet',
         },
         {
-            id: 3,
+            id: uuidv4(),
             name: 'Block Date',
         },
     ]
 
    const  nftsTable = [
         {
-            id: 1,
+            id: uuidv4(),
             name: 'Name',
         },
         {
-            id: 2,
+            id: uuidv4(),
             name: 'NFT items',
         },
         {
-            id: 3,
+            id: uuidv4(),
             name: 'Info',
         },
         {
-            id: 6,
+            id: uuidv4(),
             name: 'Actions',
         },
     ]
 
     const rewardsTable = [
         {
-            id: 1,
+            id: uuidv4(),
             name: 'Status',
         },
         {
-            id: 2,
+            id: uuidv4(),
             name: 'Name',
         },
         {
-            id: 3,
+            id: uuidv4(),
             name: 'Reward',
         },
         {
-            id: 3,
+            id: uuidv4(),
             name: 'Description',
         },
         {
-            id: 4,
+            id: uuidv4(),
             name: 'Rewarded'
         },
         {
-            id: 5,
+            id: uuidv4(),
             name: 'Actions',
         },
     ]
 
     const rewardEventsTable = [
         {
-            id: 1,
+            id: uuidv4(),
             name: 'ID',
         },
         {
-            id: 2,
+            id: uuidv4(),
             name: 'Status',
         },
         {
-            id: 3,
+            id: uuidv4(),
             name: 'Reward',
         },
         {
-            id: 4,
+            id: uuidv4(),
             name: 'Distributed',
         },
         {
-            id: 5,
+            id: uuidv4(),
             name: 'User',
         },
         {
-            id: 6,
+            id: uuidv4(),
             name: 'Actions',
         },
     ]
 
     const paymentMethodsTable = [
         {
-            id: 1,
+            id: uuidv4(),
             name: 'Card',
         },
         {
-            id: 2,
+            id: uuidv4(),
             name: 'Expire date',
         },
         {
-            id: 3,
+            id: uuidv4(),
             name: 'Status',
         },
         {
-            id: 4,
+            id: uuidv4(),
             name: 'Actions',
         },
     ]
 
     const billingHistoryTable = [
         {
-            id: 1,
+            id: uuidv4(),
             name: 'Date',
         },
         {
-            id: 2,
+            id: uuidv4(),
             name: 'Description',
         },
         {
-            id: 3,
+            id: uuidv4(),
             name: 'Amount',
         },
         {
-            id: 4,
+            id: uuidv4(),
             name: 'Actions',
         },
     ]
 
     const teamTable = [
         {
-            id: 1,
+            id: uuidv4(),
             name: 'Name',
         },
         {
-            id: 2,
+            id: uuidv4(),
             name: 'Role',
         },
         {
-            id: 3,
+            id: uuidv4(),
             name: 'Status',
         },
         {
-            id: 4,
+            id: uuidv4(),
             name: 'Actions',
         },
     ]

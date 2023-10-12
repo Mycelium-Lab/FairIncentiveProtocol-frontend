@@ -67,6 +67,15 @@ class Settings extends Component {
         })
     }
 
+    async changeProfile () {
+        await this.changeName()
+        await this.changeEmail()
+        await this.changePhone()
+        if(this.state.password) {
+            await this.changePassword()
+        }
+        this.handleShowSuccess('The company data was successfully updated')
+    }
     async changeName() {
         try {
             const headers = new Headers();
@@ -86,7 +95,7 @@ class Settings extends Component {
             const json = await res.json()
             if (res.status === 200) {
                 console.log(json.body.message)
-                this.handleShowSuccess(json.body.message, json.body.message)
+               // this.handleShowSuccess(json.body.message, json.body.message)
             } else {
                 this.handleShowError(json.error.message)
             }
@@ -114,7 +123,7 @@ class Settings extends Component {
             const json = await res.json()
             if (res.status === 200) {
                 console.log(json.body.message)
-                this.handleShowSuccess(json.body.message, json.body.message)
+               // this.handleShowSuccess(json.body.message, json.body.message)
             } else {
                 this.handleShowError(json.error.message)
             }
@@ -142,7 +151,7 @@ class Settings extends Component {
             const json = await res.json()
             if (res.status === 200) {
                 console.log(json.body.message)
-                this.handleShowSuccess(json.body.message, json.body.message)
+               // this.handleShowSuccess(json.body.message, json.body.message)
             } else {
                 this.handleShowError(json.error.message)
             }
@@ -198,7 +207,7 @@ class Settings extends Component {
             const json = await res.json()
             if (res.status === 200) {
                 console.log(json.body.message)
-                this.handleShowSuccess(json.body.message, json.body.message)
+               // this.handleShowSuccess(json.body.message, json.body.message)
             } else {
                 this.handleShowError(json.error.message)
             }
@@ -269,6 +278,7 @@ class Settings extends Component {
     onChangePassword = this.onChangePassword.bind(this)
     changeName = this.changeName.bind(this)
     changeEmail = this.changeEmail.bind(this)
+    changeProfile = this.changeProfile.bind(this)
     changePhone = this.changePhone.bind(this)
     changeWallet = this.changeWallet.bind(this)
     changePassword = this.changePassword.bind(this)
@@ -294,13 +304,13 @@ class Settings extends Component {
                                         <div className="form_col">
                                             <label className="form__label">Name: </label>
                                             <div className="input-group">
-                                                <input type="text" placeholder="Mike Jackson" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                <input type="text" placeholder="Mike Jackson" onChange={this.onChangeName} value={this.state.name} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                             </div>
                                         </div>
                                         <div className="form_col_last form_col">
                                             <label className="form__label">Email:</label>
                                             <div className="input-group">
-                                            <input type="text" placeholder="mj@gmail.com"  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                            <input type="text" placeholder="mj@gmail.com" onChangeEmail value={this.state.email}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                             </div>
                                         </div>
                                     </div>
@@ -310,7 +320,7 @@ class Settings extends Component {
                                         <div className="form_col">
                                             <label className="form__label">Phone:</label>
                                             <div className="input-group">
-                                                <input type="text" placeholder="+7 999 202 77 77" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                <input type="text" placeholder="+7 999 202 77 77" onChange={this.onChangePhone} value={this.state.phone} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                             </div>
                                         </div>
                                     </div>
@@ -330,7 +340,7 @@ class Settings extends Component {
                                         <div className="form_col_last form_col">
                                             <label className="form__label">Password</label>
                                             <div className="input-group">
-                                                <input type="text"  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                <input type="text" value={this.state.password} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                 <button className="btn btn__reset btn_primary btn_orange ms-3">Reset</button>
                                             </div>
                                         </div>
@@ -358,7 +368,7 @@ class Settings extends Component {
                                 
                                 <div className="form_row mb-4">
                                         <div className="form_col_action_left form_col_last form_col">
-                                            <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.nextStage}>
+                                            <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.changeProfile}>
                                                 Save
                                             </button>
                                         </div>

@@ -68,7 +68,7 @@ class DatePicker extends React.Component {
                 className="inputBox mb-4"
                 onClick={this.handleOpen}
             />
-                <div class ref={this.textInput}>
+                <div ref={this.textInput}>
                     {this.state.open 
                     ? 
                     <DateRangePicker

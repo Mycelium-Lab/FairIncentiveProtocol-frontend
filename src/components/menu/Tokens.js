@@ -28,6 +28,9 @@ import { tokenTable, blacklistTable } from "../../data/tables";
 import FPTable from "../common/FPTable";
 import FPDropdown from "../common/FPDropdown";
 import { Dropdown } from "react-bootstrap";
+import loader from '../../media/common/loader.svg'
+import LineChart from "../charts/LineChart";
+import { newUser } from "../../data/data";
 
 //TODO: Как-то добавлять провайдера и signer сразу
 
@@ -108,7 +111,15 @@ class Tokens extends Component {
             burnAmount: null,
             otherBurnAddress: null,
             stageOfCreateToken: 0,
-            editMintingManagersElements: []
+            editMintingManagersElements: [],
+            tokenInfo: {},
+            totalUserData: {
+                labels: newUser.map(data => data.time),
+                datasets: [{
+                    data: newUser.map(data => data.amount),
+                    borderColor: ['rgba(255, 159, 67, 0.85)'],
+                }]
+            },
         }
     }
 
@@ -214,7 +225,12 @@ class Tokens extends Component {
         this.setState({stageOfCreateToken: this.state.stageOfCreateToken + 1 })
     }
     prevStage () {
-        this.setState({stageOfCreateToken: this.state.stageOfCreateToken - 1 })
+        if(this.state.stageOfCreateToken === 1) {
+            this.setState({stageOfCreateToken: this.state.stageOfCreateToken - 1, showCreate: false  })
+        }
+        else {
+            this.setState({stageOfCreateToken: this.state.stageOfCreateToken - 1 })
+        }
     }
 
     async connect() {
@@ -362,7 +378,9 @@ class Tokens extends Component {
                 const _tokens = this.tokens
                 _tokens.push(token)
                 this.setState({
-                    tokens: _tokens
+                    tokens: _tokens,
+                    showCreate: false,
+                    stageOfCreateToken: 0,
                 })
             } else {
                 alert('Something went wrong')
@@ -706,7 +724,9 @@ class Tokens extends Component {
     }
     handleCloseRoles = () => this.setState({showRoles: false})
 
-    handleShowInfo = () =>  this.setState({showInfo: true})
+    handleShowInfo = (info) =>  {
+        this.setState({showInfo: true, tokenInfo: info})
+    }
     handleCloseInfo = () =>  this.setState({showInfo: false})
 
     handleShowPause = async (currentTokenSymbol, currentTokenAddress, currentTokenChainid) => {
@@ -966,6 +986,9 @@ class Tokens extends Component {
                         </div>
                         <div className="form_row mb-4">
                                 <div className="form_col_action_left form_col_last form_col">
+                                    <button className="btn btn_pre-sm  btn_primary btn_gray" onClick={this.prevStage}>
+                                        Back
+                                    </button>
                                     <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.nextStage}>
                                         Next
                                     </button>
@@ -1104,7 +1127,7 @@ class Tokens extends Component {
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowPause(v.symbol, v.address, v.chainid)} disabled={!v.pausable}>Pause</Dropdown.Item>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowRoles(v.symbol, v.address, v.chainid)}>Roles control</Dropdown.Item>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowBlacklist(v.symbol, v.address, v.chainid)} disabled={!v.blacklist}>Blacklist</Dropdown.Item>
-                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowInfo(v.symbol, v.address, v.chainid)}>Token info</Dropdown.Item>
+                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowInfo(v)}>Token info</Dropdown.Item>
                                             </FPDropdown>
                                           </td>
                                       </tr>
@@ -1123,7 +1146,9 @@ class Tokens extends Component {
                         {
                            this.state.showLoading
                            ?
-                           <div className="spinner-border" role="status"></div>
+                           <div className="loader-wrapper">
+                              <img className="modal__loader" src={loader}></img>
+                           </div>
                            :
                            <>
                             <div>
@@ -1223,7 +1248,9 @@ class Tokens extends Component {
                         {
                             this.state.showLoading
                             ?
-                            <div className="spinner-border" role="status"></div>
+                            <div className="loader-wrapper">
+                                   <img className="modal__loader" src={loader}></img>
+                            </div>
                             :
                             (
                                 /*<table className="table table-bordered border-dark">
@@ -1385,22 +1412,26 @@ class Tokens extends Component {
                 </Modal>
                 <Modal show={this.state.showInfo} onHide={this.handleCloseInfo} centered>
                         <Modal.Header className="modal-newuser__title modal-title modal-header" closeButton>
-                            token info
+                            {this.state.tokenInfo.symbol} token info
                         </Modal.Header>
-                        <Modal.Body>
+                        <Modal.Body className="mb-4">
                         <div className="form_row mb-4">
                             <div className="form__group_top-row-left">
                                             <img src={customTokeSymbol}></img>
                                             <div>
-                                            <div className="form__label_group form__label">ABC
+                                            <div className="form__label_group form__label">
+                                                {
+                                                    this.state.tokenInfo.symbol
+                                                }
                                             </div>
                                             <div className="modal-text modal-text__caption">
-                                                Token name
+                                                { this.state.tokenInfo.name}
                                             </div>
                                         </div>
                             </div>
                             <div className="info__group-price info__group">
-                                <span className="form__label_group form__label">Price: ~ 11.7 USD</span>
+                                {/*<span className="form__label_group form__label">Price: ~ 11.7 USD</span>*/}
+                                <span className="form__label_group form__label">Price: (soon)</span>
                                 <span className="info__group-price_red info__group-price"> <img src={down} /> <span className="modal-text modal-text__caption">15.4%</span></span>
                             </div>
                         </div>
@@ -1408,33 +1439,41 @@ class Tokens extends Component {
                                 
                             <ol className="mint-token-info-list">
                                     <li className="modal-text">
-                                        Contracts: 11 <img src={info} className="form__icon-info"/>
-                                        <ul className="unlist">
+                                        Contracts: (soon) <img src={info} className="form__icon-info"/>
+                                       {/*<ul className="unlist">
                                             <li className="custom-marker_circle_black"><a className="link__primary">0x2170ed0880ac9a755fd29b2688956bd959f933f8</a> <img src={copy} className="form__icon-info"></img></li>
-                                        </ul>
+                                            </ul>*/}
                                     </li>
                                     <li className="modal-text">
-                                        Holders: 11 <img src={info} className="form__icon-info"/>
+                                        Holders: (soon) <img src={info} className="form__icon-info"/>
                                     </li>
                                     <li className="modal-text">
-                                        Decimals: 11 <img src={info} className="form__icon-info"/>
+                                        Decimals: {this.state.tokenInfo.decimals ? this.state.tokenInfo.decimals : '-'} <img src={info} className="form__icon-info"/>
                                     </li>
                                     <li className="modal-text">
-                                        The contract balance: 11<img src={info} className="form__icon-info"/>
+                                        The contract balance: (soon)<img src={info} className="form__icon-info"/>
                                     </li>
                                     <li className="modal-text">
-                                        Total supply: 11<img src={info} className="form__icon-info"/>
+                                        Total supply: (soon)<img src={info} className="form__icon-info"/>
                                     </li>
                                     <li className="modal-text">
-                                        Max supply: 2 000 000 <img src={info} className="form__icon-info"/>
+                                        Max supply: {this.state.tokenInfo.max_supply ? this.state.tokenInfo.max_supply : '-'} <img src={info} className="form__icon-info"/>
                                     </li>
                                     <li className="modal-text">
-                                        Circulating Supply: 500 000 ABC <img src={info} className="form__icon-info"/>
+                                        Circulating Supply: (soon) <img src={info} className="form__icon-info"/>
                                     </li>
                                     <li className="modal-text">
-                                        Available to mint: 1 000 000 ABC <a className="info__content-mint_medium info__content-mint">{'[mint]'}</a> <img src={info} className="form__icon-info"/>
+                                        Available to mint: (soon) <a className="info__content-mint_medium info__content-mint">{'[mint]'}</a> <img src={info} className="form__icon-info"/>
                                     </li>
                                 </ol>
+                            </div>
+
+                          
+                            <div className="dashboard__chart_reward">
+                                <label className="chart__label">Token distribution <br/> statistic</label>
+                                <div className="mb-4" style={{position: 'relative', width:'100%', display: 'flex', justifyContent: 'center', padding: '0 24px'}}>
+                                <LineChart chartData={this.state.totalUserData}></LineChart>
+                                </div>
                             </div>
                            
                         </Modal.Body>
