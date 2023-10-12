@@ -29,6 +29,7 @@ import { nftsTable } from "../../data/tables";
 import FileUpload from "../FileUpload";
 import FPDropdown from "../common/FPDropdown";
 import { Dropdown, Form } from "react-bootstrap";
+import loader from '../../media/common/loader.svg'
 
 const beneficialTypes = {
     company: "company",
@@ -81,11 +82,25 @@ class NFTCollections extends Component {
             other: null,
             stageOfCreateNftCollection: 1,
             stageOfAddNft: 0,
+            hasLoad: false,
         }
     }
 
     async componentDidMount() {
-        await this.getNFTCollections()
+        this.setState({
+            hasLoad: true
+        })
+        try{
+            await this.getNFTCollections()
+        }
+        catch(e) {
+            console.error(e)
+        }
+        finally{ 
+            this.setState({
+                hasLoad: false
+            })
+        }
     }
 
     onChangeName(event) {
@@ -471,6 +486,10 @@ class NFTCollections extends Component {
                     }
                 </div>
                 {
+                     this.state.hasLoad ?  <img className="modal__loader_view modal__loader" src={loader}></img>
+                     : 
+                     <>
+                        {
                      this.state.showCreate && this.state.stageOfCreateNftCollection === 1 
                     ?   <div className="content__wrap">
                          <button onClick={this.connect} type="button" className="btn btn-dark">{this.state.address ? createLongStrView(this.state.address) : 'Connect'}</button>
@@ -1380,6 +1399,8 @@ class NFTCollections extends Component {
                     handleCloseError={this.handleCloseError}
                     errorText={this.state.errorText}
                 />
+                     </>
+                }
             </>
         )
     }

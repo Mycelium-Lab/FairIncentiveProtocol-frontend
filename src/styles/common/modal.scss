@@ -84,6 +84,11 @@
     animation: 1s linear 0s normal none infinite running loader;
     -webkit-animation: 1s linear 0s normal none infinite running loader;
   }
+
+  .modal__loader_view{
+    width: 80px;
+   align-self: center;
+  }
   
   @keyframes loader {
     0% {

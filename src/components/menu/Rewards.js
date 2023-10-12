@@ -18,6 +18,7 @@ import { Dropdown } from "react-bootstrap";
 import LineChart from "../charts/LineChart";
 import BarChart from "../charts/BarChart";
 import { newUser } from "../../data/data";
+import loader from '../../media/common/loader.svg'
 
 import total from '../../media/dashboard/total_rewards.svg'
 import rewarded from '../../media/dashboard/rewarded.svg'
@@ -72,6 +73,7 @@ class Rewards extends Component {
             showFilter: false,
             showSuccess: false,
             successName: null,
+            hasLoad: false,
             newUserData: {
                     labels: newUser.map(data => data.time),
                     datasets: [{
@@ -90,12 +92,25 @@ class Rewards extends Component {
     }
 
     async componentDidMount() {
-        await this.getTokens()
-        await this.getUsers()
-        await this.getTokenRewards()
-        await this.getNFTRewards()
-        
-        this.getNFTCollections().then(async () => await this.getNFTs())
+        this.setState({
+            hasLoad: true
+        })
+        try{
+            await this.getTokens()
+            await this.getUsers()
+            await this.getTokenRewards()
+            await this.getNFTRewards()
+            
+            this.getNFTCollections().then(async () => await this.getNFTs())
+        }
+        catch(e) {
+            console.error(e)
+        }
+        finally{ 
+            this.setState({
+                hasLoad: false
+            })
+        }
     }
 
     async getTokens() {
@@ -812,6 +827,10 @@ class Rewards extends Component {
                     </div>
                 </div>
                 {
+                     this.state.hasLoad ?  <img className="modal__loader_view modal__loader" src={loader}></img>
+                     : 
+                     <>
+                        {
                     this.state.showFilter 
                     ? <div>
                             <div className="input-group_filter input-group">
@@ -1389,6 +1408,8 @@ class Rewards extends Component {
                     handleCloseSuccess={this.handleCloseSuccess}
                     successName={this.state.successName} 
                 />
+                     </>
+                }
             </>
         )
     }
