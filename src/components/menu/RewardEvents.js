@@ -4,7 +4,6 @@ import { getBearerHeader } from "../../utils/getBearerHeader";
 import { createLongStrView } from "../../utils/longStrView";
 import filter from '../../media/common/filter.svg'
 import close from '../../media/common/close.svg'
-//import '../../styles/rewardEvents.scss'
 import { ethers } from "ethers";
 import { Modal } from "react-bootstrap";
 import more from '../../media/common/more.svg'
@@ -13,6 +12,7 @@ import { Dropdown } from "react-bootstrap";
 import FPDropdown from "../common/FPDropdown";
 import FPTable from "../common/FPTable";
 import { rewardEventsTable } from "../../data/tables";
+import SuccessModal from "../common/modals/success";
 
 const types = {
     token: 'token',
@@ -36,13 +36,20 @@ class RewardEvents extends Component {
             comment: null, 
             users: [],
             reward_id: null,
+            user_id: null,
             reward_nft_id: null,
+            tokenRewardsName: [],
+            tokenRewards: [],
+            showSuccess: false,
+            successName: null,
         }
     }
 
     async componentDidMount() {
         await this.getRewardTokenEvents()
         await this.getRewardNFTEvents()
+        await this.getTokenRewardsName()
+        await this.getTokenRewards()
         await this.getUsers()
     }
 
@@ -88,6 +95,48 @@ class RewardEvents extends Component {
         }
     }
 
+    async getTokenRewards() {
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/rewards/get/token`, requestOptions)
+            const json = await res.json()
+            this.setState({
+                tokenRewards: json.body.data
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+
+    async getTokenRewardsName() {
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/rewards/get/token`, requestOptions)
+            const json = await res.json()
+            const rewards = json.body.data.map(v => <option value={v.id}>{v.name}</option>)
+            this.setState({
+                tokenRewardsName: rewards
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     async getUsers() {
         try {
             const headers = new Headers();
@@ -108,6 +157,12 @@ class RewardEvents extends Component {
         } catch (error) {
             console.log(error)
         }
+    }
+
+    changeRewardToken(event) {
+       this.setState({
+        reward_id: event.target.value
+       })
     }
 
     async deleteTokenRewardEvent(id) {
@@ -172,6 +227,22 @@ class RewardEvents extends Component {
         }
     }
 
+ 
+
+    changeUser(event) {
+        this.setState({
+            chosen_user: event.target.value
+        })
+    }
+
+
+    changeComment(event) {
+        this.setState({
+            comment: event.target.value
+        })
+    }
+    
+
     async rewardWithToken() {
         try {
             const headers = new Headers();
@@ -196,9 +267,10 @@ class RewardEvents extends Component {
             if (res.status === 200) {
                 let tokenRewards = this.state.tokenRewards
                 tokenRewards.forEach(v => {if (v.id == this.state.reward_id) v.count = parseInt(v.count) + 1})
-                alert('Done')
                 this.setState({
-                    showReward: false
+                    showReward: false,
+                    showSuccess: true,
+                    successName: `The "${tokenRewards.find(v => v.id === this.state.reward_id).name}" event was successfully added`
                 })
             }
             else alert('Something went wrong')
@@ -207,69 +279,30 @@ class RewardEvents extends Component {
         }
     }
 
-    async rewardWithNFT() {
-        try {
-            const headers = new Headers();
-            headers.append("Content-Type", "application/json");
-            headers.append("Authorization", getBearerHeader())
-            const raw = JSON.stringify(
-                {
-                    reward_id: this.state.reward_id,
-                    user_id: this.state.chosen_user,
-                    comment: this.state.comment
-                }
-            );
-            const requestOptions = {
-                method: 'POST',
-                headers: headers,
-                body: raw,
-                redirect: 'follow'
-              };
-            const res = await fetch(`${config.api}/rewards/reward/nft`, requestOptions)
-            const json = await res.json()
-            if (res.status === 200) {
-                let nftRewards = this.state.nftRewards
-                nftRewards.forEach(v => {if (v.id == this.state.reward_id) v.count = parseInt(v.count) + 1})
-                alert('Done')
-                this.setState({
-                    showReward: false
-                })
-            }
-            else alert('Something went wrong')
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    changeUser(event) {
-        this.setState({
-            chosen_user: event.target.value
-        })
-    }
-
-
-    changeComment(event) {
-        this.setState({
-            comment: event.target.value
-        })
-    }
 
     handleShowRevoke = (revoke_event_id, revoke_event_type) => this.setState({showRevoke: true, revoke_event_id, revoke_event_type})
     handleCloseRevoke = () => this.setState({showRevoke: false, revoke_event_id: null, revoke_event_type: null})
     handleShowReward = () => this.setState({showReward: true})
     handleCloseReward = () => this.setState({showReward: false})
+    handleCloseSuccess = () => this.setState({showSuccess: false, successName: null})
     changeUser = this.changeUser.bind(this)
     changeComment = this.changeComment.bind(this)
+    changeRewardToken = this.changeRewardToken.bind(this)
+    getTokenRewards = this.getTokenRewards.bind(this)
+    getTokenRewardsName = this.getTokenRewardsName.bind(this)
     getUsers = this.getUsers.bind(this)
-    rewardWithToken = this.rewardWithToken.bind(this)
-    rewardWithNFT = this.rewardWithNFT.bind(this)
 
     deleteTokenRewardEvent = this.deleteTokenRewardEvent.bind(this)
     deleteNFTRewardEvent = this.deleteNFTRewardEvent.bind(this)
     handleShowRevoke = this.handleShowRevoke.bind(this)
     handleCloseRevoke = this.handleCloseRevoke.bind(this)
+    handleShowReward = this.handleShowReward.bind(this)
+    handleCloseReward = this.handleCloseReward.bind(this)
+    rewardWithToken = this.rewardWithToken.bind(this)
+    handleCloseSuccess = this.handleCloseSuccess.bind(this)
 
     render() {
+
         return (
             <>
                 <div className="title-header">
@@ -335,7 +368,7 @@ class RewardEvents extends Component {
                                             <FPDropdown icon={more}>
                                             {
                                                 v.status === 'Accrued'
-                                                ?  <Dropdown.Item className="dropdown__menu-item" onClick={this.handleShowRevoke(v.event_id, types.token)} >Revoke</Dropdown.Item>
+                                                ?  <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowRevoke(v.event_id, types.token)} >Revoke</Dropdown.Item>
                                                 : null
                                             }
                                             </FPDropdown>
@@ -459,9 +492,10 @@ class RewardEvents extends Component {
                                 <div className="form_col_last form_col">
                                 <label className="form__label">Select reward: <img className="form__icon-info" src={info}></img></label>
                                 <div className="input-group mb-4">
-                                    <select onChange={this.state.chosen_type === types.token ? this.changeRewardToken : this.changeRewardNFT} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                    <select onChange={this.changeRewardToken} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+
                                         {
-                                            this.state.rewardTokenEvents
+                                            this.state.tokenRewardsName
                                         }                                          
                                     </select>
                                 </div>
@@ -502,19 +536,24 @@ class RewardEvents extends Component {
                     </Modal.Footer>
                 </Modal>
                 <Modal show={this.state.showRevoke} onHide={this.handleCloseRevoke} centered>
-                        <Modal.Header closeButton>
+                        <Modal.Header closeButton className="modal-newuser__title modal-title h4 mb-4 modal-header">
                             Revoke {createLongStrView(this.state.revoke_event_id)} event?
                         </Modal.Header>
                         <Modal.Footer>
-                            <button className="btn btn-dark" onClick={
+                            <button className="btn btn_primary btn_gray" onClick={this.handleCloseRevoke}>Cancel</button>
+                            <button className="btn btn_primary btn_orange" onClick={
                                 () => 
                                     this.state.revoke_event_type === types.token ? 
                                     this.deleteTokenRewardEvent(this.state.revoke_event_id) :
                                     this.deleteNFTRewardEvent(this.state.revoke_event_id)
                             }>Revoke</button>
-                            <button className="btn btn-dark" onClick={this.handleCloseRevoke}>Cancel</button>
                         </Modal.Footer>
                 </Modal>
+                <SuccessModal 
+                    showSuccess={this.state.showSuccess} 
+                    handleCloseSuccess={this.handleCloseSuccess}
+                    successName={this.state.successName} 
+                />
             </>
         )
     }

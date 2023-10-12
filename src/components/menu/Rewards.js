@@ -951,7 +951,11 @@ class Rewards extends Component {
                                         }
                                         </select>
                                     </div>
-                                    <div className="form__prompt" id="basic-addon4">Select the user you would like to reward</div>
+                                    {
+                                        this.state.chosen_type === types.token
+                                        ? <div className="form__prompt" id="basic-addon4">Select the token to reward users with</div>
+                                        : <div className="form__prompt" id="basic-addon4">Select the NFT collection to reward users with</div>
+                                    }
                                 </div>
                          </div>                             
                         {
