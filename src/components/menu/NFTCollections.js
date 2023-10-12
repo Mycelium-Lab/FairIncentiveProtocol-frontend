@@ -341,9 +341,10 @@ class NFTCollections extends Component {
               };
             const res = await fetch(`${config.api}/nfts/add/nft`, requestOptions)
             if (res.status === 200){
-                alert('Done')
                 this.setState({
-                    showAddNFT: false
+                    showAddNFT: false,
+                    showSuccess: true,
+                    successName: `The NFT "${this.state.addNFTName}" was successfully created`
                 })
             }
             else alert('Something went wrong')
@@ -703,7 +704,7 @@ class NFTCollections extends Component {
                                             <div className="form_col">
                                                 <img className="instagram-icon" src={instagram}></img>
                                                 <div className="input-group">
-                                                    <input type="text" placeholder="instagram" value={this.state.instagram} onChange={this.onChangeInstagram}  className="form-control_with_image form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                    <input type="text" placeholder="Instagram" value={this.state.instagram} onChange={this.onChangeInstagram}  className="form-control_with_image form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                 </div>
                                         
                                             </div>
@@ -1192,7 +1193,7 @@ class NFTCollections extends Component {
                                                 <div className="form_col_last form_col">
                                                     <label className="form__label">External link: <img src={info} className="form__icon-info"/></label>
                                                     <div className="input-group">
-                                                    <input type="text" placeholder="https://website.com/item/123" onChange={this.onChangeSymbol} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                    <input type="text" placeholder="https://website.com/item/123" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                     </div>
                                                     <div className="form__prompt" id="basic-addon4">Will include a link to this URL on this item's detail page, so that users can click to learn more about it</div>
                                                 </div>

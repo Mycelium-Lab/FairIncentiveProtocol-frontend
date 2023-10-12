@@ -14,6 +14,7 @@ import nft3 from '../../media/collectionDetail/default_nft_3.png'
 import nft4 from '../../media/collectionDetail/default_nft_4.png'
 import { Card } from "react-bootstrap";
 import Modal from 'react-bootstrap/Modal';
+import { createLongStrView } from "../../utils/longStrView";
 
 class NFTs extends Component {
 
@@ -21,12 +22,35 @@ class NFTs extends Component {
         super()
         this.state = {
             nfts: [],
-            showNFT: false
+            nftCollection: {},
+            showNFT: false,
+            activeNft: null
         }
     }
 
     async componentDidMount() {
         await this.getNFTs()
+        await this.getNFTCollections()
+    }
+
+    async getNFTCollections() {
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/nfts/collections`, requestOptions)
+            const json = await res.json()
+            this.setState({
+                nftCollection: json.body.data[0]
+            })
+        } catch (error) {
+            alert(error)
+        }
     }
 
     async getNFTs() {
@@ -41,6 +65,7 @@ class NFTs extends Component {
               };
             const res = await fetch(`${config.api}/nfts/nfts`, requestOptions)
             const json = await res.json()
+            console.log(json)
             const nfts = []
             const keys = Object.keys(json.body.data)
             for (let i = 0; i < keys.length; i++) {
@@ -87,10 +112,11 @@ class NFTs extends Component {
         }
     }
 
-    handleShowNFT = () => { this.setState({showNFT: true})}
+    handleShowNFT = (activeNft) => { this.setState({showNFT: true, activeNft})}
     handleCloseMFT = () => { this.setState({showNFT: false})}
 
     getNFTs = this.getNFTs.bind(this)
+    getNFTCollections = this.getNFTCollections.bind(this)
     deleteNFT = this.deleteNFT.bind(this)
     handleShowNFT = this.handleShowNFT.bind(this)
     handleCloseMFT = this.handleCloseMFT.bind(this)
@@ -151,7 +177,7 @@ class NFTs extends Component {
                         </ul>
                     </div>
                     <div className="profile__decs">
-                        <h4 className="menu__title-secondary">ABC collection</h4>
+                        <h4 className="menu__title-secondary">{this.state.nftCollection.symbol} collection</h4>
                         <ul className="profile__decs_stats unlist">
                             <li className="profile__decs_stats-item">
                                 <span className="text_gray text_primary">Items 1,000</span></li>
@@ -162,24 +188,27 @@ class NFTs extends Component {
                                 <li className="profile__decs_stats-item_decor profile__decs_stats-item"><span className="text_gray text_primary">Chain: Ethereum</span></li>
                         </ul>
                         <p className="text_gray text_primary">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                        {this.state.nftCollection.description}
                         </p>
                     </div>
                     <div className="profile__nfts">
                         <ul className="profile__nfts-list unlist">
-                            <li className="profile__nfts-list-item" onClick={this.handleShowNFT}>
-                            <Card className="profile__nfts-card">
-                                <Card.Img variant="top" src={nft1} />
-                                <Card.Body>
-                                    <Card.Title className="title_secondary ">Card Title</Card.Title>
-                                    <Card.Text className="text_gray text_card text_primary">
-                                    Some quick example text to build on the card title and make up the
-                                    bulk of the card's content.
-                                    </Card.Text>
-                                    </Card.Body>
-                                </Card>
-                            </li>
-                            <li className="profile__nfts-list-item" onClick={this.handleShowNFT}>
+                            {
+                                this.state.nfts.map(v => 
+                                    <li key={v.id} className="profile__nfts-list-item" onClick={() => this.handleShowNFT(v)}>
+                                    <Card className="profile__nfts-card">
+                                        <Card.Img variant="top" src={nft1} />
+                                        <Card.Body>
+                                            <Card.Title className="title_secondary ">{v.name}</Card.Title>
+                                            <Card.Text className="text_gray text_card text_primary">
+                                                {v.description}
+                                            </Card.Text>
+                                            </Card.Body>
+                                        </Card>
+                                    </li>
+                                )
+                            }
+                            {/*<li className="profile__nfts-list-item" onClick={this.handleShowNFT}>
                             <Card className="profile__nfts-card">
                                 <Card.Img variant="top" src={nft2} />
                                 <Card.Body>
@@ -214,37 +243,38 @@ class NFTs extends Component {
                                     </Card.Text>
                                     </Card.Body>
                                 </Card>
-                            </li>
+                            </li>*/}
                         </ul>
                     </div>
                   </div>
                 </div>
                 <Modal className="modal__nft" show={this.state.showNFT} onHide={this.handleCloseMFT} centered>
                     <Modal.Header className="modal-newuser__title modal-title" closeButton>
-                        ABC collection
+                    {this.state.nftCollection.symbol} collection
                     </Modal.Header>
                     <Modal.Body className="modal__nft-body">
                             <div className="modal__nft-top">
                                 <img className="modal__nft-img" src={nft1}></img>
                                 <div className="modal__nft-top-left">
                                     <div className="mb-3">
-                                        <span className="title_primary">ABC collection</span>
+                                        <span className="title_primary"> {this.state.nftCollection.symbol} collection</span>
                                         <h4 className="title_preLgTitile">Pepemigos #3357</h4>
                                         <span className="text_gray modal-text_regular modal-text">Owned by User <a className="text_gray link__primary">#123</a></span>
                                     </div>
                                     <div className="modal-text">
-                                        <p className="modal__nft-text">Status: Minted</p>
-                                        <p className="modal__nft-text">Contract Address: <a className="link__primary">0x06f8...fe4c</a></p>
-                                        <p className="modal__nft-text">Token ID: <a className="link__primary">3357</a></p>
+                                        <p className="modal__nft-text">Status: -</p>
+                                        {/*<p className="modal__nft-text">Contract Address: <a className="link__primary">0x06f8...fe4c</a></p>*/}
+                                         {<p className="modal__nft-text">Contract Address: -</p>}
+                                        <p className="modal__nft-text">Token ID: <a className="link__primary"> {createLongStrView(this?.state?.activeNft?.id)}</a></p>
                                         <p className="modal__nft-text">Token Standard: ERC-721</p>
-                                        <p className="modal__nft-text">Chain: Ethereum</p>
-                                        <p className="modal__nft-text">Creator Earnings info: 6.9%</p>
+                                        <p className="modal__nft-text">Chain: -</p>
+                                        <p className="modal__nft-text">Creator Earnings info: -</p>
                                     </div>
                                 </div>
                             </div>
                             <div className="modal__nft-bottom">
                                 <span className="text_primary">
-                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                                    {this?.state?.activeNft?.description}
                                 </span>
                             </div>
                     </Modal.Body>

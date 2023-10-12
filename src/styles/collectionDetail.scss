@@ -64,7 +64,8 @@
 .profile__nfts-list{
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
+    gap: 34px;
+    //justify-content: space-between;
 }
 
 .profile__nfts-list-item{
