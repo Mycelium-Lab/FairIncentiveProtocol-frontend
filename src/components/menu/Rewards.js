@@ -19,6 +19,7 @@ import LineChart from "../charts/LineChart";
 import BarChart from "../charts/BarChart";
 import { newUser } from "../../data/data";
 import loader from '../../media/common/loader.svg'
+import empty from "../../media/common/empty_icon.svg"
 
 import total from '../../media/dashboard/total_rewards.svg'
 import rewarded from '../../media/dashboard/rewarded.svg'
@@ -592,6 +593,10 @@ class Rewards extends Component {
     }
 
     changeUser(event) {
+        if(event.target.value === 'create user') {
+            this.props.onSwitch(this.props.switcher.users)
+            return 
+        }
         this.setState({
             chosen_user: event.target.value
         })
@@ -820,9 +825,16 @@ class Rewards extends Component {
             <>
                 <div className="title-header">
                     <h3 className="menu__title">Rewards</h3>
-                    <button  type="button" className="btn btn_orange btn_primary" onClick={this.handleShow}>Create new reward</button>
+                    {
+                        this.state.tokenRewards?.length && !this.state.showCreate 
+                        ?  <button  type="button" className="btn btn_orange btn_primary" onClick={this.handleShow}>Create new reward</button>
+                        : null
+                    }
                 </div>
-                <div className="input-group__serach">
+
+                {
+                    this.state.tokenRewards?.length && !this.state.showCreate 
+                    ? <div className="input-group__serach">
                     <button  type="button" className="btn btn_orange btn_image btn_primary" onClick={() => this.setState({showFilter: !this.state.showFilter})}>
                         {
                             this.state.showFilter 
@@ -834,6 +846,9 @@ class Rewards extends Component {
                         <input type="text" placeholder="Search..." className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                     </div>
                 </div>
+                    : null 
+                }
+
                 {
                      this.state.hasLoad ?  <img className="modal__loader_view modal__loader" src={loader}></img>
                      : 
@@ -853,7 +868,21 @@ class Rewards extends Component {
                         </div>
                     : null
                 }
-                <div className="content__wrap">
+
+                 {
+                     !this.state.tokenRewards?.length && !this.state.showCreate ?
+                     <div className="empty">
+                       <div className="empty__wrapper">
+                           <img src={empty}></img>
+                           <span className="empty__desc">Not any reward yet</span>
+                           <button onClick={this.handleShow} type="button" className="btn btn_rounded btn_orange btn_sm">Create new reward</button>
+                       </div>
+                     </div>
+                     : null
+                }
+                {
+                      this.state.tokenRewards?.length && !this.state.showCreate ? 
+                      <div className="content__wrap">
                             <FPTable data={rewardsTable}>
                                 {
                                       this.state.switcher === types.token
@@ -862,7 +891,7 @@ class Rewards extends Component {
                                  <tr>
                                           <td>   
                                                 <label className="switch">
-                                                    <input type="checkbox" onChange={() => this.changeTokenRewardStatus(v.id, v.status)} role="switch"></input>
+                                                    <input type="checkbox" checked={v.status} onChange={() => this.changeTokenRewardStatus(v.id, v.status)} role="switch"></input>
                                                     <span className="slider round"></span>
                                                 </label>  
                                           </td>
@@ -901,6 +930,8 @@ class Rewards extends Component {
                               }
                             </FPTable>
                 </div>
+                      : null
+                }
 
               
                 {/*<div>
@@ -1173,8 +1204,14 @@ class Rewards extends Component {
                                 <label className="form__label">Select user: <img className="form__icon-info" src={info}/></label>
                                     <div className="input-group ">
                                         <select onChange={this.changeUser} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                            
                                             {
-                                                this.state.users
+                                                this.state.chosen_type === types.token && !this.state.users.length ? 
+                                                <>
+                                                 <option value="" disabled selected>Select user</option>
+                                                    <option value='create user'>Create new one</option>
+                                                </>
+                                                : this.state.users
                                             }
                                         </select>
                                     </div>
