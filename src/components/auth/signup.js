@@ -4,6 +4,7 @@ import DefaultAuth from "../../layouts/defaultAuth";
 import { config } from "../../utils/config"
 import email from "../../media/common/email.svg";
 import passwordHide from "../../media/common/password_hide.svg";
+import iata from '../../data/iata.json'
 
 const steps = {
     step1: "1",
@@ -203,7 +204,13 @@ class SignUp extends Component {
 
                                 <FormGroup>
                                     <Form.Label className="auth__form-fields-label">Country</Form.Label>
-                                    <Form.Control className='auth__form-fields-input'  value={this.state.country} id="companycountry-input-signup" onChange={this.onChangeCountry} placeholder="Choose your country" />
+                                    <select className='auth__form-fields-input form-control' value={this.state.country} id="companycountry-input-signup" onChange={this.onChangeCountry}>
+                                    {
+                                        iata.map(v => {
+                                            return <option value={v.value} selected>{v.value}</option>
+                                        })
+                                    }
+                                    </select>
                                 </FormGroup>
 
                                 <FormGroup>
