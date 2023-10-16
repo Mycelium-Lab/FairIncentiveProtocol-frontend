@@ -67,6 +67,7 @@ class Users extends Component {
             showSuccess: false,
             successName: null,
             hasLoad: false,
+            isInvalidEmail: false,
             newUserData: {
                 labels: newUser.map(data => data.time),
                 datasets: [{
@@ -123,9 +124,29 @@ class Users extends Component {
     }
 
     onChangeEmail(event) {
-        this.setState({
-            add_email: event.target.value
-        })
+        const validateEmail = (email) => {
+            console.log('email', email)
+            if(!email) {
+                return true
+            }
+            return email.match(
+              /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+            );
+          };
+
+        console.log(validateEmail(event.target.value))
+        if(validateEmail(event.target.value)) {
+            this.setState({
+                add_email: event.target.value,
+                isInvalidEmail: false
+            })
+        }
+        else{
+            this.setState({
+                add_email: event.target.value,
+                isInvalidEmail: true
+            })
+        }
     }
 
     onChangeWallet(event) {
@@ -716,9 +737,30 @@ class Users extends Component {
     changeEditEmail(event) {
         let edit_user = this.state.edit_user
         edit_user.email = event.target.value
-        this.setState({
-            edit_user
-        })
+
+        const validateEmail = (email) => {
+            console.log('email', email)
+            if(!email) {
+                return true
+            }
+            return email.match(
+              /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+            );
+          };
+
+        console.log(validateEmail(event.target.value))
+        if(validateEmail(event.target.value)) {
+            this.setState({
+                edit_user,
+                isInvalidEmail: false
+            })
+        }
+        else{
+            this.setState({
+                edit_user,
+                isInvalidEmail: true
+            })
+        }
     }
 
     onChangeExternalID = this.onChangeExternalID.bind(this)
@@ -789,7 +831,7 @@ class Users extends Component {
                     </Modal.Header>
                     <Modal.Body>
                         <div className="mb-4">
-                            <label className="form__label">Username or external ID:</label>
+                            <label className="form__label">Username or external ID* :</label>
                             <div className="input-group">
                                 <input type="text" placeholder="e.g. Joe" onChange={this.onChangeExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
@@ -803,7 +845,7 @@ class Users extends Component {
                             {/*<div className="form__prompt_disabled form__prompt" id="basic-addon4">File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>*/}
                         </div>
                         <div className="mb-4">
-                            <label className="form__label">Wallet: <img className="form__icon-info" src={info} /></label>
+                            <label className="form__label">Wallet* : <img className="form__icon-info" src={info} /></label>
                             <div className="input-group">
                                 <input placeholder="0x0000000000000000000000000000000000000000" type="text" onChange={this.onChangeWallet} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
@@ -866,20 +908,40 @@ class Users extends Component {
                             </div>
                             
                         </div>
-                        <div className="mb-4">
-                            <label className="form__label">Email:</label>
+                        {
+                             this.state.isInvalidEmail ? 
+                           
+                                 <div className="mb-4">
+                            <label className="form__label">Email* :</label>
+                            <div className="input-group">
+                                <input onChange={this.onChangeEmail} value={this.state.add_email}  placeholder="example@gmail.com" type="email" className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                            </div>
+                            <span className="form__prompt_error form__prompt" id="basic-addon4">Invalid email format. Example: example@gmail.com</span>
+                        </div>
+                           
+                             : 
+                             <div className="mb-4">
+                            <label className="form__label">Email* :</label>
                             <div className="input-group">
                                 <input onChange={this.onChangeEmail} value={this.state.add_email}  placeholder="example@gmail.com" type="email" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
                         </div>
+                        }
                     </Modal.Body>
                     <Modal.Footer>
                     <button className="btn btn_primary btn_gray" onClick={this.handleCloseAdd}>
                         Back
                     </button>
-                    <button className="btn btn_primary btn_orange" onClick={this.addUser}>
-                        Create
-                    </button>
+                    {   
+                        this.state.add_externalID && this.state.add_wallet && this.state.add_email && !this.state.isInvalidEmail
+                        ?
+                        <button className="btn btn_primary btn_orange" onClick={this.addUser}>
+                            Create
+                        </button>
+                        :   <button className="btn btn_primary btn_orange btn_disabled" onClick={this.addUser}>
+                            Create
+                            </button>
+                    }
                     </Modal.Footer>
                 </Modal>
                 <div>
@@ -1026,7 +1088,7 @@ class Users extends Component {
                             <button className="btn btn__copy btn_primary btn_orange">Copy</button>
                         </div>
                         <div className="mb-4">
-                            <label className="form__label">Username or external ID:</label>
+                            <label className="form__label">Username or external ID* :</label>
                             <div className="input-group">
                                 <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
@@ -1040,7 +1102,7 @@ class Users extends Component {
                            {/*<div className="form__prompt_disabled form__prompt" id="basic-addon4">File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>*/}
                         </div>
                         <div className="mb-4">
-                            <label className="form__label">Wallet: <img src={info} /></label>
+                            <label className="form__label">Wallet* : <img src={info} /></label>
                             <div className="input-group">
                                 <input placeholder="0xhjfg7...9fdf" type="text" value={this.state.edit_user.wallet} onChange={this.changeEditWallet} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
@@ -1107,12 +1169,27 @@ class Users extends Component {
                             </div>
                             
                         </div>
-                        <div className="mb-4">
-                            <label className="form__label">Email:</label>
+
+                        {
+                             this.state.isInvalidEmail ? 
+                           
+                                 <div className="mb-4">
+                            <label className="form__label">Email* :</label>
                             <div className="input-group">
-                                <input onChange={this.changeEditEmail} value={this.state.edit_user.email}  placeholder="example@gmail.com" type="email" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                <input onChange={this.changeEditEmail} value={this.state.edit_user.email} placeholder="example@gmail.com" type="email" className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                            </div>
+                            <span className="form__prompt_error form__prompt" id="basic-addon4">Invalid email format. Example: example@gmail.com</span>
+                        </div>
+                           
+                             : 
+                             <div className="mb-4">
+                            <label className="form__label">Email* :</label>
+                            <div className="input-group">
+                                <input onChange={this.changeEditEmail} value={this.state.edit_user.email} placeholder="example@gmail.com" type="email" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
                         </div>
+                        }
+
                         <div className="mb-4">
                             <label className="form__label">Log:</label>
                             <div className="input-group">
@@ -1125,9 +1202,16 @@ class Users extends Component {
                     <button className="btn btn_primary btn_gray" onClick={this.handleCloseEdit}>
                         Back
                     </button>
-                    <button className="btn btn_primary btn_orange" onClick={this.edit}>
-                        Edit
-                    </button>
+                    {   
+                        this.state.edit_user.external_id && this.state.edit_user.wallet && this.state.edit_user.email && !this.state.isInvalidEmail
+                        ?
+                        <button className="btn btn_primary btn_orange" onClick={this.edit}>
+                            Edit
+                        </button>
+                        :   <button className="btn btn_primary btn_orange btn_disabled" onClick={this.edit}>
+                            Edit
+                            </button>
+                    }
                     </Modal.Footer>
                 </Modal>
                 <Modal show={this.state.showStats} onHide={this.handleCloseStats} centered>
