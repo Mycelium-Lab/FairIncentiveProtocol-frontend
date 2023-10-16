@@ -133,12 +133,13 @@ input[type=radio]#rd_2 {
     margin: 0px;
     display: flex;
     gap: 8px;
+    align-items: center;
 }
 .form-check-label{
-    margin-top: 2px;
     font-size: map-get($theme-fontSize, "primary");
     font-weight: 500;
     line-height: 21px;
+    //margin-left: 8px;
 }
 
 .search-input{
