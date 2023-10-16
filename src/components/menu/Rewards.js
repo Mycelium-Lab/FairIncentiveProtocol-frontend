@@ -1025,14 +1025,14 @@ class Rewards extends Component {
                             </div>
                         }
 
-                        <div className="form_row mb-4">
+                        <div className="form_row_reward_switch form_row mb-4">
                                 <div className="form_col_last form_col">
                                 <div className="form__group_top-row-left">
                                         <img src={drug_drop}></img>
                                             <div>
                                                 <label className="form__label_group form__label">Allow a repeat reward:  <img className="form__icon-info" src={info} />
                                                 </label>
-                                                <div className="form__prompt" id="basic-addon4">If activated, this award can be given to each user only once</div>
+                                                <div className="form__prompt_reward_switch form__prompt" id="basic-addon4">If activated, this award can be given to each user only once</div>
                                                         </div>
                                     </div>
                                 </div>
@@ -1041,14 +1041,14 @@ class Rewards extends Component {
                                         <span className="slider round"></span>
                                     </label>  
                         </div>
-                        <div className="form_row mb-4">
+                        <div className="form_row_reward_switch form_row mb-4">
                                 <div className="form_col_last form_col">
                                     <div className="form__group_top-row-left">
                                         <img src={drug_drop}></img>
                                             <div>
                                                 <label className="form__label_group form__label">Limit the total number of rewards:  <img className="form__icon-info" src={info} />
                                                 </label>
-                                                <div className="form__prompt" id="basic-addon4">You can set a limit of total number of awards</div>
+                                                <div className="form__prompt_reward_switch form__prompt" id="basic-addon4">You can set a limit of total number of awards</div>
                                                         </div>
                                     </div>
                                 </div>
