@@ -59,3 +59,10 @@
     align-items: center;
     flex-direction: column;
   }
+
+  .form-file-upload_disabled{
+    background-color: #e9ecef;
+  }
+  .form-file-upload__prompt_disbaled{
+    color: rgb(33, 43, 54, 0.2);
+  }

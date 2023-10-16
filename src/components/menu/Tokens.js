@@ -15,6 +15,7 @@ import SuccessModal from "../common/modals/success";
 import ErrorModal from "../common/modals/error";
 import empty from "../../media/common/empty_icon.svg"
 import info from '../../media/common/info-small.svg'
+import infoDisabled from '../../media/common/info-small_disabled.svg'
 import infoRed from '../../media/common/info-red.svg'
 import more from '../../media/common/more.svg'
 import copy from '../../media/common/copy.svg'
@@ -955,8 +956,8 @@ class Tokens extends Component {
 
                             <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
-                                <label className="form__label">Upload a picture of the token (soon) </label>
-                                    <FileUpload></FileUpload>
+                                <label className="form__label_disbaled form__label">Upload a picture of the token </label>
+                                    <FileUpload disabled></FileUpload>
                                 </div>
                             </div>
                         </div>
@@ -965,11 +966,11 @@ class Tokens extends Component {
 
                             <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
-                                    <label className="form__label">Decimals * (soon) <img src={info} className="form__icon-info"/></label>
+                                    <label className="form__label_disbaled form__label">Decimals * <img src={infoDisabled} className="form__icon-info"/></label>
                                         <div className="input-group">
-                                        <input onChange={this.onChangeMaxSupply} type="number" placeholder="1 000 000" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        <input onChange={this.onChangeMaxSupply} disabled type="number" placeholder="1 000 000" className="form-control_disabled form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                         </div>
-                                    <div className="form__prompt" id="basic-addon4">Insert the decimals precision of your token</div>
+                                    <div className="form__prompt_disabled form__prompt" id="basic-addon4">Insert the decimals precision of your token</div>
                                 </div>
                             </div>
 

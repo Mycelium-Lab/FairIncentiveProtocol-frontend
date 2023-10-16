@@ -4,6 +4,9 @@
     line-height: 21px;
     margin-bottom: 9px;
 }
+.form__label_disbaled{
+    color: rgb(33, 43, 54, 0.2);
+}
 .form__label_group{
     margin-bottom: 0px;
 }
@@ -13,7 +16,9 @@
     line-height: 18.38px;
     color: rgba(108, 117, 125, 1);
 }
-
+.form-control_disabled::placeholder, .form__prompt_disabled {
+    color: rgb(33, 43, 54, 0.2);
+}
 .form__prompt_warning{
     color: map-get($theme-colors, "warning");
 }
