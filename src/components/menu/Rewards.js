@@ -646,6 +646,14 @@ class Rewards extends Component {
     }
 
     changeRewardToken(event) {
+        if(event.target.value === 'create token') {
+            this.props.onSwitch(this.props.switcher.tokens)
+            return 
+        }
+        else if (event.target.value === 'create nft') {
+            this.props.onSwitch(this.props.switcher.nftcollection)
+            return 
+        }
         let current_nfts = {}
         if (this.state.reward_type === types.nft) {
             const _nfts = this.state.nfts.find(v => v.collection_address === event.target.value)
@@ -964,8 +972,18 @@ class Rewards extends Component {
                                     <div className="input-group">
                                         <select onChange={this.changeRewardToken} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
                                         {
-                                            this.state.chosen_type === types.token
-                                            ?
+                                            this.state.chosen_type === types.token && !this.state.tokens.length
+                                            ? <>
+                                              <option value="" disabled selected>Select token</option>
+                                              <option value='create token'>Create new one</option>
+                                            </>
+                                            :  this.state.chosen_type !== types.token && !this.state.tokens.length
+                                            ? <>
+                                              <option value="" disabled selected>Select nft</option>
+                                              <option value='create nft'>Create new one</option>
+                                            </>
+                                            : this.state.chosen_type === types.token  
+                                            ? 
                                             this.state.tokens.map(v => {
                                                 if (v.address === this.state.reward_token) {
                                                     return <option value={v.address} selected>{v.symbol}</option>
@@ -990,7 +1008,7 @@ class Rewards extends Component {
                                 </div>
                          </div>                             
                         {
-                           this.state.chosen_type === types.token
+                           this.state.chosen_type === types.token && this.state.tokens.length
                             ?
                             <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
@@ -1002,27 +1020,29 @@ class Rewards extends Component {
                                 </div>
                             </div>
                             :
+                            this.state.chosen_type !== types.token && this.state.current_nfts.length ?
                             <div className="form_row mb-4">
-                                <div className="form_col_last form_col">
-                                    <label className="form__label">Select token from collection: <img className="form__icon-info" src={info}/></label>
-                                        <select onChange={this.changeChosenRewardNFT} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                         {
-                                            this.state.current_nfts 
-                                            ?
-                                            this.state.current_nfts.map(v => {
-                                                if (v.id === this.state.reward_nft_id) {
-                                                    return <option value={v.id} selected>{v.name}</option>
-                                                }
-                                                return <option value={v.id}>{v.name}</option>
+                            <div className="form_col_last form_col">
+                                <label className="form__label">Select token from collection: <img className="form__icon-info" src={info}/></label>
+                                    <select onChange={this.changeChosenRewardNFT} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                     {
+                                        this.state.current_nfts 
+                                        ?
+                                        this.state.current_nfts.map(v => {
+                                            if (v.id === this.state.reward_nft_id) {
+                                                return <option value={v.id} selected>{v.name}</option>
                                             }
-                                            )
-                                            :
-                                            null
+                                            return <option value={v.id}>{v.name}</option>
                                         }
-                                        </select>
-                                        <div className="form__prompt" id="basic-addon4">Select the NFT to reward users with</div>
-                                </div>
+                                        )
+                                        :
+                                        null
+                                    }
+                                    </select>
+                                    <div className="form__prompt" id="basic-addon4">Select the NFT to reward users with</div>
                             </div>
+                        </div>
+                        : null
                         }
 
                         <div className="form_row_reward_switch form_row mb-4">

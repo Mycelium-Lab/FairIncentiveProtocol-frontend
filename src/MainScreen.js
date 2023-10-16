@@ -52,8 +52,8 @@ class MainScreen extends Component {
 
     renderInfo() {
         if (this.state.switcher === switcher.dashboard) return <Dashboard/>
-        if (this.state.switcher === switcher.rewards) return <Rewards/>
-        if (this.state.switcher === switcher.reward_events) return <RewardEvents/>
+        if (this.state.switcher === switcher.rewards) return <Rewards switcher={switcher} onSwitch={this.onSwitch}/>
+        if (this.state.switcher === switcher.reward_events) return <RewardEvents switcher={switcher} onSwitch={this.onSwitch}/>
         if (this.state.switcher === switcher.tokens) return <Tokens/>
         if (this.state.switcher === switcher.users) return <Users/>
         if (this.state.switcher === switcher.nftcollection) return <NFTCollections auth={this.state.auth} switcher={switcher} onSwitch={this.onSwitch}/>

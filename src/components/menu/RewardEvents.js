@@ -175,6 +175,10 @@ class RewardEvents extends Component {
     }
 
     changeRewardToken(event) {
+        if(event.target.value === 'create reward') {
+            this.props.onSwitch(this.props.switcher.rewards)
+            return 
+        }
        this.setState({
         reward_id: event.target.value
        })
@@ -245,6 +249,10 @@ class RewardEvents extends Component {
  
 
     changeUser(event) {
+        if(event.target.value === 'create user') {
+            this.props.onSwitch(this.props.switcher.users)
+            return 
+        }
         this.setState({
             chosen_user: event.target.value
         })
@@ -515,6 +523,12 @@ class RewardEvents extends Component {
                                     <select onChange={this.changeRewardToken} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
 
                                         {
+                                            !this.state.tokenRewardsName.length
+                                             ? <>
+                                               <option value="" disabled selected>Select token</option>
+                                               <option value='create reward'>Create new one</option>
+                                             </>
+                                            :
                                             this.state.tokenRewardsName
                                         }                                          
                                     </select>
@@ -526,9 +540,15 @@ class RewardEvents extends Component {
                                 <label className="form__label">Select user: <img className="form__icon-info" src={info}/></label>
                                     <div className="input-group ">
                                         <select onChange={this.changeUser} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                            {
-                                                this.state.users
-                                            }
+                                        {
+                                            !this.state.users.length
+                                             ? <>
+                                               <option value="" disabled selected>Select users</option>
+                                               <option value='create user'>Create new one</option>
+                                             </>
+                                            :
+                                            this.state.users
+                                        }     
                                         </select>
                                     </div>
                                     <div className="form__prompt" id="basic-addon4">Select the user you would like to reward</div>
