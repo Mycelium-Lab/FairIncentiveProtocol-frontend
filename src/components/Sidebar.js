@@ -22,6 +22,14 @@ class Sidebar extends Component {
         }
     }
 
+    componentDidUpdate (prevProps, prevState) {
+        if ( this.state.activeTab !== this.props.currentSwitch) { 
+            this.setState({
+                activeTab: this.props.currentSwitch
+            })
+        }
+    }
+
     handleSwitch = this.handleSwitch.bind(this)
 
     render() {
