@@ -882,7 +882,7 @@ class Rewards extends Component {
                                             <FPDropdown icon={more}>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowStats(v.name)}>Stat</Dropdown.Item>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowEditReward(v.name, v.id, v.count, v.description, v.amount, types.token, v.address, undefined, v.symbol)}>Edit</Dropdown.Item>
-                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowReward(v.name, v.id)} disabled={v.status}>To reward</Dropdown.Item>
+                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowReward(v.name, v.id)} disabled={!v.status}>To reward</Dropdown.Item>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowDelete(types.token, v.id, v.name)}>Delete</Dropdown.Item>
                                             </FPDropdown>
                                               {/*

@@ -143,6 +143,7 @@ class RewardEvents extends Component {
               };
             const res = await fetch(`${config.api}/rewards/get/token`, requestOptions)
             const json = await res.json()
+            json.body.data = json.body.data.filter(v => v.status === 1)
             const rewards = json.body.data.map(v => <option value={v.id}>{v.name}</option>)
             this.setState({
                 tokenRewardsName: rewards
