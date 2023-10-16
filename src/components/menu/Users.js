@@ -803,8 +803,7 @@ class Users extends Component {
                         <div className="mb-4">
                             <label className="form__label">Notes: <img className="form__icon-info" src={info} /></label>
                             <div className="input-group">
-                                <textarea onChange={this.onChangeNotes} placeholder="User notes available to system administrators and 
-moderators" type="text" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
+                                <textarea onChange={this.onChangeNotes} placeholder="User notes available to system administrators and moderators" type="text" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
                             </div>
                             <div className="form__prompt" id="basic-addon4">The user does not see this text. <a href="https://www.markdownguide.org/cheat-sheet/" className="link__form-prompt" target="blank">Markdown</a> syntax is supported.</div>
                         </div>

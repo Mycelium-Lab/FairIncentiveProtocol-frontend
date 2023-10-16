@@ -915,7 +915,7 @@ class Tokens extends Component {
                                     <div className="form__prompt" id="basic-addon4">Choose a symbol for your token</div>
                                 </div>
                                 <div className="form_col_last form_col">
-                                    <label className="form__label">Initial supply {this.state.emissionType === "1" ? "*" : null}<img src={info} /></label>
+                                    <label className="form__label">Initial supply {this.state.emissionType === "1" ? " *" : null} <img src={info} className="form__icon-info" /></label>
                                     <div className="input-group">
                                     <input onChange={this.onChangeInitialSupply} type="number" placeholder="1 000 000" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                     </div>
@@ -924,13 +924,19 @@ class Tokens extends Component {
                             </div>
 
                             <div className="form_row mb-4">
-                                <div className="form_col">
+                                {
+                                    this.state.emissionType !== "2" 
+                                    ? <div className="form_col">
                                     <label className="form__label">Maximum supply * <img src={info} className="form__icon-info" /></label>
                                     <div className="input-group">
                                         <input onChange={this.onChangeMaxSupply} type="text" placeholder="1 000 000" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                     </div>
                                     <div className="form__prompt" id="basic-addon4">The maximum number of coins ever minted</div>
-                                </div>
+                                    </div>
+                                    : null
+                                
+                                }
+                                
                                 <div className="form_col_last form_col">
                                     <label className="form__label">Blockchain * <img src={info} className="form__icon-info" /></label>
                                     <div className="input-group">
