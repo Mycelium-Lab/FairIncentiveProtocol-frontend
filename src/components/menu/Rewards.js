@@ -1211,7 +1211,12 @@ class Rewards extends Component {
                                                  <option value="" disabled selected>Select user</option>
                                                     <option value='create user'>Create new one</option>
                                                 </>
-                                                : this.state.users
+                                                
+                                                : 
+                                                <>
+                                                <option value="" disabled selected>Select user</option>
+                                                 { this.state.users }
+                                               </>
                                             }
                                         </select>
                                     </div>

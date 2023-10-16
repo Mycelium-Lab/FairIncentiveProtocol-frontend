@@ -1056,7 +1056,10 @@ class Users extends Component {
                                   {
                                       this.state.chosen_type === types.token
                                       ?
-                                      this.state.tokenRewards.map(v => <option value={v.id}>{v.name}</option>)
+                                      <>
+                                       <option value="" disabled selected>Select reward</option>
+                                        { this.state.tokenRewards.map(v => <option value={v.id}>{v.name}</option>) }
+                                      </>
                                       :
                                       this.state.nftRewards.map(v => <option value={v.id}>{v.name}</option>)
                                   }

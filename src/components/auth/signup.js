@@ -204,7 +204,7 @@ class SignUp extends Component {
 
                                 <FormGroup>
                                     <Form.Label className="auth__form-fields-label">Country</Form.Label>
-                                    <select className='auth__form-fields-input form-control' value={this.state.country} id="companycountry-input-signup" onChange={this.onChangeCountry}>
+                                    <select className='form-select' value={this.state.country} id="companycountry-input-signup" onChange={this.onChangeCountry}>
                                     {
                                         iata.map(v => {
                                             return <option value={v.value} selected>{v.value}</option>

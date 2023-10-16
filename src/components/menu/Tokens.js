@@ -1485,9 +1485,9 @@ class Tokens extends Component {
                             </div>
                            
                         </Modal.Body>
-                        <Modal.Footer>
+                       {/* <Modal.Footer>
                             <button className="btn btn_secondary btn_orange" onClick={this.addToBlacklist}>Add</button>
-                        </Modal.Footer>
+                                        </Modal.Footer>*/}
                 </Modal>
                 <Modal show={this.state.showBurn} onHide={this.handleCloseBurn} centered>
                     <Modal.Header closeButton>
