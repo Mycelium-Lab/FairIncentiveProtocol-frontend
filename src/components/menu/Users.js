@@ -37,6 +37,7 @@ class Users extends Component {
             add_externalID: '',
             add_email: '',
             add_wallet: '',
+            add_image: '',
             add_notes: null,
             showAdd: false,
             showToReward: false,
@@ -106,6 +107,13 @@ class Users extends Component {
         this.setState({
             add_externalID: event.target.value
         })
+    }
+
+    onChangeImage(event) {
+        console.log('changeEditImage', event[0].name)
+            this.setState({
+                add_image:event[0].name
+            })
     }
 
     onChangeNotes(event) {
@@ -690,8 +698,8 @@ class Users extends Component {
             edit_user
         })
     }
-    changeEditIage(event) {
-        console.log('changeEditIage', event)
+    changeEditmIage(event) {
+        console.log('changeEditImage', event)
         let edit_user = this.state.edit_user
         edit_user.image = event.name
          this.setState({
@@ -714,6 +722,7 @@ class Users extends Component {
     }
 
     onChangeExternalID = this.onChangeExternalID.bind(this)
+    onChangeImage = this.onChangeImage.bind(this)
     onChangeNotes = this.onChangeNotes.bind(this)
     onChangeEmail = this.onChangeEmail.bind(this)
     onChangeWallet = this.onChangeWallet.bind(this)
@@ -754,7 +763,7 @@ class Users extends Component {
     addEditPropertyInput = this.addEditPropertyInput.bind(this)
     changeEditPropertyName = this.changeEditPropertyName.bind(this)
     changeEditPropertyValue = this.changeEditPropertyValue.bind(this)
-    changeEditIage = this.changeEditIage.bind(this)
+    changeEditmIage = this.changeEditmIage.bind(this)
     deleteEditStatInput = this.deleteEditStatInput.bind(this)
     addEditStatInput = this.addEditStatInput.bind(this)
     changeEditStatName = this.changeEditStatName.bind(this)
@@ -787,11 +796,11 @@ class Users extends Component {
                             <div className="form__prompt" id="basic-addon4">Specify the user ID for API calls or it will be generated automatically</div>
                         </div>
                         <div className="mb-4">
-                            <label className="form__label">Profile image *</label>
+                            <label className="form__label_disbaled form__label">Profile image</label>
                             <div className="input-group">
-                                <FileUpload></FileUpload>
+                                <FileUpload handleImage={this.onChangeImage} disabled></FileUpload>
                             </div>
-                            <div className="form__prompt" id="basic-addon4">File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>
+                            {/*<div className="form__prompt_disabled form__prompt" id="basic-addon4">File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>*/}
                         </div>
                         <div className="mb-4">
                             <label className="form__label">Wallet: <img className="form__icon-info" src={info} /></label>
@@ -1024,11 +1033,11 @@ class Users extends Component {
                             <div className="form__prompt" id="basic-addon4">Specify the user ID for API calls or it will be generated automatically</div>
                         </div>
                         <div className="mb-4">
-                            <label className="form__label">Profile image *</label>
+                            <label className="form__label_disbaled form__label">Profile image</label>
                             <div className="input-group">
-                                <FileUpload getImage={this.changeEditIage}></FileUpload>
+                                <FileUpload disabled></FileUpload>
                             </div>
-                            <div className="form__prompt" id="basic-addon4">File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>
+                           {/*<div className="form__prompt_disabled form__prompt" id="basic-addon4">File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>*/}
                         </div>
                         <div className="mb-4">
                             <label className="form__label">Wallet: <img src={info} /></label>

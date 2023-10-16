@@ -40,6 +40,7 @@ class FileUpload extends Component {
 
     // triggers when file is selected with click
     handleChange (e) {
+        console.log(this.props)
         e.preventDefault();
         if (e.target.files && e.target.files[0]) {
             this.handleFile(e.target.files);
@@ -52,13 +53,15 @@ class FileUpload extends Component {
     };
 
     handleFile(files) {
-        this.props.getImage(files)
+        console.log(this.props)
+        this.props.handleImage(files)
     }
 
     handleDrag = this.handleDrop.bind(this)
     handleDrop = this.handleDrop.bind(this)
     handleChange = this.handleChange.bind(this)
     onButtonClick = this.onButtonClick.bind(this)
+    handleFile = this.handleFile.bind(this)
 
     render() {
         const {disabled} = this.props

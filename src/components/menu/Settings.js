@@ -327,8 +327,8 @@ class Settings extends Component {
 
                                     <div className="form_row mb-4">
                                         <div className="form_col_last form_col">
-                                        <label className="form__label">Profile image *</label>
-                                            <FileUpload></FileUpload>
+                                        <label className="form__label_disbaled form__label">Profile image</label>
+                                            <FileUpload disabled></FileUpload>
                                         </div>
                                     </div>
                                 </div>

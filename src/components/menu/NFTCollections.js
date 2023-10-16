@@ -568,6 +568,7 @@ class NFTCollections extends Component {
                     : null
                 }
                 {
+                    /*
                       this.state.showCreate && this.state.stageOfCreateNftCollection === 2
                       ?   <div className="content__wrap">
                                 <h4 className="menu__title-secondary mb-4">Collection graphics</h4>
@@ -575,19 +576,19 @@ class NFTCollections extends Component {
                                 <div className="form_row">
                                 <div className="form_col">
                                 <label className="form-label">Logo image *</label>
-                                        <FileUpload></FileUpload>
+                                        <FileUpload disabled></FileUpload>
                                         <div className="form__prompt" id="basic-addon4">This image will appear at the top of your collection page. File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>
                                 </div>
                                 <div className="form_col_last form_col">
                                 <label className="form-label">Featured image *</label>
-                                        <FileUpload></FileUpload>
+                                        <FileUpload disabled></FileUpload>
                                         <div className="form__prompt" id="basic-addon4">This image will appear at the top of your collection page. File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>
                                 </div>
                                 </div>
                                 <div className="form_row mb-4">
                                     <div className="form_col_last form_col">
                                     <label className="form-label">Banner image *</label>
-                                        <FileUpload></FileUpload>
+                                        <FileUpload disabled></FileUpload>
                                         <div className="form__prompt" id="basic-addon4">This image will appear at the top of your collection page. File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>
                                     </div>
                                 </div>
@@ -604,10 +605,11 @@ class NFTCollections extends Component {
                                 </div>
                             </div>
                     : null
+                    */
                 }
 
                 {
-                     this.state.showCreate && this.state.stageOfCreateNftCollection === 3
+                     this.state.showCreate && this.state.stageOfCreateNftCollection === 2
                      ?    <div className="content__wrap">
                             <div className="mb-4">
                             <h4 className="menu__title-secondary ">Beneficial owner</h4>
@@ -709,7 +711,7 @@ class NFTCollections extends Component {
                 }
 
                 {
-                 this.state.showCreate && this.state.stageOfCreateNftCollection === 4
+                 this.state.showCreate && this.state.stageOfCreateNftCollection === 3
                  ?  <div className="content__wrap">
                          <h4 className="menu__title-secondary mb-4">Links</h4>
                         <div className="form__groups">
@@ -1205,9 +1207,9 @@ class NFTCollections extends Component {
                                         <div className="form__groups">
                                             <div className="form_row mb-4">
                                                 <div className="form_col_last form_col">
-                                                <label className="form-label">Logo image *</label>
-                                                    <FileUpload></FileUpload>
-                                                    <div className="form__prompt" id="basic-addon4">This image will appear at the top of your collection page. File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>
+                                                <label className="form__label_disbaled form__label">Logo image</label>
+                                                    <FileUpload disabled></FileUpload>
+                                                    {/*<div className="form__prompt" id="basic-addon4">This image will appear at the top of your collection page. File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>*/}
                                                 </div>
                                             </div>
                                             <div className="form_row mb-4">

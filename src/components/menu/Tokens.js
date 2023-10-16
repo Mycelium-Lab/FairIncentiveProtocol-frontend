@@ -939,7 +939,7 @@ class Tokens extends Component {
 
                             <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
-                                    <label className="form__label_disbaled form__label">Decimals * <img src={infoDisabled} className="form__icon-info"/></label>
+                                    <label className="form__label_disbaled form__label">Decimals <img src={infoDisabled} className="form__icon-info"/></label>
                                         <div className="input-group">
                                         <input onChange={this.onChangeMaxSupply} disabled type="number" placeholder="1 000 000" className="form-control_disabled form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                         </div>
