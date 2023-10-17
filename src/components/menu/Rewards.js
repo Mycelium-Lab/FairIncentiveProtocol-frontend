@@ -109,8 +109,7 @@ class Rewards extends Component {
         }
         finally{ 
             this.setState({
-                hasLoad: false,
-                combinedRewards: [...this.state.tokenRewards, ...this.state.nftRewards]
+                hasLoad: false
             })
         }
     }
@@ -216,7 +215,8 @@ class Rewards extends Component {
             const res = await fetch(`${config.api}/rewards/get/token`, requestOptions)
             const json = await res.json()
             this.setState({
-                tokenRewards: json.body.data
+                tokenRewards: json.body.data,
+                combinedRewards: [...json.body.data, ...this.state.combinedRewards]
             })
         } catch (error) {
             console.log(error)
@@ -236,7 +236,8 @@ class Rewards extends Component {
             const res = await fetch(`${config.api}/rewards/get/nfts`, requestOptions)
             const json = await res.json()
             this.setState({
-                nftRewards: json.body.data
+                nftRewards: json.body.data,
+                combinedRewards: [...json.body.data, ...this.state.combinedRewards]
             })
         } catch (error) {
             console.log(error)
