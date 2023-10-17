@@ -3,7 +3,7 @@ import logo from '../media/header/logo.svg'
 import more from '../media/header/more_header.svg'
 import burger from '../media/header/menu_burger.svg'
 import close from '../media/header/menu_close.svg'
-import notification from '../media/common/notification.svg'
+import notificationIcon from '../media/common/notification.svg'
 import user from '../media/common/user.svg'
 import chevron from '../media/common/chevron.svg'
 import defaultUser from '../media/notifications/default.png'
@@ -12,10 +12,14 @@ import mock_2 from '../media/notifications/mock_2.png'
 import mock_3 from '../media/notifications/mock_3.png'
 import FPDropdown from "./common/FPDropdown";
 import { Dropdown } from "react-bootstrap";
+import notifications from "../data/notifications";
 
 class Header extends Component {
     constructor(props) {
         super(props)
+        this.state = {
+            notifications
+        }
     }
 
     logout() {
@@ -40,11 +44,18 @@ class Header extends Component {
         this.props.onSwitch(this.props.settings)
     }
 
+    clearAll() {
+        this.setState({
+            notifications: []
+        })
+    }
+
 
     logout = this.logout.bind(this)
     handleShowSidebar = this.handleShowSidebar.bind(this)
     handleNotifications = this.handleNotifications.bind(this)
     handleSettings = this.handleSettings.bind(this)
+    clearAll = this.clearAll.bind(this)
 
     render() {
         const {userName, showSidebar} = this.props
@@ -63,40 +74,35 @@ class Header extends Component {
                     <div className="header-right">
                         <div>
                             {/*<img className="header-right__notification" src={notification} onClick={this.handleNotifications}></img>*/}
-                            <FPDropdown icon={notification} isTransformIcon={false}>
+                            <FPDropdown icon={notificationIcon} isTransformIcon={false}>
                                 <div className="dropdown__notification_top">
-                                    <span className="dropdown__menu-item-notification-name">Notifications</span>
-                                    <span className="dropdown__menu-item_clear dropdown__menu-item">CLEAR ALL</span>
+                                    {
+                                         this.state.notifications.length ?  <span className="dropdown__menu-item-notification-name">Notifications</span>
+                                         : <span className="dropdown__menu-item-notification-name">No notifications</span>
+                                    }
+                                    {
+                                         this.state.notifications.length ? <span className="dropdown__menu-item_clear dropdown__menu-item" onClick={this.clearAll}>CLEAR ALL</span>
+                                         : null
+                                    }
                                 </div>
-                                <Dropdown.Item className="dropdown__notification__item notification__item dropdown__menu-item">
-                                <img className="dropdown__menu-item-notification-img" src={defaultUser}></img>
-                                <div className="notification__item-desc">
-                                    <p className="notification__item-messag_gray notification__item-message"><span className="notification__item-message_primary notification__item-message">Elwis Mathew</span> added a new product <span className="notification__item-message_primary notification__item-message">Redmi Pro 7 Mobile</span></p>
-                                    <span className="notification__item-time">4 mins ago</span>
-                                </div>
-                                </Dropdown.Item>
-                                <Dropdown.Item className="dropdown__notification__item  notification__item dropdown__menu-item">
-                                <img className="dropdown__menu-item-notification-img" src={mock_1}></img>
-                                <div className="notification__item-desc">
-                                    <p className="notification__item-messag_gray notification__item-message"><span className="notification__item-message_primary notification__item-message">Elwis Mathew</span> added a new product <span className="notification__item-message_primary notification__item-message">Redmi Pro 7 Mobile</span></p>
-                                    <span className="notification__item-time">4 mins ago</span>
-                                </div>
-                                </Dropdown.Item>
-                                  <Dropdown.Item className="dropdown__notification__item  notification__item dropdown__menu-item">
-                                <img className="dropdown__menu-item-notification-img" src={mock_2}></img>
-                                <div className="notification__item-desc">
-                                    <p className="notification__item-messag_gray notification__item-message"><span className="notification__item-message_primary notification__item-message">Elwis Mathew</span> added a new product <span className="notification__item-message_primary notification__item-message">Redmi Pro 7 Mobile</span></p>
-                                    <span className="notification__item-time">4 mins ago</span>
-                                </div>
-                                </Dropdown.Item>
-                                <Dropdown.Item className="dropdown__notification__item  notification__item dropdown__menu-item">
-                                <img className="dropdown__menu-item-notification-img" src={mock_3}></img>
-                                <div className="notification__item-desc">
-                                    <p className="notification__item-messag_gray notification__item-message"><span className="notification__item-message_primary notification__item-message">Elwis Mathew</span> added a new product <span className="notification__item-message_primary notification__item-message">Redmi Pro 7 Mobile</span></p>
-                                    <span className="notification__item-time">4 mins ago</span>
-                                </div>
-                                </Dropdown.Item>
-                                <Dropdown.Item className="dropdown__menu-item_view dropdown__menu-item" onClick={this.handleNotifications}>View all Notifications</Dropdown.Item>
+                                {
+                                    this.state.notifications.length ? 
+                                    this.state.notifications.map(v => 
+                                        <Dropdown.Item key={v.key} className="dropdown__notification__item notification__item dropdown__menu-item">
+                                        <img className="dropdown__menu-item-notification-img" src={v.avatar}></img>
+                                        <div className="notification__item-desc">
+                                            <p className="notification__item-messag_gray notification__item-message"><span className="notification__item-message_primary notification__item-message">{v.name}</span> added a new product <span className="notification__item-message_primary notification__item-message">Redmi Pro 7 Mobile</span></p>
+                                            <span className="notification__item-time">{v.ago}</span>
+                                        </div>
+                                        </Dropdown.Item>
+                                    )
+                                    : null
+                                }
+                                {
+                                    this.state.notifications.length ?
+                                    <Dropdown.Item className="dropdown__menu-item_view dropdown__menu-item" onClick={this.handleNotifications}>View all Notifications</Dropdown.Item>
+                                    : null
+                                }
                             </FPDropdown>
                         </div>
                         <span className="devider"></span>
