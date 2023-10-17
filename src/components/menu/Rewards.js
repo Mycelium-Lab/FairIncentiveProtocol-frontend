@@ -215,7 +215,6 @@ class Rewards extends Component {
               };
             const res = await fetch(`${config.api}/rewards/get/token`, requestOptions)
             const json = await res.json()
-            console.log(json.body.data)
             this.setState({
                 tokenRewards: json.body.data
             })
@@ -236,7 +235,6 @@ class Rewards extends Component {
               };
             const res = await fetch(`${config.api}/rewards/get/nfts`, requestOptions)
             const json = await res.json()
-            console.log(json.body.data)
             this.setState({
                 nftRewards: json.body.data
             })
@@ -696,9 +694,9 @@ class Rewards extends Component {
               };
             const res = await fetch(`${config.api}/rewards/update/status/token`, requestOptions)
             if (res.status === 200) {
-                const tokenRewards = this.state.tokenRewards
-                tokenRewards.forEach(v => {if (v.id === reward_id) v.status = status === 0 ? 1 : 0})
-                this.setState({tokenRewards})
+                const combinedRewards = this.state.combinedRewards
+                combinedRewards.forEach(v => {if (v.id === reward_id) v.status = status === 0 ? 1 : 0})
+                this.setState({combinedRewards})
             }
         } catch (error) {
             alert('Something went wrong')
@@ -722,9 +720,9 @@ class Rewards extends Component {
               };
             const res = await fetch(`${config.api}/rewards/update/status/nft`, requestOptions)
             if (res.status === 200) {
-                const nftRewards = this.state.nftRewards
-                nftRewards.forEach(v => {if (v.id === reward_id) v.status = status === 0 ? 1 : 0})
-                this.setState({nftRewards})
+                const combinedRewards = this.state.combinedRewards
+                combinedRewards.forEach(v => {if (v.id === reward_id) v.status = status === 0 ? 1 : 0})
+                this.setState({combinedRewards})
             }
         } catch (error) {
             alert('Something went wrong')
@@ -856,7 +854,7 @@ class Rewards extends Component {
                                  <tr>
                                           <td>   
                                                 <label className="switch">
-                                                    <input type="checkbox" onChange={() => v.nft_id ? this.changeNFTRewardStatus(v.id, v.status) : this.changeTokenRewardStatus(v.id, v.status)} role="switch"></input>
+                                                    <input type="checkbox" checked={v.status == 0} onChange={() => v.nft_id ? this.changeNFTRewardStatus(v.id, v.status) : this.changeTokenRewardStatus(v.id, v.status)} role="switch"></input>
                                                     <span className="slider round"></span>
                                                 </label>  
                                           </td>
