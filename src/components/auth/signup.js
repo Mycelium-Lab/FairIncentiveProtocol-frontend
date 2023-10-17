@@ -207,6 +207,7 @@ class SignUp extends Component {
                                 <FormGroup>
                                     <Form.Label className="auth__form-fields-label">Country</Form.Label>
                                     <Select
+                                        placeholder={"Choose your country"}
                                         options={countries}
                                         value={this.state.country}
                                         onChange={(country) => this.setState({country})}
