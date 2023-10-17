@@ -17,6 +17,25 @@ import { billingHistoryTable, paymentMethodsTable, teamTable } from "../../data/
 import FPDropdown from "../common/FPDropdown";
 import countries from "../../data/countries";
 
+// Mock
+let paymentMethods = [
+    {
+        card: 'Visa ending in 6967', 
+        'expire_date': 'Expires 02/2026',
+        status: 'Default'
+    },
+    {
+        card: 'Visa ending in 1234', 
+        'expire_date': 'Expires 03/2026',
+        status: 'Default'
+    },
+    {
+        card: 'Visa ending in 3214', 
+        'expire_date': 'Expires 04/2026',
+        status: 'Default'
+    }
+]
+
 class Settings extends Component {
 
     constructor(props) {
@@ -33,7 +52,10 @@ class Settings extends Component {
             showInvite: false,
             changeMemberRole: false,
             removeFromTeam: false,
-            showAddPaymentMethod: false
+            showAddPaymentMethod: false,
+            showDeletePaymentMethods: false,
+            chosen_payment_method: null,
+            paymentMethods
         }
     }
 
@@ -215,6 +237,14 @@ class Settings extends Component {
             alert(error)
         }
     }
+
+    deletePaymentMethods(id) {
+        const _paymentMethods = this.state.paymentMethods.filter(v => v.card !== id)
+        this.setState({
+            paymentMethods: _paymentMethods,
+            showDeletePaymentMethods: false
+        })
+    }
     
     handleCopy(event) {
         const tooltip = event.target.parentNode
@@ -243,6 +273,12 @@ class Settings extends Component {
     handleCloseMakePayment() {
         this.setState({showMakePayment: false})
     }
+    handleShowDeletePaymentMethods(id) {
+        this.setState({showDeletePaymentMethods: true, chosen_payment_method: id})   
+    }
+    handleCloseDeletePaymentMethods() {
+        this.setState({showDeletePaymentMethods: false})   
+    }
 
      handleShowAddPaymentMethod() {
         this.setState({showAddPaymentMethod: true})
@@ -250,12 +286,16 @@ class Settings extends Component {
     handleCloseAddPaymentMethod() {
         this.setState({showAddPaymentMethod: false})
     }
-
     handleShowInvite() {
         this.setState({showInvite: true})
     }
     handleCloseInvite() {
         this.setState({showInvite: false})
+    }
+
+    handleInvite() {
+        this.setState({showInvite: false})
+        this.handleShowSuccess('Invitation', 'Invitations have been send out')
     }
 
     handleCloseChangeMemeberRole() {
@@ -277,6 +317,9 @@ class Settings extends Component {
     handleShowError = (errorText) => this.setState({showError: true, errorText})
     handleCloseError = () => this.setState({showError: false})
 
+    deletePaymentMethods = this.deletePaymentMethods.bind(this)
+    handleInvite = this.handleInvite.bind(this)
+
     handleCopy = this.handleCopy.bind(this)
     handleOutTooltip = this.handleOutTooltip.bind(this)
     handleAddNewPayment  = this.handleAddNewPayment.bind(this)
@@ -290,6 +333,8 @@ class Settings extends Component {
     handleShowInvite = this.handleShowInvite.bind(this)
     handleShowMakePayment = this.handleShowMakePayment.bind(this)
     handleCloseMakePayment = this.handleCloseMakePayment.bind(this)
+    handleShowDeletePaymentMethods = this.handleShowDeletePaymentMethods.bind(this)
+    handleCloseDeletePaymentMethods = this.handleCloseDeletePaymentMethods.bind(this)
     onChangeName = this.onChangeName.bind(this)
     onChangeEmail = this.onChangeEmail.bind(this)
     onChangePhone = this.onChangePhone.bind(this)
@@ -512,19 +557,28 @@ class Settings extends Component {
                                         <h4 className="menu__title-secondary-payment menu__title-secondary mb-4">Payment methods</h4>
                                         <button type="button" onClick={this.handleShowAddPaymentMethod} className="btn btn_orange btn_primary">Add a payment method </button>
                                     </div>
-                                    <FPTable data={paymentMethodsTable}>
-                                            <tr>
-                                                <td>Visa ending in 6967</td>
-                                                <td>Expires 02/2026</td>
-                                                <td>Default</td>
-                                                <td>
-                                                    <FPDropdown icon={more}>
-                                                        <Dropdown.Item className="dropdown__menu-item">Make a payment</Dropdown.Item>
-                                                        <Dropdown.Item className="dropdown__menu-item">Delete</Dropdown.Item>
-                                                    </FPDropdown>
-                                                </td>
-                                            </tr>
+                                    {
+                                     this.state.paymentMethods.length 
+                                     ?   <FPTable data={paymentMethodsTable}>
+                                     {
+                                         this.state.paymentMethods.map(v => 
+                                             <tr key={v.card}>
+                                                 <td>{v.card}</td>
+                                                 <td>{v.expire_date}</td>
+                                                 <td>{v.status}</td>
+                                                 <td>
+                                                     <FPDropdown icon={more}>
+                                                         <Dropdown.Item className="dropdown__menu-item" onClick={this.handleShowMakePayment}>Make a payment</Dropdown.Item>
+                                                         <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowDeletePaymentMethods(v.card)}>Delete</Dropdown.Item>
+                                                     </FPDropdown>
+                                                 </td> 
+                                             </tr>      
+                                         )
+                                     }
                                     </FPTable>
+                                    : null 
+
+                                    }
                                 </div>
 
                                 <div className="content__wrap">                                
@@ -789,7 +843,7 @@ class Settings extends Component {
                     <button className="btn btn_primary btn_gray" onClick={this.handleCloseInvite}>
                         Cancel
                     </button>
-                    <button className="btn btn_primary btn_orange">
+                    <button className="btn btn_primary btn_orange" onClick={this.handleInvite}>
                     Invite team members
                     </button>
                     </Modal.Footer>
@@ -870,6 +924,15 @@ class Settings extends Component {
                     <button className="btn btn_primary btn_orange">
                         Delete
                     </button>
+                    </Modal.Footer>
+                </Modal>
+                <Modal show={this.state.showDeletePaymentMethods} onHide={this.handleCloseDeletePaymentMethods} centered>
+                    <Modal.Header className="modal-newuser__title modal-title h4 mb-4" closeButton>
+                        Delete payment method with card {this.state.chosen_payment_method}
+                    </Modal.Header>
+                    <Modal.Footer>
+                    <button className="btn btn_primary btn_gray" onClick={this.handleCloseDeletePaymentMethods}>Back</button>
+                        <button className="btn btn_primary btn_orange" onClick={() => this.deletePaymentMethods(this.state.chosen_payment_method)}>Delete</button>
                     </Modal.Footer>
                 </Modal>
                 <UpdateModal 
