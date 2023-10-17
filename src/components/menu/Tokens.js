@@ -140,6 +140,12 @@ class Tokens extends Component {
                 hasLoad: false
             })
         }
+        if(this.props.isGoToCreationPage) {
+            this.setState({
+                stageOfCreateToken: 1,
+                showCreate: true,
+            })
+        }
     }
 
     onChangeName(event) {

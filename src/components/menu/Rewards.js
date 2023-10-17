@@ -112,6 +112,9 @@ class Rewards extends Component {
                 hasLoad: false
             })
         }
+        if(this.props.isGoToCreationPage) {
+            this.handleShow()
+        }
     }
 
     async getTokens() {
@@ -578,12 +581,22 @@ class Rewards extends Component {
     }
 
     changeToken(event) {
+        if(event.target.value === 'create token') {
+            this.props.onSwitch(this.props.switcher.tokens)
+            this.props.goToCreationPage()
+            return 
+        }
         this.setState({
             chosen_token: event.target.value
         })
     }
 
     changeNFTCollection(event) {
+        if(event.target.value === 'create nft') {
+            this.props.onSwitch(this.props.switcher.nftcollection)
+            this.props.goToCreationPage()
+            return 
+        }
         const current_nfts = this.state.nfts.find(v => v.collection_address === event.target.value).nfts
         this.setState({
             chosen_nft_collection: event.target.value,
@@ -595,6 +608,7 @@ class Rewards extends Component {
     changeUser(event) {
         if(event.target.value === 'create user') {
             this.props.onSwitch(this.props.switcher.users)
+            this.props.goToCreationPage()
             return 
         }
         this.setState({
@@ -653,12 +667,13 @@ class Rewards extends Component {
     changeRewardToken(event) {
         if(event.target.value === 'create token') {
             this.props.onSwitch(this.props.switcher.tokens)
+            this.props.goToCreationPage()
             return 
         }
-        else if (event.target.value === 'create nft') {
+        /*else if (event.target.value === 'create nft') {
             this.props.onSwitch(this.props.switcher.nftcollection)
             return 
-        }
+        }*/
         let current_nfts = {}
         if (this.state.reward_type === types.nft) {
             const _nfts = this.state.nfts.find(v => v.collection_address === event.target.value)
@@ -1001,16 +1016,16 @@ class Rewards extends Component {
                                 <div className="form_col_last form_col">
                                     <label  className="form__label">Select {this.state.chosen_type === types.token ? 'token' : 'NFT collection'}:<img className="form__icon-info" src={info}/> </label>
                                     <div className="input-group">
-                                        <select onChange={this.changeRewardToken} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                        <select onChange={this.state.chosen_type === types.token ? this.changeToken : this.changeNFTCollection} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
                                         {
                                             this.state.chosen_type === types.token && !this.state.tokens.length
                                             ? <>
                                               <option value="" disabled selected>Select token</option>
                                               <option value='create token'>Create new one</option>
                                             </>
-                                            :  this.state.chosen_type !== types.token && !this.state.tokens.length
+                                            :  this.state.chosen_type !== types.token && !this.state.nftCollections.length
                                             ? <>
-                                              <option value="" disabled selected>Select nft</option>
+                                              <option value="" disabled selected>Select NFT collection</option>
                                               <option value='create nft'>Create new one</option>
                                             </>
                                             : this.state.chosen_type === types.token  

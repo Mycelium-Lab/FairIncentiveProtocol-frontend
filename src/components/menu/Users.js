@@ -102,6 +102,10 @@ class Users extends Component {
                 hasLoad: false
             })
         }
+
+        if(this.props.isGoToCreationPage) {
+            this.handleShowAdd()
+        }
     }
 
     onChangeExternalID(event) {
@@ -125,7 +129,6 @@ class Users extends Component {
 
     onChangeEmail(event) {
         const validateEmail = (email) => {
-            console.log('email', email)
             if(!email) {
                 return true
             }
@@ -133,8 +136,6 @@ class Users extends Component {
               /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
             );
           };
-
-        console.log(validateEmail(event.target.value))
         if(validateEmail(event.target.value)) {
             this.setState({
                 add_email: event.target.value,
@@ -694,6 +695,7 @@ class Users extends Component {
     changeRewardToken(event) {
         if(event.target.value === 'create reward') {
             this.props.onSwitch(this.props.switcher.rewards)
+            this.props.goToCreationPage()
             return 
         }
         this.setState({

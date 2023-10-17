@@ -103,6 +103,9 @@ class NFTCollections extends Component {
                 hasLoad: false
             })
         }
+        if(this.props.isGoToCreationPage) {
+            this.handleShowCreate()
+        }
     }
 
     onChangeName(event) {
