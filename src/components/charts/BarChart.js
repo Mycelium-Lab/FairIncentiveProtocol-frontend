@@ -17,7 +17,16 @@ class BarChart extends Component {
                 plugins: {
                   legend: {
                     display: false,
-                  },     
+                  },   
+                  tooltip: {
+                    callbacks: {
+                      // this callback is used to create the tooltip label
+                      label: function(tooltipItem) {
+                        let label = `  ${tooltipItem.formattedValue}`
+                        return label
+                      } 
+                    }
+                  } 
                 },
                 maintainAspectRatio : false,
                 responsive: true,

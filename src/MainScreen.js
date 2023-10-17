@@ -37,7 +37,6 @@ class MainScreen extends Component {
     }
 
     componentDidMount() {
-        console.log(window.innerWidth)
         if(window.innerWidth < 769) {
             this.setState({
                 showSidebar: false
