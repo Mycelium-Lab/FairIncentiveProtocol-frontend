@@ -88,6 +88,8 @@ class Rewards extends Component {
                         borderColor: ['rgba(255, 159, 67, 0.85)'],
                     }]
             },
+            combinedRewards: [],
+            toRewardNftId: null
         }
     }
 
@@ -100,7 +102,6 @@ class Rewards extends Component {
             await this.getUsers()
             await this.getTokenRewards()
             await this.getNFTRewards()
-            
             this.getNFTCollections().then(async () => await this.getNFTs())
         }
         catch(e) {
@@ -108,7 +109,8 @@ class Rewards extends Component {
         }
         finally{ 
             this.setState({
-                hasLoad: false
+                hasLoad: false,
+                combinedRewards: [...this.state.tokenRewards, ...this.state.nftRewards]
             })
         }
     }
@@ -213,6 +215,7 @@ class Rewards extends Component {
               };
             const res = await fetch(`${config.api}/rewards/get/token`, requestOptions)
             const json = await res.json()
+            console.log(json.body.data)
             this.setState({
                 tokenRewards: json.body.data
             })
@@ -233,6 +236,7 @@ class Rewards extends Component {
               };
             const res = await fetch(`${config.api}/rewards/get/nfts`, requestOptions)
             const json = await res.json()
+            console.log(json.body.data)
             this.setState({
                 nftRewards: json.body.data
             })
@@ -442,7 +446,7 @@ class Rewards extends Component {
             const res = await fetch(`${config.api}/rewards/reward/token`, requestOptions)
             const json = await res.json()
             if (res.status === 200) {
-                let tokenRewards = this.state.tokenRewards
+                let tokenRewards = this.state.combinedRewards
                 tokenRewards.forEach(v => {if (v.id == this.state.reward_id) v.count = parseInt(v.count) + 1})
                 alert('Done')
                 this.setState({
@@ -476,7 +480,7 @@ class Rewards extends Component {
             const res = await fetch(`${config.api}/rewards/reward/nft`, requestOptions)
             const json = await res.json()
             if (res.status === 200) {
-                let nftRewards = this.state.nftRewards
+                let nftRewards = this.state.combinedRewards
                 nftRewards.forEach(v => {if (v.id == this.state.reward_id) v.count = parseInt(v.count) + 1})
                 alert('Done')
                 this.setState({
@@ -733,7 +737,7 @@ class Rewards extends Component {
     handleClose = () => this.setState({show: false});
     handleShow = () => this.setState({show: true});
     handleCloseReward = () => this.setState({showReward: false})
-    handleShowReward = (reward_name, reward_id) => this.setState({showReward: true, reward_name, reward_id})
+    handleShowReward = (reward_name, reward_id, nft_id) => this.setState({showReward: true, reward_name, reward_id, toRewardNftId: nft_id})
     handleShowEditReward = (
         reward_name, reward_id, reward_count, 
         reward_description, reward_amount, reward_type, 
@@ -848,13 +852,11 @@ class Rewards extends Component {
                 <div className="content__wrap">
                             <FPTable data={rewardsTable}>
                                 {
-                                      this.state.switcher === types.token
-                                      ?
-                                    this.state.tokenRewards.map(v =>
+                                    this.state.combinedRewards.map(v =>
                                  <tr>
                                           <td>   
                                                 <label className="switch">
-                                                    <input type="checkbox" onChange={() => this.changeTokenRewardStatus(v.id, v.status)} role="switch"></input>
+                                                    <input type="checkbox" onChange={() => v.nft_id ? this.changeNFTRewardStatus(v.id, v.status) : this.changeTokenRewardStatus(v.id, v.status)} role="switch"></input>
                                                     <span className="slider round"></span>
                                                 </label>  
                                           </td>
@@ -862,7 +864,13 @@ class Rewards extends Component {
                                             {v.name}
                                           </td>
                                           <td>
-                                            {ethers.utils.formatEther(v.amount)} {v.symbol}
+                                            {
+                                            v.nft_id
+                                            ?
+                                            `${v.nft_name} from ${v.symbol} collection`
+                                            :
+                                            `${ethers.utils.formatEther(v.amount)} ${v.symbol}`
+                                            }
                                           </td>
                                           <td>
                                             {v.description ? v.description : '-'}
@@ -873,9 +881,9 @@ class Rewards extends Component {
                                           <td>
                                             <FPDropdown icon={more}>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowStats(v.name)}>Stat</Dropdown.Item>
-                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowEditReward(v.name, v.id, v.count, v.description, v.amount, types.token, v.address, undefined, v.symbol)}>Edit</Dropdown.Item>
-                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowReward(v.name, v.id)} disabled={v.status}>To reward</Dropdown.Item>
-                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowDelete(types.token, v.id, v.name)}>Delete</Dropdown.Item>
+                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowEditReward(v.name, v.id, v.count, v.description, v.amount, v.nft_id ? types.nft :types.token, v.address, undefined, v.symbol)}>Edit</Dropdown.Item>
+                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowReward(v.name, v.id, v.nft_id)} disabled={v.status}>To reward</Dropdown.Item>
+                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowDelete(v.nft_id ? types.nft : types.token, v.id, v.name)}>Delete</Dropdown.Item>
                                             </FPDropdown>
                                               {/*
                                               <button className="btn btn-dark" onClick={() => this.handleShowMint(v.symbol, v.address, v.chainid)} disabled={v.supply_type == 1 ? true : false}>Mint</button>
@@ -888,8 +896,6 @@ class Rewards extends Component {
                                           </td>
                                       </tr>
                                     )
-                                    :
-                                    null
                               }
                             </FPTable>
                 </div>
@@ -1177,7 +1183,7 @@ class Rewards extends Component {
                     <button className="btn btn_primary btn_gray" onClick={this.handleCloseReward}>
                         Cancel
                     </button>
-                    <button className="btn btn_primary btn_orange" onClick={this.state.switcher === types.token ? this.rewardWithToken : this.rewardWithNFT}>
+                    <button className="btn btn_primary btn_orange" onClick={this.state.toRewardNftId ? this.rewardWithNFT : this.rewardWithToken }>
                         Reward
                     </button>
                     </Modal.Footer>
