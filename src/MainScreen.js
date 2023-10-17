@@ -80,7 +80,9 @@ class MainScreen extends Component {
                     userName={this.state.auth.name} 
                     showSidebar={this.state.showSidebar} 
                     changeShowSidebar={this.changeShowSidebar}
-                    notifications={switcher.notifications} onSwitch={this.onSwitch}
+                    notifications={switcher.notifications} 
+                    settings={switcher.settings} 
+                    onSwitch={this.onSwitch}
                     >
                     </Header>
                 <div className="middle">
