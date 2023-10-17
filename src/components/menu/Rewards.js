@@ -868,7 +868,7 @@ class Rewards extends Component {
                                             {v.description ? v.description : '-'}
                                           </td>
                                           <td>
-                                          {v.count} from ABC collection
+                                          {v.count}
                                           </td>
                                           <td>
                                             <FPDropdown icon={more}>
