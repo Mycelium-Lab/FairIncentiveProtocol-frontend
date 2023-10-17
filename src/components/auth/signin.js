@@ -13,6 +13,7 @@ class SignIn extends Component {
             email: '',
             password: '',
             isInvalidEmail: false,
+            isNonFoundEmail: false,
             isInvalidPassword: false,
         }
     }
@@ -38,7 +39,16 @@ class SignIn extends Component {
                 document.cookie = `token=${json.body.data.token}`
                 window.location.reload()
             } else {
-                alert(json.error.message)
+                if(json.error.message === 'Wrong <password>') {
+                    this.setState(({
+                        isInvalidPassword: true
+                    }))
+                }
+                if(json.error.message === 'Company not exist with this <email>') {
+                    this.setState(({
+                        isNonFoundEmail: true
+                    }))
+                }
             }
         } catch (error) {
             console.log(error)
@@ -66,6 +76,9 @@ class SignIn extends Component {
                 isInvalidEmail: true
             })
         }
+        this.setState({
+            isNonFoundEmail: false
+        })
     }
 
     onChangePassword(event) {
@@ -124,6 +137,14 @@ class SignIn extends Component {
                                     <img className="form__signin-icon-email_error form__signin-icon-email" src={email}></img>
                                 <Form.Control className='auth__form-fields-input_error auth__form-fields-input' onChange={this.onChangeEmail} type="email" placeholder="Email" />
                                 <span className="form__prompt_error form__prompt" id="basic-addon4">Invalid email format. Example: example@gmail.com</span>
+                            </>
+                            :
+                             this.state.isNonFoundEmail ? 
+                            <>
+                                 <Form.Label className='auth__form-fields-label'>Email</Form.Label>
+                                    <img className="form__signin-icon-email_error form__signin-icon-email" src={email}></img>
+                                <Form.Control className='auth__form-fields-input_error auth__form-fields-input' onChange={this.onChangeEmail} type="email" placeholder="Email" />
+                                <span className="form__prompt_error form__prompt" id="basic-addon4">Company not exist with this email</span>
                             </>
                             : 
                             <>
