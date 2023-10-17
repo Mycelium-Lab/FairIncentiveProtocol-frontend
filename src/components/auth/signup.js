@@ -1,10 +1,12 @@
 import { Component } from "react";
 import { Button, Container, Form, FormGroup } from "react-bootstrap";
+import Select from "react-select";
+
 import DefaultAuth from "../../layouts/defaultAuth";
 import { config } from "../../utils/config"
 import email from "../../media/common/email.svg";
 import passwordHide from "../../media/common/password_hide.svg";
-import iata from '../../data/iata.json'
+import { countries } from "../../utils/countries";
 
 const steps = {
     step1: "1",
@@ -36,7 +38,7 @@ class SignUp extends Component {
             const raw = JSON.stringify({
                 "name": this.state.companyName,
                 "email": this.state.email,
-                "country": this.state.country,
+                "country": this.state.country.value,
                 "password": this.state.password,
                 "repeat_password": this.state.repeat_password,
                 "repname": this.state.repname,
@@ -204,13 +206,14 @@ class SignUp extends Component {
 
                                 <FormGroup>
                                     <Form.Label className="auth__form-fields-label">Country</Form.Label>
-                                    <select className='form-select' value={this.state.country} id="companycountry-input-signup" onChange={this.onChangeCountry}>
-                                    {
-                                        iata.map(v => {
-                                            return <option value={v.value} selected>{v.value}</option>
-                                        })
-                                    }
-                                    </select>
+                                    <Select
+                                        placeholder={"Choose your country"}
+                                        options={countries}
+                                        value={this.state.country}
+                                        onChange={(country) => this.setState({country})}
+                                    >
+                                    </Select>
+                                    {/* <Form.Control className='auth__form-fields-input'  value={this.state.country} id="companycountry-input-signup" onChange={this.onChangeCountry} placeholder="Choose your country" /> */}
                                 </FormGroup>
 
                                 <FormGroup>
