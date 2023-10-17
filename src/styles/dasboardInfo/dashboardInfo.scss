@@ -1,13 +1,14 @@
 .info__list{
     display: flex;
-    gap: 24px;
+    justify-content: space-between;
+    gap: 24px 0px;
     flex-wrap: wrap;
 }
 
 .info__list-item{
     display: flex;
     justify-content: space-between;
-    width: 336px;
+     width: 336px;
     padding: 20.5px 20px;
     border-radius: 20px;
     align-items: center;

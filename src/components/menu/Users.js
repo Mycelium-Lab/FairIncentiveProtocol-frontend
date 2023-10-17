@@ -37,6 +37,7 @@ class Users extends Component {
             add_externalID: '',
             add_email: '',
             add_wallet: '',
+            add_image: '',
             add_notes: null,
             showAdd: false,
             showToReward: false,
@@ -66,6 +67,7 @@ class Users extends Component {
             showSuccess: false,
             successName: null,
             hasLoad: false,
+            isInvalidEmail: false,
             newUserData: {
                 labels: newUser.map(data => data.time),
                 datasets: [{
@@ -100,12 +102,23 @@ class Users extends Component {
                 hasLoad: false
             })
         }
+
+        if(this.props.isGoToCreationPage) {
+            this.handleShowAdd()
+        }
     }
 
     onChangeExternalID(event) {
         this.setState({
             add_externalID: event.target.value
         })
+    }
+
+    onChangeImage(event) {
+        console.log('changeEditImage', event[0].name)
+            this.setState({
+                add_image:event[0].name
+            })
     }
 
     onChangeNotes(event) {
@@ -115,9 +128,26 @@ class Users extends Component {
     }
 
     onChangeEmail(event) {
-        this.setState({
-            add_email: event.target.value
-        })
+        const validateEmail = (email) => {
+            if(!email) {
+                return true
+            }
+            return email.match(
+              /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+            );
+          };
+        if(validateEmail(event.target.value)) {
+            this.setState({
+                add_email: event.target.value,
+                isInvalidEmail: false
+            })
+        }
+        else{
+            this.setState({
+                add_email: event.target.value,
+                isInvalidEmail: true
+            })
+        }
     }
 
     onChangeWallet(event) {
@@ -247,7 +277,7 @@ class Users extends Component {
               };
             const res = await fetch(`${config.api}/rewards/get/token`, requestOptions)
             const json = await res.json()
-            json.body.data = json.body.data.filter(v => v.status !== 1)
+            json.body.data = json.body.data.filter(v => v.status === 1)
             this.setState({
                 tokenRewards: json.body.data,
                 chosen_reward_token: json.body.data[0] ? json.body.data[0].id : null
@@ -661,7 +691,13 @@ class Users extends Component {
             chosen_type: event.target.value
         })
     }
+
     changeRewardToken(event) {
+        if(event.target.value === 'create reward') {
+            this.props.onSwitch(this.props.switcher.rewards)
+            this.props.goToCreationPage()
+            return 
+        }
         this.setState({
             chosen_reward_token: event.target.value
         })
@@ -690,8 +726,8 @@ class Users extends Component {
             edit_user
         })
     }
-    changeEditIage(event) {
-        console.log('changeEditIage', event)
+    changeEditmIage(event) {
+        console.log('changeEditImage', event)
         let edit_user = this.state.edit_user
         edit_user.image = event.name
          this.setState({
@@ -708,12 +744,34 @@ class Users extends Component {
     changeEditEmail(event) {
         let edit_user = this.state.edit_user
         edit_user.email = event.target.value
-        this.setState({
-            edit_user
-        })
+
+        const validateEmail = (email) => {
+            console.log('email', email)
+            if(!email) {
+                return true
+            }
+            return email.match(
+              /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+            );
+          };
+
+        console.log(validateEmail(event.target.value))
+        if(validateEmail(event.target.value)) {
+            this.setState({
+                edit_user,
+                isInvalidEmail: false
+            })
+        }
+        else{
+            this.setState({
+                edit_user,
+                isInvalidEmail: true
+            })
+        }
     }
 
     onChangeExternalID = this.onChangeExternalID.bind(this)
+    onChangeImage = this.onChangeImage.bind(this)
     onChangeNotes = this.onChangeNotes.bind(this)
     onChangeEmail = this.onChangeEmail.bind(this)
     onChangeWallet = this.onChangeWallet.bind(this)
@@ -754,7 +812,7 @@ class Users extends Component {
     addEditPropertyInput = this.addEditPropertyInput.bind(this)
     changeEditPropertyName = this.changeEditPropertyName.bind(this)
     changeEditPropertyValue = this.changeEditPropertyValue.bind(this)
-    changeEditIage = this.changeEditIage.bind(this)
+    changeEditmIage = this.changeEditmIage.bind(this)
     deleteEditStatInput = this.deleteEditStatInput.bind(this)
     addEditStatInput = this.addEditStatInput.bind(this)
     changeEditStatName = this.changeEditStatName.bind(this)
@@ -780,21 +838,21 @@ class Users extends Component {
                     </Modal.Header>
                     <Modal.Body>
                         <div className="mb-4">
-                            <label className="form__label">Username or external ID:</label>
+                            <label className="form__label">Username or external ID* :</label>
                             <div className="input-group">
                                 <input type="text" placeholder="e.g. Joe" onChange={this.onChangeExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
                             <div className="form__prompt" id="basic-addon4">Specify the user ID for API calls or it will be generated automatically</div>
                         </div>
                         <div className="mb-4">
-                            <label className="form__label">Profile image *</label>
+                            <label className="form__label_disbaled form__label">Profile image</label>
                             <div className="input-group">
-                                <FileUpload></FileUpload>
+                                <FileUpload handleImage={this.onChangeImage} disabled></FileUpload>
                             </div>
-                            <div className="form__prompt" id="basic-addon4">File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>
+                            {/*<div className="form__prompt_disabled form__prompt" id="basic-addon4">File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>*/}
                         </div>
                         <div className="mb-4">
-                            <label className="form__label">Wallet: <img className="form__icon-info" src={info} /></label>
+                            <label className="form__label">Wallet* : <img className="form__icon-info" src={info} /></label>
                             <div className="input-group">
                                 <input placeholder="0x0000000000000000000000000000000000000000" type="text" onChange={this.onChangeWallet} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
@@ -803,8 +861,7 @@ class Users extends Component {
                         <div className="mb-4">
                             <label className="form__label">Notes: <img className="form__icon-info" src={info} /></label>
                             <div className="input-group">
-                                <textarea onChange={this.onChangeNotes} placeholder="User notes available to system administrators and 
-moderators" type="text" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
+                                <textarea onChange={this.onChangeNotes} placeholder="User notes available to system administrators and moderators" type="text" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
                             </div>
                             <div className="form__prompt" id="basic-addon4">The user does not see this text. <a href="https://www.markdownguide.org/cheat-sheet/" className="link__form-prompt" target="blank">Markdown</a> syntax is supported.</div>
                         </div>
@@ -858,20 +915,40 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                             </div>
                             
                         </div>
-                        <div className="mb-4">
-                            <label className="form__label">Email:</label>
+                        {
+                             this.state.isInvalidEmail ? 
+                           
+                                 <div className="mb-4">
+                            <label className="form__label">Email* :</label>
+                            <div className="input-group">
+                                <input onChange={this.onChangeEmail} value={this.state.add_email}  placeholder="example@gmail.com" type="email" className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                            </div>
+                            <span className="form__prompt_error form__prompt" id="basic-addon4">Invalid email format. Example: example@gmail.com</span>
+                        </div>
+                           
+                             : 
+                             <div className="mb-4">
+                            <label className="form__label">Email* :</label>
                             <div className="input-group">
                                 <input onChange={this.onChangeEmail} value={this.state.add_email}  placeholder="example@gmail.com" type="email" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
                         </div>
+                        }
                     </Modal.Body>
                     <Modal.Footer>
                     <button className="btn btn_primary btn_gray" onClick={this.handleCloseAdd}>
                         Back
                     </button>
-                    <button className="btn btn_primary btn_orange" onClick={this.addUser}>
-                        Create
-                    </button>
+                    {   
+                        this.state.add_externalID && this.state.add_wallet && this.state.add_email && !this.state.isInvalidEmail
+                        ?
+                        <button className="btn btn_primary btn_orange" onClick={this.addUser}>
+                            Create
+                        </button>
+                        :   <button className="btn btn_primary btn_orange btn_disabled" onClick={this.addUser}>
+                            Create
+                            </button>
+                    }
                     </Modal.Footer>
                 </Modal>
                 <div>
@@ -975,15 +1052,25 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                         </div>*/}
                         <label className="form__label">Select reward: <img className="form__icon-info" src={info}></img></label>
                         <div className="input-group mb-4">
-                            <select onChange={this.state.chosen_type === types.token ? this.changeRewardToken : this.changeRewardNFT} disabled={this.state.chosen_type ? false : true} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                {
-                                    this.state.chosen_type === types.token
-                                    ?
-                                    this.state.tokenRewards.map(v => <option value={v.id}>{v.name}</option>)
-                                    :
-                                    this.state.nftRewards.map(v => <option value={v.id}>{v.name}</option>)
-                                }
-                            </select>
+                            {
+                                  this.state.chosen_type === types.token && this.state.tokenRewards.length
+                                  ?  <select onChange={this.state.chosen_type === types.token ? this.changeRewardToken : this.changeRewardNFT} disabled={this.state.chosen_type ? false : true} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                  {
+                                      this.state.chosen_type === types.token
+                                      ?
+                                      <>
+                                       <option value="" disabled selected>Select reward</option>
+                                        { this.state.tokenRewards.map(v => <option value={v.id}>{v.name}</option>) }
+                                      </>
+                                      :
+                                      this.state.nftRewards.map(v => <option value={v.id}>{v.name}</option>)
+                                  }
+                              </select>
+                              : <select onChange={this.state.chosen_type === types.token ? this.changeRewardToken : this.changeRewardNFT} disabled={this.state.chosen_type ? false : true} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                <option value="" disabled selected>Select Reward</option>
+                                <option value='create reward'>Create new one</option>
+                          </select>
+                            }
                         </div>
                         <div className="mb-4">
                             <label className="form__label">Comment: <img className="form__icon-info" src={info}></img></label>
@@ -1018,21 +1105,21 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                             <button className="btn btn__copy btn_primary btn_orange">Copy</button>
                         </div>
                         <div className="mb-4">
-                            <label className="form__label">Username or external ID:</label>
+                            <label className="form__label">Username or external ID* :</label>
                             <div className="input-group">
                                 <input type="text" placeholder="Username" value={this.state.edit_user.external_id} onChange={this.changeEditExternalID} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
                             <div className="form__prompt" id="basic-addon4">Specify the user ID for API calls or it will be generated automatically</div>
                         </div>
                         <div className="mb-4">
-                            <label className="form__label">Profile image *</label>
+                            <label className="form__label_disbaled form__label">Profile image</label>
                             <div className="input-group">
-                                <FileUpload getImage={this.changeEditIage}></FileUpload>
+                                <FileUpload disabled></FileUpload>
                             </div>
-                            <div className="form__prompt" id="basic-addon4">File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>
+                           {/*<div className="form__prompt_disabled form__prompt" id="basic-addon4">File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>*/}
                         </div>
                         <div className="mb-4">
-                            <label className="form__label">Wallet: <img src={info} /></label>
+                            <label className="form__label">Wallet* : <img src={info} /></label>
                             <div className="input-group">
                                 <input placeholder="0xhjfg7...9fdf" type="text" value={this.state.edit_user.wallet} onChange={this.changeEditWallet} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
@@ -1099,12 +1186,27 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                             </div>
                             
                         </div>
-                        <div className="mb-4">
-                            <label className="form__label">Email:</label>
+
+                        {
+                             this.state.isInvalidEmail ? 
+                           
+                                 <div className="mb-4">
+                            <label className="form__label">Email* :</label>
                             <div className="input-group">
-                                <input onChange={this.changeEditEmail} value={this.state.edit_user.email}  placeholder="example@gmail.com" type="email" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                <input onChange={this.changeEditEmail} value={this.state.edit_user.email} placeholder="example@gmail.com" type="email" className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                            </div>
+                            <span className="form__prompt_error form__prompt" id="basic-addon4">Invalid email format. Example: example@gmail.com</span>
+                        </div>
+                           
+                             : 
+                             <div className="mb-4">
+                            <label className="form__label">Email* :</label>
+                            <div className="input-group">
+                                <input onChange={this.changeEditEmail} value={this.state.edit_user.email} placeholder="example@gmail.com" type="email" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
                         </div>
+                        }
+
                         <div className="mb-4">
                             <label className="form__label">Log:</label>
                             <div className="input-group">
@@ -1117,9 +1219,16 @@ moderators" type="text" className="form-control" id="basic-url" aria-describedby
                     <button className="btn btn_primary btn_gray" onClick={this.handleCloseEdit}>
                         Back
                     </button>
-                    <button className="btn btn_primary btn_orange" onClick={this.edit}>
-                        Edit
-                    </button>
+                    {   
+                        this.state.edit_user.external_id && this.state.edit_user.wallet && this.state.edit_user.email && !this.state.isInvalidEmail
+                        ?
+                        <button className="btn btn_primary btn_orange" onClick={this.edit}>
+                            Edit
+                        </button>
+                        :   <button className="btn btn_primary btn_orange btn_disabled" onClick={this.edit}>
+                            Edit
+                            </button>
+                    }
                     </Modal.Footer>
                 </Modal>
                 <Modal show={this.state.showStats} onHide={this.handleCloseStats} centered>

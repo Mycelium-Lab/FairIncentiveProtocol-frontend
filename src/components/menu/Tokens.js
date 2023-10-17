@@ -15,6 +15,7 @@ import SuccessModal from "../common/modals/success";
 import ErrorModal from "../common/modals/error";
 import empty from "../../media/common/empty_icon.svg"
 import info from '../../media/common/info-small.svg'
+import infoDisabled from '../../media/common/info-small_disabled.svg'
 import infoRed from '../../media/common/info-red.svg'
 import more from '../../media/common/more.svg'
 import copy from '../../media/common/copy.svg'
@@ -139,6 +140,12 @@ class Tokens extends Component {
                 hasLoad: false
             })
         }
+        if(this.props.isGoToCreationPage) {
+            this.setState({
+                stageOfCreateToken: 1,
+                showCreate: true,
+            })
+        }
     }
 
     onChangeName(event) {
@@ -248,54 +255,12 @@ class Tokens extends Component {
     }
 
     async connect() {
-        try {
-            const { network } = this.state
-            const provider = new ethers.providers.Web3Provider(window.ethereum)
+        const network = this.state.network
+        const provider = new ethers.providers.Web3Provider(window.ethereum)
             await provider.send("eth_requestAccounts", [])
             const signer = await provider.getSigner()
             const address = await signer.getAddress()
             const chainid = (await provider.getNetwork()).chainId
-            if (chainid.toString() !== network.chainid) {
-                try {
-                    this.handleShowConfirm('Confirm the network change', 'Please, confirm the network change in your wallet')
-                    await window.ethereum.request({
-                      method: 'wallet_switchEthereumChain',
-                      params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
-                    })
-                    // .then(() => window.location.reload())
-                  } catch (err) {
-                    console.log(err)
-                    if (err.code === 4902) {
-                      await window.ethereum.request({
-                        method: 'wallet_addEthereumChain',
-                        params: [
-                          {
-                            chainName: network.name,
-                            chainId: ethers.utils.hexlify(parseInt(network.chainid)),
-                            nativeCurrency: { name: network.currency, decimals: 18, symbol: network.currency},
-                            rpcUrls: [network.rpc]
-                          }
-                        ]
-                      })
-                    //   .then(() => window.location.reload())
-                    }
-                  }
-                  this.handleCloseConfirm()
-            }
-            this.setState({
-                provider,
-                signer,
-                address,
-                chainid
-            })
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    async changeNetwork(id) {
-        const network = networks[id]
-        if (window.ethereum.isConnected()) {
             try {
                 this.handleShowConfirm('Confirm the network change', 'Please, confirm the network change in your wallet')
                 await window.ethereum.request({
@@ -303,6 +268,13 @@ class Tokens extends Component {
                   params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
                 })
                 // .then(() => window.location.reload())
+                this.setState({
+                    provider,
+                    signer,
+                    address,
+                    chainid,
+                    stageOfCreateToken: 3
+                })
               } catch (err) {
                 console.log(err)
                 if (err.code === 4902) {
@@ -320,10 +292,17 @@ class Tokens extends Component {
                 //   .then(() => window.location.reload())
                 }
               }
-            this.handleCloseConfirm()
-        }
+              this.handleCloseConfirm()
+    }
+
+    async changeNetwork(id) {
+        const network = networks[id]
         this.setState({
-            network
+            network,
+            provider: null,
+            signer: null,
+            address: null,
+            chainid: null
         })
     }
 
@@ -389,12 +368,10 @@ class Tokens extends Component {
             const res = await fetch(`${config.api}/tokens/add`, requestOptions)
             if (res.status === 200) {
                 const token = (await res.json()).body.data
-                const _tokens = this.tokens
+                const _tokens = this.state.tokens
                 _tokens.push(token)
                 this.setState({
                     tokens: _tokens,
-                    showCreate: false,
-                    stageOfCreateToken: 0,
                 })
             } else {
                 alert('Something went wrong')
@@ -402,6 +379,10 @@ class Tokens extends Component {
             contract.deployed().then(() => {
                 this.handleCloseProgress()
                 this.handleShowSuccess(`${symbol} token created`, `The contract creation was successful`)
+                this.setState({
+                    showCreate: false,
+                    stageOfCreateToken: 0,
+                })
             })
         } catch (error) {
             this.customError(error)
@@ -885,14 +866,14 @@ class Tokens extends Component {
                                 <div className="form_col">
                                     <label className="form__label">Token name * <img src={info} className="form__icon-info"/></label>
                                     <div className="input-group">
-                                        <input type="text" placeholder="e.g. Bitcoin" onChange={this.onChangeName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        <input type="text" value={this.state.name} placeholder="e.g. Bitcoin" onChange={this.onChangeName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                     </div>
                                     <div className="form__prompt" id="basic-addon4">Choose a name for your token</div>
                                 </div>
                                 <div className="form_col_last form_col">
                                     <label className="form__label">Symbol * <img src={info} className="form__icon-info"/></label>
                                     <div className="input-group">
-                                    <input type="text" placeholder="e.g. BTC" onChange={this.onChangeSymbol} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    <input type="text" value={this.state.symbol} placeholder="e.g. BTC" onChange={this.onChangeSymbol} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                     </div>
                                     <div className="form__prompt" id="basic-addon4">Choose a symbol for your token</div>
                                 </div>
@@ -915,7 +896,7 @@ class Tokens extends Component {
                                     <div className="form__prompt" id="basic-addon4">Choose a symbol for your token</div>
                                 </div>
                                 <div className="form_col_last form_col">
-                                    <label className="form__label">Initial supply {this.state.emissionType === "1" ? "*" : null}<img src={info} /></label>
+                                    <label className="form__label">Initial supply {this.state.emissionType === "1" ? " *" : null} <img src={info} className="form__icon-info" /></label>
                                     <div className="input-group">
                                     <input onChange={this.onChangeInitialSupply} type="number" placeholder="1 000 000" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                     </div>
@@ -924,13 +905,19 @@ class Tokens extends Component {
                             </div>
 
                             <div className="form_row mb-4">
-                                <div className="form_col">
+                                {
+                                    this.state.emissionType !== "2" 
+                                    ? <div className="form_col">
                                     <label className="form__label">Maximum supply * <img src={info} className="form__icon-info" /></label>
                                     <div className="input-group">
-                                        <input onChange={this.onChangeMaxSupply} type="text" placeholder="1 000 000" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        <input value={this.state.maxSupply} onChange={this.onChangeMaxSupply} type="text" placeholder="1 000 000" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                     </div>
                                     <div className="form__prompt" id="basic-addon4">The maximum number of coins ever minted</div>
-                                </div>
+                                    </div>
+                                    : null
+                                
+                                }
+                                
                                 <div className="form_col_last form_col">
                                     <label className="form__label">Blockchain * <img src={info} className="form__icon-info" /></label>
                                     <div className="input-group">
@@ -949,8 +936,8 @@ class Tokens extends Component {
 
                             <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
-                                <label className="form__label">Upload a picture of the token (soon) </label>
-                                    <FileUpload></FileUpload>
+                                <label className="form__label_disbaled form__label">Upload a picture of the token </label>
+                                    <FileUpload disabled></FileUpload>
                                 </div>
                             </div>
                         </div>
@@ -959,11 +946,11 @@ class Tokens extends Component {
 
                             <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
-                                    <label className="form__label">Decimals * (soon) <img src={info} className="form__icon-info"/></label>
+                                    <label className="form__label_disbaled form__label">Decimals <img src={infoDisabled} className="form__icon-info"/></label>
                                         <div className="input-group">
-                                        <input onChange={this.onChangeMaxSupply} type="number" placeholder="1 000 000" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        <input onChange={this.onChangeMaxSupply} disabled type="number" placeholder="1 000 000" className="form-control_disabled form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                         </div>
-                                    <div className="form__prompt" id="basic-addon4">Insert the decimals precision of your token</div>
+                                    <div className="form__prompt_disabled form__prompt" id="basic-addon4">Insert the decimals precision of your token</div>
                                 </div>
                             </div>
 
@@ -1007,9 +994,19 @@ class Tokens extends Component {
                                     <button className="btn btn_pre-sm  btn_primary btn_gray" onClick={this.prevStage}>
                                         Back
                                     </button>
-                                    <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.nextStage}>
+                                    {
+                                    this.state.symbol && this.state.name && this.state.emissionType !=='2' && this.state.maxSupply ? 
+                                    <button className="btn btn_pre-sm btn_primary btn_orange" onClick={this.nextStage}>
                                         Next
                                     </button>
+                                    :  this.state.symbol && this.state.name && this.state.emissionType ==='2' ? 
+                                    <button className="btn btn_pre-sm btn_primary btn_orange" onClick={this.nextStage}>
+                                        Next
+                                    </button>
+                                    :   <button disabled className="btn btn_pre-sm  btn_primary btn_orange btn_disabled">
+                                        Next
+                                        </button>
+                                }
                                 </div>
                         </div>
                     </div> : null
@@ -1495,9 +1492,9 @@ class Tokens extends Component {
                             </div>
                            
                         </Modal.Body>
-                        <Modal.Footer>
+                       {/* <Modal.Footer>
                             <button className="btn btn_secondary btn_orange" onClick={this.addToBlacklist}>Add</button>
-                        </Modal.Footer>
+                                        </Modal.Footer>*/}
                 </Modal>
                 <Modal show={this.state.showBurn} onHide={this.handleCloseBurn} centered>
                     <Modal.Header closeButton>

@@ -14,6 +14,7 @@ import FPTable from "../common/FPTable";
 import { rewardEventsTable } from "../../data/tables";
 import SuccessModal from "../common/modals/success";
 import loader from '../../media/common/loader.svg'
+import empty from "../../media/common/empty_icon.svg"
 
 const types = {
     token: 'token',
@@ -143,6 +144,7 @@ class RewardEvents extends Component {
               };
             const res = await fetch(`${config.api}/rewards/get/token`, requestOptions)
             const json = await res.json()
+            json.body.data = json.body.data.filter(v => v.status === 1)
             const rewards = json.body.data.map(v => <option value={v.id}>{v.name}</option>)
             this.setState({
                 tokenRewardsName: rewards
@@ -175,6 +177,10 @@ class RewardEvents extends Component {
     }
 
     changeRewardToken(event) {
+        if(event.target.value === 'create reward') {
+            this.props.onSwitch(this.props.switcher.rewards)
+            return 
+        }
        this.setState({
         reward_id: event.target.value
        })
@@ -245,6 +251,10 @@ class RewardEvents extends Component {
  
 
     changeUser(event) {
+        if(event.target.value === 'create user') {
+            this.props.onSwitch(this.props.switcher.users)
+            return 
+        }
         this.setState({
             chosen_user: event.target.value
         })
@@ -299,6 +309,9 @@ class RewardEvents extends Component {
     handleCloseRevoke = () => this.setState({showRevoke: false, revoke_event_id: null, revoke_event_type: null})
     handleShowReward = () => this.setState({showReward: true})
     handleCloseReward = () => this.setState({showReward: false})
+    handleShowAdd = () => {
+        this.props.onSwitch(this.props.switcher.rewards)
+    }
     handleCloseSuccess = () => this.setState({showSuccess: false, successName: null})
     changeUser = this.changeUser.bind(this)
     changeComment = this.changeComment.bind(this)
@@ -312,6 +325,7 @@ class RewardEvents extends Component {
     handleShowRevoke = this.handleShowRevoke.bind(this)
     handleCloseRevoke = this.handleCloseRevoke.bind(this)
     handleShowReward = this.handleShowReward.bind(this)
+    handleShowAdd = this.handleShowAdd.bind(this)
     handleCloseReward = this.handleCloseReward.bind(this)
     rewardWithToken = this.rewardWithToken.bind(this)
     handleCloseSuccess = this.handleCloseSuccess.bind(this)
@@ -322,10 +336,16 @@ class RewardEvents extends Component {
             <>
                 <div className="title-header">
                     <h3 className="menu__title">Reward Events</h3>
-                    <button  type="button" className="btn btn_orange btn_primary" onClick={this.handleShowReward}>To reward</button>
+                    {
+                        this.state.rewardTokenEvents?.length && !this.state.showCreate 
+                        ?  <button  type="button" className="btn btn_orange btn_primary" onClick={this.handleShowReward}>To reward</button> 
+                        : null
+                    }
                 </div>
 
-                <div className="input-group__serach">
+                {
+                    this.state.rewardTokenEvents?.length && !this.state.showCreate 
+                    ? <div className="input-group__serach">
                     <button  type="button" className="btn btn_orange btn_image btn_primary" onClick={() => this.setState({showFilter: !this.state.showFilter})}>
                         {
                             this.state.showFilter 
@@ -337,6 +357,8 @@ class RewardEvents extends Component {
                         <input type="text" placeholder="Search..." className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                     </div>
                 </div>
+                    : null 
+                }
 
                 {
                      this.state.hasLoad ?  <img className="modal__loader_view modal__loader" src={loader}></img>
@@ -358,47 +380,61 @@ class RewardEvents extends Component {
                     : null
                 }
 
-                        <div className="content__wrap">
-                            <FPTable data={rewardEventsTable}>
-                                {
-                                     this.state.switcher === types.token 
-                                    ?  this.state.rewardTokenEvents.map(v =>
-                                 <tr>
-                                          <td>   
-                                          {createLongStrView(v.event_id)}
-                                          </td>
-                                          <td>
-                                          {v.status}
-                                          </td>
-                                          <td>
-                                          {v.reward_name}
-                                          </td>
-                                          <td>
-                                          {ethers.utils.formatEther(v.token_amount)} {v.token_symbol} from collection
-                                          </td>
-                                          <td>
-                                            <div>
-                                                {v.user_external_id}
-                                            </div>
-                                            <div>
-                                                (FAIR id: {createLongStrView(v.user_id)})
-                                            </div>
-                                          </td>
-                                          <td>
-                                            <FPDropdown icon={more}>
-                                            {
-                                                v.status === 'Accrued'
-                                                ?  <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowRevoke(v.event_id, types.token)} >Revoke</Dropdown.Item>
-                                                : null
-                                            }
-                                            </FPDropdown>
-                                          </td>
-                                      </tr>)
-                                      : null
-                              }
-                            </FPTable>
-                        </div>
-
+                {
+                     !this.state.rewardTokenEvents?.length && !this.state.showCreate ?
+                     <div className="empty">
+                       <div className="empty__wrapper">
+                           <img src={empty}></img>
+                           <span className="empty__desc">Not any reward event yet</span>
+                           <button onClick={this.handleShowAdd} type="button" className="btn btn_rounded btn_orange btn_sm">Add new reward event</button>
+                       </div>
+                     </div>
+                     : null
+                }
+                {
+                    this.state.rewardTokenEvents?.length && !this.state.showCreate ? 
+                    <div className="content__wrap">
+                    <FPTable data={rewardEventsTable}>
+                        {
+                             this.state.switcher === types.token 
+                            ?  this.state.rewardTokenEvents.map(v =>
+                         <tr>
+                                  <td>   
+                                  {createLongStrView(v.event_id)}
+                                  </td>
+                                  <td>
+                                  {v.status}
+                                  </td>
+                                  <td>
+                                  {v.reward_name}
+                                  </td>
+                                  <td>
+                                  {ethers.utils.formatEther(v.token_amount)} {v.token_symbol} from collection
+                                  </td>
+                                  <td>
+                                    <div>
+                                        {v.user_external_id}
+                                    </div>
+                                    <div>
+                                        (FAIR id: {createLongStrView(v.user_id)})
+                                    </div>
+                                  </td>
+                                  <td>
+                                    <FPDropdown icon={more}>
+                                    {
+                                        v.status === 'Accrued'
+                                        ?  <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowRevoke(v.event_id, types.token)} >Revoke</Dropdown.Item>
+                                        : null
+                                    }
+                                    </FPDropdown>
+                                  </td>
+                              </tr>)
+                              : null
+                      }
+                    </FPTable>
+                </div>
+                :null
+                }
                {
                     /* <div>
                     <button type="button" className={this.state.switcher === types.token ? "btn btn-dark" : "btn btn-light"} onClick={() => this.setState({switcher: types.token})}>Token rewards</button>
@@ -515,6 +551,12 @@ class RewardEvents extends Component {
                                     <select onChange={this.changeRewardToken} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
 
                                         {
+                                            !this.state.tokenRewardsName.length
+                                             ? <>
+                                               <option value="" disabled selected>Select token</option>
+                                               <option value='create reward'>Create new one</option>
+                                             </>
+                                            :
                                             this.state.tokenRewardsName
                                         }                                          
                                     </select>
@@ -526,9 +568,15 @@ class RewardEvents extends Component {
                                 <label className="form__label">Select user: <img className="form__icon-info" src={info}/></label>
                                     <div className="input-group ">
                                         <select onChange={this.changeUser} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                            {
-                                                this.state.users
-                                            }
+                                        {
+                                            !this.state.users.length
+                                             ? <>
+                                               <option value="" disabled selected>Select users</option>
+                                               <option value='create user'>Create new one</option>
+                                             </>
+                                            :
+                                            this.state.users
+                                        }     
                                         </select>
                                     </div>
                                     <div className="form__prompt" id="basic-addon4">Select the user you would like to reward</div>

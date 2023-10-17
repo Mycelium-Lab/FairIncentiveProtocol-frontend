@@ -2,4 +2,7 @@
     .modal-header{
         gap: 15px
     }    
+    .modal.show .modal-dialog{
+        max-width: 100%;
+    }
 }

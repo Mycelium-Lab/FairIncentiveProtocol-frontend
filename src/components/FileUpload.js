@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import uploadIcon from "../media/common/upload_icon.svg"
+import uploadIconDisable from "../media/common/upload_icon_disable.svg"
 
 class FileUpload extends Component {
     constructor(props) {
@@ -39,6 +40,7 @@ class FileUpload extends Component {
 
     // triggers when file is selected with click
     handleChange (e) {
+        console.log(this.props)
         e.preventDefault();
         if (e.target.files && e.target.files[0]) {
             this.handleFile(e.target.files);
@@ -51,17 +53,35 @@ class FileUpload extends Component {
     };
 
     handleFile(files) {
-        this.props.getImage(files)
+        console.log(this.props)
+        this.props.handleImage(files)
     }
 
     handleDrag = this.handleDrop.bind(this)
     handleDrop = this.handleDrop.bind(this)
     handleChange = this.handleChange.bind(this)
     onButtonClick = this.onButtonClick.bind(this)
+    handleFile = this.handleFile.bind(this)
 
     render() {
+        const {disabled} = this.props
         return (
-            <form id="form-file-upload" onDragEnter={this.handleDrag} onSubmit={(e) => e.preventDefault()}>
+            <>
+            {
+                disabled 
+                ?  <form className="form-file-upload_disabled" id="form-file-upload" onDragEnter={this.handleDrag} onSubmit={(e) => e.preventDefault()}>
+                <input  disabled={disabled} ref={this.input} type="file" id="input-file-upload" multiple={true} onChange={this.handleChange} />
+                <label id="label-file-upload" htmlFor="input-file-upload" className={this.dragActive ? "drag-active" : "" }>
+                    <div className="form-file-upload__inner">
+                    <img src={uploadIconDisable}></img>
+                    <p className="form-file-upload__prompt_disbaled form-file-upload__prompt">Recommended size: 350 x 350</p>
+                    <button className="upload-button" onClick={this.onButtonClick}></button>
+                    </div> 
+                </label>
+                { this.dragActive && <div id="drag-file-element" onDragEnter={this.handleDrag} onDragLeave={this.handleDrag} onDragOver={this.handleDrag} onDrop={this.handleDrop}></div> }
+                </form>
+                :
+                <form id="form-file-upload" onDragEnter={this.handleDrag} onSubmit={(e) => e.preventDefault()}>
                 <input ref={this.input} type="file" id="input-file-upload" multiple={true} onChange={this.handleChange} />
                 <label id="label-file-upload" htmlFor="input-file-upload" className={this.dragActive ? "drag-active" : "" }>
                     <div className="form-file-upload__inner">
@@ -71,7 +91,9 @@ class FileUpload extends Component {
                     </div> 
                 </label>
                 { this.dragActive && <div id="drag-file-element" onDragEnter={this.handleDrag} onDragLeave={this.handleDrag} onDragOver={this.handleDrag} onDrop={this.handleDrop}></div> }
-            </form>
+                </form>
+            }
+            </>
         )
     }
 }

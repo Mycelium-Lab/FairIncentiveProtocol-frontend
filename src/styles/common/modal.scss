@@ -59,7 +59,7 @@
 .confirm__text{
     font-size: map-get($theme-fontSize, "primary");
     color: #212B36;
-    line-height: 27px;
+    //line-height: 27px;
     font-weight: 600;
     padding-bottom: 40px;
     text-align: center;
@@ -123,4 +123,10 @@
 .loader-wrapper{
     display: flex;
     justify-content: center;
+}
+
+.confirm__content{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }

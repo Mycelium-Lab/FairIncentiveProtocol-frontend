@@ -32,6 +32,7 @@ class MainScreen extends Component {
             switcher: switcher.dashboard,
             auth: props.auth,
             showSidebar: true,
+            isGoToCreationPage: false
         }
     }
 
@@ -52,11 +53,11 @@ class MainScreen extends Component {
 
     renderInfo() {
         if (this.state.switcher === switcher.dashboard) return <Dashboard/>
-        if (this.state.switcher === switcher.rewards) return <Rewards/>
-        if (this.state.switcher === switcher.reward_events) return <RewardEvents/>
-        if (this.state.switcher === switcher.tokens) return <Tokens/>
-        if (this.state.switcher === switcher.users) return <Users/>
-        if (this.state.switcher === switcher.nftcollection) return <NFTCollections auth={this.state.auth} switcher={switcher} onSwitch={this.onSwitch}/>
+        if (this.state.switcher === switcher.rewards) return <Rewards switcher={switcher} onSwitch={this.onSwitch} goToCreationPage={this.goToCreationPage} isGoToCreationPage={this.state.isGoToCreationPage}/>
+        if (this.state.switcher === switcher.reward_events) return <RewardEvents switcher={switcher} onSwitch={this.onSwitch}/>
+        if (this.state.switcher === switcher.tokens) return <Tokens isGoToCreationPage={this.state.isGoToCreationPage}/>
+        if (this.state.switcher === switcher.users) return <Users switcher={switcher} onSwitch={this.onSwitch} goToCreationPage={this.goToCreationPage} isGoToCreationPage={this.state.isGoToCreationPage}/>
+        if (this.state.switcher === switcher.nftcollection) return <NFTCollections auth={this.state.auth} switcher={switcher} onSwitch={this.onSwitch} isGoToCreationPage={this.state.isGoToCreationPage}/>
         if (this.state.switcher === switcher.nft) return <NFTs/>
         if (this.state.switcher === switcher.settings) return <Settings auth={this.state.auth}/>
         if (this.state.switcher === switcher.notifications) return <Notifications/>
@@ -68,8 +69,22 @@ class MainScreen extends Component {
         })
     }
 
+    goToCreationPage() {
+        this.setState({
+            isGoToCreationPage: true
+        })
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if(prevState.isGoToCreationPage) {
+            this.setState({
+                isGoToCreationPage: false
+            })
+        }
+    }
 
     onSwitch = this.onSwitch.bind(this)
+    goToCreationPage = this.goToCreationPage.bind(this)
     renderInfo = this.renderInfo.bind(this)
     changeShowSidebar = this.changeShowSidebar.bind(this)
 
@@ -80,12 +95,14 @@ class MainScreen extends Component {
                     userName={this.state.auth.name} 
                     showSidebar={this.state.showSidebar} 
                     changeShowSidebar={this.changeShowSidebar}
-                    notifications={switcher.notifications} onSwitch={this.onSwitch}
+                    notifications={switcher.notifications} 
+                    settings={switcher.settings} 
+                    onSwitch={this.onSwitch}
                     >
                     </Header>
                 <div className="middle">
                 {
-                    this.state.showSidebar ? <Sidebar switcher={switcher} onSwitch={this.onSwitch} changeShowSidebar={this.changeShowSidebar}></Sidebar>  : null  
+                    this.state.showSidebar ? <Sidebar switcher={switcher} currentSwitch={this.state.switcher} onSwitch={this.onSwitch} changeShowSidebar={this.changeShowSidebar}></Sidebar>  : null  
                 }
                 {
                     !this.state.showSidebar &&  window.innerWidth < 769 ? 

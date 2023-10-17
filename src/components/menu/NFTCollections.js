@@ -29,7 +29,9 @@ import { nftsTable } from "../../data/tables";
 import FileUpload from "../FileUpload";
 import FPDropdown from "../common/FPDropdown";
 import { Dropdown, Form } from "react-bootstrap";
-import loader from '../../media/common/loader.svg'
+import loader from '../../media/common/loader.svg';
+import metamask from '../../media/common/metamask.svg'
+import walletconnect from '../../media/common/walletconnect.svg'
 
 const beneficialTypes = {
     company: "company",
@@ -80,7 +82,7 @@ class NFTCollections extends Component {
             facebook: null,
             discord: null,
             other: null,
-            stageOfCreateNftCollection: 1,
+            stageOfCreateNftCollection: 0,
             stageOfAddNft: 0,
             hasLoad: false,
         }
@@ -100,6 +102,9 @@ class NFTCollections extends Component {
             this.setState({
                 hasLoad: false
             })
+        }
+        if(this.props.isGoToCreationPage) {
+            this.handleShowCreate()
         }
     }
 
@@ -167,7 +172,22 @@ class NFTCollections extends Component {
 
     async changeNetwork(event) {
         const network = networks[event.target.value]
-        if (this.state.address) {
+        this.setState({
+            network,
+            provider: null,
+            signer: null,
+            address: null,
+            chainid: null
+        })
+    }
+
+    async connect() {
+        const network = this.state.network
+        const provider = new ethers.providers.Web3Provider(window.ethereum)
+            await provider.send("eth_requestAccounts", [])
+            const signer = await provider.getSigner()
+            const address = await signer.getAddress()
+            const chainid = (await provider.getNetwork()).chainId
             try {
                 this.handleShowConfirm('Confirm the network change', 'Please, confirm the network change in your wallet')
                 await window.ethereum.request({
@@ -175,6 +195,12 @@ class NFTCollections extends Component {
                   params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
                 })
                 // .then(() => window.location.reload())
+                this.setState({
+                    provider,
+                    signer,
+                    address,
+                    chainid
+                })
               } catch (err) {
                 console.log(err)
                 if (err.code === 4902) {
@@ -193,56 +219,6 @@ class NFTCollections extends Component {
                 }
               }
               this.handleCloseConfirm()
-        }
-        this.setState({
-            network
-        })
-    }
-
-    async connect() {
-        try {
-            const { network } = this.state
-            const provider = new ethers.providers.Web3Provider(window.ethereum)
-            await provider.send("eth_requestAccounts", [])
-            const signer = await provider.getSigner()
-            const address = await signer.getAddress()
-            const chainid = (await provider.getNetwork()).chainId
-            if (chainid.toString() !== network.chainid) {
-                try {
-                    this.handleShowConfirm('Confirm the network change', 'Please, confirm the network change in your wallet')
-                    await window.ethereum.request({
-                      method: 'wallet_switchEthereumChain',
-                      params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
-                    })
-                    // .then(() => window.location.reload())
-                  } catch (err) {
-                    console.log(err)
-                    if (err.code === 4902) {
-                      await window.ethereum.request({
-                        method: 'wallet_addEthereumChain',
-                        params: [
-                          {
-                            chainName: network.name,
-                            chainId: ethers.utils.hexlify(parseInt(network.chainid)),
-                            nativeCurrency: { name: network.currency, decimals: 18, symbol: network.currency},
-                            rpcUrls: [network.rpc]
-                          }
-                        ]
-                      })
-                    //   .then(() => window.location.reload())
-                    }
-                }
-                this.handleCloseConfirm()
-            }
-            this.setState({
-                provider,
-                signer,
-                address,
-                chainid
-            })
-        } catch (error) {
-            console.log(error)
-        }
     }
 
     nextStage () {
@@ -250,10 +226,10 @@ class NFTCollections extends Component {
     }
     prevStage () {
         if(this.state.stageOfCreateNftCollection === 1) {
-            this.setState({stageOfCreateNftCollection: this.state.stageOfCreateToken - 1, showCreate: false  })
+            this.setState({stageOfCreateNftCollection: this.state.stageOfCreateNftCollection - 1, showCreate: false  })
         }
         else {
-            this.setState({stageOfCreateNftCollection: this.state.stageOfCreateToken - 1 })
+            this.setState({stageOfCreateNftCollection: this.state.stageOfCreateNftCollection - 1 })
         }
     }
 
@@ -322,7 +298,6 @@ class NFTCollections extends Component {
                 _nfts.push(collection)
                 this.setState({
                     nftCollections: _nfts,
-                    showCreate: false,
                     name: null,
                     symbol: null,
                     description: null,
@@ -333,6 +308,10 @@ class NFTCollections extends Component {
                 contract.deployed().then(() => {
                     this.handleCloseProgress()
                     this.handleShowSuccess(`${symbol} collection created`, `The contract creation was successful`)
+                    this.setState({
+                        showCreate: false,
+                        stageOfCreateToken: 0,
+                    })
                 })
             } else {
                 alert('Something went wrong')
@@ -395,7 +374,7 @@ class NFTCollections extends Component {
 
     handleCloseCreate = () => this.setState({showCreate: false})
     handleShowCreate = () => {
-        this.setState({showCreate: true, stageOfAddNft: 1})
+        this.setState({showCreate: true, stageOfCreateNftCollection: 1})
     }
 
     handleCloseCreateImagesPage = () => this.setState({showCreateImagesPage: false})
@@ -482,7 +461,7 @@ class NFTCollections extends Component {
                         }
                     </div>
                     {
-                        this.state.nftCollections?.length && !this.state.stageOfAddNft ? <button onClick={this.handleShowCreate} type="button" className="btn btn_orange btn_primary">Create new collection</button> : null
+                        this.state.nftCollections?.length && !this.state.stageOfCreateNftCollection ? <button onClick={this.handleShowCreate} type="button" className="btn btn_orange btn_primary">Create new collection</button> : null
                     }
                 </div>
                 {
@@ -492,51 +471,85 @@ class NFTCollections extends Component {
                         {
                      this.state.showCreate && this.state.stageOfCreateNftCollection === 1 
                     ?   <div className="content__wrap">
-                         <button onClick={this.connect} type="button" className="btn btn-dark">{this.state.address ? createLongStrView(this.state.address) : 'Connect'}</button>
+                         {/*<button onClick={this.connect} type="button" className="btn btn-dark">{this.state.address ? createLongStrView(this.state.address) : 'Connect'}</button>*/}
                         <h4 className="menu__title-secondary mb-4">Specify the parameters of the new token</h4>
                             <div className="form__groups"> 
 
                                 <div className="form_row">
                                     <div className="form_col">
-                                    <label className="form-label">Name</label>
+                                    <label className="form-label">Name *</label>
                                         <div className="input-group">
                                             <input type="text" value={this.state.name} placeholder="Example: Treasures of the sea" onChange={this.onChangeName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                         </div>
                                     </div>
-                                    <div className="form_col_last form_col">
-                                        <label className="form-label">Symbol</label>
+                                    <div className="form_col_last form_col mb-4">
+                                        <label className="form-label">Symbol *</label>
                                         <div className="input-group">
                                             <input type="text" value={this.state.symbol} placeholder="Example: TOS" onChange={this.onChangeSymbol} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                         </div>
                                     </div>
                                 </div>
+                                {
+                                     window.innerWidth < 769 ?
+                                     <div className="form_row mb-4">
+                                     <div className="form_col_last form_col">
+                                     <label className="form-label">Blockchain *</label>
+                                     <div className="input-group">
+                                         <select onChange={this.changeNetwork} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                             <option value={config.status === "test" ? '5' : '1'} selected={this.state.network.chainid === (config.status === "test" ? '5' : '1')}>{networks[config.status === "test" ? '5' : '1'].name}</option>
+                                             <option value={config.status === "test" ? '97' : '56'} selected={this.state.network.chainid === (config.status === "test" ? '97' : '56')}>{networks[config.status === "test" ? '97' : '56'].name}</option>
+                                             <option value={config.status === "test" ? '80001' : '137'} selected={this.state.network.chainid === (config.status === "test" ? '80001' : '137')}>{networks[config.status === "test" ? '80001' : '137'].name}</option>
+                                             <option value={config.status === "test" ? '420' : '10'} selected={this.state.network.chainid === (config.status === "test" ? '420' : '10')} disabled={config.status === "test" ? true : false} >{networks[config.status === "test" ? '420' : '10'].name}</option>
+                                             <option value={config.status === "test" ? '43113' : '43114'} selected={this.state.network.chainid === (config.status === "test" ? '43113' : '43114')}>{networks[config.status === "test" ? '43113' : '43114'].name}</option>
+                                             <option value={config.status === "test" ? '421613' : '42161'} selected={this.state.network.chainid === (config.status === "test" ? '421613' : '42161')}>{networks[config.status === "test" ? '421613' : '42161'].name}</option>
+                                         </select>
+                                     </div>
+                                     <div className="form__prompt" id="basic-addon4">Select the blockchain where you'd like new items from this collection to be added by default</div>
+                                     </div>
+                                 </div>
+ 
+                                     :  <div className="form_row">
+                                     <div className="form_col_last form_col">
+                                     <label className="form-label">Blockchain *</label>
+                                     <div className="input-group">
+                                         <select onChange={this.changeNetwork} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                             <option value={config.status === "test" ? '5' : '1'} selected={this.state.network.chainid === (config.status === "test" ? '5' : '1')}>{networks[config.status === "test" ? '5' : '1'].name}</option>
+                                             <option value={config.status === "test" ? '97' : '56'} selected={this.state.network.chainid === (config.status === "test" ? '97' : '56')}>{networks[config.status === "test" ? '97' : '56'].name}</option>
+                                             <option value={config.status === "test" ? '80001' : '137'} selected={this.state.network.chainid === (config.status === "test" ? '80001' : '137')}>{networks[config.status === "test" ? '80001' : '137'].name}</option>
+                                             <option value={config.status === "test" ? '420' : '10'} selected={this.state.network.chainid === (config.status === "test" ? '420' : '10')} disabled={config.status === "test" ? true : false} >{networks[config.status === "test" ? '420' : '10'].name}</option>
+                                             <option value={config.status === "test" ? '43113' : '43114'} selected={this.state.network.chainid === (config.status === "test" ? '43113' : '43114')}>{networks[config.status === "test" ? '43113' : '43114'].name}</option>
+                                             <option value={config.status === "test" ? '421613' : '42161'} selected={this.state.network.chainid === (config.status === "test" ? '421613' : '42161')}>{networks[config.status === "test" ? '421613' : '42161'].name}</option>
+                                         </select>
+                                     </div>
+                                     <div className="form__prompt" id="basic-addon4">Select the blockchain where you'd like new items from this collection to be added by default</div>
+                                     </div>
+                                 </div>
+ 
+                                }
 
-                                <div className="form_row">
-                                    <div className="form_col_last form_col">
-                                    <label className="form-label">Blockchain *</label>
-                                    <div className="input-group">
-                                        <select onChange={this.changeNetwork} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                            <option value={config.status === "test" ? '5' : '1'} selected={this.state.network.chainid === (config.status === "test" ? '5' : '1')}>{networks[config.status === "test" ? '5' : '1'].name}</option>
-                                            <option value={config.status === "test" ? '97' : '56'} selected={this.state.network.chainid === (config.status === "test" ? '97' : '56')}>{networks[config.status === "test" ? '97' : '56'].name}</option>
-                                            <option value={config.status === "test" ? '80001' : '137'} selected={this.state.network.chainid === (config.status === "test" ? '80001' : '137')}>{networks[config.status === "test" ? '80001' : '137'].name}</option>
-                                            <option value={config.status === "test" ? '420' : '10'} selected={this.state.network.chainid === (config.status === "test" ? '420' : '10')} disabled={config.status === "test" ? true : false} >{networks[config.status === "test" ? '420' : '10'].name}</option>
-                                            <option value={config.status === "test" ? '43113' : '43114'} selected={this.state.network.chainid === (config.status === "test" ? '43113' : '43114')}>{networks[config.status === "test" ? '43113' : '43114'].name}</option>
-                                            <option value={config.status === "test" ? '421613' : '42161'} selected={this.state.network.chainid === (config.status === "test" ? '421613' : '42161')}>{networks[config.status === "test" ? '421613' : '42161'].name}</option>
-                                        </select>
-                                    </div>
-                                    <div className="form__prompt" id="basic-addon4">Select the blockchain where you'd like new items from this collection to be added by default</div>
-                                    </div>
-                                </div>
-
-                                <div className="form_row mb-4">
-                                    <div className="form_col_last form_col">
-                                        <label className="form-label">Description (optional)</label>
-                                            <div className="input-group">
-                                                <textarea type="text" value={this.state.description} onChange={this.onChangeDescription} className="form__textarea form__textarea_desct-nft-collection" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
-                                            </div>
-                                            <div className="form-text" id="basic-addon4"><a className="link__form-prompt" href="https://www.markdownguide.org/cheat-sheet/" target="blank">Markdown</a> syntax is supported. 0 of 1000 characters used</div>
-                                    </div>
-                                </div>
+                                {
+                                     window.innerWidth < 769 
+                                     ?    <div className="form_row mb-4">
+                                     <div className="form_col_last form_col">
+                                         <label className="form-label">Description (optional)</label>
+                                             <div className="input-group">
+                                                 <textarea type="text" value={this.state.description} onChange={this.onChangeDescription} className="form__textarea form__textarea_desct-nft-collection" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
+                                             </div>
+                                             <div className="form-text" id="basic-addon4"><a className="link__form-prompt" href="https://www.markdownguide.org/cheat-sheet/" target="blank">Markdown</a> syntax is supported. 0 of 1000 characters used</div>
+                                     </div>
+                                 </div> 
+                                     
+                                     :    <div className="form_row">
+                                     <div className="form_col_last form_col">
+                                         <label className="form-label">Description (optional)</label>
+                                             <div className="input-group">
+                                                 <textarea type="text" value={this.state.description} onChange={this.onChangeDescription} className="form__textarea form__textarea_desct-nft-collection" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
+                                             </div>
+                                             <div className="form-text" id="basic-addon4"><a className="link__form-prompt" href="https://www.markdownguide.org/cheat-sheet/" target="blank">Markdown</a> syntax is supported. 0 of 1000 characters used</div>
+                                     </div>
+                                 </div>
+                                }
+                             
 
                                 <div className="form_row mb-4">
                                 <div className="form_col_action_left form_col_last form_col">
@@ -545,11 +558,9 @@ class NFTCollections extends Component {
                                 </button>
                                 {
                                     (
-                                        !this.state.address
+                                        !this.state.name
                                         ||
-                                        this.state.name === null
-                                        ||
-                                        this.state.name === ''
+                                        !this.state.symbol
                                     )
                                     ?
                                     <button className="btn btn_pre-sm  btn_primary btn_orange btn_disabled" disabled onClick={this.nextStage}>
@@ -568,6 +579,7 @@ class NFTCollections extends Component {
                     : null
                 }
                 {
+                    /*
                       this.state.showCreate && this.state.stageOfCreateNftCollection === 2
                       ?   <div className="content__wrap">
                                 <h4 className="menu__title-secondary mb-4">Collection graphics</h4>
@@ -575,19 +587,19 @@ class NFTCollections extends Component {
                                 <div className="form_row">
                                 <div className="form_col">
                                 <label className="form-label">Logo image *</label>
-                                        <FileUpload></FileUpload>
+                                        <FileUpload disabled></FileUpload>
                                         <div className="form__prompt" id="basic-addon4">This image will appear at the top of your collection page. File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>
                                 </div>
                                 <div className="form_col_last form_col">
                                 <label className="form-label">Featured image *</label>
-                                        <FileUpload></FileUpload>
+                                        <FileUpload disabled></FileUpload>
                                         <div className="form__prompt" id="basic-addon4">This image will appear at the top of your collection page. File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>
                                 </div>
                                 </div>
                                 <div className="form_row mb-4">
                                     <div className="form_col_last form_col">
                                     <label className="form-label">Banner image *</label>
-                                        <FileUpload></FileUpload>
+                                        <FileUpload disabled></FileUpload>
                                         <div className="form__prompt" id="basic-addon4">This image will appear at the top of your collection page. File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>
                                     </div>
                                 </div>
@@ -603,6 +615,46 @@ class NFTCollections extends Component {
                          </div>
                                 </div>
                             </div>
+                    : null
+                    */
+                }
+
+                {
+                    this.state.showCreate && this.state.stageOfCreateNftCollection === 2 
+                    ?  <div className="content__wrap">
+                         <h4 className="menu__title-secondary">Choose a wallet connection method</h4>
+                         <span className="menu__subtitle">To create an nft collection, you need to complete a transaction using a cryptocurrency wallet</span>
+                         <ul className="walletl__list unlist">
+                            <li className="walletl__list-item" onClick={this.connect}>
+                                <div>
+                                     <img src={metamask}></img>
+                                </div>
+                                <p  className="walletl__list-item-name">MetaMask</p>
+                            </li>
+                            <li className="walletl__list-item">
+                                <div>
+                                    <img src={walletconnect}></img>
+                                </div>
+                                <p className="walletl__list-item-name">WalletConnect</p>
+                            </li>
+                         </ul>
+                         <div className="form_row mb-4">
+                            <div className="form_col_action_left form_col_last form_col">
+                                <button className="btn btn_pre-sm  btn_primary btn_gray" onClick={this.prevStage}>
+                                    Back
+                                </button>
+                                {
+                                    this.state.provider && this.state.signer && this.state.address && this.state.chainid ? 
+                                    <button className="btn btn_pre-sm btn_primary btn_orange" onClick={this.nextStage}>
+                                        Next
+                                    </button>
+                                  :   <button disabled className="btn btn_pre-sm  btn_primary btn_orange btn_disabled">
+                                        Next
+                                        </button>
+                                }
+                            </div>
+                         </div>
+                        </div> 
                     : null
                 }
 
@@ -1162,23 +1214,43 @@ class NFTCollections extends Component {
                                 </div>
                             </div>
                             <div className="form_row">
-                                    <div className="form_col">
-                                        <label className="form-label">Adding options:</label> 
-                                        <div className="input-group">
-                                        <div className="form-check custom-control custom-radio custom-control-inline">
-                                            <input type="radio" id="rd_1" name="rd" value="One by one"/>
-                                            <label className="form-check-label custom-control-label green" for="rd_1">
-                                            One by one <img src={info} className="form__icon-info"/>
-                                            </label>
-                                        </div>
-                                        <div className="form-check custom-control custom-radio custom-control-inline ms-3">
-                                            <input type="radio" id="rd_2" name="rd" value="Massive adding" />
-                                            <label className="form-check-label custom-control-label red" for="rd_2">
-                                            Massive adding <img src={info} className="form__icon-info"/>
-                                            </label>
-                                        </div>
-                                        </div>   
-                                    </div>
+                                {
+                                      window.innerWidth < 769 
+                                      ? <div className="form_col mb-4">
+                                      <label className="form-label">Adding options:</label> 
+                                      <div className="input-group">
+                                      <div className="form-check custom-control custom-radio custom-control-inline">
+                                          <input type="radio" id="rd_1" name="rd" value="One by one"/>
+                                          <label className="form-check-label custom-control-label green" for="rd_1">
+                                          One by one <img src={info} className="form__icon-info"/>
+                                          </label>
+                                      </div>
+                                      <div className="form-check custom-control custom-radio custom-control-inline ms-3">
+                                          <input type="radio" id="rd_2" name="rd" value="Massive adding" />
+                                          <label className="form-check-label custom-control-label red" for="rd_2">
+                                          Massive adding <img src={info} className="form__icon-info"/>
+                                          </label>
+                                      </div>
+                                      </div>   
+                                  </div>
+                                      : <div className="form_col">
+                                      <label className="form-label">Adding options:</label> 
+                                      <div className="input-group">
+                                      <div className="form-check custom-control custom-radio custom-control-inline">
+                                          <input type="radio" id="rd_1" name="rd" value="One by one"/>
+                                          <label className="form-check-label custom-control-label green" for="rd_1">
+                                          One by one <img src={info} className="form__icon-info"/>
+                                          </label>
+                                      </div>
+                                      <div className="form-check custom-control custom-radio custom-control-inline ms-3">
+                                          <input type="radio" id="rd_2" name="rd" value="Massive adding" />
+                                          <label className="form-check-label custom-control-label red" for="rd_2">
+                                          Massive adding <img src={info} className="form__icon-info"/>
+                                          </label>
+                                      </div>
+                                      </div>   
+                                  </div>
+                                }
                             </div>
                             <div className="form_row mb-4">
                                 <div className="form_col_action_left form_col_last form_col">
@@ -1205,9 +1277,9 @@ class NFTCollections extends Component {
                                         <div className="form__groups">
                                             <div className="form_row mb-4">
                                                 <div className="form_col_last form_col">
-                                                <label className="form-label">Logo image *</label>
-                                                    <FileUpload></FileUpload>
-                                                    <div className="form__prompt" id="basic-addon4">This image will appear at the top of your collection page. File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>
+                                                <label className="form__label_disbaled form__label">Logo image</label>
+                                                    <FileUpload disabled></FileUpload>
+                                                    {/*<div className="form__prompt" id="basic-addon4">This image will appear at the top of your collection page. File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>*/}
                                                 </div>
                                             </div>
                                             <div className="form_row mb-4">

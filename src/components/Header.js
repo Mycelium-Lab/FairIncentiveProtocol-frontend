@@ -36,10 +36,15 @@ class Header extends Component {
         this.props.onSwitch(this.props.notifications)
     }
 
+    handleSettings() {
+        this.props.onSwitch(this.props.settings)
+    }
+
 
     logout = this.logout.bind(this)
     handleShowSidebar = this.handleShowSidebar.bind(this)
     handleNotifications = this.handleNotifications.bind(this)
+    handleSettings = this.handleSettings.bind(this)
 
     render() {
         const {userName, showSidebar} = this.props
@@ -105,8 +110,7 @@ class Header extends Component {
                                         <span className="dropdown__menu-item_profile-status">Admin</span>
                                     </div>
                                 </Dropdown.Item>
-                                <Dropdown.Item className="dropdown__menu-item">My Profile</Dropdown.Item>
-                                <Dropdown.Item className="dropdown__menu-item">Settings</Dropdown.Item>
+                                <Dropdown.Item className="dropdown__menu-item" onClick={this.handleSettings}>Settings</Dropdown.Item>
                                 <Dropdown.Item className="dropdown__menu-item_logout dropdown__menu-item" onClick={this.logout}>Logout</Dropdown.Item>
                             </FPDropdown>
                         </div>

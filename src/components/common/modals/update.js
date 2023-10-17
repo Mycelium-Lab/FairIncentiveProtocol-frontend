@@ -2,7 +2,7 @@ import { Component } from "react";
 import { Modal } from "react-bootstrap";
 import success from '../../../media/common/success.svg'
 
-class UpdateCardModal extends Component {
+class UpdateModal extends Component {
     constructor(props) {
         super(props)
     }
@@ -10,12 +10,12 @@ class UpdateCardModal extends Component {
     render() {
         return <Modal show={this.props.showSuccess} onHide={this.props.handleCloseSuccess} centered>
              <Modal.Header  className="modal-newuser__title modal-title" closeButton>
-             Update Default Card
+             {this.props.successTitle}
             </Modal.Header>
             <Modal.Body>
                 <div className="confirm__body">
                     <img src={success}></img>
-                    <div>
+                    <div className="confirm__content">
                         <div className="confirm__name">{this.props.successName}</div>
                         <div className="confirm__text">{this.props.successText}</div>
                     </div>
@@ -25,4 +25,4 @@ class UpdateCardModal extends Component {
     }
 }
 
-export default UpdateCardModal
+export default UpdateModal

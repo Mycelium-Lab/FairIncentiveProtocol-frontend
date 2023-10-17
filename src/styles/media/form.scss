@@ -48,7 +48,7 @@
         gap: 10px
     }
     .form__group_top-row-left{
-        align-items: flex-start;
+        align-items: center;
     }
     .form_row-switch{
         flex-direction: row;
@@ -70,5 +70,12 @@
     }
     .input-group > :not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
         margin: 0px !important;
+    }
+    .form__prompt_reward_switch{
+        width: 237px;
+    }
+    .form_row_reward_switch{
+        flex-direction: row;
+        gap: 0px;
     }
 }

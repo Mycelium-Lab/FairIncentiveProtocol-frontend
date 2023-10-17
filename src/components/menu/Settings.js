@@ -2,7 +2,7 @@ import { Component } from "react";
 import { config } from "../../utils/config";
 import { getBearerHeader } from "../../utils/getBearerHeader";
 import ErrorModal from "../common/modals/error";
-import SuccessModal from "../common/modals/updateCard";
+import UpdateModal from "../common/modals/update";
 import { Dropdown, Modal, Tab, Tabs } from "react-bootstrap";
 import FileUpload from "../FileUpload";
 import drug_drop from '../../media/settings/drug_drop.svg'
@@ -16,6 +16,25 @@ import cardholder from '../../media/common/cardholder.svg'
 import { billingHistoryTable, paymentMethodsTable, teamTable } from "../../data/tables";
 import FPDropdown from "../common/FPDropdown";
 import countries from "../../data/countries";
+
+// Mock
+let paymentMethods = [
+    {
+        card: 'Visa ending in 6967', 
+        'expire_date': 'Expires 02/2026',
+        status: 'Default'
+    },
+    {
+        card: 'Visa ending in 1234', 
+        'expire_date': 'Expires 03/2026',
+        status: 'Default'
+    },
+    {
+        card: 'Visa ending in 3214', 
+        'expire_date': 'Expires 04/2026',
+        status: 'Default'
+    }
+]
 
 class Settings extends Component {
 
@@ -33,7 +52,10 @@ class Settings extends Component {
             showInvite: false,
             changeMemberRole: false,
             removeFromTeam: false,
-            showAddPaymentMethod: false
+            showAddPaymentMethod: false,
+            showDeletePaymentMethods: false,
+            chosen_payment_method: null,
+            paymentMethods
         }
     }
 
@@ -74,7 +96,7 @@ class Settings extends Component {
         if(this.state.password) {
             await this.changePassword()
         }
-        this.handleShowSuccess('The company data was successfully updated')
+        this.handleShowSuccess('Update personal information', 'The personal information has been changed')
     }
     async changeName() {
         try {
@@ -216,15 +238,46 @@ class Settings extends Component {
         }
     }
 
+    deletePaymentMethods(id) {
+        const _paymentMethods = this.state.paymentMethods.filter(v => v.card !== id)
+        this.setState({
+            paymentMethods: _paymentMethods,
+            showDeletePaymentMethods: false
+        })
+    }
+    
+    handleCopy(event) {
+        const tooltip = event.target.parentNode
+        const tooltipText = event.target.children[0]
+       const copyText = tooltip.previousSibling
+       copyText.select();
+       tooltipText.innerHTML = "Copied: " + copyText.value;
+       document.execCommand("copy");
+    }
+
+
+    handleOutTooltip(event) {
+       if(!event.target.classList.contains("tooltiptext")) {
+            const tooltipText = event.target.children[0]
+            tooltipText.innerHTML = "Copy to clipboard";
+        }
+    }
+
     handleAddNewPayment() {
         this.setState({showAddPaymentMethod: false})
-        this.handleShowSuccess('The default card has been changed', 'We will automatically charge your default card at the close of the current billing period.')
+        this.handleShowSuccess('Update default card', 'The default card has been changed', 'We will automatically charge your default card at the close of the current billing period.')
     }
     handleShowMakePayment() {
         this.setState({showMakePayment: true})
     }
     handleCloseMakePayment() {
         this.setState({showMakePayment: false})
+    }
+    handleShowDeletePaymentMethods(id) {
+        this.setState({showDeletePaymentMethods: true, chosen_payment_method: id})   
+    }
+    handleCloseDeletePaymentMethods() {
+        this.setState({showDeletePaymentMethods: false})   
     }
 
      handleShowAddPaymentMethod() {
@@ -233,12 +286,16 @@ class Settings extends Component {
     handleCloseAddPaymentMethod() {
         this.setState({showAddPaymentMethod: false})
     }
-
     handleShowInvite() {
         this.setState({showInvite: true})
     }
     handleCloseInvite() {
         this.setState({showInvite: false})
+    }
+
+    handleInvite() {
+        this.setState({showInvite: false})
+        this.handleShowSuccess('Invitation', 'Invitations have been send out')
     }
 
     handleCloseChangeMemeberRole() {
@@ -255,11 +312,16 @@ class Settings extends Component {
         this.setState({removeFromTeam: false})
     }
 
-    handleShowSuccess = (successName, successText) => this.setState({showSuccess: true, successName, successText})
-    handleCloseSuccess = () => this.setState({showSuccess: false, successName: null, successText: null})
+    handleShowSuccess = (successTitle, successName, successText) => this.setState({showSuccess: true, successTitle, successName, successText})
+    handleCloseSuccess = () => this.setState({showSuccess: false, successTitle: null, successName: null, successText: null})
     handleShowError = (errorText) => this.setState({showError: true, errorText})
     handleCloseError = () => this.setState({showError: false})
 
+    deletePaymentMethods = this.deletePaymentMethods.bind(this)
+    handleInvite = this.handleInvite.bind(this)
+
+    handleCopy = this.handleCopy.bind(this)
+    handleOutTooltip = this.handleOutTooltip.bind(this)
     handleAddNewPayment  = this.handleAddNewPayment.bind(this)
     handleShowAddPaymentMethod = this.handleShowAddPaymentMethod.bind(this)
     handleCloseAddPaymentMethod = this.handleCloseAddPaymentMethod.bind(this)
@@ -271,6 +333,8 @@ class Settings extends Component {
     handleShowInvite = this.handleShowInvite.bind(this)
     handleShowMakePayment = this.handleShowMakePayment.bind(this)
     handleCloseMakePayment = this.handleCloseMakePayment.bind(this)
+    handleShowDeletePaymentMethods = this.handleShowDeletePaymentMethods.bind(this)
+    handleCloseDeletePaymentMethods = this.handleCloseDeletePaymentMethods.bind(this)
     onChangeName = this.onChangeName.bind(this)
     onChangeEmail = this.onChangeEmail.bind(this)
     onChangePhone = this.onChangePhone.bind(this)
@@ -327,8 +391,8 @@ class Settings extends Component {
 
                                     <div className="form_row mb-4">
                                         <div className="form_col_last form_col">
-                                        <label className="form__label">Profile image *</label>
-                                            <FileUpload></FileUpload>
+                                        <label className="form__label_disbaled form__label">Profile image: </label>
+                                            <FileUpload disabled></FileUpload>
                                         </div>
                                     </div>
                                 </div>
@@ -338,7 +402,7 @@ class Settings extends Component {
                                 <div className="form__groups_adaptive form__groups">
                                     <div className="form_row mb-4">
                                         <div className="form_col_last form_col">
-                                            <label className="form__label">Password</label>
+                                            <label className="form__label">Change password: </label>
                                             <div className="input-group">
                                                 <input type="text" value={this.state.password} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                 <button className="btn btn__reset btn_primary btn_orange ms-3">Reset</button>
@@ -398,7 +462,12 @@ class Settings extends Component {
                                     <label className="form__label">API key #1: </label>
                                     <div className="input-group">
                                         <input type="text" value={'0xE8D562606F35CB14dA3E8faB1174F9B5AE8319c4'}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                        <button className="btn btn__copy btn_primary btn_orange ms-3">Copy</button>
+                                        <div className="tooltip-fp">
+                                            <button onClick={this.handleCopy} onMouseOut={this.handleOutTooltip} className="btn btn__copy btn_primary btn_orange ms-3">
+                                            <span class="tooltiptext">Copy to clipboard</span>
+                                            Copy
+                                            </button>
+                                        </div>
                                         <button className="btn btn__copy btn_primary btn_orange ms-3">Revoke</button>
                                     </div>
                                 </div>
@@ -408,7 +477,12 @@ class Settings extends Component {
                                     <label className="form__label">API key #2: </label>
                                     <div className="input-group">
                                         <input type="text" value={'0xE8D562606F35CB14dA3E8faB1174F9B5AE8319c4'}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                        <button className="btn btn__copy btn_primary btn_orange ms-3">Copy</button>
+                                        <div className="tooltip-fp">
+                                            <button onClick={this.handleCopy} onMouseOut={this.handleOutTooltip}  className="btn btn__copy btn_primary btn_orange ms-3">
+                                            <span class="tooltiptext">Copy to clipboard</span>
+                                            Copy
+                                            </button>
+                                        </div>
                                         <button className="btn btn__copy btn_primary btn_orange ms-3">Revoke</button>
                                     </div>
                                 </div>
@@ -418,7 +492,12 @@ class Settings extends Component {
                                     <label className="form__label">API key #3: </label>
                                     <div className="input-group">
                                         <input type="text" value={'0xE8D562606F35CB14dA3E8faB1174F9B5AE8319c4'}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                        <button className="btn btn__copy btn_primary btn_orange ms-3">Copy</button>
+                                        <div className="tooltip-fp">
+                                            <button onClick={this.handleCopy} onMouseOut={this.handleOutTooltip} className="btn btn__copy btn_primary btn_orange ms-3">
+                                            <span class="tooltiptext">Copy to clipboard</span>
+                                            Copy
+                                            </button>
+                                        </div>
                                         <button className="btn btn__copy btn_primary btn_orange ms-3">Revoke</button>
                                     </div>
                                 </div>
@@ -478,19 +557,28 @@ class Settings extends Component {
                                         <h4 className="menu__title-secondary-payment menu__title-secondary mb-4">Payment methods</h4>
                                         <button type="button" onClick={this.handleShowAddPaymentMethod} className="btn btn_orange btn_primary">Add a payment method </button>
                                     </div>
-                                    <FPTable data={paymentMethodsTable}>
-                                            <tr>
-                                                <td>Visa ending in 6967</td>
-                                                <td>Expires 02/2026</td>
-                                                <td>Default</td>
-                                                <td>
-                                                    <FPDropdown icon={more}>
-                                                        <Dropdown.Item className="dropdown__menu-item">Make a payment</Dropdown.Item>
-                                                        <Dropdown.Item className="dropdown__menu-item">Delete</Dropdown.Item>
-                                                    </FPDropdown>
-                                                </td>
-                                            </tr>
+                                    {
+                                     this.state.paymentMethods.length 
+                                     ?   <FPTable data={paymentMethodsTable}>
+                                     {
+                                         this.state.paymentMethods.map(v => 
+                                             <tr key={v.card}>
+                                                 <td>{v.card}</td>
+                                                 <td>{v.expire_date}</td>
+                                                 <td>{v.status}</td>
+                                                 <td>
+                                                     <FPDropdown icon={more}>
+                                                         <Dropdown.Item className="dropdown__menu-item" onClick={this.handleShowMakePayment}>Make a payment</Dropdown.Item>
+                                                         <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowDeletePaymentMethods(v.card)}>Delete</Dropdown.Item>
+                                                     </FPDropdown>
+                                                 </td> 
+                                             </tr>      
+                                         )
+                                     }
                                     </FPTable>
+                                    : null 
+
+                                    }
                                 </div>
 
                                 <div className="content__wrap">                                
@@ -755,7 +843,7 @@ class Settings extends Component {
                     <button className="btn btn_primary btn_gray" onClick={this.handleCloseInvite}>
                         Cancel
                     </button>
-                    <button className="btn btn_primary btn_orange">
+                    <button className="btn btn_primary btn_orange" onClick={this.handleInvite}>
                     Invite team members
                     </button>
                     </Modal.Footer>
@@ -838,9 +926,19 @@ class Settings extends Component {
                     </button>
                     </Modal.Footer>
                 </Modal>
-                <SuccessModal 
+                <Modal show={this.state.showDeletePaymentMethods} onHide={this.handleCloseDeletePaymentMethods} centered>
+                    <Modal.Header className="modal-newuser__title modal-title h4 mb-4" closeButton>
+                        Delete payment method with card {this.state.chosen_payment_method}
+                    </Modal.Header>
+                    <Modal.Footer>
+                    <button className="btn btn_primary btn_gray" onClick={this.handleCloseDeletePaymentMethods}>Back</button>
+                        <button className="btn btn_primary btn_orange" onClick={() => this.deletePaymentMethods(this.state.chosen_payment_method)}>Delete</button>
+                    </Modal.Footer>
+                </Modal>
+                <UpdateModal 
                     showSuccess={this.state.showSuccess} 
                     handleCloseSuccess={this.handleCloseSuccess}
+                    successTitle={this.state.successTitle} 
                     successName={this.state.successName} 
                     successText={this.state.successText}
                 />
