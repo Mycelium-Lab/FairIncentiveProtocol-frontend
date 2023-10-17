@@ -272,7 +272,8 @@ class Tokens extends Component {
                     provider,
                     signer,
                     address,
-                    chainid
+                    chainid,
+                    stageOfCreateToken: 3
                 })
               } catch (err) {
                 console.log(err)
