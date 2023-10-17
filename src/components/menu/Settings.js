@@ -215,6 +215,23 @@ class Settings extends Component {
             alert(error)
         }
     }
+    
+    handleCopy(event) {
+        const tooltip = event.target.parentNode
+        const tooltipText = event.target.children[0]
+       const copyText = tooltip.previousSibling
+       copyText.select();
+       tooltipText.innerHTML = "Copied: " + copyText.value;
+       document.execCommand("copy");
+    }
+
+
+    handleOutTooltip(event) {
+       if(!event.target.classList.contains("tooltiptext")) {
+            const tooltipText = event.target.children[0]
+            tooltipText.innerHTML = "Copy to clipboard";
+        }
+    }
 
     handleAddNewPayment() {
         this.setState({showAddPaymentMethod: false})
@@ -260,6 +277,8 @@ class Settings extends Component {
     handleShowError = (errorText) => this.setState({showError: true, errorText})
     handleCloseError = () => this.setState({showError: false})
 
+    handleCopy = this.handleCopy.bind(this)
+    handleOutTooltip = this.handleOutTooltip.bind(this)
     handleAddNewPayment  = this.handleAddNewPayment.bind(this)
     handleShowAddPaymentMethod = this.handleShowAddPaymentMethod.bind(this)
     handleCloseAddPaymentMethod = this.handleCloseAddPaymentMethod.bind(this)
@@ -398,7 +417,12 @@ class Settings extends Component {
                                     <label className="form__label">API key #1: </label>
                                     <div className="input-group">
                                         <input type="text" value={'0xE8D562606F35CB14dA3E8faB1174F9B5AE8319c4'}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                        <button className="btn btn__copy btn_primary btn_orange ms-3">Copy</button>
+                                        <div className="tooltip-fp">
+                                            <button onClick={this.handleCopy} onMouseOut={this.handleOutTooltip} className="btn btn__copy btn_primary btn_orange ms-3">
+                                            <span class="tooltiptext">Copy to clipboard</span>
+                                            Copy
+                                            </button>
+                                        </div>
                                         <button className="btn btn__copy btn_primary btn_orange ms-3">Revoke</button>
                                     </div>
                                 </div>
@@ -408,7 +432,12 @@ class Settings extends Component {
                                     <label className="form__label">API key #2: </label>
                                     <div className="input-group">
                                         <input type="text" value={'0xE8D562606F35CB14dA3E8faB1174F9B5AE8319c4'}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                        <button className="btn btn__copy btn_primary btn_orange ms-3">Copy</button>
+                                        <div className="tooltip-fp">
+                                            <button onClick={this.handleCopy} onMouseOut={this.handleOutTooltip}  className="btn btn__copy btn_primary btn_orange ms-3">
+                                            <span class="tooltiptext">Copy to clipboard</span>
+                                            Copy
+                                            </button>
+                                        </div>
                                         <button className="btn btn__copy btn_primary btn_orange ms-3">Revoke</button>
                                     </div>
                                 </div>
@@ -418,7 +447,12 @@ class Settings extends Component {
                                     <label className="form__label">API key #3: </label>
                                     <div className="input-group">
                                         <input type="text" value={'0xE8D562606F35CB14dA3E8faB1174F9B5AE8319c4'}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                        <button className="btn btn__copy btn_primary btn_orange ms-3">Copy</button>
+                                        <div className="tooltip-fp">
+                                            <button onClick={this.handleCopy} onMouseOut={this.handleOutTooltip} className="btn btn__copy btn_primary btn_orange ms-3">
+                                            <span class="tooltiptext">Copy to clipboard</span>
+                                            Copy
+                                            </button>
+                                        </div>
                                         <button className="btn btn__copy btn_primary btn_orange ms-3">Revoke</button>
                                     </div>
                                 </div>
