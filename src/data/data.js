@@ -200,7 +200,7 @@ const distributionOfRewards = [
     {
         id: '4',
         name: 'Reward #4',
-        value: '32',
+        value: '38',
         color: 'rgba(13, 37, 53, 1)'
     },
 ]
@@ -236,7 +236,7 @@ const tokensIssue = [
     {
         id: '3',
         name: 'Available',
-        value: '18',
+        value: '66',
         color: 'rgba(83, 136, 216, 1)'
     },
 ]
@@ -260,19 +260,19 @@ const collectionIssue = [
     {
         id: '1',
         name: 'Claimed',
-        value: '17',
+        value: '27',
         color: 'rgba(255, 159, 64, 1)'
     },
     {
         id: '2',
         name: 'Distributed',
-        value: '17',
+        value: '56',
         color: 'rgba(244, 190, 55, 1)'
     },
     {
         id: '3',
         name: 'Available',
-        value: '18',
+        value: '17',
         color: 'rgba(83, 136, 216, 1)'
     },
 ]

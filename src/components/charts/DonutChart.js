@@ -14,7 +14,16 @@ class DonutChart extends Component {
                 legend: {
                   position: 'right',
                   align: 'center'
-                }
+                },
+                tooltip: {
+                    callbacks: {
+                      // this callback is used to create the tooltip label
+                      label: function(tooltipItem) {
+                        let label = `  ${tooltipItem.formattedValue}%`
+                        return label
+                      } 
+                    }
+                  } 
               }
             }
         return (

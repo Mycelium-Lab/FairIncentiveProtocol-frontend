@@ -1,8 +1,5 @@
 import React, { Component } from "react";
-import defaultUser from '../media/notifications/default.png'
-import mock_1 from '../media/notifications/mock_1.png'
-import mock_2 from '../media/notifications/mock_2.png'
-import mock_3 from '../media/notifications/mock_3.png'
+import notifications from '../data/notifications'
 
 class Notifications extends Component {
     constructor(props) {
@@ -17,34 +14,17 @@ class Notifications extends Component {
              </div>
               
                 <ul className="unlist">
-                    <li className="notification__item">
-                        <img src={defaultUser}></img>
-                        <div className="notification__item-desc">
-                            <p className="notification__item-message"><span className="notification__item-message_semimedium notification__item-message">Elwis Mathew</span> added a new product <span className="notification__item-message_semimedium notification__item-message">Redmi Pro 7 Mobile</span></p>
-                            <span className="notification__item-time">4 mins ago</span>
-                        </div>
-                    </li>
-                    <li className="notification__item">
-                    <img src={mock_1}></img>
-                        <div className="notification__item-desc">
-                            <p className="notification__item-message"><span className="notification__item-message_semimedium notification__item-message">Elwis Mathew</span> added a new product <span className="notification__item-message_semimedium notification__item-message">Redmi Pro 7 Mobile</span></p>
-                            <span className="notification__item-time">4 mins ago</span>
-                        </div>
-                    </li>
-                    <li className="notification__item">
-                    <img src={mock_2}></img>
-                        <div className="notification__item-desc">
-                            <p className="notification__item-message"><span className="notification__item-message_semimedium notification__item-message">Elwis Mathew</span> added a new product <span className="notification__item-message_semimedium notification__item-message">Redmi Pro 7 Mobile</span></p>
-                            <span className="notification__item-time">4 mins ago</span>
-                        </div>
-                    </li>
-                    <li className="notification__item">
-                    <img src={mock_3}></img>
-                        <div className="notification__item-desc">
-                            <p className="notification__item-message"><span className="notification__item-message_semimedium notification__item-message">Elwis Mathew</span> added a new product <span className="notification__item-message_semimedium notification__item-message">Redmi Pro 7 Mobile</span></p>
-                            <span className="notification__item-time">4 mins ago</span>
-                        </div>
-                    </li>
+                    {
+                        notifications.map(v => 
+                            <li key={v.id} className="notification__item">
+                                <img src={v.avatar}></img>
+                                <div className="notification__item-desc">
+                                    <p className="notification__item-message"><span className="notification__item-message_semimedium notification__item-message">{v.name}</span> added a new product <span className="notification__item-message_semimedium notification__item-message">Redmi Pro 7 Mobile</span></p>
+                                    <span className="notification__item-time">{v.ago}</span>
+                                </div>
+                            </li>
+                        )
+                    }
                 </ul>
             </>
         )

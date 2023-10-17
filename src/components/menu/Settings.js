@@ -366,7 +366,7 @@ class Settings extends Component {
 
                                     <div className="form_row mb-4">
                                         <div className="form_col">
-                                            <label className="form__label">Name: </label>
+                                            <label className="form__label">Company Name: </label>
                                             <div className="input-group">
                                                 <input type="text" placeholder="Mike Jackson" onChange={this.onChangeName} value={this.state.name} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                             </div>
