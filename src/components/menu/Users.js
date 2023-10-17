@@ -415,7 +415,7 @@ class Users extends Component {
                                 <input type="text" id={`property-name-${id}`} onChange={(event) => this.changePropertyName(id, event.target.value)} className="form-control" placeholder="Property name"/>
                             </div>
                             <div className="input-group">
-                                <input type="text" id={`property-value-${id}`} onChange={(event) => this.changePropertyValue(id, event.target.value)} className="form-control" placeholder="Property value"/>
+                                <input type="text" id={`property-value-${id}`} onChange={(event) => this.changePropertyValue(id, event.target.value)} className="form-control" placeholder="Default value"/>
                             </div>
                     <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={() => this.deletePropertyInput(id)}>-</button>
                 </div>,
@@ -467,7 +467,7 @@ class Users extends Component {
                             <input type="text" id={`stat-name-${id}`} onChange={this.changeStatName} className="form-control" placeholder="Stat name"/>
                         </div>
                         <div className="input-group">
-                            <input type="number" id={`stat-value-${id}`} onChange={this.changeStatValue} className="form-control" placeholder="Stat value"/>
+                            <input type="number" id={`stat-value-${id}`} onChange={this.changeStatValue} className="form-control" placeholder="Default value"/>
                         </div>
                     <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={() => this.deleteStatInput(id)}>-</button>
                 </div>,
@@ -523,7 +523,7 @@ class Users extends Component {
                             <input type="text" id={`edit-property-name-${propertyId}`} onChange={(event) => this.changeEditPropertyName(propertyId, event.target.value)} defaultValue={v.name} className="form-control" placeholder="Property name"/>
                         </div>
                         <div className="input-group">
-                            <input type="text" id={`edit-property-value-${propertyId}`} onChange={(event) => this.changeEditPropertyValue(propertyId, event.target.value)} defaultValue={v.value} className="form-control" placeholder="Property value"/>
+                            <input type="text" id={`edit-property-value-${propertyId}`} onChange={(event) => this.changeEditPropertyValue(propertyId, event.target.value)} defaultValue={v.value} className="form-control" placeholder="Default value"/>
                         </div>
                     <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={() => this.deleteEditPropertyInput(propertyId)}>-</button>
                     </div>,
@@ -545,7 +545,7 @@ class Users extends Component {
                             <input type="text" id={`edit-stat-name-${statId}`} onChange={this.changeEditStatName} defaultValue={v.name} className="form-control" placeholder="Stat name"/>
                         </div>
                         <div className="input-group">
-                            <input type="number" id={`edit-stat-value-${statId}`} onChange={this.changeEditStatValue} defaultValue={v.value} className="form-control" placeholder="Stat value"/>
+                            <input type="number" id={`edit-stat-value-${statId}`} onChange={this.changeEditStatValue} defaultValue={v.value} className="form-control" placeholder="Default value"/>
                         </div>
                         <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={() => this.deleteEditStatInput(statId)}>-</button>
                     </div>,
@@ -598,7 +598,7 @@ class Users extends Component {
                         <input type="text" id={`edit-property-name-${id}`} onChange={(event) => this.changeEditPropertyName(id, event.target.value)} className="form-control" placeholder="Property name"/>
                     </div>
                     <div className="input-group">
-                        <input type="text" id={`edit-property-value-${id}`} onChange={(event) => this.changeEditPropertyValue(id, event.target.value)} className="form-control" placeholder="Property value"/>
+                        <input type="text" id={`edit-property-value-${id}`} onChange={(event) => this.changeEditPropertyValue(id, event.target.value)} className="form-control" placeholder="Default value"/>
                     </div>
                     <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={() => this.deleteEditPropertyInput(id)}>-</button>      
                 </div>,
@@ -649,7 +649,7 @@ class Users extends Component {
                         <input type="text" id={`edit-stat-name-${id}`} onChange={this.changeEditStatName} className="form-control" placeholder="Stat name"/>
                     </div>
                     <div className="input-group">
-                        <input type="number" id={`edit-stat-value-${id}`} onChange={this.changeEditStatValue} className="form-control" placeholder="Stat value"/>
+                        <input type="number" id={`edit-stat-value-${id}`} onChange={this.changeEditStatValue} className="form-control" placeholder="Default value"/>
                     </div>
                     <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={() => this.deleteEditStatInput(id)}>-</button>
                 </div>,
