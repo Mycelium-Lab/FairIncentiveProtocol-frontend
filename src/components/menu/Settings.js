@@ -2,7 +2,7 @@ import { Component } from "react";
 import { config } from "../../utils/config";
 import { getBearerHeader } from "../../utils/getBearerHeader";
 import ErrorModal from "../common/modals/error";
-import SuccessModal from "../common/modals/updateCard";
+import UpdateModal from "../common/modals/update";
 import { Dropdown, Modal, Tab, Tabs } from "react-bootstrap";
 import FileUpload from "../FileUpload";
 import drug_drop from '../../media/settings/drug_drop.svg'
@@ -74,7 +74,7 @@ class Settings extends Component {
         if(this.state.password) {
             await this.changePassword()
         }
-        this.handleShowSuccess('The company data was successfully updated')
+        this.handleShowSuccess('Update personal information', 'The personal information has been changed')
     }
     async changeName() {
         try {
@@ -218,7 +218,7 @@ class Settings extends Component {
 
     handleAddNewPayment() {
         this.setState({showAddPaymentMethod: false})
-        this.handleShowSuccess('The default card has been changed', 'We will automatically charge your default card at the close of the current billing period.')
+        this.handleShowSuccess('Update default card', 'The default card has been changed', 'We will automatically charge your default card at the close of the current billing period.')
     }
     handleShowMakePayment() {
         this.setState({showMakePayment: true})
@@ -255,8 +255,8 @@ class Settings extends Component {
         this.setState({removeFromTeam: false})
     }
 
-    handleShowSuccess = (successName, successText) => this.setState({showSuccess: true, successName, successText})
-    handleCloseSuccess = () => this.setState({showSuccess: false, successName: null, successText: null})
+    handleShowSuccess = (successTitle, successName, successText) => this.setState({showSuccess: true, successTitle, successName, successText})
+    handleCloseSuccess = () => this.setState({showSuccess: false, successTitle: null, successName: null, successText: null})
     handleShowError = (errorText) => this.setState({showError: true, errorText})
     handleCloseError = () => this.setState({showError: false})
 
@@ -327,7 +327,7 @@ class Settings extends Component {
 
                                     <div className="form_row mb-4">
                                         <div className="form_col_last form_col">
-                                        <label className="form__label_disbaled form__label">Profile image</label>
+                                        <label className="form__label_disbaled form__label">Profile image: </label>
                                             <FileUpload disabled></FileUpload>
                                         </div>
                                     </div>
@@ -338,7 +338,7 @@ class Settings extends Component {
                                 <div className="form__groups_adaptive form__groups">
                                     <div className="form_row mb-4">
                                         <div className="form_col_last form_col">
-                                            <label className="form__label">Password</label>
+                                            <label className="form__label">Change password: </label>
                                             <div className="input-group">
                                                 <input type="text" value={this.state.password} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                 <button className="btn btn__reset btn_primary btn_orange ms-3">Reset</button>
@@ -838,9 +838,10 @@ class Settings extends Component {
                     </button>
                     </Modal.Footer>
                 </Modal>
-                <SuccessModal 
+                <UpdateModal 
                     showSuccess={this.state.showSuccess} 
                     handleCloseSuccess={this.handleCloseSuccess}
+                    successTitle={this.state.successTitle} 
                     successName={this.state.successName} 
                     successText={this.state.successText}
                 />
