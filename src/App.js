@@ -49,7 +49,7 @@ class App extends Component {
       getWindow() {
       if (this.state.switcher === switcher.signin) return <SignIn switcher={{signup: switcher.signup, forgot: switcher.forgot}} switcherText={this.formatText(switcher.signup)} switch={this.switch}/>
       if (this.state.switcher === switcher.signup) return <SignUp switcher={switcher.signin} switcherText={this.formatText(switcher.signin)} switch={this.switch}/>
-      if (this.state.switcher === switcher.forgot) return <Forgot/>
+      if (this.state.switcher === switcher.forgot) return <Forgot switcher={switcher.signin} switch={this.switch}/>
       return <MainScreen auth={this.state.auth}/>
   }
 

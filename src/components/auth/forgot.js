@@ -17,8 +17,14 @@ class Forgot extends Component {
         this.setState({isSend: true})
     }
 
+    handleSwitch(event, value) {
+        this.props.switch(event, value)
+    }
+
+    handleSwitch = this.handleSwitch.bind(this)
     onsubmit = this.onsubmit.bind(this)
     render() {
+        const { switcher } = this.props;
         return (
             <>
             <DefaultAuth>
@@ -53,6 +59,7 @@ class Forgot extends Component {
 
             
                    <div className='auth__form-action'>
+                   <Button  onClick={(ev) => this.handleSwitch(ev, switcher)} className='auth__form-action-btn_back auth__form-action-btn w-100'>Back</Button>
                        <Button  onClick={this.onsubmit} className='auth__form-action-btn w-100'>Submit</Button>
                    </div>
                    </>
