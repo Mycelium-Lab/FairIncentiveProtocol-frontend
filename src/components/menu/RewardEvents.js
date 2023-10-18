@@ -28,6 +28,7 @@ class RewardEvents extends Component {
         this.state = {
             rewardTokenEvents: [],
             rewardNFTEvents: [],
+            combinedRewardEvents: [],
             switcher: types.token,
             showRevoke: false,
             revoke_event_id: null,
@@ -83,7 +84,8 @@ class RewardEvents extends Component {
             const json = await res.json()
             const rewardEvents = json.body.data
             this.setState({
-                rewardTokenEvents: rewardEvents
+                rewardTokenEvents: rewardEvents,
+                combinedRewardEvents: [...rewardEvents, ...this.state.combinedRewardEvents]
             })
         } catch (error) {
             console.log(error)
@@ -104,7 +106,8 @@ class RewardEvents extends Component {
             const json = await res.json()
             const rewardEvents = json.body.data
             this.setState({
-                rewardNFTEvents: rewardEvents
+                rewardNFTEvents: rewardEvents,
+                combinedRewardEvents: [...rewardEvents, ...this.state.combinedRewardEvents]
             })
         } catch (error) {
             console.log(error)
@@ -204,10 +207,10 @@ class RewardEvents extends Component {
               };
             const res = await fetch(`${config.api}/rewards/delete/events/token`, requestOptions)
             if (res.status === 200) {
-                let tokenEvents = this.state.rewardTokenEvents
-                tokenEvents = tokenEvents.filter(v => v.event_id !== id)
+                let combinedRewardEvents = this.state.combinedRewardEvents
+                combinedRewardEvents = combinedRewardEvents.filter(v => v.event_id !== id)
                 this.setState({
-                    rewardTokenEvents: tokenEvents
+                    combinedRewardEvents
                 })
                 this.handleCloseRevoke()
             }
@@ -235,10 +238,10 @@ class RewardEvents extends Component {
               };
             const res = await fetch(`${config.api}/rewards/delete/events/nft`, requestOptions)
             if (res.status === 200) {
-                let rewardNFTEvents = this.state.rewardNFTEvents
-                rewardNFTEvents = rewardNFTEvents.filter(v => v.event_id !== id)
+                let combinedRewardEvents = this.state.combinedRewardEvents
+                combinedRewardEvents = combinedRewardEvents.filter(v => v.event_id !== id)
                 this.setState({
-                    rewardNFTEvents
+                    combinedRewardEvents
                 })
                 this.handleCloseRevoke()
             }
@@ -337,14 +340,14 @@ class RewardEvents extends Component {
                 <div className="title-header">
                     <h3 className="menu__title">Reward Events</h3>
                     {
-                        this.state.rewardTokenEvents?.length && !this.state.showCreate 
+                        this.state.combinedRewardEvents?.length && !this.state.showCreate 
                         ?  <button  type="button" className="btn btn_orange btn_primary" onClick={this.handleShowReward}>To reward</button> 
                         : null
                     }
                 </div>
 
                 {
-                    this.state.rewardTokenEvents?.length && !this.state.showCreate 
+                    this.state.combinedRewardEvents?.length && !this.state.showCreate 
                     ? <div className="input-group__serach">
                     <button  type="button" className="btn btn_orange btn_image btn_primary" onClick={() => this.setState({showFilter: !this.state.showFilter})}>
                         {
@@ -379,9 +382,8 @@ class RewardEvents extends Component {
                         </div>
                     : null
                 }
-
                 {
-                     !this.state.rewardTokenEvents?.length && !this.state.showCreate ?
+                     !this.state.combinedRewardEvents?.length && !this.state.showCreate ?
                      <div className="empty">
                        <div className="empty__wrapper">
                            <img src={empty}></img>
@@ -391,49 +393,53 @@ class RewardEvents extends Component {
                      </div>
                      : null
                 }
-                {
-                    this.state.rewardTokenEvents?.length && !this.state.showCreate ? 
-                    <div className="content__wrap">
-                    <FPTable data={rewardEventsTable}>
-                        {
-                             this.state.switcher === types.token 
-                            ?  this.state.rewardTokenEvents.map(v =>
-                         <tr>
-                                  <td>   
-                                  {createLongStrView(v.event_id)}
-                                  </td>
-                                  <td>
-                                  {v.status}
-                                  </td>
-                                  <td>
-                                  {v.reward_name}
-                                  </td>
-                                  <td>
-                                  {ethers.utils.formatEther(v.token_amount)} {v.token_symbol} from collection
-                                  </td>
-                                  <td>
-                                    <div>
-                                        {v.user_external_id}
-                                    </div>
-                                    <div>
-                                        (FAIR id: {createLongStrView(v.user_id)})
-                                    </div>
-                                  </td>
-                                  <td>
-                                    <FPDropdown icon={more}>
-                                    {
-                                        v.status === 'Accrued'
-                                        ?  <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowRevoke(v.event_id, types.token)} >Revoke</Dropdown.Item>
-                                        : null
-                                    }
-                                    </FPDropdown>
-                                  </td>
-                              </tr>)
-                              : null
-                      }
-                    </FPTable>
-                </div>
-                :null
+                {this.state.combinedRewardEvents?.length && !this.state.showCreate ?
+                        <div className="content__wrap">
+                            <FPTable data={rewardEventsTable}>
+                                {
+                                this.state.combinedRewardEvents.map(v =>
+                                    <tr>
+                                          <td>   
+                                          {createLongStrView(v.event_id)}
+                                          </td>
+                                          <td>
+                                          {v.status}
+                                          </td>
+                                          <td>
+                                          {v.reward_name}
+                                          </td>
+                                          <td>
+                                          {
+                                            v.nft_name
+                                            ?
+                                            `${v.nft_name} from ${v.token_symbol} collection`
+                                            :
+                                            `${ethers.utils.formatEther(v.token_amount)} ${v.token_symbol}`
+                                          }
+                                          </td>
+                                          <td>
+                                            <div>
+                                                {v.user_external_id}
+                                            </div>
+                                            <div>
+                                                (FAIR id: {createLongStrView(v.user_id)})
+                                            </div>
+                                          </td>
+                                          <td>
+                                            <FPDropdown icon={more}>
+                                            {
+                                                v.status === 'Accrued'
+                                                ?  <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowRevoke(v.event_id, v.nft_name ? types.nft : types.token)} >Revoke</Dropdown.Item>
+                                                : null
+                                            }
+                                            </FPDropdown>
+                                          </td>
+                                    </tr>)
+                              }
+                            </FPTable>
+                        </div>
+                        :
+                        null
                 }
                {
                     /* <div>

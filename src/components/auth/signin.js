@@ -15,6 +15,7 @@ class SignIn extends Component {
             isInvalidEmail: false,
             isNonFoundEmail: false,
             isInvalidPassword: false,
+            showPassword: false
         }
     }
 
@@ -160,15 +161,15 @@ class SignIn extends Component {
                             this.state.isInvalidPassword ? 
                             <>
                                 <Form.Label className="auth__form-fields-label">Password</Form.Label>
-                                <img className="form__signin-icon-password_error form__signin-icon-password" src={passwordHide}></img>
-                                <Form.Control className='auth__form-fields-input_error auth__form-fields-input' onChange={this.onChangePassword} type='password' placeholder='Password' />
+                                <img className="form__signin-icon-password_error form__signin-icon-password" onClick={() => this.setState({showPassword: !this.state.showPassword})} src={passwordHide}></img>
+                                <Form.Control className='auth__form-fields-input_error auth__form-fields-input' onChange={this.onChangePassword} type={this.state.showPassword ? 'text' : 'password'} placeholder='Password' />
                                 <span className="form__prompt_error form__prompt" id="basic-addon4">Wrong password</span>
                             </>
                             : 
                             <>
                                 <Form.Label className="auth__form-fields-label">Password</Form.Label>
-                                <img className="form__signin-icon-password" src={passwordHide}></img>
-                                <Form.Control className='auth__form-fields-input' onChange={this.onChangePassword} type='password' placeholder='Password' />
+                                <img className="form__signin-icon-password" onClick={() => this.setState({showPassword: !this.state.showPassword})} src={passwordHide}></img>
+                                <Form.Control className='auth__form-fields-input' onChange={this.onChangePassword} type={this.state.showPassword ? 'text' : 'password'} placeholder='Password' />
                             </>
                         }
                           
