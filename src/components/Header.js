@@ -100,7 +100,7 @@ class Header extends Component {
             await provider.send("eth_requestAccounts", [])
             const signer = await provider.getSigner()
             const address = await signer.getAddress()
-            const chainid = (await provider.getNetwork()).chainId
+            const chainid = network.chainid
             try {
                 this.handleShowConfirm('Connect', 'Confirm the network change', 'Please, confirm the network change in your wallet')
                 await window.ethereum.request({
@@ -114,7 +114,7 @@ class Header extends Component {
                     signer,
                     address,
                     chainid,
-                })
+                }, () => this.props.getProvider(provider, signer, address, chainid))
               } catch (err) {
                 console.log(err)
                 if (err.code === 4902) {
