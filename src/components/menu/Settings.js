@@ -251,7 +251,8 @@ class Settings extends Component {
         const tooltipText = event.target.children[0]
        const copyText = tooltip.previousSibling
        copyText.select();
-       tooltipText.innerHTML = "Copied: " + copyText.value;
+       const abbreviateAddress = copyText.value.slice(0, 6) + '...' + copyText.value.slice(copyText.value.length - 4, copyText.value.length)
+       tooltipText.innerHTML = "Copied: " + abbreviateAddress;
        document.execCommand("copy");
     }
 
