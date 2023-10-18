@@ -62,3 +62,9 @@
     line-height: 21px;
     color: map-get($theme-colors, "back");
 }
+.dropdown__menu-item_connect {
+    color: map-get($theme-colors, "activeTab");
+}
+.dropdown__menu-item_disconnect {
+    color: map-get($theme-colors, "errorPrimary");
+}
