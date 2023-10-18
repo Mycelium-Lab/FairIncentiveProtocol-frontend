@@ -29,7 +29,7 @@ class ErrorModal extends Component {
     render() {
         return <Modal onEntering={this.entering} onEntered={this.entered} show={this.props.showError} onHide={this.props.handleCloseError} centered>
              <Modal.Header  className="modal-newuser__title modal-title" closeButton>
-                 Purchace
+                 Error
             </Modal.Header>
             <Modal.Body>
                 <div className="confirm__body">

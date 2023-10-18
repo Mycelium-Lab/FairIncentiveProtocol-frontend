@@ -33,7 +33,12 @@ class MainScreen extends Component {
             auth: props.auth,
             showSidebar: true,
             isGoToCreationPage: '',
-            creationPagePayload: ''
+            creationPagePayload: '',
+            provider: null,
+            chainid: null,
+            signer: null,
+            address: null,
+            nftcollectionAddress: null,
         }
     }
 
@@ -55,12 +60,12 @@ class MainScreen extends Component {
         if (this.state.switcher === switcher.dashboard) return <Dashboard/>
         if (this.state.switcher === switcher.rewards) return <Rewards switcher={switcher} onSwitch={this.onSwitch} goToCreationPage={this.goToCreationPage} isGoToCreationPage={this.state.isGoToCreationPage}/>
         if (this.state.switcher === switcher.reward_events) return <RewardEvents switcher={switcher} onSwitch={this.onSwitch}/>
-        if (this.state.switcher === switcher.tokens) return <Tokens isGoToCreationPage={this.state.isGoToCreationPage}/>
+        if (this.state.switcher === switcher.tokens) return <Tokens isGoToCreationPage={this.state.isGoToCreationPage} wallet={{provider: this.state.provider,signer: this.state.signer,address: this.state.address,chainid: this.state.chainid}}/>
         if (this.state.switcher === switcher.users) return <Users switcher={switcher} onSwitch={this.onSwitch} goToCreationPage={this.goToCreationPage} isGoToCreationPage={this.state.isGoToCreationPage}/>
-        if (this.state.switcher === switcher.nftcollection) return <NFTCollections auth={this.state.auth} switcher={switcher} onSwitch={this.onSwitch} isGoToCreationPage={this.state.isGoToCreationPage} creationPagePayload={this.state.creationPagePayload}/>
-        if (this.state.switcher === switcher.nft) return <NFTs/>
+        if (this.state.switcher === switcher.nftcollection) return <NFTCollections auth={this.state.auth} switcher={switcher} onSwitch={this.onSwitch} isGoToCreationPage={this.state.isGoToCreationPage} creationPagePayload={this.state.creationPagePayload} getNeftCollection={this.getNeftCollection} wallet={{provider: this.state.provider,signer: this.state.signer,address: this.state.address,chainid: this.state.chainid}}/>
+        if (this.state.switcher === switcher.nft) return <NFTs address={this.state.nftcollectionAddress}/>
         if (this.state.switcher === switcher.settings) return <Settings auth={this.state.auth}/>
-        if (this.state.switcher === switcher.notifications) return <Notifications/>
+        if (this.state.switcher === switcher.notifications) return <Notifications />
     }
 
     changeShowSidebar() {
@@ -76,6 +81,21 @@ class MainScreen extends Component {
         })
     }
 
+    getProvider(provider, signer, address, chainid) {
+        this.setState({
+            provider,
+            signer,
+            address,
+            chainid
+        })
+    }
+
+    getNeftCollection(address) {
+        this.setState({
+            nftcollectionAddress: address
+        })
+    }
+
     componentDidUpdate(prevProps, prevState) {
         if(prevState.isGoToCreationPage) {
             this.setState({
@@ -88,6 +108,8 @@ class MainScreen extends Component {
     goToCreationPage = this.goToCreationPage.bind(this)
     renderInfo = this.renderInfo.bind(this)
     changeShowSidebar = this.changeShowSidebar.bind(this)
+    getProvider = this.getProvider.bind(this)
+    getNeftCollection = this.getNeftCollection.bind(this)
 
     render() {
         return (
@@ -99,6 +121,7 @@ class MainScreen extends Component {
                     notifications={switcher.notifications} 
                     settings={switcher.settings} 
                     onSwitch={this.onSwitch}
+                    getProvider={this.getProvider}
                     >
                     </Header>
                 <div className="middle">

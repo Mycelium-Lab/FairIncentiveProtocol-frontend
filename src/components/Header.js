@@ -81,7 +81,7 @@ class Header extends Component {
         },  async () => await this.connect())
     }
 
-    handleShowConfirm = (confirmName, confirmText) => this.setState({showConfirm: true, confirmName, confirmText})
+    handleShowConfirm = (confirmTitle, confirmName, confirmText) => this.setState({showConfirm: true, confirmTitle, confirmName, confirmText})
     handleCloseConfirm = () => this.setState({showConfirm: false, confirmName: null, confirmText: null})
 
     async disconnect() {
@@ -100,9 +100,9 @@ class Header extends Component {
             await provider.send("eth_requestAccounts", [])
             const signer = await provider.getSigner()
             const address = await signer.getAddress()
-            const chainid = (await provider.getNetwork()).chainId
+            const chainid = network.chainid
             try {
-                this.handleShowConfirm('Confirm the network change', 'Please, confirm the network change in your wallet')
+                this.handleShowConfirm('Connect', 'Confirm the network change', 'Please, confirm the network change in your wallet')
                 await window.ethereum.request({
                   method: 'wallet_switchEthereumChain',
                   params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
@@ -114,7 +114,7 @@ class Header extends Component {
                     signer,
                     address,
                     chainid,
-                })
+                }, () => this.props.getProvider(provider, signer, address, chainid))
               } catch (err) {
                 console.log(err)
                 if (err.code === 4902) {
@@ -247,6 +247,7 @@ class Header extends Component {
                     <ConfirmModal 
                     showConfirm={this.state.showConfirm} 
                     handleCloseConfirm={this.handleCloseConfirm}
+                    confirmTitle={this.state.confirmTitle}
                     confirmName={this.state.confirmName}
                     confirmText={this.state.confirmText}
                 />

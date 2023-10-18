@@ -146,6 +146,14 @@ class Tokens extends Component {
                 showCreate: true,
             })
         }
+        if(this.props?.wallet?.provider && this.props?.wallet?.signer && this.props?.wallet?.address && this.props?.wallet?.chainid){
+            this.setState({
+                provider: this.props.wallet.provider,
+                signer: this.props.wallet.signer,
+                address: this.props.wallet.address,
+                chainid: this.props.wallet.chainid.toString()
+            })
+        }
     }
 
     onChangeName(event) {
@@ -262,7 +270,7 @@ class Tokens extends Component {
             const signer = await provider.getSigner()
             const address = await signer.getAddress()
             try {
-                this.handleShowConfirm('Confirm the network change', 'Please, confirm the network change in your wallet')
+                this.handleShowConfirm('Connect', 'Confirm the network change', 'Please, confirm the network change in your wallet')
                 await window.ethereum.request({
                   method: 'wallet_switchEthereumChain',
                   params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
@@ -296,13 +304,20 @@ class Tokens extends Component {
 
     async changeNetwork(id) {
         const network = networks[id]
-        this.setState({
-            network,
-            chainid: network.chainid,
-            provider: null,
-            signer: null,
-            address: null
-        })
+        if(network.chainid.toString() !== this.state.chainid) {
+            this.setState({
+                network,
+                chainid: network.chainid,
+                provider: null,
+                signer: null,
+                address: null
+            })
+        }
+        else {
+            this.setState({
+                network,
+            })
+        }
     }
 
     async createToken() {
@@ -323,7 +338,7 @@ class Tokens extends Component {
                 network
             } = this.state
             const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
-            this.handleShowConfirm(`Confirm ${symbol} token creation`, `Please, confirm contract creation in your wallet`)
+            this.handleShowConfirm('Purchace', `Confirm ${symbol} token creation`, `Please, confirm contract creation in your wallet`)
             const contract = await Token.deploy(
                 name,
                 symbol,
@@ -406,7 +421,7 @@ class Tokens extends Component {
             const signer = await provider.getSigner()
             const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
             const token = Token.attach(currentTokenAddress)
-            this.handleShowConfirm(`Confirm the minting of ${mintTokenAmount} ${currentTokenSymbol} tokens`, `Please, confirm transaction in your wallet`)
+            this.handleShowConfirm('Mint', `Confirm the minting of ${mintTokenAmount} ${currentTokenSymbol} tokens`, `Please, confirm transaction in your wallet`)
             const tx = await token.mint(ethers.utils.parseEther(mintTokenAmount))
             this.handleCloseConfirm()
             this.handleShowProgress()
@@ -429,7 +444,6 @@ class Tokens extends Component {
                 currentTokenChainid
             } = this.state
             let provider = new ethers.providers.Web3Provider(window.ethereum)
-            console.log(await provider.getNetwork())
             const chainid = (await provider.getNetwork()).chainId
             if (chainid.toString() !== currentTokenChainid) {
                 await this.changeNetwork(currentTokenChainid)
@@ -440,7 +454,7 @@ class Tokens extends Component {
             const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
             const token = Token.attach(currentTokenAddress)
             let tx;
-            this.handleShowConfirm(`Confirm ${!isCurrentTokenPaused ? 'pausing' : 'unpausing'} ${currentTokenSymbol} token`, `Please, confirm transaction in your wallet`)
+            this.handleShowConfirm('Pause'`Confirm ${!isCurrentTokenPaused ? 'pausing' : 'unpausing'} ${currentTokenSymbol} token`, `Please, confirm transaction in your wallet`)
             if (!isCurrentTokenPaused) {
                 tx = await token.pause()
             } else {
@@ -462,7 +476,7 @@ class Tokens extends Component {
     async burn() {
         try {
             const { currentBurnAddressType, otherBurnAddress, currentToken, currentTokenSymbol, burnAmount } = this.state
-            this.handleShowConfirm(`Confirm burning ${currentTokenSymbol} token`, `Please, confirm tx in your wallet`)
+            this.handleShowConfirm('Burn', `Confirm burning ${currentTokenSymbol} token`, `Please, confirm tx in your wallet`)
             let tx;
             if (currentBurnAddressType === burnAddressType.current) {
                 tx = await currentToken.burn(ethers.utils.parseEther(burnAmount.toString()))
@@ -529,7 +543,7 @@ class Tokens extends Component {
         try {
             const { currentTokenSymbol, currentToken, currentTokenBlacklistAddText, currentTokenBlacklist } = this.state
             const blacklistAdd = currentTokenBlacklistAddText.split('\n')
-            this.handleShowConfirm(`Confirm adding addresses to ${currentTokenSymbol} token blacklist`, `Please, confirm transaction in your wallet`)
+            this.handleShowConfirm('Add to black list', `Confirm adding addresses to ${currentTokenSymbol} token blacklist`, `Please, confirm transaction in your wallet`)
             const tx = await currentToken.setBlacklistUsers(blacklistAdd)
             this.handleCloseConfirm()
             this.handleShowProgress()
@@ -556,7 +570,7 @@ class Tokens extends Component {
         try {
             const { currentTokenSymbol, currentToken, currentTokenBlacklistRemove } = this.state
             if (currentTokenBlacklistRemove.length) {
-                this.handleShowConfirm(`Confirm removing addresses from ${currentTokenSymbol} token blacklist`, `Please, confirm transaction in your wallet`)
+                this.handleShowConfirm('Remove from black list', `Confirm removing addresses from ${currentTokenSymbol} token blacklist`, `Please, confirm transaction in your wallet`)
                 const tx = await currentToken.deleteBlacklistUsers(currentTokenBlacklistRemove)
                 this.handleCloseConfirm()
                 this.handleShowProgress()
@@ -738,7 +752,7 @@ class Tokens extends Component {
         this.setState({showPause: true, currentTokenSymbol, currentTokenAddress, isCurrentTokenPaused: paused})
     }
     handleClosePause = () => this.setState({showPause: false})
-    handleShowConfirm = (confirmName, confirmText) => this.setState({showConfirm: true, confirmName, confirmText})
+    handleShowConfirm = (confirmTitle, confirmName, confirmText) => this.setState({showConfirm: true, confirmTitle, confirmName, confirmText})
     handleCloseConfirm = () => this.setState({showConfirm: false, confirmName: null, confirmText: null})
     handleShowProgress = () => this.setState({showProgress: true})
     handleCloseProgress = () => this.setState({showProgress: false})
@@ -1010,8 +1024,9 @@ class Tokens extends Component {
                         </div>
                     </div> : null
                 }
+                
                 {
-                    this.state.showCreate && this.state.stageOfCreateToken === 2 
+                    this.state.showCreate && this.state.stageOfCreateToken === 2 && (this.props?.wallet?.chainid?.toString() !== this.state.chainid || !this.props?.wallet?.chainid)
                     ?  <div className="content__wrap">
                          <h4 className="menu__title-secondary">Choose a wallet connection method</h4>
                          <span className="menu__subtitle">To create a token, you need to complete a transaction using a cryptocurrency wallet</span>
@@ -1046,10 +1061,37 @@ class Tokens extends Component {
                             </div>
                          </div>
                         </div> 
+                    : this.state.showCreate && this.state.stageOfCreateToken === 2 && this.props?.wallet?.chainid?.toString() === this.state.chainid ?
+                     <div className="content__wrap">
+                    <h4 className="menu__title-secondary mb-4">Configure access settings for token management</h4>
+
+                    <div className="form__groups">
+                       <div className="form_row mb-4">
+                           <div className="form_col_last form_col">
+                               <label className="form__label">Chief administrator of the token (owner) * <img src={info} className="form__icon-info"/></label>
+                               <div className="input-group">
+                                   <input type="text" value={this.state.address} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                               </div>
+                               <div className="form__prompt_warning form__prompt" id="basic-addon4">Attention: the wallet with this role has the right to carry out any actions</div>
+                           </div>
+                       </div>
+                   </div>
+                    
+                   <div className="form_row mb-4">
+                       <div className="form_col_action_left form_col_last form_col">
+                           <button className="btn btn_pre-sm  btn_primary btn_gray" onClick={this.prevStage}>
+                               Back
+                           </button>
+                           <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.createToken}>
+                               Create Token
+                           </button>
+                       </div>
+                   </div>
+                   </div>
                     : null
                 }
                 {
-                    this.state.showCreate && this.state.stageOfCreateToken === 3
+                   this.state.showCreate && this.state.stageOfCreateToken === 3
                     ?  <div className="content__wrap">
                          <h4 className="menu__title-secondary mb-4">Configure access settings for token management</h4>
 
@@ -1076,10 +1118,33 @@ class Tokens extends Component {
                             </div>
                         </div>
                         </div> 
+                    : this.props.chainid && this.state.stageOfCreateToken === 3 && this.props?.wallet?.chainid?.toString() === this.state.chainid ? 
+                    <div className="content__wrap">
+                    <h4 className="menu__title-secondary mb-4">Token successfully created!</h4>
+                    <div className="form__groups">
+                       <div className="form_row mb-4">
+                           <div className="form_col_last form_col">
+                               <label className="form__label">Your token address * <img src={info} className="form__icon-info"/></label>
+                               <div className="input-group">
+                                   <input type="text" value={'0xE8D562606F35CB14dA3E8faB1174F9B5AE8319c4'}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                   <button className="btn btn__copy btn_primary btn_orange ms-3">Copy</button>
+                               </div>
+                               <div className="form__prompt_warning form__prompt" id="basic-addon4"><a className="link__form-prompt link__primary">Show on etherscan</a></div>
+                           </div>
+                       </div>
+                       <div className="form_row mb-4">
+                       <div className="form_col_action_left form_col_last form_col">
+                           <button className="btn btn_pre-sm  btn_primary btn_orange">
+                               Done
+                           </button>
+                       </div>
+                    </div>
+                   </div>
+                   </div> 
                     : null
                 }
                    {
-                    this.state.showCreate && this.state.stageOfCreateToken === 4
+                     this.state.showCreate && this.state.stageOfCreateToken === 4
                     ?  <div className="content__wrap">
                          <h4 className="menu__title-secondary mb-4">Token successfully created!</h4>
                          <div className="form__groups">
@@ -1550,6 +1615,7 @@ class Tokens extends Component {
                 <ConfirmModal 
                     showConfirm={this.state.showConfirm} 
                     handleCloseConfirm={this.handleCloseConfirm}
+                    confirmTitle={this.state.confirmTitle}
                     confirmName={this.state.confirmName}
                     confirmText={this.state.confirmText}
                 />

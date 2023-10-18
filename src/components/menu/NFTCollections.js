@@ -119,6 +119,14 @@ class NFTCollections extends Component {
                 this.handleShowCreate()
             }
         }
+        if(this.props?.wallet?.provider && this.props?.wallet?.signer && this.props?.wallet?.address && this.props?.wallet?.chainid) {
+            this.setState({
+                provider: this.props.wallet.provider,
+                signer: this.props.wallet.signer,
+                address: this.props.wallet.address,
+                chainid: this.props.wallet.chainid.toString()
+            })
+        }
     }
 
     onChangeName(event) {
@@ -185,13 +193,20 @@ class NFTCollections extends Component {
 
     async changeNetwork(event) {
         const network = networks[event.target.value]
-        this.setState({
-            network,
-            provider: null,
-            signer: null,
-            address: null,
-            chainid: network.chainid,
-        })
+        if(network.chainid.toString() !== this.state.chainid) {
+            this.setState({
+                network,
+                chainid: network.chainid,
+                provider: null,
+                signer: null,
+                address: null
+            })
+        }
+        else {
+            this.setState({
+                network,
+            })
+        }
     }
 
     async connect() {
@@ -201,7 +216,7 @@ class NFTCollections extends Component {
             const signer = await provider.getSigner()
             const address = await signer.getAddress()
             try {
-                this.handleShowConfirm('Confirm the network change', 'Please, confirm the network change in your wallet')
+                this.handleShowConfirm('Connect', 'Confirm the network change', 'Please, confirm the network change in your wallet')
                 await window.ethereum.request({
                   method: 'wallet_switchEthereumChain',
                   params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
@@ -278,7 +293,7 @@ class NFTCollections extends Component {
             if (discord) links.push({link: discord})
             if (other) links.push({link: other})
             let NFT, contract
-            this.handleShowConfirm(`Confirm ${symbol} collection creation`, `Please, confirm contract creation in your wallet`)
+            this.handleShowConfirm('Purchace', `Confirm ${symbol} collection creation`, `Please, confirm contract creation in your wallet`)
             if (beneficialType === beneficialTypes.company) {
                 NFT = new ethers.ContractFactory(ERC721DefaultRoyalty.abi, ERC721DefaultRoyalty.bytecode, this.state.signer)
                 contract = await NFT.deploy(this.state.name, this.state.symbol, config.signerAddress, beneficialAddress, royalties);
@@ -334,7 +349,7 @@ class NFTCollections extends Component {
                 alert('Something went wrong')
             }
         } catch (error) {
-            alert(error) 
+            this.customError(error)
         }
     }
 
@@ -403,8 +418,9 @@ class NFTCollections extends Component {
     handleCloseCreateLinkPage = () => this.setState({showCreateLinkPage: false})
     handleShowCreateLinkPage = () => this.setState({showCreateLinkPage: true})
 
-    handleShowNFTDetail = (event, active) => {
+    handleShowNFTDetail = (event, active, address) => {
         event.stopPropagation();
+        this.props.getNeftCollection(address)
         this.props.onSwitch(active)
         this.setState({showNFTDetail: true})
     }
@@ -441,7 +457,6 @@ class NFTCollections extends Component {
     }
 
     deletePropertyInput = (index) => {
-        console.log(index)
         let propertiesElements = this.state.propertiesElements
         propertiesElements.forEach(v => {if (v.id === index) v.work = false})
         this.setState({
@@ -516,9 +531,36 @@ class NFTCollections extends Component {
         this.setState({levelsElements})
     }
 
+    customError = (error) => {
+        this.handleCloseConfirm()
+        this.handleCloseProgress()
+        if (error.message.includes('user rejected transaction')) {
+            this.handleShowError('User rejected transaction')
+        }
+        if (error.message.includes('insufficient allowance')) {
+            this.handleShowError('Insufficient allowance')
+        }
+        if (error.message.includes('User in blacklist')) {
+            this.handleShowError('User in blacklist')
+        }
+        if (error.message.includes('Cap exceeded')) {
+            this.handleShowError('Maximum supply exceeded')
+        }
+        if (error.message.includes('Empty list')) {
+            this.handleShowError('Empty removing list')
+        }
+        if (error.message.includes('Cap is 0')) {
+            this.handleShowError('The maximum supply is not set')
+        }
+        if (error.message.includes('Initial supply is 0')) {
+            this.handleShowError('The initial supply is not set')
+        }
+        console.log(error)
+    } 
+
     handleCloseAddNFT = () => this.setState({showAddNFT: false})
     handleShowAddNFT = (addNFTAddress) => this.setState({showAddNFT: true, stageOfAddNft: 1, stageOfCreateNftCollection: 0, addNFTAddress,})
-    handleShowConfirm = (confirmName, confirmText) => this.setState({showConfirm: true, confirmName, confirmText})
+    handleShowConfirm = (confirmTitle, confirmName, confirmText) => this.setState({showConfirm: true, confirmTitle, confirmName, confirmText})
     handleCloseConfirm = () => this.setState({showConfirm: false, confirmName: null, confirmText: null})
     handleShowProgress = () => this.setState({showProgress: true})
     handleCloseProgress = () => this.setState({showProgress: false})
@@ -749,7 +791,7 @@ class NFTCollections extends Component {
                 }
 
                 {
-                    this.state.showCreate && this.state.stageOfCreateNftCollection === 2 
+                    this.state.showCreate && this.state.stageOfCreateNftCollection === 2  && (this.props?.wallet?.chainid?.toString() !== this.state.chainid || !this.props?.wallet?.chainid)
                     ?  <div className="content__wrap">
                          <h4 className="menu__title-secondary">Choose a wallet connection method</h4>
                          <span className="menu__subtitle">To create an nft collection, you need to complete a transaction using a cryptocurrency wallet</span>
@@ -784,11 +826,110 @@ class NFTCollections extends Component {
                             </div>
                          </div>
                         </div> 
+                    :  this.state.showCreate && this.state.stageOfCreateNftCollection === 2 && this.props?.wallet?.chainid?.toString() === this.state.chainid ?
+                    <div className="content__wrap">
+                            <div className="mb-4">
+                            <h4 className="menu__title-secondary ">Beneficial owner</h4>
+                             <span className="menu__subtitle">Collection beneficiary can collect creator earnings when a user re-sells an item they created</span>
+                            </div>
+                            <div className="form__groups">
+                                <div className="form_row">
+                                    <div className="form_col">
+                                        <label className="form-label">Beneficial recipient:</label> 
+                                        <div className="input-group mb-4">
+                                        <div className="form-check custom-control custom-radio custom-control-inline">
+                                            <input type="radio" name="rd" id="rd_1"  
+                                                value={beneficialTypes.company} checked={this.state.beneficialType === beneficialTypes.company}
+                                                onChange={this.onChangeBeneficialType}/>
+                                            <label className="form-check-label custom-control-label green" for="rd_1">
+                                            The company <img src={info} className="form__icon-info"/>
+                                            </label>
+                                        </div>
+                                        <div className="form-check custom-control custom-radio custom-control-inline ms-3">
+                                            <input type="radio" name="rd" id="rd_2"
+                                                value={beneficialTypes.owner} checked={this.state.beneficialType === beneficialTypes.owner}
+                                                onChange={this.onChangeBeneficialType}   />
+                                            <label className="form-check-label custom-control-label red" for="rd_2">
+                                            First owner of a NFT <img src={info} className="form__icon-info"/>
+                                            </label>
+                                        </div>
+                                        </div>   
+                                    </div>
+                                </div>
+                                <div className="form_row mb-4">
+                              
+                                        {
+                                            this.state.beneficialType === beneficialTypes.company
+                                            ?
+                                            <div className="form_col">
+                                            <label className="form__label">Beneficiary address:</label>
+                                            <div className="input-group">
+                                                <input type="text" placeholder="Address" onChange={this.onChangeBeneficialAddress} value={this.state.beneficialAddress}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                            </div>
+                                            <div className="form__prompt" id="basic-addon4">Wallet for receiving commissions from re-sales of the collection items</div>
+                                        </div>
+                                            :
+                                            null
+                                        }
+                                     <div className="form_col_last form_col">
+                                    <label className="form__label">Resale royalties: <img src={info} className="form__icon-info"/></label>
+                                    <div className="input-group">
+                                    <input type="number" placeholder="20%" onChange={this.onChangeRoyalties} value={this.state.royalties}  min={0.5} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                    <div className="form__prompt" id="basic-addon4">Total creator earnings must be between 0.5% and 10%</div>
+                                </div>
+                                </div>
+                                {
+                                    /*
+                                    <div className="form_row mb-4">
+                                <div className="form_col">
+                                    <label className="form__label">Beneficiary address:</label>
+                                    <div className="input-group">
+                                        <input type="text" placeholder="Address" onChange={this.onChangeName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                    <div className="form__prompt" id="basic-addon4">Wallet for receiving commissions from re-sales of the collection items</div>
+                                </div>
+                                <div className="form_col_last form_col">
+                                    <label className="form__label">Resale royalties: <img src={info} className="form__icon-info"/></label>
+                                    <div className="input-group">
+                                    <input type="text" placeholder="20%" onChange={this.onChangeSymbol} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                    <div className="form__prompt" id="basic-addon4">Total creator earnings must be between 0.5% and 10%</div>
+                                </div>
+                            </div>
+                                */}
+                            <div className="form_row mb-4">
+                            <div className="form_col_action_left form_col_last form_col">
+                            <button className="btn btn_pre-sm  btn_primary btn_gray" onClick={this.prevStage}>
+                                    Back
+                            </button>
+                                {
+                                    (
+                                        this.state.royalties === null
+                                        ||
+                                        this.state.royalties === ''
+                                        ||
+                                        (
+                                            this.state.beneficialType === beneficialTypes.company ? 
+                                            !ethers.utils.isAddress(this.state.beneficialAddress) 
+                                            : false
+                                        )
+                                    )
+                                    ?
+                                    <button type="button" className="btn btn_pre-sm  btn_primary btn_orange btn_disabled" disabled onClick={this.nextStage}>Next</button>
+                                    :
+                                    <button type="button" className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.nextStage}>Next</button>
+                                }
+                            </div>
+                         </div>
+                            </div>
+                            </div>
+
                     : null
                 }
 
                 {
-                     this.state.showCreate && this.state.stageOfCreateNftCollection === 3
+                     this.state.showCreate && this.state.stageOfCreateNftCollection === 3 && (this.props?.wallet?.chainid?.toString() !== this.state.chainid || !this.props?.wallet?.chainid)
                      ?    <div className="content__wrap">
                             <div className="mb-4">
                             <h4 className="menu__title-secondary ">Beneficial owner</h4>
@@ -886,7 +1027,86 @@ class NFTCollections extends Component {
                          </div>
                             </div>
                             </div>
-                     : null
+                    : this.state.showCreate && this.state.stageOfCreateNftCollection === 3 && this.props?.wallet?.chainid?.toString() === this.state.chainid ?
+                    <div className="content__wrap">
+                         <h4 className="menu__title-secondary mb-4">Links</h4>
+                        <div className="form__groups">
+                            <div className="form_row_relative form_row mb-4">
+                                        <div className="form_col_last form_col">
+                                        <label className="form__label">Website</label>
+                                        <img className="website-icon" src={webicon}></img>
+                                        <div className="input-group">
+                                            <input type="text" placeholder="yourwebsite.io" value={this.state.website} onChange={this.onChangeWebsite} className="form-control_with_image form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        </div>
+                                        </div>
+                            </div>
+                        </div>
+
+                        <div className="form_row">
+                                    <div className="form_col_last form_col">
+                                        <label className="form-label">Socials:</label> 
+                                        <div className="form_row_relative form_row mb-4">
+                                            <div className="form_col">
+                                                <img className="instagram-icon" src={instagram}></img>
+                                                <div className="input-group">
+                                                    <input type="text" placeholder="Instagram" value={this.state.instagram} onChange={this.onChangeInstagram}  className="form-control_with_image form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                </div>
+                                        
+                                            </div>
+                                            <div className="form_row_relative form_col_last form_col">
+                                            <img className="facebook-icon" src={facebook}></img>
+                                                <div className="input-group">
+                                                <input type="text" placeholder="Facebook" value={this.state.facebook} onChange={this.onChangeFacebook} className="form-control_with_image form-control form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                </div>
+                                            
+                                            </div>
+                                        </div>
+                                        <div className="form_row_relative form_row mb-4">
+                                            <div className="form_col">
+                                            <img className="telegram-icon" src={telegram}></img>
+                                                <div className="input-group">
+                                                    <input type="text" placeholder="Telegram" value={this.state.telegram} onChange={this.onChangeTelegram} className="form-control_with_image form-control form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                </div>
+                                        
+                                            </div>
+                                            <div className="form_row_relative form_col_last form_col">
+                                            <img className="discord-icon" src={discord}></img>
+                                                <div className="input-group">
+                                                <input type="text" placeholder="Discord" alue={this.state.discord} onChange={this.onChangeDiscord} className="form-control_with_image form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                </div>
+                                            
+                                            </div>
+                                        </div>
+                                        <div className="form_row_relative form_row mb-4">
+                                            <div className="form_col">
+                                            <img className="medium-icon" src={medium}></img>
+                                                <div className="input-group">
+                                                    <input type="text" placeholder="Medium" value={this.state.medium} onChange={this.onChangeMedium} className="form-control_with_image form-control form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                </div>
+                                        
+                                            </div>
+                                            <div className="form_row_relative form_col_last form_col">
+                                            <img className="other-icon" src={webicon}></img>
+                                                <div className="input-group">
+                                                <input type="text" placeholder="Other" value={this.state.other} onChange={this.onChangeOther} className="form-control_with_image form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                </div>
+                                            
+                                            </div>
+                                        </div>
+                                </div>
+                        </div>
+                        <div className="form_row mb-4">
+                            <div className="form_col_action_left form_col_last form_col">
+                            <button className="btn btn_pre-sm  btn_primary btn_gray" onClick={this.prevStage}>
+                                    Back
+                                </button>
+                                <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.createNFTCollection}>
+                                    Create
+                                </button>
+                            </div>
+                         </div>
+                    </div>
+                    : null
                 }
 
                 {
@@ -1313,7 +1533,7 @@ class NFTCollections extends Component {
                                             <td>
                                                 <FPDropdown icon={more}>
                                                     <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowAddNFT(v.address)}>Add NFT</Dropdown.Item>
-                                                    <Dropdown.Item className="dropdown__menu-item" onClick={(event) => this.handleShowNFTDetail(event, switcher.nft)}>Collection details</Dropdown.Item>
+                                                    <Dropdown.Item className="dropdown__menu-item" onClick={(event) => this.handleShowNFTDetail(event, switcher.nft, v.address)}>Collection details</Dropdown.Item>
                                                 </FPDropdown>
                                             </td>
                                         </tr>
@@ -1592,6 +1812,7 @@ class NFTCollections extends Component {
                 <ConfirmModal
                     showConfirm={this.state.showConfirm} 
                     handleCloseConfirm={this.handleCloseConfirm}
+                    confirmTitle={this.state.confirmTitle}
                     confirmName={this.state.confirmName}
                     confirmText={this.state.confirmText}
                 />
