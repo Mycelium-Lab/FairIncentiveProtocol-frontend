@@ -938,14 +938,6 @@ class Rewards extends Component {
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowDelete(v.nft_id ? types.nft : types.token, v.id, v.name)}>Delete</Dropdown.Item>
 
                                             </FPDropdown>
-                                              {/*
-                                              <button className="btn btn-dark" onClick={() => this.handleShowMint(v.symbol, v.address, v.chainid)} disabled={v.supply_type == 1 ? true : false}>Mint</button>
-                                              <button className="btn btn-dark" disabled>Roles control</button>
-                                              <button className="btn btn-dark" onClick={() => this.handleShowPause(v.symbol, v.address, v.chainid)} disabled={!v.pausable}>{v.paused ? "Unpause" : "Pause"}</button>
-                                              <button className="btn btn-dark" onClick={() => this.handleShowBlacklist(v.symbol, v.address, v.chainid)} disabled={!v.blacklist}>Blacklist</button>
-                                              <button className="btn btn-dark" onClick={() => this.handleShowBurn(v.symbol, v.address, v.chainid)} disabled={!v.burnable}>Burn</button>
-                                              <button className="btn btn-dark" disabled>Token info</button>
-                                            */}
                                           </td>
                                       </tr>
                                     )
@@ -954,14 +946,6 @@ class Rewards extends Component {
                 </div>
                       : null
                 }
-
-              
-                {/*<div>
-                    <button type="button" className={this.state.switcher === types.token ? "btn btn-dark" : "btn btn-light"} onClick={() => this.setState({switcher: types.token})}>Token rewards</button>
-                    <button type="button" className={this.state.switcher === types.nft ? "btn btn-dark" : "btn btn-light"} onClick={() => this.setState({switcher: types.nft})}>NFT rewards</button>
-                </div>*/}
-
-
 
                 <Modal show={this.state.show} onHide={this.handleClose} centered>
                 <Modal.Header  className="modal-newuser__title modal-title" closeButton>
