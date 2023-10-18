@@ -578,6 +578,29 @@ class Users extends Component {
     handleCloseDelete = () => this.setState({showDelete: false, chosen_user_external_id: null, chosen_user_id: null})
     handleCloseSuccess = () => this.setState({showSuccess: false})
 
+    handleCopy(event) {
+        const tooltipText = event.target.children[0]
+       const copyText1 = document.querySelector('#user-id-input-1')
+       const copyText2 = document.querySelector('#user-id-input-2')
+       if(copyText1) {
+        copyText1.select();
+        tooltipText.innerHTML = "Copied: " + copyText1.value;
+       }
+       else if (copyText2){
+        copyText2.select();
+        tooltipText.innerHTML = "Copied: " + copyText2.value;
+       }
+       document.execCommand("copy");
+    }
+
+
+    handleOutTooltip(event) {
+       if(!event.target.classList.contains("tooltiptext")) {
+            const tooltipText = event.target.children[0]
+            tooltipText.innerHTML = "Copy to clipboard";
+        }
+    }
+
     deleteEditPropertyInput = (index) => {
         let propertiesElements = this.state.editPropertiesElements
         propertiesElements.forEach(v => {if (v.id === index) v.work = false})
@@ -746,7 +769,6 @@ class Users extends Component {
         edit_user.email = event.target.value
 
         const validateEmail = (email) => {
-            console.log('email', email)
             if(!email) {
                 return true
             }
@@ -755,7 +777,6 @@ class Users extends Component {
             );
           };
 
-        console.log(validateEmail(event.target.value))
         if(validateEmail(event.target.value)) {
             this.setState({
                 edit_user,
@@ -770,6 +791,8 @@ class Users extends Component {
         }
     }
 
+    handleCopy = this.handleCopy.bind(this)
+    handleOutTooltip = this.handleOutTooltip.bind(this)
     onChangeExternalID = this.onChangeExternalID.bind(this)
     onChangeImage = this.onChangeImage.bind(this)
     onChangeNotes = this.onChangeNotes.bind(this)
@@ -1099,10 +1122,14 @@ class Users extends Component {
                             <div className="fp-userid-row_left">
                                 <label className="form__label">FAIR protocol user ID:</label>
                                 <div className="input-group">
-                                    <input type="text" value={createLongStrView(this.state.edit_user.id)} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    <input id="user-id-input-1" type="text" value={createLongStrView(this.state.edit_user.id)} className="form-control" aria-describedby="basic-addon3 basic-addon4"/>
                                 </div>
                             </div>
-                            <button className="btn btn__copy btn_primary btn_orange">Copy</button>
+                            <div className="tooltip-fp">
+                                <button onClick={this.handleCopy} onMouseOut={this.handleOutTooltip} className="btn btn__copy btn_primary btn_orange">Copy
+                                    <span class="tooltiptext">Copy to clipboard</span>
+                                </button>
+                            </div>
                         </div>
                         <div className="mb-4">
                             <label className="form__label">Username or external ID* :</label>
@@ -1243,10 +1270,14 @@ class Users extends Component {
                             <div className="fp-userid-row_left">
                                 <label className="form__label">FAIR protocol user ID:</label>
                                 <div className="input-group">
-                                    <input type="text" value={createLongStrView(this.state.edit_user.id)} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    <input id="user-id-input-2" type="text" value={createLongStrView(this.state.edit_user.id)} className="form-control" aria-describedby="basic-addon3 basic-addon4"/>
                                 </div>
                             </div>
-                            <button className="btn btn__copy btn_primary btn_orange">Copy</button>
+                            <div className="tooltip-fp">
+                                <button onClick={this.handleCopy} onMouseOut={this.handleOutTooltip} className="btn btn__copy btn_primary btn_orange">Copy
+                                    <span class="tooltiptext">Copy to clipboard</span>
+                                </button>
+                            </div>
                         </div>
                         <div className="mb-4">
                             <label className="form__label_group form__label">

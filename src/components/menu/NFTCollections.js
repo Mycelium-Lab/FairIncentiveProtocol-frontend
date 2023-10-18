@@ -38,6 +38,10 @@ const beneficialTypes = {
     owner: "owner"
 }
 
+let propertiesElementsLength = 0
+let levelsElementsLength = 0
+let statsElementsLength = 0
+
 class NFTCollections extends Component {
 
     constructor(props) {
@@ -71,6 +75,9 @@ class NFTCollections extends Component {
             addNFTName: '',
             addNFTDescription: null,
             nftCollections: [],
+            propertiesElements: [],
+            statsElements: [],
+            levelsElements: [],
             network: networks[config.status === "test" ? '5' : '1'],
             beneficialAddress: this.props.auth.wallet,
             beneficialType: beneficialTypes.company,
@@ -85,6 +92,7 @@ class NFTCollections extends Component {
             stageOfCreateNftCollection: 0,
             stageOfAddNft: 0,
             hasLoad: false,
+            collectionOptions: null,
         }
     }
 
@@ -104,7 +112,12 @@ class NFTCollections extends Component {
             })
         }
         if(this.props.isGoToCreationPage) {
-            this.handleShowCreate()
+            if(this.props.isGoToCreationPage === 'create token from collection') {
+                this.handleShowAddNFT(this.props.creationPagePayload)
+            }
+            else {
+                this.handleShowCreate()
+            }
         }
     }
 
@@ -177,17 +190,16 @@ class NFTCollections extends Component {
             provider: null,
             signer: null,
             address: null,
-            chainid: null
+            chainid: network.chainid,
         })
     }
 
     async connect() {
         const network = this.state.network
-        const provider = new ethers.providers.Web3Provider(window.ethereum)
+        const provider = new ethers.providers.Web3Provider(window.ethereum, "any")
             await provider.send("eth_requestAccounts", [])
             const signer = await provider.getSigner()
             const address = await signer.getAddress()
-            const chainid = (await provider.getNetwork()).chainId
             try {
                 this.handleShowConfirm('Confirm the network change', 'Please, confirm the network change in your wallet')
                 await window.ethereum.request({
@@ -199,7 +211,7 @@ class NFTCollections extends Component {
                     provider,
                     signer,
                     address,
-                    chainid
+                    stageOfCreateNftCollection: 3
                 })
               } catch (err) {
                 console.log(err)
@@ -392,6 +404,113 @@ class NFTCollections extends Component {
         this.setState({showNFTDetail: true})
     }
 
+    handlCollectionOptions = (event) => {
+        this.setState({
+            collectionOptions: event.target.value
+        })
+    }
+
+    addPropertyInput = () => {
+        const propertiesElements = this.state.propertiesElements
+        const id = propertiesElementsLength
+        propertiesElements.push(
+            {
+                id,
+                element: 
+                <div className="user-custom-params">
+                            <div className="input-group">
+                                <input type="text" id={`property-name-${id}`} onChange={(event) => this.changePropertyName(id, event.target.value)} className="form-control" placeholder="Property name"/>
+                            </div>
+                            <div className="input-group">
+                                <input type="text" id={`property-value-${id}`} onChange={(event) => this.changePropertyValue(id, event.target.value)} className="form-control" placeholder="Default value"/>
+                            </div>
+                    <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={() => this.deletePropertyInput(id)}>-</button>
+                </div>,
+                name: undefined,
+                value: undefined,
+                work: true
+            }
+        )
+        propertiesElementsLength += 1
+        this.setState({propertiesElements})
+    }
+
+    deletePropertyInput = (index) => {
+        console.log(index)
+        let propertiesElements = this.state.propertiesElements
+        propertiesElements.forEach(v => {if (v.id === index) v.work = false})
+        this.setState({
+            propertiesElements
+        })
+    }
+
+    addStatInput = () => {
+        const statsElements = this.state.statsElements
+        const id = statsElementsLength
+        statsElements.push(
+            {
+                id,
+                element: 
+                <div className="user-custom-params">
+                        <div className="input-group">
+                            <input type="text" id={`stat-name-${id}`} onChange={this.changeStatName} className="form-control" placeholder="Stat name"/>
+                        </div>
+                        <div className="input-group">
+                            <input type="number" id={`stat-value-${id}`} onChange={this.changeStatValue} className="form-control" placeholder="Default value"/>
+                        </div>
+                    <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={() => this.deleteStatInput(id)}>-</button>
+                </div>,
+                name: undefined,
+                value: undefined,
+                work: true
+            }
+        )
+
+        statsElementsLength += 1
+        this.setState({statsElements})
+    }
+
+    deleteStatInput = (index) => {
+        let statsElements = this.state.statsElements
+        statsElements.forEach(v => { if (v.id === index) v.work = false});
+        this.setState({statsElements})
+    }
+
+    addLevelInput = () => {
+        const levelsElements = this.state.levelsElements
+        const id = levelsElementsLength
+        levelsElements.push(
+            {
+                id,
+                element:                                               
+                <div className="user-custom-params">
+                        <div className="input-group">
+                            <input type="text" id={`stat-name-${id}`} onChange={this.changeStatName} className="form-control" placeholder="Level name"/>
+                        </div>
+                        <div className="input-group">
+                            <input type="number" id={`stat-value-${id}`} onChange={this.changeStatValue} className="form-control" placeholder="Default value 1"/>
+                        </div>
+                        <div className="input-group">
+                            <input type="number" id={`stat-value-${id}`} onChange={this.changeStatValue} className="form-control" placeholder="Default value 2"/>
+                        </div>
+                    <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={() => this.deleteLevelInput(id)}>-</button>
+                </div>,
+                name: undefined,
+                value: undefined,
+                work: true
+            }
+        )
+
+        levelsElementsLength += 1
+        this.setState({levelsElements})
+    }
+
+    deleteLevelInput = (index) => {
+        let levelsElements = this.state.levelsElements
+        levelsElements.forEach(v => { if (v.id === index) v.work = false});
+        this.setState({levelsElements})
+    }
+
     handleCloseAddNFT = () => this.setState({showAddNFT: false})
     handleShowAddNFT = (addNFTAddress) => this.setState({showAddNFT: true, stageOfAddNft: 1, stageOfCreateNftCollection: 0, addNFTAddress,})
     handleShowConfirm = (confirmName, confirmText) => this.setState({showConfirm: true, confirmName, confirmText})
@@ -446,6 +565,11 @@ class NFTCollections extends Component {
     handleCloseSuccess = this.handleCloseSuccess.bind(this)
     handleShowError = this.handleShowError.bind(this)
     handleCloseError = this.handleCloseError.bind(this)
+    handlCollectionOptions = this.handlCollectionOptions.bind(this)
+    addPropertyInput = this.addPropertyInput.bind(this)
+    deletePropertyInput = this.deletePropertyInput.bind(this)
+    addStatInput = this.addStatInput.bind(this)
+    deleteStatInput = this.deleteStatInput.bind(this)
 
     render() {
         const {switcher} = this.props
@@ -1237,13 +1361,13 @@ class NFTCollections extends Component {
                                       <label className="form-label">Adding options:</label> 
                                       <div className="input-group">
                                       <div className="form-check custom-control custom-radio custom-control-inline">
-                                          <input type="radio" id="rd_1" name="rd" value="One by one"/>
+                                          <input checked={this.state.collectionOptions === 'One by one' ? 1 : 0} type="radio" id="rd_1" name="rd" value="One by one" onChange={this.handlCollectionOptions}/>
                                           <label className="form-check-label custom-control-label green" for="rd_1">
                                           One by one <img src={info} className="form__icon-info"/>
                                           </label>
                                       </div>
                                       <div className="form-check custom-control custom-radio custom-control-inline ms-3">
-                                          <input type="radio" id="rd_2" name="rd" value="Massive adding" />
+                                          <input checked={this.state.collectionOptions === 'Massive adding' ? 1 : 0} type="radio" id="rd_2" name="rd" value="Massive adding" onChange={this.handlCollectionOptions} />
                                           <label className="form-check-label custom-control-label red" for="rd_2">
                                           Massive adding <img src={info} className="form__icon-info"/>
                                           </label>
@@ -1254,9 +1378,16 @@ class NFTCollections extends Component {
                             </div>
                             <div className="form_row mb-4">
                                 <div className="form_col_action_left form_col_last form_col">
-                                    <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.nextStageAddNft}>
+                                    {
+                                        this.state.collectionOptions ? 
+                                        <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.nextStageAddNft}>
+                                         Next
+                                        </button>
+                                        :   <button disabled className="btn btn_pre-sm  btn_primary btn_orange btn_disabled">
                                         Next
-                                    </button>
+                                        </button>
+
+                                    }
                                 </div>
                         </div>
                         </div>
@@ -1273,7 +1404,7 @@ class NFTCollections extends Component {
                         {
                             this.state.showAddNFT && !this.state.showCreate && this.state.stageOfAddNft === 2
                             ?    <div className="content__wrap">
-                                     <h4 className="menu__title-secondary mb-4">Adding one by one</h4>
+                                     <h4 className="menu__title-secondary mb-4">Adding {this.state.collectionOptions.toLowerCase()}</h4>
                                         <div className="form__groups">
                                             <div className="form_row mb-4">
                                                 <div className="form_col_last form_col">
@@ -1312,7 +1443,7 @@ class NFTCollections extends Component {
 
                                             <div className="form__group_row form__group mb-4">
 
-                                                <div className="form_col">
+                                                <div className="form_col form__group">
                                                         <div className="form__group_top-row">
                                                             <div className="form__group_top-row-left">
                                                                     <img src={drug_drop}></img>
@@ -1322,31 +1453,30 @@ class NFTCollections extends Component {
                                                                     <div className="form__prompt" id="basic-addon4">Textual traits that show up as rectangles</div>
                                                                 </div>
                                                             </div>
-                                                            <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={this.addEditPropertyInput}>+</button>
+                                                            <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={this.addPropertyInput}>+</button>
                                                         </div>
                                                         <div className="form__group_bottom-row">
                                                             {
                                                             <div id="user-properties">
                                                                 {
-                                                                    this.state.editPropertiesElements ?
-                                                                    this.state.editPropertiesElements.map(v => v.work ? v.element : null) :
+                                                                    this.state.propertiesElements ?
+                                                                    this.state.propertiesElements.map(v => v.work ? v.element : null) :
                                                                     null
                                                                 }
                                                             </div>
                                                             }
-                                                            <div className="form__group_bottom-row-last">
+                                                            {/*<div className="form__group_bottom-row-last">
                                                                 <div className="input-group">
                                                                     <input type="text" placeholder="Property"  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                                 </div>
                                                                 <div className="input-group">
                                                                     <input type="text" placeholder="Value"  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                                 </div>
-                                                            </div>
-                                                            
+                                                        </div>*/}
                                                     </div>
                                                 </div>
 
-                                                <div className="form_col_last form_col">
+                                                <div className="form_col_last form_col form__group">
                                                         <div className="form__group_top-row">
                                                             <div className="form__group_top-row-left">
                                                                     <img src={drug_drop}></img>
@@ -1356,19 +1486,19 @@ class NFTCollections extends Component {
                                                                     <div className="form__prompt" id="basic-addon4">Numerical traits that show as a progress bar</div>
                                                                 </div>
                                                             </div>
-                                                            <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={this.addEditPropertyInput}>+</button>
+                                                            <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={this.addLevelInput}>+</button>
                                                         </div>
                                                         <div className="form__group_bottom-row">
                                                             {
                                                             <div id="user-properties">
                                                                 {
-                                                                    this.state.editPropertiesElements ?
-                                                                    this.state.editPropertiesElements.map(v => v.work ? v.element : null) :
+                                                                    this.state.levelsElements ?
+                                                                    this.state.levelsElements.map(v => v.work ? v.element : null) :
                                                                     null
                                                                 }
                                                             </div>
                                                             }
-                                                            <div className="form__group_bottom-row-last">
+                                                            {/*<div className="form__group_bottom-row-last">
                                                                 <div className="input-group">
                                                                     <input type="text" placeholder="Property"  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                                 </div>
@@ -1378,7 +1508,7 @@ class NFTCollections extends Component {
                                                                 <div className="input-group">
                                                                     <input type="text" placeholder="Value 2"  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                                 </div>
-                                                            </div>
+                                                        </div>*/}
                                                             
                                                     </div>
                                                 </div>
@@ -1395,26 +1525,26 @@ class NFTCollections extends Component {
                                                             <div className="form__prompt" id="basic-addon4">Numerical traits that just show as numbers</div>
                                                         </div>
                                                     </div>
-                                                    <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={this.addEditPropertyInput}>+</button>
+                                                    <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={this.addStatInput}>+</button>
                                                 </div>
                                                 <div className="form__group_bottom-row">
                                                     {
                                                     <div id="user-properties">
                                                         {
-                                                            this.state.editPropertiesElements ?
-                                                            this.state.editPropertiesElements.map(v => v.work ? v.element : null) :
+                                                            this.state.statsElements ?
+                                                            this.state.statsElements.map(v => v.work ? v.element : null) :
                                                             null
                                                         }
                                                     </div>
                                                     }
-                                                    <div className="form__group_bottom-row-last">
+                                                    {/*<div className="form__group_bottom-row-last">
                                                         <div className="input-group_wide input-group">
                                                             <input type="text" placeholder="Property"  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                         </div>
                                                         <div className="input-group">
                                                             <input type="text" placeholder="Value"  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                         </div>
-                                                    </div>
+                                                </div>*/}
                                                 </div>
                                             </div>
 
@@ -1428,12 +1558,10 @@ class NFTCollections extends Component {
                                                             <div className="form__prompt" id="basic-addon4">Include unlockable content that can only be revealed by the owner of the item</div>
                                                         </div>
                                                     </div>
-                                                        <Form>
-                                                            <Form.Check
-                                                                type="switch"
-                                                                id="custom-switch"
-                                                            />
-                                                        </Form>
+                                                        <label className="switch">
+                                                        <input type="checkbox" role="switch"></input>
+                                                        <span className="slider round"></span>
+                                                </label>  
                                                     </div>
                                                     <div input-group>
                                                         <textarea type="text" value={this.state.description} onChange={this.onChangeDescription} className="form__textarea form__textarea_desct-nft-collection" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>

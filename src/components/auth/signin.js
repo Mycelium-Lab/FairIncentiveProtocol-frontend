@@ -111,13 +111,7 @@ class SignIn extends Component {
         return (
             <>
             <DefaultAuth>
-                {
-                    /*<img className="auth-decore_left" src={require('../../media/auth/left-wave.png')}/>
-                    <img className="auth-decore_right" src={require('../../media/auth/right-wave.png')}/>
-
-                    <img className="auth-decore_left" src={require('../../media/auth/left-wave.png')}/>
-                    <img className="auth-decore_right" src={require('../../media/auth/right-wave.png')}/>*/
-                    }
+               
             </DefaultAuth>
            <Container className="auth-warapp">
            <img className="auth-logo w-100" src={require('../../media/auth/logo.png')}/>
