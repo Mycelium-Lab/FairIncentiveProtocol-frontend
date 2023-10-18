@@ -256,11 +256,11 @@ class Tokens extends Component {
 
     async connect() {
         const network = this.state.network
-        const provider = new ethers.providers.Web3Provider(window.ethereum)
+        // https://github.com/ethers-io/ethers.js/issues/866
+        const provider = new ethers.providers.Web3Provider(window.ethereum, "any")
             await provider.send("eth_requestAccounts", [])
             const signer = await provider.getSigner()
             const address = await signer.getAddress()
-            const chainid = (await provider.getNetwork()).chainId
             try {
                 this.handleShowConfirm('Confirm the network change', 'Please, confirm the network change in your wallet')
                 await window.ethereum.request({
@@ -272,7 +272,6 @@ class Tokens extends Component {
                     provider,
                     signer,
                     address,
-                    chainid,
                     stageOfCreateToken: 3
                 })
               } catch (err) {
@@ -299,10 +298,10 @@ class Tokens extends Component {
         const network = networks[id]
         this.setState({
             network,
+            chainid: network.chainid,
             provider: null,
             signer: null,
-            address: null,
-            chainid: null
+            address: null
         })
     }
 

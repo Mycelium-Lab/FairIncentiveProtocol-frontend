@@ -190,17 +190,16 @@ class NFTCollections extends Component {
             provider: null,
             signer: null,
             address: null,
-            chainid: null
+            chainid: network.chainid,
         })
     }
 
     async connect() {
         const network = this.state.network
-        const provider = new ethers.providers.Web3Provider(window.ethereum)
+        const provider = new ethers.providers.Web3Provider(window.ethereum, "any")
             await provider.send("eth_requestAccounts", [])
             const signer = await provider.getSigner()
             const address = await signer.getAddress()
-            const chainid = (await provider.getNetwork()).chainId
             try {
                 this.handleShowConfirm('Confirm the network change', 'Please, confirm the network change in your wallet')
                 await window.ethereum.request({
@@ -212,7 +211,7 @@ class NFTCollections extends Component {
                     provider,
                     signer,
                     address,
-                    chainid
+                    stageOfCreateNftCollection: 3
                 })
               } catch (err) {
                 console.log(err)
