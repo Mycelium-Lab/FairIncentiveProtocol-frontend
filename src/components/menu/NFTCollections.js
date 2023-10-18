@@ -201,7 +201,7 @@ class NFTCollections extends Component {
             const signer = await provider.getSigner()
             const address = await signer.getAddress()
             try {
-                this.handleShowConfirm('Confirm the network change', 'Please, confirm the network change in your wallet')
+                this.handleShowConfirm('Connect', 'Confirm the network change', 'Please, confirm the network change in your wallet')
                 await window.ethereum.request({
                   method: 'wallet_switchEthereumChain',
                   params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
@@ -278,7 +278,7 @@ class NFTCollections extends Component {
             if (discord) links.push({link: discord})
             if (other) links.push({link: other})
             let NFT, contract
-            this.handleShowConfirm(`Confirm ${symbol} collection creation`, `Please, confirm contract creation in your wallet`)
+            this.handleShowConfirm('Purchace', `Confirm ${symbol} collection creation`, `Please, confirm contract creation in your wallet`)
             if (beneficialType === beneficialTypes.company) {
                 NFT = new ethers.ContractFactory(ERC721DefaultRoyalty.abi, ERC721DefaultRoyalty.bytecode, this.state.signer)
                 contract = await NFT.deploy(this.state.name, this.state.symbol, config.signerAddress, beneficialAddress, royalties);
@@ -518,7 +518,7 @@ class NFTCollections extends Component {
 
     handleCloseAddNFT = () => this.setState({showAddNFT: false})
     handleShowAddNFT = (addNFTAddress) => this.setState({showAddNFT: true, stageOfAddNft: 1, stageOfCreateNftCollection: 0, addNFTAddress,})
-    handleShowConfirm = (confirmName, confirmText) => this.setState({showConfirm: true, confirmName, confirmText})
+    handleShowConfirm = (confirmTitle, confirmName, confirmText) => this.setState({showConfirm: true, confirmTitle, confirmName, confirmText})
     handleCloseConfirm = () => this.setState({showConfirm: false, confirmName: null, confirmText: null})
     handleShowProgress = () => this.setState({showProgress: true})
     handleCloseProgress = () => this.setState({showProgress: false})
@@ -1592,6 +1592,7 @@ class NFTCollections extends Component {
                 <ConfirmModal
                     showConfirm={this.state.showConfirm} 
                     handleCloseConfirm={this.handleCloseConfirm}
+                    confirmTitle={this.state.confirmTitle}
                     confirmName={this.state.confirmName}
                     confirmText={this.state.confirmText}
                 />

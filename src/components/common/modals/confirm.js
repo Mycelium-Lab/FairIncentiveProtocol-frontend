@@ -9,7 +9,7 @@ class ConfirmModal extends Component {
     render() {
         return <Modal show={this.props.showConfirm} onHide={this.props.handleCloseConfirm} centered>
              <Modal.Header  className="modal-newuser__title modal-title" closeButton>
-                 Purchace
+             {this.props.confirmTitle}
             </Modal.Header>
             <Modal.Body>
                 <div className="confirm__body">

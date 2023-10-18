@@ -81,7 +81,7 @@ class Header extends Component {
         },  async () => await this.connect())
     }
 
-    handleShowConfirm = (confirmName, confirmText) => this.setState({showConfirm: true, confirmName, confirmText})
+    handleShowConfirm = (confirmTitle, confirmName, confirmText) => this.setState({showConfirm: true, confirmTitle, confirmName, confirmText})
     handleCloseConfirm = () => this.setState({showConfirm: false, confirmName: null, confirmText: null})
 
     async disconnect() {
@@ -102,7 +102,7 @@ class Header extends Component {
             const address = await signer.getAddress()
             const chainid = (await provider.getNetwork()).chainId
             try {
-                this.handleShowConfirm('Confirm the network change', 'Please, confirm the network change in your wallet')
+                this.handleShowConfirm('Connect', 'Confirm the network change', 'Please, confirm the network change in your wallet')
                 await window.ethereum.request({
                   method: 'wallet_switchEthereumChain',
                   params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
@@ -247,6 +247,7 @@ class Header extends Component {
                     <ConfirmModal 
                     showConfirm={this.state.showConfirm} 
                     handleCloseConfirm={this.handleCloseConfirm}
+                    confirmTitle={this.state.confirmTitle}
                     confirmName={this.state.confirmName}
                     confirmText={this.state.confirmText}
                 />
