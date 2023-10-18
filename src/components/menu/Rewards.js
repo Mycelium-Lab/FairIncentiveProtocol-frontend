@@ -582,7 +582,7 @@ class Rewards extends Component {
     changeToken(event) {
         if(event.target.value === 'create token') {
             this.props.onSwitch(this.props.switcher.tokens)
-            this.props.goToCreationPage()
+            this.props.goToCreationPage('create token')
             return 
         }
         this.setState({
@@ -607,7 +607,7 @@ class Rewards extends Component {
     changeUser(event) {
         if(event.target.value === 'create user') {
             this.props.onSwitch(this.props.switcher.users)
-            this.props.goToCreationPage()
+            this.props.goToCreationPage('create user')
             return 
         }
         this.setState({
@@ -666,7 +666,7 @@ class Rewards extends Component {
     changeRewardToken(event) {
         if(event.target.value === 'create token') {
             this.props.onSwitch(this.props.switcher.tokens)
-            this.props.goToCreationPage()
+            this.props.goToCreationPage('create token')
             return 
         }
         /*else if (event.target.value === 'create nft') {
@@ -959,7 +959,7 @@ class Rewards extends Component {
                      <div className="form_col_last form_col">
                         <label className="form__label">Name:</label>
                                 <div className="input-group">
-                                    <input type="text" value={this.state.reward_name} placeholder="e.g. My fisrt reward" onChange={this.changeName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    <input type="text" placeholder="e.g. My fisrt reward" onChange={this.changeName} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                 </div>
                                 <div className="form__prompt" id="basic-addon4">Specify the name of your reward. <b>User will see this</b></div>
                      </div>

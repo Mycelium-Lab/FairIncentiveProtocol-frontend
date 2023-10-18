@@ -718,7 +718,7 @@ class Users extends Component {
     changeRewardToken(event) {
         if(event.target.value === 'create reward') {
             this.props.onSwitch(this.props.switcher.rewards)
-            this.props.goToCreationPage()
+            this.props.goToCreationPage('create reward')
             return 
         }
         this.setState({
