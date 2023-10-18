@@ -112,7 +112,12 @@ class NFTCollections extends Component {
             })
         }
         if(this.props.isGoToCreationPage) {
-            this.handleShowCreate()
+            if(this.props.isGoToCreationPage === 'create token from collection') {
+                this.handleShowAddNFT(this.props.creationPagePayload)
+            }
+            else {
+                this.handleShowCreate()
+            }
         }
     }
 

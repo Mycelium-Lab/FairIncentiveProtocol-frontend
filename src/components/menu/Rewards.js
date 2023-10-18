@@ -54,8 +54,6 @@ class Rewards extends Component {
             name: null,
             description: null,
             comment: null,
-            tokenRewards: [],
-            nftRewards: [],
             tokens: [],
             nftCollections: [],
             nfts: {},
@@ -219,7 +217,6 @@ class Rewards extends Component {
             const res = await fetch(`${config.api}/rewards/get/token`, requestOptions)
             const json = await res.json()
             this.setState({
-                tokenRewards: json.body.data,
                 combinedRewards: [...json.body.data, ...this.state.combinedRewards]
             })
         } catch (error) {
@@ -240,7 +237,6 @@ class Rewards extends Component {
             const res = await fetch(`${config.api}/rewards/get/nfts`, requestOptions)
             const json = await res.json()
             this.setState({
-                nftRewards: json.body.data,
                 combinedRewards: [...json.body.data, ...this.state.combinedRewards]
             })
         } catch (error) {
@@ -309,11 +305,11 @@ class Rewards extends Component {
             const res = await fetch(`${config.api}/rewards/add/token`, requestOptions)
             const json = await res.json()
             if (res.status === 200) {
-                const tokenRewards = this.state.tokenRewards
+                const combinedRewards = this.state.combinedRewards
                 json.body.data.count = 0
-                tokenRewards.push(json.body.data)
+                combinedRewards.push(json.body.data)
                 this.setState({
-                    tokenRewards,
+                    combinedRewards,
                     show: false,
                     amount: null,
                     name: null,
@@ -345,11 +341,11 @@ class Rewards extends Component {
             const res = await fetch(`${config.api}/rewards/add/nft`, requestOptions)
             const json = await res.json()
             if (res.status === 200) {
-                const nftRewards = this.state.nftRewards
+                const combinedRewards = this.state.combinedRewards
                 json.body.data.count = 0
-                nftRewards.push(json.body.data)
+                combinedRewards.push(json.body.data)
                 this.setState({
-                    nftRewards,
+                    combinedRewards,
                     show: false,
                     amount: null,
                     name: null,
@@ -384,9 +380,9 @@ class Rewards extends Component {
             const json = await res.json()
             if (res.status !== 200) alert('Something went wrong')
             else {
-                const tokenRewards = this.state.tokenRewards.filter(v => v.id != id)
+                const combinedRewards = this.state.combinedRewards.filter(v => v.id != id)
                 this.setState({
-                    tokenRewards
+                    combinedRewards
                 })
                 this.handleCloseDelete()
             }
@@ -416,9 +412,9 @@ class Rewards extends Component {
             const json = await res.json()
             if (res.status !== 200) alert('Something went wrong')
             else {
-                const nftRewards = this.state.nftRewards.filter(v => v.id != id)
+                const combinedRewards = this.state.combinedRewards.filter(v => v.id != id)
                 this.setState({
-                    nftRewards
+                    combinedRewards
                 })
                 this.handleCloseDelete()
             }
@@ -449,8 +445,8 @@ class Rewards extends Component {
             const res = await fetch(`${config.api}/rewards/reward/token`, requestOptions)
             const json = await res.json()
             if (res.status === 200) {
-                let tokenRewards = this.state.combinedRewards
-                tokenRewards.forEach(v => {if (v.id == this.state.reward_id) v.count = parseInt(v.count) + 1})
+                let combinedRewards = this.state.combinedRewards
+                combinedRewards.forEach(v => {if (v.id == this.state.reward_id) v.count = parseInt(v.count) + 1})
                 alert('Done')
                 this.setState({
                     showReward: false
@@ -483,8 +479,8 @@ class Rewards extends Component {
             const res = await fetch(`${config.api}/rewards/reward/nft`, requestOptions)
             const json = await res.json()
             if (res.status === 200) {
-                let nftRewards = this.state.combinedRewards
-                nftRewards.forEach(v => {if (v.id == this.state.reward_id) v.count = parseInt(v.count) + 1})
+                let combinedRewards = this.state.combinedRewards
+                combinedRewards.forEach(v => {if (v.id == this.state.reward_id) v.count = parseInt(v.count) + 1})
                 alert('Done')
                 this.setState({
                     showReward: false
@@ -538,8 +534,8 @@ class Rewards extends Component {
             const res = await fetch(`${config.api}/rewards/update/${reward_type === types.token ? 'token' : 'nft'}`, requestOptions)
             if(res.status === 200) {
                 if (reward_type === types.token) {
-                    let tokenRewards = this.state.tokenRewards
-                    tokenRewards.forEach(v => {
+                    let combinedRewards = this.state.combinedRewards
+                    combinedRewards.forEach(v => {
                         if (v.id == reward_id) {
                             v.name = reward_name
                             v.description = reward_description
@@ -551,11 +547,11 @@ class Rewards extends Component {
                     this.setState({
                         showEditReward: false,
                         showSuccess: true,
-                        successName: `The "${this.state.tokenRewards.find(v => v.id === reward_id).name}" event was successfully edited`
+                        successName: `The "${this.state.combinedRewards.find(v => v.id === reward_id).name}" event was successfully edited`
                     })
                 } else {
-                    let nftRewards = this.state.nftRewards
-                    nftRewards.forEach(v => {
+                    let combinedRewards = this.state.combinedRewards
+                    combinedRewards.forEach(v => {
                         if (v.id === reward_id) {
                             v.name = reward_name
                             v.description = reward_description
@@ -568,7 +564,7 @@ class Rewards extends Component {
                     this.setState({
                         showEditReward: false,
                         showSuccess: true,
-                        successName: `The "${this.state.nftRewards.find(v => v.id === reward_id).name}" event was successfully edited`
+                        successName: `The "${this.state.combinedRewards.find(v => v.id === reward_id).name}" event was successfully edited`
                     })
                 }
             }
@@ -597,14 +593,14 @@ class Rewards extends Component {
     changeNFTCollection(event) {
         if(event.target.value === 'create nft') {
             this.props.onSwitch(this.props.switcher.nftcollection)
-            this.props.goToCreationPage()
+            this.props.goToCreationPage('create nft')
             return 
         }
         const current_nfts = this.state.nfts.find(v => v.collection_address === event.target.value).nfts
         this.setState({
             chosen_nft_collection: event.target.value,
             current_nfts: current_nfts,
-            chosen_nft: current_nfts ? current_nfts[0].id : null 
+            chosen_nft: current_nfts.length ? current_nfts[0].id : null 
         })
     }
 
@@ -700,9 +696,14 @@ class Rewards extends Component {
     }
 
     changeChosenRewardNFT(event) {
+        if(event.target.value === 'create token from collection') {
+            this.props.onSwitch(this.props.switcher.nftcollection)
+            this.props.goToCreationPage('create token from collection', this.state.chosen_nft_collection)
+            return 
+        }
         this.setState({
             reward_nft_id: event.target.value,
-            reward_nft_name: this.state.nfts.find(v => v.collection_address === this.state.reward_token).nfts.find(v => v.id === event.target.value).name
+            reward_nft_name: this.state.nfts.find(v => v.collection_address === this.state.chosen_nft_collection).nfts.find(v => v.id === event.target.value)?.name
         })
     }
 
@@ -844,14 +845,14 @@ class Rewards extends Component {
                 <div className="title-header">
                     <h3 className="menu__title">Rewards</h3>
                     {
-                        this.state.tokenRewards?.length && !this.state.showCreate 
+                        this.state.combinedRewards?.length && !this.state.showCreate 
                         ?  <button  type="button" className="btn btn_orange btn_primary" onClick={this.handleShow}>Create new reward</button>
                         : null
                     }
                 </div>
 
                 {
-                    this.state.tokenRewards?.length && !this.state.showCreate 
+                    this.state.combinedRewards?.length && !this.state.showCreate 
                     ? <div className="input-group__serach">
                     <button  type="button" className="btn btn_orange btn_image btn_primary" onClick={() => this.setState({showFilter: !this.state.showFilter})}>
                         {
@@ -888,7 +889,7 @@ class Rewards extends Component {
                 }
 
                  {
-                     !this.state.tokenRewards?.length && !this.state.showCreate ?
+                     !this.state.combinedRewards?.length && !this.state.showCreate ?
                      <div className="empty">
                        <div className="empty__wrapper">
                            <img src={empty}></img>
@@ -899,7 +900,7 @@ class Rewards extends Component {
                      : null
                 }
                 {
-                      this.state.tokenRewards?.length && !this.state.showCreate ? 
+                      this.state.combinedRewards?.length && !this.state.showCreate ? 
                       <div className="content__wrap">
                             <FPTable data={rewardsTable}>
                                 {
@@ -1057,13 +1058,13 @@ class Rewards extends Component {
                                 </div>
                             </div>
                             :
-                            this.state.chosen_type !== types.token && this.state.current_nfts.length ?
+                            this.state.chosen_type !== types.token ?
                             <div className="form_row mb-4">
                             <div className="form_col_last form_col">
                                 <label className="form__label">Select token from collection: <img className="form__icon-info" src={info}/></label>
                                     <select onChange={this.changeChosenRewardNFT} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
                                      {
-                                        this.state.current_nfts 
+                                        this.state.current_nfts.length
                                         ?
                                         this.state.current_nfts.map(v => {
                                             if (v.id === this.state.reward_nft_id) {
@@ -1073,7 +1074,10 @@ class Rewards extends Component {
                                         }
                                         )
                                         :
-                                        null
+                                        <>
+                                        <option value="" disabled selected>Select token from collection</option>
+                                           <option value='create token from collection'>Create new one</option>
+                                       </>
                                     }
                                     </select>
                                     <div className="form__prompt" id="basic-addon4">Select the NFT to reward users with</div>
@@ -1119,87 +1123,22 @@ class Rewards extends Component {
                     <button className="btn btn_primary btn_gray" onClick={this.handleClose}>
                         Cancel
                     </button>
-                    <button className="btn btn_primary btn_orange" onClick={this.state.chosen_type === types.token ? this.rewardToken : this.createNFTReward}>
+                    {
+                        this.state.chosen_type === types.token 
+                        ? <button className="btn btn_primary btn_orange" onClick={this.rewardToken}>
                         Create
-                    </button>
+                        </button>
+                        : this.state.chosen_type !== types.token && this.state.current_nfts.length 
+                        ?  <button className="btn btn_primary btn_orange" onClick={this.createNFTReward}>
+                            Create
+                        </button>
+                        :  <button disabled className="btn btn_primary btn_orange btn_disabled">
+                        Create
+                        </button>
+                    }
                     </Modal.Footer>
                 </Modal>
 
-                {/*<div>
-                <table className="table table-bordered border-dark">
-                    <thead>
-                        <tr className="table-secondary" >
-                        <th className="table-secondary" scope="col">Status</th>
-                        <th className="table-secondary" scope="col">Name</th>
-                        <th className="table-secondary" scope="col">Reward</th>
-                        <th className="table-secondary" scope="col">Description</th>
-                        <th className="table-secondary" scope="col">Rewarded</th>
-                        <th className="table-secondary" scope="col">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            this.state.switcher === types.token
-                            ?
-                            this.state.tokenRewards.map(v =>
-                                <tr className="table-secondary">
-                                    <td className="table-secondary">
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" onChange={() => this.changeTokenRewardStatus(v.id, v.status)} role="switch" id="flexSwitchCheckDefault" checked={!v.status}/>
-                                        </div>
-                                    </td>
-                                    <td className="table-secondary">
-                                        {v.name}
-                                    </td>
-                                    <td className="table-secondary">
-                                        {ethers.utils.formatEther(v.amount)} {v.symbol}
-                                    </td>
-                                    <td className="table-secondary">
-                                        {v.description}
-                                    </td>
-                                    <td className="table-secondary">
-                                        {v.count} times
-                                    </td>
-                                    <td className="table-secondary">
-                                        <button className="btn btn-dark" onClick={() => this.handleShowEditReward(v.name, v.id, v.count, v.description, v.amount, types.token, v.address, undefined, v.symbol)}>Edit</button>
-                                        <button className="btn btn-dark" disabled>Stat</button>
-                                        <button className="btn btn-dark" onClick={() => this.handleShowReward(v.name, v.id)} disabled={v.status}>To reward</button>
-                                        <button className="btn btn-danger" onClick={() => this.handleShowDelete(types.token, v.id, v.name)}>Delete</button>
-                                    </td>
-                                </tr>
-                                )
-                            :
-                            this.state.nftRewards.map(v =>
-                                <tr className="table-secondary">
-                                    <td className="table-secondary">
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" onChange={() => this.changeNFTRewardStatus(v.id, v.status)} role="switch" id="flexSwitchCheckDefault" checked={!v.status}/>
-                                        </div>
-                                    </td>
-                                    <td className="table-secondary">
-                                        {v.name}
-                                    </td>
-                                    <td className="table-secondary">
-                                        {v.nft_name} from {v.symbol} collection
-                                    </td>
-                                    <td className="table-secondary">
-                                        {v.description}
-                                    </td>
-                                    <td className="table-secondary">
-                                        {v.count} times
-                                    </td>
-                                    <td className="table-secondary">
-                                        <button className="btn btn-dark" onClick={() => this.handleShowEditReward(v.name, v.id, v.count, v.description, null, types.nft, v.address, v.nft_id, v.symbol, v.nft_name)}>Edit</button>
-                                        <button className="btn btn-dark" disabled>Stat</button>
-                                        <button className="btn btn-dark" onClick={() => this.handleShowReward(v.name, v.id)} disabled={v.status}>To reward</button>
-                                        <button className="btn btn-danger" onClick={() => this.handleShowDelete(types.nft, v.id, v.name)}>Delete</button>
-                                    </td>
-                                </tr>
-                                )
-                        }
-                    </tbody>
-                </table>
-                    </div>*/}
                 <Modal show={this.state.showReward} onHide={this.handleCloseReward} centered>
                     <Modal.Header  className="modal-newuser__title modal-title" closeButton>
                         Rewarding {this.state.reward_name}
@@ -1308,9 +1247,9 @@ class Rewards extends Component {
 
                      <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
-                                    <label style={this.state.reward_count != 0 ? {color: "grey"} : null} className="form__label">Select {this.state.chosen_type === types.token ? 'token' : 'NFT collection'}:<img className="form__icon-info" src={info}/> </label>
+                                    <label style={this.state.reward_count != 0 ? {color: "grey"} : null} className="form__label">Select { this.state.reward_type === types.token ? 'token' : 'NFT collection'}:<img className="form__icon-info" src={info}/> </label>
                                     <div className="input-group ">
-                                        <select style={this.state.reward_count != 0 ? {color: "grey"} : null} onChange={this.changeRewardToken} disabled={this.state.reward_count != 0 ? true : false} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
+                                        <select style={this.state.reward_count != 0 ? {color: "grey"} : null} onChange={ this.state.reward_type === types.token ? this.changeToken : this.changeNFTCollection} disabled={this.state.reward_count != 0 ? true : false} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
                                         {
                                             this.state.reward_type === types.token
                                             ?
@@ -1330,7 +1269,11 @@ class Rewards extends Component {
                                         }
                                         </select>
                                     </div>
-                                    <div className="form__prompt" id="basic-addon4">Select the user you would like to reward</div>
+                                    {
+                                        this.state.reward_type === types.token
+                                        ? <div className="form__prompt" id="basic-addon4">Select the token to reward users with</div>
+                                        : <div className="form__prompt" id="basic-addon4">Select the NFT collection to reward users with</div>
+                                    }
                                 </div>
                          </div>                             
                         {
@@ -1348,21 +1291,24 @@ class Rewards extends Component {
                             :
                             <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
-                                    <label className="form__label" style={this.state.reward_count != 0 ? {color: "grey"} : null}>NFT</label>
+                                    <label className="form__label" style={this.state.reward_count != 0 ? {color: "grey"} : null}>Select token from collection: <img className="form__icon-info" src={info}/> </label>
                                         <select style={this.state.reward_count != 0 ? {color: "grey"} : null} disabled={this.state.reward_count != 0 ? true : false} onChange={this.changeChosenRewardNFT} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                         {
-                                            this.state.current_nfts 
-                                            ?
-                                            this.state.current_nfts.map(v => {
-                                                if (v.id === this.state.reward_nft_id) {
-                                                    return <option value={v.id} selected>{v.name}</option>
-                                                }
-                                                return <option value={v.id}>{v.name}</option>
+                                        {
+                                        this.state.current_nfts.length
+                                        ?
+                                        this.state.current_nfts.map(v => {
+                                            if (v.id === this.state.reward_nft_id) {
+                                                return <option value={v.id} selected>{v.name}</option>
                                             }
-                                            )
-                                            :
-                                            null
+                                            return <option value={v.id}>{v.name}</option>
                                         }
+                                        )
+                                        :
+                                        <>
+                                        <option value="" disabled selected>Select token from collection</option>
+                                           <option value='create token from collection'>Create new one</option>
+                                       </>
+                                    }
                                         </select>
                                 </div>
                             </div>
