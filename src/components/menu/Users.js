@@ -977,7 +977,7 @@ class Users extends Component {
                                               {v.external_id}
                                           </td>
                                           <td>
-                                          <a className="link__primary">{createLongStrView(v.wallet)}</a>
+                                          <a className="link__primary" href={`https://app.zerion.io/${v.wallet}`} ref="norefferer" target="_blank">{createLongStrView(v.wallet)}</a>
                                           </td>
                                           <td>
                                               (soon)
