@@ -102,19 +102,21 @@ class MainScreen extends Component {
                     >
                     </Header>
                 <div className="middle">
-                {
-                    this.state.showSidebar ? <Sidebar switcher={switcher} currentSwitch={this.state.switcher} onSwitch={this.onSwitch} changeShowSidebar={this.changeShowSidebar}></Sidebar>  : null  
-                }
-                {
-                    !this.state.showSidebar &&  window.innerWidth < 769 ? 
-                    <div className="middle-info">
-                        {this.renderInfo()}
-                    </div>
-                    : this.state.showSidebar &&  window.innerWidth < 769 ? null 
-                    :  <div className="middle-info">
+                    <>
+                        {
+                        this.state.showSidebar ? <Sidebar switcher={switcher} currentSwitch={this.state.switcher} onSwitch={this.onSwitch} changeShowSidebar={this.changeShowSidebar}></Sidebar>  : null  
+                        }
+                        {
+                        !this.state.showSidebar &&  window.innerWidth < 769 ? 
+                        <div className="middle-info">
                             {this.renderInfo()}
                         </div>
-                }
+                        : this.state.showSidebar &&  window.innerWidth < 769 ? null 
+                        :  <div className="middle-info">
+                                {this.renderInfo()}
+                            </div>
+                        }
+                    </>
                 </div>
             </div>
         )

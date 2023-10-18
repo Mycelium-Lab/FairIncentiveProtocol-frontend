@@ -11,7 +11,8 @@
 }
 
 @media (max-width: map-get($breakpoints, "lg")) {
-    .auth-decore_right-people, .auth-decore_left-people{
+    .auth-decore_right-people, .auth-decore_left-people,
+    .auth-decore_left, .auth-decore_right{
         width: 306px;
         display: block;
     }
@@ -22,7 +23,8 @@
 }
 
 @media (max-width: map-get($breakpoints, "md")) {
-    .auth-decore_right-people, .auth-decore_left-people{
+    .auth-decore_right-people, .auth-decore_left-people,
+    .auth-decore_left, .auth-decore_right{
         display: none;
     }
     .auth{
