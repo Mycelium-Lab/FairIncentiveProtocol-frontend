@@ -46,7 +46,7 @@ class NFTs extends Component {
             const res = await fetch(`${config.api}/nfts/collections`, requestOptions)
             const json = await res.json()
             this.setState({
-                nftCollection: json.body.data[0]
+                nftCollection: json.body.data.filter(v => v.address === this.props.address)[0]
             })
         } catch (error) {
             alert(error)
@@ -65,9 +65,7 @@ class NFTs extends Component {
               };
             const res = await fetch(`${config.api}/nfts/nfts`, requestOptions)
             const json = await res.json()
-            console.log(json)
-            const nfts = []
-            const keys = Object.keys(json.body.data)
+            /*const keys = Object.keys(json.body.data)
             for (let i = 0; i < keys.length; i++) {
                 for (let j = 0; j < json.body.data[keys[i]].nfts.length; j++) {
                     let nft = {}
@@ -78,7 +76,8 @@ class NFTs extends Component {
                     nft.real_image = jsonImage
                     nfts.push(nft)
                 } 
-            }
+            }*/
+            const nfts = json.body.data.filter(v => v.collection_address === this.props.address)[0]?.nfts
             this.setState({
                 nfts
             })
@@ -180,7 +179,7 @@ class NFTs extends Component {
                         <h4 className="menu__title-secondary">{this.state.nftCollection.symbol} collection</h4>
                         <ul className="profile__decs_stats unlist">
                             <li className="profile__decs_stats-item">
-                                <span className="text_gray text_primary">Items 1,000</span></li>
+                                <span className="text_gray text_primary">Items {this.state.nfts.length}</span></li>
                                 <li className="profile__decs_stats-item_decor profile__decs_stats-item"><span className="text_gray text_primary">Distributed 500</span></li>
                                 <li className="profile__decs_stats-item_decor profile__decs_stats-item"><span className="text_gray text_primary">Available to distribution 500</span></li>
                                 <li className="profile__decs_stats-item_decor profile__decs_stats-item"><span className="text_gray text_primary">Created Mar 2023</span></li>
