@@ -45,6 +45,7 @@ class Settings extends Component {
             email: props.auth.email,
             phone: props.auth.phone,
             wallet: props.auth.wallet,
+            repname: props.auth.repname,
             password: '',
             showSuccess: false,
             showError: false,
@@ -89,13 +90,18 @@ class Settings extends Component {
         })
     }
 
+    onChangeRepname(event) {
+        this.setState({
+            repname: event.target.value
+        })
+    }
+
     async changeProfile () {
-        await this.changeName()
-        await this.changeEmail()
-        await this.changePhone()
+        const promisesArray = [this.changeName(), this.changeEmail(), this.changePhone(), this.changeRepname()]
         if(this.state.password) {
-            await this.changePassword()
+            promisesArray.push(this.changePassword())
         }
+        await Promise.all(promisesArray)
         this.handleShowSuccess('Update personal information', 'The personal information has been changed')
     }
     async changeName() {
@@ -238,6 +244,34 @@ class Settings extends Component {
         }
     }
 
+    async changeRepname() {
+        try {
+            const headers = new Headers();
+            headers.append("Content-Type", "application/json");
+            headers.append("Authorization", getBearerHeader())
+
+            const raw = JSON.stringify({
+                "newRepname": this.state.repname
+            });
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                body: raw,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/company/changerepname`, requestOptions)
+            const json = await res.json()
+            if (res.status === 200) {
+                console.log(json.body.message)
+               // this.handleShowSuccess(json.body.message, json.body.message)
+            } else {
+                this.handleShowError(json.error.message)
+            }
+        } catch (error) {
+            alert(error)
+        }
+    }
+
     deletePaymentMethods(id) {
         const _paymentMethods = this.state.paymentMethods.filter(v => v.card !== id)
         this.setState({
@@ -341,6 +375,7 @@ class Settings extends Component {
     onChangePhone = this.onChangePhone.bind(this)
     onChangeWallet = this.onChangeWallet.bind(this)
     onChangePassword = this.onChangePassword.bind(this)
+    onChangeRepname = this.onChangeRepname.bind(this)
     changeName = this.changeName.bind(this)
     changeEmail = this.changeEmail.bind(this)
     changeProfile = this.changeProfile.bind(this)
@@ -366,26 +401,31 @@ class Settings extends Component {
                                 <div className="form__groups">
 
                                     <div className="form_row mb-4">
-                                        <div className="form_col">
+                                        <div className=" form_col">
+                                            <label className="form__label">Name:</label>
+                                            <div className="input-group">
+                                                <input type="text" placeholder="Mike Jackson" onChange={this.onChangeRepname} value={this.state.repname}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                            </div>
+                                        </div>
+                                        <div className="form_col_last form_col">
                                             <label className="form__label">Company Name: </label>
                                             <div className="input-group">
-                                                <input type="text" placeholder="Mike Jackson" onChange={this.onChangeName} value={this.state.name} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                <input type="text" placeholder={`"ООО "Ромашка""`} onChange={this.onChangeName} value={this.state.name} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="form_row mb-4">
+                                        <div className="form_col">
+                                            <label className="form__label">Phone: </label>
+                                            <div className="input-group">
+                                                <input type="text" placeholder="+7 999 202 77 77" onChange={this.onChangePhone} value={this.state.phone} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                             </div>
                                         </div>
                                         <div className="form_col_last form_col">
                                             <label className="form__label">Email:</label>
                                             <div className="input-group">
-                                            <input type="text" placeholder="mj@gmail.com" onChangeEmail value={this.state.email}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                               
-                                    <div className="form_row mb-4">
-                                        <div className="form_col">
-                                            <label className="form__label">Phone:</label>
-                                            <div className="input-group">
-                                                <input type="text" placeholder="+7 999 202 77 77" onChange={this.onChangePhone} value={this.state.phone} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                            <input type="text" placeholder="mj@gmail.com" onChange={this.onChangeEmail} value={this.state.email}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                             </div>
                                         </div>
                                     </div>
@@ -405,7 +445,7 @@ class Settings extends Component {
                                         <div className="form_col_last form_col">
                                             <label className="form__label">Change password: </label>
                                             <div className="input-group">
-                                                <input type="text" value={this.state.password} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                <input type="text" onChange={this.onChangePassword} value={this.state.password} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                                 <button className="btn btn__reset btn_primary btn_orange ms-3">Reset</button>
                                             </div>
                                         </div>
