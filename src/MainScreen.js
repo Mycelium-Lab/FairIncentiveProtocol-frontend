@@ -115,7 +115,7 @@ class MainScreen extends Component {
         return (
             <div>
                 <Header 
-                    userName={this.state.auth.name} 
+                    userName={this.state.auth ? this.state.auth.name : null} 
                     showSidebar={this.state.showSidebar} 
                     changeShowSidebar={this.changeShowSidebar}
                     notifications={switcher.notifications} 
