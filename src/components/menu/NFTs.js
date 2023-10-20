@@ -53,6 +53,10 @@ class NFTs extends Component {
         }
     }
 
+    handleBackToCollections() {
+        this.props.onSwitch(this.props.switcher.nftcollection)
+    }
+
     async getNFTs() {
         try {
             const headers = new Headers();
@@ -119,12 +123,14 @@ class NFTs extends Component {
     deleteNFT = this.deleteNFT.bind(this)
     handleShowNFT = this.handleShowNFT.bind(this)
     handleCloseMFT = this.handleCloseMFT.bind(this)
+    handleBackToCollections = this.handleBackToCollections.bind(this)
 
     render() {
         return (
             <>
                 <div className="title-header">
                 <h3 className="menu__title">NFTs</h3>
+                <button onClick={this.handleBackToCollections} type="button" className="btn btn_orange btn_primary">Back to NFT collections list</button> 
                 </div>
                 <div className="content__wrap">
                   <div className="collection-detail__wrap">

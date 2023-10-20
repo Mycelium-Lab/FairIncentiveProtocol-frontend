@@ -63,7 +63,7 @@ class MainScreen extends Component {
         if (this.state.switcher === switcher.tokens) return <Tokens isGoToCreationPage={this.state.isGoToCreationPage} wallet={{provider: this.state.provider,signer: this.state.signer,address: this.state.address,chainid: this.state.chainid}}/>
         if (this.state.switcher === switcher.users) return <Users switcher={switcher} onSwitch={this.onSwitch} goToCreationPage={this.goToCreationPage} isGoToCreationPage={this.state.isGoToCreationPage}/>
         if (this.state.switcher === switcher.nftcollection) return <NFTCollections auth={this.state.auth} switcher={switcher} onSwitch={this.onSwitch} isGoToCreationPage={this.state.isGoToCreationPage} creationPagePayload={this.state.creationPagePayload} getNeftCollection={this.getNeftCollection} wallet={{provider: this.state.provider,signer: this.state.signer,address: this.state.address,chainid: this.state.chainid}}/>
-        if (this.state.switcher === switcher.nft) return <NFTs address={this.state.nftcollectionAddress}/>
+        if (this.state.switcher === switcher.nft) return <NFTs switcher={switcher} onSwitch={this.onSwitch} address={this.state.nftcollectionAddress}/>
         if (this.state.switcher === switcher.settings) return <Settings auth={this.state.auth}/>
         if (this.state.switcher === switcher.notifications) return <Notifications />
     }
