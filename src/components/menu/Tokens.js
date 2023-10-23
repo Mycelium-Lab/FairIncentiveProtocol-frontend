@@ -250,6 +250,12 @@ class Tokens extends Component {
         this.setState({burnAmount: event.target.value})
     }
 
+    onChangeFpManager(event) {
+        const network = this.state.network
+        network.fpmanager = event.target.value;
+        this.setState({network})
+    }
+
     nextStage () {
         this.setState({stageOfCreateToken: this.state.stageOfCreateToken + 1 })
     }
@@ -335,7 +341,8 @@ class Tokens extends Component {
                 chainid,
                 pausable,
                 signer,
-                network
+                network,
+                address
             } = this.state
             const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
             this.handleShowConfirm('Purchace', `Confirm ${symbol} token creation`, `Please, confirm contract creation in your wallet`)
@@ -349,7 +356,7 @@ class Tokens extends Component {
                 burnable,
                 blacklist,
                 recoverable,
-                network.fpmanager
+                network.fpmanager || address
             );
             this.handleCloseConfirm()
             this.handleShowProgress()
@@ -614,6 +621,9 @@ class Tokens extends Component {
         if (error.message.includes('Initial supply is 0')) {
             this.handleShowError('The initial supply is not set')
         }
+        if (error.message.includes('invalid address')) {
+            this.handleShowError("Invalid chief administrator's address")
+        }
         console.log(error)
     } 
 
@@ -801,6 +811,7 @@ class Tokens extends Component {
     onChangeBlacklist = this.onChangeBlacklist.bind(this)
     onChangeVerified = this.onChangeVerified.bind(this)
     onChangeRecoverable = this.onChangeRecoverable.bind(this)
+    onChangeFpManager = this.onChangeFpManager.bind(this)
     changeNetwork = this.changeNetwork.bind(this)
     onChangeMintTokenAmount = this.onChangeMintTokenAmount.bind(this)
     nextStage = this.nextStage.bind(this)
@@ -1070,7 +1081,7 @@ class Tokens extends Component {
                            <div className="form_col_last form_col">
                                <label className="form__label">Chief administrator of the token (owner) * <img src={info} className="form__icon-info"/></label>
                                <div className="input-group">
-                                   <input type="text" value={this.state.address} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                   <input type="text" value={this.state.network.fpmanager || this.state.address} onChange={this.onChangeFpManager} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                </div>
                                <div className="form__prompt_warning form__prompt" id="basic-addon4">Attention: the wallet with this role has the right to carry out any actions</div>
                            </div>
@@ -1100,7 +1111,7 @@ class Tokens extends Component {
                                 <div className="form_col_last form_col">
                                     <label className="form__label">Chief administrator of the token (owner) * <img src={info} className="form__icon-info"/></label>
                                     <div className="input-group">
-                                        <input type="text" value={this.state.address} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        <input type="text" value={this.state.network.fpmanager || this.state.address} onChange={this.onChangeFpManager} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                     </div>
                                     <div className="form__prompt_warning form__prompt" id="basic-addon4">Attention: the wallet with this role has the right to carry out any actions</div>
                                 </div>
