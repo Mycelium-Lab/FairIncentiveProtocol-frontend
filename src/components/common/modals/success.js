@@ -10,7 +10,7 @@ class SuccessModal extends Component {
     render() {
         return <Modal show={this.props.showSuccess} onHide={this.props.handleCloseSuccess} centered>
              <Modal.Header  className="modal-newuser__title modal-title" closeButton>
-                 Purchace
+                 {this.props.successTitle ? this.props.successTitle : 'Purchace'}
             </Modal.Header>
             <Modal.Body>
                 <div className="confirm__body">
