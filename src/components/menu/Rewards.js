@@ -82,6 +82,7 @@ class Rewards extends Component {
             reward_nft_name: null,
             showFilter: false,
             showSuccess: false,
+            successTitle: null,
             successName: null,
             hasLoad: false,
             newUserData: {
@@ -208,10 +209,9 @@ class Rewards extends Component {
               };
             const res = await fetch(`${config.api}/users`, requestOptions)
             const json = await res.json()
-            const users = json.body.data.map(v => <option value={v.id}>{v.external_id}</option>)
+             const users = json.body.data.map(v => ({value: v?.id ? v?.id : null, label: v.external_id}))
             this.setState({
                 users,
-                chosen_user: json.body.data.length > 0 ? json.body.data[0].id : null
             })
         } catch (error) {
             console.log(error)
@@ -528,7 +528,7 @@ class Rewards extends Component {
             const raw = JSON.stringify(
                 {
                     reward_id: this.state.reward_id,
-                    user_id: this.state.chosen_user,
+                    user_id: this.state.chosen_user.value,
                     comment: this.state.comment
                 }
             );
@@ -543,9 +543,12 @@ class Rewards extends Component {
             if (res.status === 200) {
                 let combinedRewards = this.state.combinedRewards
                 combinedRewards.forEach(v => {if (v.id == this.state.reward_id) v.count = parseInt(v.count) + 1})
-                alert('Done')
+                const currentReward = combinedRewards.filter((v) => v.id === this.state.reward_id)[0]
                 this.setState({
-                    showReward: false
+                    showReward: false,
+                    showSuccess: true,
+                    successTitle: 'To reward',
+                    successName: `The token reward "${currentReward.name}" event was successfully added for ${this.state.chosen_user.label}`
                 })
             }
             else alert('Something went wrong')
@@ -562,7 +565,7 @@ class Rewards extends Component {
             const raw = JSON.stringify(
                 {
                     reward_id: this.state.reward_id,
-                    user_id: this.state.chosen_user,
+                    user_id: this.state.chosen_user.value,
                     comment: this.state.comment
                 }
             );
@@ -577,9 +580,12 @@ class Rewards extends Component {
             if (res.status === 200) {
                 let combinedRewards = this.state.combinedRewards
                 combinedRewards.forEach(v => {if (v.id == this.state.reward_id) v.count = parseInt(v.count) + 1})
-                alert('Done')
+                const currentReward = combinedRewards.filter((v) => v.id === this.state.reward_id)[0]
                 this.setState({
-                    showReward: false
+                    showReward: false,
+                    showSuccess: true,
+                    successTitle: 'To reward',
+                    successName: `The NFT reward "${currentReward.nft_name}" event was successfully added for ${this.state.chosen_user.label}`
                 })
             }
             else alert('Something went wrong')
@@ -708,14 +714,14 @@ class Rewards extends Component {
         })
     }
 
-    changeUser(event) {
-        if(event.target.value === 'create user') {
+    changeUser(selectedOption) {
+        if(selectedOption.label === 'create user') {
             this.props.onSwitch(this.props.switcher.users)
             this.props.goToCreationPage('create user')
             return 
         }
         this.setState({
-            chosen_user: event.target.value
+            chosen_user: selectedOption
         })
     }
 
@@ -1250,24 +1256,15 @@ class Rewards extends Component {
                     <Modal.Body>
                         <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
-                                <label className="form__label">Select user: <img className="form__icon-info" src={info}/></label>
+                                <label className="form__label">Select user*: <img className="form__icon-info" src={info}/></label>
                                     <div className="input-group ">
-                                        <select onChange={this.changeUser} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                            
-                                            {
-                                                this.state.chosen_type === types.token && !this.state.users.length ? 
-                                                <>
-                                                 <option value="" disabled selected>Select user</option>
-                                                    <option value='create user'>Create new one</option>
-                                                </>
-                                                
-                                                : 
-                                                <>
-                                                <option value="" disabled selected>Select user</option>
-                                                 { this.state.users }
-                                               </>
-                                            }
-                                        </select>
+                                        <Select
+                                            className="w-100"
+                                            value={!this.state.chosen_user ? 'create user:' : this.state.chosen_user }
+                                            placeholder={"Choose user to reward"}
+                                            options={!this.state.users.length ? optionEmpty : this.state.users}
+                                            onChange={this.changeUser}
+                                        ></Select>
                                     </div>
                                     <div className="form__prompt" id="basic-addon4">Select the user you would like to reward</div>
                                 </div>
@@ -1288,9 +1285,15 @@ class Rewards extends Component {
                     <button className="btn btn_primary btn_gray" onClick={this.handleCloseReward}>
                         Cancel
                     </button>
-                    <button className="btn btn_primary btn_orange" onClick={this.state.toRewardNftId ? this.rewardWithNFT : this.rewardWithToken }>
+                    {
+                        this.state.chosen_user
+                        ? <button className="btn btn_primary btn_orange" onClick={this.state.toRewardNftId ? this.rewardWithNFT : this.rewardWithToken }>
                         Reward
-                    </button>
+                        </button>
+                        :  <button disabled className="btn btn_primary btn_orange btn_disabled">
+                        Reward
+                        </button>
+                    }
                     </Modal.Footer>
                 </Modal>
                 <Modal show={this.state.showEditReward} onHide={this.handleCloseEditReward} centered>
@@ -1512,6 +1515,7 @@ class Rewards extends Component {
                 <SuccessModal 
                     showSuccess={this.state.showSuccess} 
                     handleCloseSuccess={this.handleCloseSuccess}
+                    successTitle={this.state.successTitle} 
                     successName={this.state.successName} 
                 />
                      </>
