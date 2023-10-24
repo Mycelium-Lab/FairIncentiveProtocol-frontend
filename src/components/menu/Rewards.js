@@ -253,12 +253,12 @@ class Rewards extends Component {
               const json = await res.json()
               const rewardById = json.body.data.filter(v => v.id === id)[0]
               let index
-              this.state.combinedRewards.forEach((v, i) => {
-                if (v => v.id === id) {
+              for(let i = 0; i <= this.state.combinedRewards.length; i++) {
+                if (this.state.combinedRewards[i].id === id) {
                     index = i
-                    return
+                    break
                 }
-              })
+            }
               const combinedRewards = this.state.combinedRewards
               combinedRewards[index] = rewardById
               this.setState({
@@ -301,10 +301,19 @@ class Rewards extends Component {
               };
             const res = await fetch(`${config.api}/rewards/get/nfts`, requestOptions)
             const json = await res.json()
-            const rewardById = json.body.data.filter(v => v.id === id)
+            const rewardById = json.body.data.filter(v => v.id === id)[0]
+            let index
+            for(let i = 0; i <= this.state.combinedRewards.length; i++) {
+                if (this.state.combinedRewards[i].id === id) {
+                    index = i
+                    break
+                }
+            }
+            const combinedRewards = this.state.combinedRewards
+            combinedRewards[index] = rewardById
             this.setState({
-                combinedRewards: [...rewardById, ...this.state.combinedRewards]
-            })
+              combinedRewards
+          })
         } catch (error) {
             console.log(error)
         }
@@ -630,6 +639,7 @@ class Rewards extends Component {
                             v.nft_id = reward_nft_id
                         }
                     })
+                    await this.getNFTRewardById(reward_id)
                     this.handleCloseEditReward()
                     this.setState({
                         showEditReward: false,
@@ -671,6 +681,7 @@ class Rewards extends Component {
             chosen_nft_collection: selectedOption,
             current_nfts: current_nfts,
             chosen_nft: current_nfts.length ? current_nfts[0].id : null,
+            reward_nft_id: current_nfts[0]?.id ? current_nfts[0]?.id : this.state.reward_nft_id,
             reward_nft_name: current_nfts.map(v => ({value: v?.id ? v?.id : null, label: v.name}))[0],
             optionCurrentNfts: current_nfts.map(v => ({value: v?.id ? v?.id : null, label: v.name}))
         })
