@@ -592,7 +592,7 @@ class Rewards extends Component {
                             v.description = reward_description
                             v.symbol = reward_symbol
                             v.address = reward_token
-                            v.nft_name = reward_nft_name 
+                            v.nft_name = reward_nft_name.label
                             v.nft_id = reward_nft_id
                         }
                     })
@@ -836,7 +836,8 @@ class Rewards extends Component {
                 reward_nft_name: {label: reward_nft_name, value: reward_nft_name},
                 ...current_nfts,
                 chosen_token:{value: token?.address, label: token?.symbol},
-                chosen_nft_collection: {value: nft?.value, label: nft?.label}
+                chosen_nft_collection: {value: nft?.value, label: nft?.label},
+                optionCurrentNfts: current_nfts.current_nfts.map(v => ({value: v?.id ? v?.id : null, label: v.name}))
             }
         )
     }
