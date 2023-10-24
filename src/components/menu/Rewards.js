@@ -837,7 +837,7 @@ class Rewards extends Component {
                 ...current_nfts,
                 chosen_token:{value: token?.address, label: token?.symbol},
                 chosen_nft_collection: {value: nft?.value, label: nft?.label},
-                optionCurrentNfts: current_nfts.current_nfts.map(v => ({value: v?.id ? v?.id : null, label: v.name}))
+                optionCurrentNfts: reward_type === types.nft ? current_nfts.current_nfts.map(v => ({value: v?.id ? v?.id : null, label: v.name})) : this.state.optionCurrentNfts
             }
         )
     }
