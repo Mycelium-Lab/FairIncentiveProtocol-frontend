@@ -579,8 +579,8 @@ class Rewards extends Component {
                             v.address = reward_token
                         }}
                     )
+                    this.handleCloseEditReward()
                     this.setState({
-                        showEditReward: false,
                         showSuccess: true,
                         successName: `The "${this.state.combinedRewards.find(v => v.id === reward_id).name}" event was successfully edited`
                     })
@@ -596,6 +596,7 @@ class Rewards extends Component {
                             v.nft_id = reward_nft_id
                         }
                     })
+                    this.handleCloseEditReward()
                     this.setState({
                         showEditReward: false,
                         showSuccess: true,
