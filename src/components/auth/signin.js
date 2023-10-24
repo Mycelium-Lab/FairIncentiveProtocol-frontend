@@ -5,6 +5,7 @@ import { Button, Form, FormGroup } from "react-bootstrap";
 import DefaultAuth from "../../layouts/defaultAuth";
 import email from "../../media/common/email.svg";
 import passwordHide from "../../media/common/password_hide.svg";
+import passwordShow from "../../media/common/password_show.svg";
 
 class SignIn extends Component {
     constructor() {
@@ -155,14 +156,27 @@ class SignIn extends Component {
                             this.state.isInvalidPassword ? 
                             <>
                                 <Form.Label className="auth__form-fields-label">Password</Form.Label>
-                                <img className="form__signin-icon-password_error form__signin-icon-password" onClick={() => this.setState({showPassword: !this.state.showPassword})} src={passwordHide}></img>
+                                {
+                                      !this.state.showPassword 
+                                      ? 
+                                      <img className="form__signin-icon-password_error form__signin-icon-password" onClick={() => this.setState({showPassword: !this.state.showPassword})} src={passwordHide}></img>
+                                      : 
+                                      <img className="form__signin-icon-password_error form__signin-icon-password" onClick={() => this.setState({showPassword: !this.state.showPassword})} src={passwordShow}></img>
+                                }
+                               
                                 <Form.Control className='auth__form-fields-input_error auth__form-fields-input' onChange={this.onChangePassword} type={this.state.showPassword ? 'text' : 'password'} placeholder='Password' />
                                 <span className="form__prompt_error form__prompt" id="basic-addon4">Wrong password</span>
                             </>
                             : 
                             <>
                                 <Form.Label className="auth__form-fields-label">Password</Form.Label>
-                                <img className="form__signin-icon-password" onClick={() => this.setState({showPassword: !this.state.showPassword})} src={passwordHide}></img>
+                                {
+                                    !this.state.showPassword 
+                                    ?
+                                    <img className="form__signin-icon-password" onClick={() => this.setState({showPassword: !this.state.showPassword})} src={passwordHide}></img>
+                                    :
+                                    <img className="form__signin-icon-password" onClick={() => this.setState({showPassword: !this.state.showPassword})} src={passwordShow}></img>
+                                }
                                 <Form.Control className='auth__form-fields-input' onChange={this.onChangePassword} type={this.state.showPassword ? 'text' : 'password'} placeholder='Password' />
                             </>
                         }

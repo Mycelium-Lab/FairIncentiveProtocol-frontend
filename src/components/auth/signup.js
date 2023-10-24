@@ -6,6 +6,7 @@ import DefaultAuth from "../../layouts/defaultAuth";
 import { config } from "../../utils/config"
 import email from "../../media/common/email.svg";
 import passwordHide from "../../media/common/password_hide.svg";
+import passwordShow from "../../media/common/password_show.svg";
 import { countries } from "../../utils/countries";
 
 const steps = {
@@ -255,14 +256,28 @@ class SignUp extends Component {
                                         this.state.isInvalidPassword ?
                                         <>
                                             <Form.Label className='auth__form-fields-label'>Password</Form.Label>
-                                            <img className="form__signin-icon-password_error form__signin-icon-password" onClick={() => this.setState({showPassword: !this.state.showPassword})} src={passwordHide}></img>
+                                            {
+                                                !this.state.showPassword
+                                                ?
+                                                <img className="form__signin-icon-password_error form__signin-icon-password" onClick={() => this.setState({showPassword: !this.state.showPassword})} src={passwordHide}></img>
+                                                :
+                                                <img className="form__signin-icon-password_error form__signin-icon-password" onClick={() => this.setState({showPassword: !this.state.showPassword})} src={passwordShow}></img>
+                                            }
+                                            
                                             <Form.Control className='auth__form-fields-input_error auth__form-fields-input' value={this.state.password} id="companypassword-input-signup" onChange={this.onChangePassword} type={this.state.showPassword ? 'text' : 'password'} placeholder='Enter your password' />
                                             <span className="form__prompt_error form__prompt" id="basic-addon4">Wrong password</span>
                                         </> 
                                         : 
                                         <>
                                         <Form.Label className='auth__form-fields-label'>Password</Form.Label>
-                                        <img className="form__signin-icon-password" onClick={() => this.setState({showPassword: !this.state.showPassword})} src={passwordHide}></img>
+                                        {
+                                             !this.state.showPassword
+                                             ?
+                                            <img className="form__signin-icon-password" onClick={() => this.setState({showPassword: !this.state.showPassword})} src={passwordHide}></img>
+                                            :
+                                            <img className="form__signin-icon-password" onClick={() => this.setState({showPassword: !this.state.showPassword})} src={passwordShow}></img>
+                                        }
+                                        
                                         <Form.Control className='auth__form-fields-input' value={this.state.password} id="companypassword-input-signup" onChange={this.onChangePassword} type={this.state.showPassword ? 'text' : 'password'} placeholder='Enter your password' />
                                         </>
                                     }
@@ -273,14 +288,26 @@ class SignUp extends Component {
                                         this.state.isInvalidRepeatPassword ?
                                         <>
                                             <Form.Label className='auth__form-fields-label'>Repeat password</Form.Label>
-                                            <img className="form__signin-icon-password_error form__signin-icon-password" onClick={() => this.setState({showPassword: !this.state.showPassword})} src={passwordHide}></img>
+                                            {
+                                                 !this.state.showPassword
+                                                 ?
+                                                 <img className="form__signin-icon-password_error form__signin-icon-password" onClick={() => this.setState({showPassword: !this.state.showPassword})} src={passwordHide}></img>
+                                                 :
+                                                 <img className="form__signin-icon-password_error form__signin-icon-password" onClick={() => this.setState({showPassword: !this.state.showPassword})} src={passwordShow}></img>
+                                            }
+                                      
                                             <Form.Control className='auth__form-fields-input_error auth__form-fields-input' value={this.state.repeat_password} id="companyreppassword-input-signup" onChange={this.onChangeRepeatPassword} type={this.state.showPassword ? 'text' : 'password'} placeholder='Repeat your password' />
                                             <span className="form__prompt_error form__prompt" id="basic-addon4">Wrong password</span>
                                         </> 
                                         : 
                                         <>
                                         <Form.Label className='auth__form-fields-label'>Password</Form.Label>
-                                        <img className="form__signin-icon-password" onClick={() => this.setState({showPassword: !this.state.showPassword})} src={passwordHide}></img>
+                                        {
+                                         !this.state.showPassword
+                                         ?  <img className="form__signin-icon-password" onClick={() => this.setState({showPassword: !this.state.showPassword})} src={passwordHide}></img>
+                                         : 
+                                         <img className="form__signin-icon-password" onClick={() => this.setState({showPassword: !this.state.showPassword})} src={passwordShow}></img>  
+                                        }
                                         <Form.Control className='auth__form-fields-input' value={this.state.repeat_password} id="companyreppassword-input-signup" onChange={this.onChangeRepeatPassword} type={this.state.showPassword ? 'text' : 'password'} placeholder='Repeat your password' />
                                         </>
                                     }
