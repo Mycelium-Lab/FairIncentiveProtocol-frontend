@@ -238,6 +238,37 @@ class Rewards extends Component {
         }
     }
 
+
+    async getTokenRewardById(id) {
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+              const res = await fetch(`${config.api}/rewards/get/token`, requestOptions)
+              const json = await res.json()
+              const rewardById = json.body.data.filter(v => v.id === id)[0]
+              let index
+              this.state.combinedRewards.forEach((v, i) => {
+                if (v => v.id === id) {
+                    index = i
+                    return
+                }
+              })
+              const combinedRewards = this.state.combinedRewards
+              combinedRewards[index] = rewardById
+              this.setState({
+                combinedRewards
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     async getNFTRewards() {
         try {
             const headers = new Headers();
@@ -545,11 +576,13 @@ class Rewards extends Component {
             headers.append("Authorization", getBearerHeader())
             let rawJSON = {}
             if (reward_type === types.token) {
+                const address = this.state.chosen_token.value
                 rawJSON = {
                     id: reward_id,
                     name: reward_name,
                     description: reward_description,
-                    amount: ethers.utils.parseEther(reward_amount.toString()).toString()
+                    amount: ethers.utils.parseEther(reward_amount.toString()).toString(),
+                    address
                 }
             } else {
                 rawJSON = {
@@ -579,6 +612,7 @@ class Rewards extends Component {
                             v.address = reward_token
                         }}
                     )
+                    await this.getTokenRewardById(reward_id)
                     this.handleCloseEditReward()
                     this.setState({
                         showSuccess: true,
