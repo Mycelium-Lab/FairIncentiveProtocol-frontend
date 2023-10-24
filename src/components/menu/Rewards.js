@@ -408,6 +408,9 @@ class Rewards extends Component {
                 this.setState({
                     combinedRewards,
                     show: false,
+                    showSuccess: true,
+                    successTitle: 'Create new reward',
+                    successName: `The token "${json.body.data.name}" was successfully added`,
                     amount: null,
                     name: null,
                     description: null
@@ -616,7 +619,7 @@ class Rewards extends Component {
                 rawJSON = {
                     id: reward_id,
                     name: reward_name,
-                    description: reward_description,
+                    description: reward_description ? reward_description : null,
                     amount: ethers.utils.parseEther(reward_amount.toString()).toString(),
                     address
                 }
@@ -624,7 +627,7 @@ class Rewards extends Component {
                 rawJSON = {
                     id: reward_id,
                     name: reward_name,
-                    description: reward_description,
+                    description: reward_description ? reward_description : null,
                     nft_id: reward_nft_id
                 }
             }
@@ -652,6 +655,7 @@ class Rewards extends Component {
                     this.handleCloseEditReward()
                     this.setState({
                         showSuccess: true,
+                        successTitle: "Edit",
                         successName: `The "${this.state.combinedRewards.find(v => v.id === reward_id).name}" event was successfully edited`
                     })
                 } else {
@@ -671,6 +675,7 @@ class Rewards extends Component {
                     this.setState({
                         showEditReward: false,
                         showSuccess: true,
+                        successTitle: "Edit",
                         successName: `The "${this.state.combinedRewards.find(v => v.id === reward_id).name}" event was successfully edited`
                     })
                 }
