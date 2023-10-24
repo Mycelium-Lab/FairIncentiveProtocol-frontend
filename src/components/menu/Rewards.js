@@ -269,6 +269,27 @@ class Rewards extends Component {
         }
     }
 
+    async getNFTRewardByIdFromCreate(id) {
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/rewards/get/nfts`, requestOptions)
+            const json = await res.json()
+            const rewardById = json.body.data.filter(v => v.id === id)
+            this.setState({
+                combinedRewards: [...rewardById, ...this.state.combinedRewards]
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     async getNFTRewards() {
         try {
             const headers = new Headers();
@@ -418,7 +439,7 @@ class Rewards extends Component {
             const json = await res.json()
             if (res.status === 200) {
                 const id = json.body.data.id
-                await this.getNFTRewardById(id)
+                await this.getNFTRewardByIdFromCreate(id)
                 json.body.data.count = 0
                 this.setState({
                     show: false,
