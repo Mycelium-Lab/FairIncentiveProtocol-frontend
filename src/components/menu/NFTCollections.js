@@ -323,7 +323,7 @@ class NFTCollections extends Component {
                 "chainid": network.chainid.toString(),
                 description,
                 links,
-                beneficiary: beneficialAddress,
+                beneficiary: beneficialAddress || null,
                 royalties
             });
             const requestOptions = {
