@@ -5,10 +5,13 @@ import NftsInfo from "../dashboardInfo/Nfts";
 import RewardsInfo from "../dashboardInfo/RewardsInfo";
 import TokensInfo from "../dashboardInfo/TokensInfo";
 import UserInfo from "../dashboardInfo/UserInfo";
-import { collectionIssue, collectionSupply, distributionOfRewards, newUser , tokensIssue, tokensSupply, typeOfRewards} from "../../data/data";
+import { collectionIssue, collectionSupply, newUser , tokensIssue, tokensSupply} from "../../data/data";
 import LineChart from "../charts/LineChart";
 import DonutChart from "../charts/DonutChart";
 import DatePicker from "../DatePicker";
+import { getBearerHeader } from "../../utils/getBearerHeader";
+import { config } from "../../utils/config";
+import { getRandomRGBAColor } from "../../utils/color";
 
 class Dashboard extends Component {
     constructor(props) {
@@ -29,18 +32,12 @@ class Dashboard extends Component {
                 }]
             },
             distributionOfRewardsData: {
-                labels: distributionOfRewards.map(data => data.name),
-                datasets: [{
-                    data: distributionOfRewards.map(data => data.value),
-                    backgroundColor: distributionOfRewards.map(data => data.color)
-                }]
+                labels: [],
+                datasets: []
             },
             typeOfRewardsData: {
-                labels: typeOfRewards.map(data => data.name),
-                datasets: [{
-                    data: typeOfRewards.map(data => data.value),
-                    backgroundColor: typeOfRewards.map(data => data.color)
-                }]
+                labels: [],
+                datasets: []
             },
             tokensIssuesData: {
                 labels: tokensIssue.map(data => data.name),
@@ -69,9 +66,93 @@ class Dashboard extends Component {
                     data: collectionSupply.map(data => data.value),
                     backgroundColor: collectionSupply.map(data => data.color)
                 }]
-            }
+            },
+            rewards_total_count: 0
         }
     }
+
+    async componentDidMount() {
+        await this.getTypeOfRewards()
+        await this.getRewardDistribution()
+    }
+
+    async getTypeOfRewards() {
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/stat/total_rewards`, requestOptions)
+            const json = await res.json()
+            const total = +json.body.data.erc20 + +json.body.data.erc721
+            const typeOfRewards = [
+                {
+                    id: '1',
+                    name: 'Tokens',
+                    value: json.body.data.erc20 * 100 / total,
+                    color: 'rgba(244, 190, 55, 1)',
+                },
+                {
+                    id: '2',
+                    name: 'NFTs',
+                    value: json.body.data.erc721 * 100 / total,
+                    color: 'rgba(255, 159, 64, 1)'
+                },
+            ]
+            this.setState({
+                typeOfRewardsData: {
+                    labels: typeOfRewards.map(data => data.name),
+                    datasets: [{
+                        data: typeOfRewards.map(data => data.value),
+                        backgroundColor: typeOfRewards.map(data => data.color)
+                    }]
+                },
+                rewards_total_count: total
+            })
+        } catch (error) {
+            alert(error)
+        }
+    }
+
+    async getRewardDistribution() {
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/stat/rewards_distribution`, requestOptions)
+            const json = await res.json()
+            const total = json.body.data.reduce((total, row) => total + parseInt(row.event_count), 0);
+            const distributionOfRewards = json.body.data.map((v, i) => {
+                return {
+                    id: (i + 1).toString(),
+                    name: v.name,
+                    value: parseInt(v.event_count) * 100 / total,
+                    color: getRandomRGBAColor()
+                }
+            })
+            this.setState({
+                distributionOfRewardsData: {
+                    labels: distributionOfRewards.map(data => data.name),
+                    datasets: [{
+                        data: distributionOfRewards.map(data => data.value),
+                        backgroundColor: distributionOfRewards.map(data => data.color)
+                    }]
+                }
+            })
+        } catch (error) {
+            alert(error)
+        }
+    }
+
     render() {
         return (
             <div className="dashboard">
@@ -98,7 +179,7 @@ class Dashboard extends Component {
                         </Tab>
                         <Tab eventKey="rewards" title="Rewards">
                             <DatePicker></DatePicker>
-                            <RewardsInfo></RewardsInfo>
+                            <RewardsInfo total={this.state.rewards_total_count}></RewardsInfo>
                             <div className="dashboard__chart_dashboard-info  mb-4">
                             <label className="chart__label">Rewards</label>
                                 <div className="dashboard__chart_wrapper mb-4" style={{position: 'relative', height:'358px', display: 'flex', justifyContent: 'center'}}>
