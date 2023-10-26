@@ -35,7 +35,7 @@ class ErrorModal extends Component {
                 <div className="confirm__body">
                 <img src={attention}></img>
                 <div>
-                    <div className="confirm__name">Error</div>
+                    <div className="confirm__name">{this.props.errorName}</div>
                     <div className="confirm__text_red confirm__text">{this.props.errorText}</div>
                 </div>
                 </div>

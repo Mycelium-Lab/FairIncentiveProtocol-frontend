@@ -32,6 +32,7 @@ import { Dropdown, Form } from "react-bootstrap";
 import loader from '../../media/common/loader.svg';
 import metamask from '../../media/common/metamask.svg'
 import walletconnect from '../../media/common/walletconnect.svg'
+import Select from "react-select";
 
 const beneficialTypes = {
     company: "company",
@@ -67,6 +68,7 @@ class NFTCollections extends Component {
             showError: false,
             successName: null,
             successText: null,
+            errorName: null,
             errorText: null,
             confirmName: null,
             confirmText: null,
@@ -75,6 +77,7 @@ class NFTCollections extends Component {
             addNFTName: '',
             addNFTDescription: null,
             nftCollections: [],
+            optionNftCollection: [],
             propertiesElements: [],
             statsElements: [],
             levelsElements: [],
@@ -207,6 +210,12 @@ class NFTCollections extends Component {
                 network,
             })
         }
+    }
+
+    changeCollection(event) {
+        this.setState({
+            addNFTAddress: event,
+        })
     }
 
     async connect() {
@@ -359,7 +368,7 @@ class NFTCollections extends Component {
             headers.append("Content-Type", "application/json");
             headers.append("Authorization", getBearerHeader())
             const raw = JSON.stringify({
-                "address": this.state.addNFTAddress,
+                "address": this.state.addNFTAddress.value,
                 "amount": this.state.addNFTAmount,
                 "name": this.state.addNFTName,
                 "description": this.state.addNFTDescription
@@ -378,9 +387,17 @@ class NFTCollections extends Component {
                     successName: `The NFT "${this.state.addNFTName}" was successfully created`
                 })
             }
-            else alert('Something went wrong')
+            else{
+                this.setState({
+                    showError: true,
+                    errorName: 'Something went wrong'
+                })
+            }
         } catch (error) {
-            alert(error)
+            this.setState({
+                showError: true,
+                errorName: 'Something went wrong'
+            })
         }
     }
 
@@ -397,7 +414,8 @@ class NFTCollections extends Component {
             const res = await fetch(`${config.api}/nfts/collections`, requestOptions)
             const json = await res.json()
             this.setState({
-                nftCollections: json.body.data
+                nftCollections: json.body.data,
+                optionNftCollection: json.body.data.map(v => ({value: v.address, label: v.symbol}))
             })
         } catch (error) {
             alert(error)
@@ -559,7 +577,7 @@ class NFTCollections extends Component {
     } 
 
     handleCloseAddNFT = () => this.setState({showAddNFT: false})
-    handleShowAddNFT = (addNFTAddress) => this.setState({showAddNFT: true, stageOfAddNft: 1, stageOfCreateNftCollection: 0, addNFTAddress,})
+    handleShowAddNFT = (nft) => this.setState({showAddNFT: true, stageOfAddNft: 1, stageOfCreateNftCollection: 0, addNFTAddress: nft})
     handleShowConfirm = (confirmTitle, confirmName, confirmText) => this.setState({showConfirm: true, confirmTitle, confirmName, confirmText})
     handleCloseConfirm = () => this.setState({showConfirm: false, confirmName: null, confirmText: null})
     handleShowProgress = () => this.setState({showProgress: true})
@@ -587,6 +605,7 @@ class NFTCollections extends Component {
     onChangeAddNFTName = this.onChangeAddNFTName.bind(this)
     onChangeAddNFTDescription = this.onChangeAddNFTDescription.bind(this)
     changeNetwork = this.changeNetwork.bind(this)
+    changeCollection = this.changeCollection.bind(this)
     onChangeDescription = this.onChangeDescription.bind(this)
     handleCloseCreateImagesPage = this.handleCloseCreateImagesPage.bind(this)
     handleShowCreateImagesPage = this.handleShowCreateImagesPage.bind(this)
@@ -1137,7 +1156,7 @@ class NFTCollections extends Component {
                                             </td>
                                             <td>
                                                 <FPDropdown icon={more}>
-                                                    <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowAddNFT(v.address)}>Add NFT</Dropdown.Item>
+                                                    <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowAddNFT({value: v.address, label: v.symbol})}>Add NFT</Dropdown.Item>
                                                     <Dropdown.Item className="dropdown__menu-item" onClick={(event) => this.handleShowNFTDetail(event, switcher.nft, v.address)}>Collection details</Dropdown.Item>
                                                 </FPDropdown>
                                             </td>
@@ -1154,14 +1173,15 @@ class NFTCollections extends Component {
                                         <div className="form_col_last form_col">
                                             <label className="form-label">Collection:</label>
                                             <div className="input-group">
-                                                <select onChange={this.changeNetwork} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                                    {
-                                                        this.state.nftCollections.map(v => {
-                                                            return <option value={v.symbol} selected>{v.symbol}</option>
-                                                        })
-                                                    }
-                                                   
-                                                </select>
+                                                 <Select
+                                                    className="w-100"
+                                                    value={this.state.addNFTAddress}
+                                                    placeholder={"Choose NFT collection"}
+                                                    options={this.state.optionNftCollection}
+                                                    onChange={this.changeCollection}
+                                                ></Select>
+                                            
+
                                             </div>
                                             <div className="form__prompt" id="basic-addon4">This is the collection where your item will appear</div>
                                          </div>
@@ -1432,6 +1452,7 @@ class NFTCollections extends Component {
                     showError={this.state.showError}
                     handleCloseError={this.handleCloseError}
                     errorText={this.state.errorText}
+                    errorName={this.state.errorName}
                 />
                      </>
                 }
