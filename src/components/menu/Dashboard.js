@@ -12,6 +12,7 @@ import DatePicker from "../DatePicker";
 import { getBearerHeader } from "../../utils/getBearerHeader";
 import { config } from "../../utils/config";
 import { getRandomRGBAColor } from "../../utils/color";
+import { subDays } from "date-fns";
 
 class Dashboard extends Component {
     constructor(props) {
@@ -75,6 +76,7 @@ class Dashboard extends Component {
     async componentDidMount() {
         await this.getTypeOfRewards()
         await this.getRewardDistribution()
+        await this.changeNewUsersRange(subDays(new Date(), 7), new Date())
     }
 
     async getTypeOfRewards() {
@@ -154,24 +156,33 @@ class Dashboard extends Component {
         }
     }
 
-    async changeNewUsersRange(newRange) {
-        console.log(newRange[0].startDate.toString())
-        console.log(newRange[0].endDate.toString())
-        const headers = new Headers();
-        headers.append("Authorization", getBearerHeader())
-        let query = new URLSearchParams();
-        query.append("startDate", newRange[0].startDate.toString())
-        query.append("endDate", newRange[0].endDate.toString())
-        const requestOptions = {
-            method: 'GET',
-            headers: headers,
-            redirect: 'follow'
-          };
-        const res = await fetch(`${config.api}/stat/new_users_range?` + query.toString(), requestOptions)
-        // const json = await res.json()
-        // this.setState({
-        //     new_users_range: newRange
-        // })
+    async changeNewUsersRange(startDate, endDate) {
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+            let query = new URLSearchParams();
+            query.append("startDate", startDate.toString())
+            query.append("endDate", endDate.toString())
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/stat/new_users_range?` + query.toString(), requestOptions)
+            const json = await res.json()
+            const range = {
+                labels: json.body.data.map(v => `${new Date(v.date_interval_end).toLocaleDateString()} ${new Date(v.date_interval_end).toLocaleTimeString()}`),
+                datasets: [{
+                    data: json.body.data.map(v => parseInt(v.count)),
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                }]
+            }
+            this.setState({
+                newUserData: range
+            })
+        } catch (error) {
+            
+        }
     }
 
     changeNewUsersRange = this.changeNewUsersRange.bind(this)

@@ -35,6 +35,9 @@ class BarChart extends Component {
                   x: {
                      grid: {
                        display: false
+                     },
+                     ticks: {
+                      stepSize: 1
                      }
                   }
                   }
