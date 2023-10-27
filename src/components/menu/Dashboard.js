@@ -177,8 +177,18 @@ class Dashboard extends Component {
                     backgroundColor: ['rgba(255, 159, 67, 0.85)']
                 }]
             }
+            const resTotal = await fetch(`${config.api}/stat/total_users_range?` + query.toString(), requestOptions)
+            const jsonTotal = await resTotal.json()
+            const rangeTotal = {
+                labels: jsonTotal.body.data.map(v => `${new Date(v.end_date).toLocaleDateString()} ${new Date(v.end_date).toLocaleTimeString()}`),
+                datasets: [{
+                    data: jsonTotal.body.data.map(v => parseInt(v.count)),
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                }]
+            }
             this.setState({
-                newUserData: range
+                newUserData: range,
+                totalUserData: rangeTotal
             })
         } catch (error) {
             
