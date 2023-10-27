@@ -67,7 +67,8 @@ class Dashboard extends Component {
                     backgroundColor: collectionSupply.map(data => data.color)
                 }]
             },
-            rewards_total_count: 0
+            rewards_total_count: 0,
+            new_users_range: null
         }
     }
 
@@ -153,6 +154,28 @@ class Dashboard extends Component {
         }
     }
 
+    async changeNewUsersRange(newRange) {
+        console.log(newRange[0].startDate.toString())
+        console.log(newRange[0].endDate.toString())
+        const headers = new Headers();
+        headers.append("Authorization", getBearerHeader())
+        let query = new URLSearchParams();
+        query.append("startDate", newRange[0].startDate.toString())
+        query.append("endDate", newRange[0].endDate.toString())
+        const requestOptions = {
+            method: 'GET',
+            headers: headers,
+            redirect: 'follow'
+          };
+        const res = await fetch(`${config.api}/stat/new_users_range?` + query.toString(), requestOptions)
+        // const json = await res.json()
+        // this.setState({
+        //     new_users_range: newRange
+        // })
+    }
+
+    changeNewUsersRange = this.changeNewUsersRange.bind(this)
+
     render() {
         return (
             <div className="dashboard">
@@ -160,7 +183,7 @@ class Dashboard extends Component {
                 <div className="dashboard__tab">
                     <Tabs defaultActiveKey="users">
                         <Tab eventKey="users" title="Users">
-                            <DatePicker></DatePicker>
+                            <DatePicker changeNewUsersRange={this.changeNewUsersRange}></DatePicker>
                             <UserInfo></UserInfo>
                             <div className="dashboard__chart mb-4">
                                 <div className="dashboard__chart_dashboard-info">

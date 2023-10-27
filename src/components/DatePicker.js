@@ -46,6 +46,7 @@ class DatePicker extends React.Component {
     }
 
     handleRange(range) {
+        this.props.changeNewUsersRange(range)
         this.setState({range})
     }
      
