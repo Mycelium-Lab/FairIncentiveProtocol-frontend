@@ -4,7 +4,7 @@ import 'react-date-range/dist/styles.css'
 import 'react-date-range/dist/theme/default.css'
 
 import format from "date-fns/format"
-import { addDays } from 'date-fns'
+import { addDays, endOfDay, isToday, subDays, isSameDay } from 'date-fns'
 
 class DatePicker extends React.Component {
     textInput = React.createRef(null);
@@ -15,8 +15,8 @@ class DatePicker extends React.Component {
             calendar: '',
             range: [
                 {
-                    startDate: new Date(),
-                    endDate: addDays(new Date(), 7),
+                    startDate: subDays(new Date(), 7),
+                    endDate: new Date(),
                     key: 'selection'
                 }
             ]
@@ -46,6 +46,13 @@ class DatePicker extends React.Component {
     }
 
     handleRange(range) {
+        if (isToday(range[0].endDate)) {
+            range[0].endDate = endOfDay(range[0].endDate);
+        }
+        if (isSameDay(range[0].startDate, range[0].endDate)) {
+            range[0].endDate = endOfDay(range[0].endDate);
+        }
+        this.props.changeNewUsersRange(range[0].startDate, range[0].endDate)
         this.setState({range})
     }
      

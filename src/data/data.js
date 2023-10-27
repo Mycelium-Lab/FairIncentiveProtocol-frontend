@@ -149,31 +149,31 @@ const newUser = [
         amount: 230,
         time: 'Sat',
     },
-    {
-        id: 31,
-        amount: 230,
-        time: 'Sun',
-    },
-    {
-        id: 32,
-        amount: 230,
-        time: 'Sun',
-    },
-    {
-        id: 33,
-        amount: 230,
-        time: 'Sun',
-    },
-    {
-        id: 34,
-        amount: 230,
-        time: 'Sun',
-    },
-    {
-        id: 35,
-        amount: 230,
-        time: 'Sun',
-    }
+    // {
+    //     id: 31,
+    //     amount: 230,
+    //     time: 'Sun',
+    // },
+    // {
+    //     id: 32,
+    //     amount: 230,
+    //     time: 'Sun',
+    // },
+    // {
+    //     id: 33,
+    //     amount: 230,
+    //     time: 'Sun',
+    // },
+    // {
+    //     id: 34,
+    //     amount: 230,
+    //     time: 'Sun',
+    // },
+    // {
+    //     id: 35,
+    //     amount: 230,
+    //     time: 'Sun',
+    // }
 ]
 
 

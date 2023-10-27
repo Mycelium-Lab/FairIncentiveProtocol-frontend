@@ -12,6 +12,7 @@ import DatePicker from "../DatePicker";
 import { getBearerHeader } from "../../utils/getBearerHeader";
 import { config } from "../../utils/config";
 import { getRandomRGBAColor } from "../../utils/color";
+import { subDays } from "date-fns";
 
 class Dashboard extends Component {
     constructor(props) {
@@ -67,13 +68,15 @@ class Dashboard extends Component {
                     backgroundColor: collectionSupply.map(data => data.color)
                 }]
             },
-            rewards_total_count: 0
+            rewards_total_count: 0,
+            new_users_range: null
         }
     }
 
     async componentDidMount() {
         await this.getTypeOfRewards()
         await this.getRewardDistribution()
+        await this.changeNewUsersRange(subDays(new Date(), 7), new Date())
     }
 
     async getTypeOfRewards() {
@@ -153,6 +156,47 @@ class Dashboard extends Component {
         }
     }
 
+    async changeNewUsersRange(startDate, endDate) {
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+            let query = new URLSearchParams();
+            query.append("startDate", startDate.toString())
+            query.append("endDate", endDate.toString())
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/stat/new_users_range?` + query.toString(), requestOptions)
+            const json = await res.json()
+            const range = {
+                labels: json.body.data.map(v => `${new Date(v.date_interval_end).toLocaleDateString()} ${new Date(v.date_interval_end).toLocaleTimeString()}`),
+                datasets: [{
+                    data: json.body.data.map(v => parseInt(v.count)),
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                }]
+            }
+            const resTotal = await fetch(`${config.api}/stat/total_users_range?` + query.toString(), requestOptions)
+            const jsonTotal = await resTotal.json()
+            const rangeTotal = {
+                labels: jsonTotal.body.data.map(v => `${new Date(v.end_date).toLocaleDateString()} ${new Date(v.end_date).toLocaleTimeString()}`),
+                datasets: [{
+                    data: jsonTotal.body.data.map(v => parseInt(v.count)),
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                }]
+            }
+            this.setState({
+                newUserData: range,
+                totalUserData: rangeTotal
+            })
+        } catch (error) {
+            
+        }
+    }
+
+    changeNewUsersRange = this.changeNewUsersRange.bind(this)
+
     render() {
         return (
             <div className="dashboard">
@@ -160,7 +204,7 @@ class Dashboard extends Component {
                 <div className="dashboard__tab">
                     <Tabs defaultActiveKey="users">
                         <Tab eventKey="users" title="Users">
-                            <DatePicker></DatePicker>
+                            <DatePicker changeNewUsersRange={this.changeNewUsersRange}></DatePicker>
                             <UserInfo></UserInfo>
                             <div className="dashboard__chart mb-4">
                                 <div className="dashboard__chart_dashboard-info">
