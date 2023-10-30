@@ -10,6 +10,7 @@ class UserInfo extends Component {
         super(props)
         this.state = {
             total_users: 0,
+            active_users: 0,
             new_users_24h: 0
         }
     }
@@ -17,6 +18,7 @@ class UserInfo extends Component {
     async componentDidMount() {
         await this.getTotalUsers()
         await this.getUsers24h()
+        await this.getActiveUsers()
     }
 
     async getTotalUsers() {
@@ -59,6 +61,26 @@ class UserInfo extends Component {
         }
     }
 
+    async getActiveUsers() {
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/stat/users_active`, requestOptions)
+            const json = await res.json()
+            this.setState({
+                active_users: json.body.data
+            })
+        } catch (error) {
+            alert(error)
+        }
+    }
+
     render() {
         return (
             <>
@@ -83,7 +105,7 @@ class UserInfo extends Component {
                 </li>
                 <li className="info__list-item_dark-blue info__list-item">
                     <div className="info__content_left">
-                        <span className="info__content-amount">7 824</span>
+                        <span className="info__content-amount">{this.state.active_users}</span>
                         <span className="info__content-desc">Active users</span>
                     </div>
                     <div className="info__content_right">
