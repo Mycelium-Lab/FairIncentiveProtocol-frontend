@@ -13,6 +13,7 @@ import { getBearerHeader } from "../../utils/getBearerHeader";
 import { config } from "../../utils/config";
 import { getRandomRGBAColor } from "../../utils/color";
 import { subDays } from "date-fns";
+import { typesOfDashboard } from "../../utils/constants";
 
 class Dashboard extends Component {
     constructor(props) {
@@ -31,6 +32,10 @@ class Dashboard extends Component {
                     data: newUser.map(data => data.amount),
                     borderColor: ['rgba(255, 159, 67, 0.85)'],
                 }]
+            },
+            rewardsRange: {
+                labels: [],
+                datasets: []
             },
             distributionOfRewardsData: {
                 labels: [],
@@ -74,9 +79,12 @@ class Dashboard extends Component {
     }
 
     async componentDidMount() {
+        const now = new Date()
+        const nowSub7 = subDays(new Date(), 7)
         await this.getTypeOfRewards()
         await this.getRewardDistribution()
-        await this.changeNewUsersRange(subDays(new Date(), 7), new Date())
+        await this.changeNewUsersRange(nowSub7, now)
+        await this.changeRewardsRange(nowSub7, now)
     }
 
     async getTypeOfRewards() {
@@ -195,7 +203,38 @@ class Dashboard extends Component {
         }
     }
 
+    async changeRewardsRange(startDate, endDate) {
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+            let query = new URLSearchParams();
+            query.append("startDate", startDate.toString())
+            query.append("endDate", endDate.toString())
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/stat/rewards_range?` + query.toString(), requestOptions)
+            const json = await res.json()
+            const range = {
+                labels: json.body.data.map(v => `${new Date(v.date_interval_end).toLocaleDateString()} ${new Date(v.date_interval_end).toLocaleTimeString()}`),
+                datasets: [{
+                    data: json.body.data.map(v => parseInt(v.count)),
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                }]
+            }
+            console.log(json)
+            this.setState({
+                rewardsRange: range
+            })
+        } catch (error) {
+            
+        }
+    }
+
     changeNewUsersRange = this.changeNewUsersRange.bind(this)
+    changeRewardsRange = this.changeRewardsRange.bind(this)
 
     render() {
         return (
@@ -204,7 +243,7 @@ class Dashboard extends Component {
                 <div className="dashboard__tab">
                     <Tabs defaultActiveKey="users">
                         <Tab eventKey="users" title="Users">
-                            <DatePicker changeNewUsersRange={this.changeNewUsersRange}></DatePicker>
+                            <DatePicker changeNewUsersRange={this.changeNewUsersRange} type={typesOfDashboard.users}></DatePicker>
                             <UserInfo></UserInfo>
                             <div className="dashboard__chart mb-4">
                                 <div className="dashboard__chart_dashboard-info">
@@ -222,12 +261,12 @@ class Dashboard extends Component {
                             </div>
                         </Tab>
                         <Tab eventKey="rewards" title="Rewards">
-                            <DatePicker></DatePicker>
+                            <DatePicker changeRewardsRange={this.changeRewardsRange} type={typesOfDashboard.rewards}></DatePicker>
                             <RewardsInfo total={this.state.rewards_total_count}></RewardsInfo>
                             <div className="dashboard__chart_dashboard-info  mb-4">
                             <label className="chart__label">Rewards</label>
                                 <div className="dashboard__chart_wrapper mb-4" style={{position: 'relative', height:'358px', display: 'flex', justifyContent: 'center'}}>
-                                    <BarChart chartData={this.state.newUserData}></BarChart>
+                                    <BarChart chartData={this.state.rewardsRange}></BarChart>
                                 </div>
                             </div>
                             <div className="chart__group">

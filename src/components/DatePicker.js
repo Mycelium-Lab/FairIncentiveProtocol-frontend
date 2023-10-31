@@ -5,6 +5,7 @@ import 'react-date-range/dist/theme/default.css'
 
 import format from "date-fns/format"
 import { addDays, endOfDay, isToday, subDays, isSameDay } from 'date-fns'
+import { typesOfDashboard } from "../utils/constants";
 
 class DatePicker extends React.Component {
     textInput = React.createRef(null);
@@ -52,7 +53,12 @@ class DatePicker extends React.Component {
         if (isSameDay(range[0].startDate, range[0].endDate)) {
             range[0].endDate = endOfDay(range[0].endDate);
         }
-        this.props.changeNewUsersRange(range[0].startDate, range[0].endDate)
+        if (this.props.type === typesOfDashboard.users) {
+            this.props.changeNewUsersRange(range[0].startDate, range[0].endDate)
+        }
+        if (this.props.type === typesOfDashboard.rewards) {
+            this.props.changeRewardsRange(range[0].startDate, range[0].endDate)
+        }
         this.setState({range})
     }
      
