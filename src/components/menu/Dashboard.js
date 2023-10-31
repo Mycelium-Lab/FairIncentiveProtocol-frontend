@@ -141,6 +141,7 @@ class Dashboard extends Component {
               };
             const res = await fetch(`${config.api}/stat/rewards_distribution`, requestOptions)
             const json = await res.json()
+            json.body.data = json.body.data.filter(row => row.event_count != 0)
             const total = json.body.data.reduce((total, row) => total + parseInt(row.event_count), 0);
             const distributionOfRewards = json.body.data.map((v, i) => {
                 return {
