@@ -692,7 +692,7 @@ class Rewards extends Component {
     }
 
     changeToken(selectedOption) {
-        if(selectedOption.value === 'create token') {
+        if(selectedOption.value === 'Create new one') {
             this.props.onSwitch(this.props.switcher.tokens)
             this.props.goToCreationPage('create token')
             return 
@@ -880,8 +880,8 @@ class Rewards extends Component {
         description: null,
         amount: null,
         show: false,
-        chosen_token: {value: this.state.tokens[0].address, label: this.state.tokens[0].symbol},
-        chosen_nft_collection: {value: this.state.nftCollections[0].address, label: this.state.nftCollections[0].name},
+        chosen_token: this.state.tokens.length ? {value: this.state.tokens[0].address, label: this.state.tokens[0].symbol} : null,
+        chosen_nft_collection: this.state.nftCollections.length ?  {value: this.state.nftCollections[0].address, label: this.state.nftCollections[0].name} : null,
         chosen_type: 'token'
     });
     handleShow = () => this.setState({show: true});
