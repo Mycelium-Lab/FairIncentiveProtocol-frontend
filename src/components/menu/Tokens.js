@@ -879,8 +879,35 @@ class Tokens extends Component {
         })
     }
 
-    handleShowInfo = (info) =>  {
-        this.setState({showInfo: true, tokenInfo: info})
+    handleShowInfo = async (info) =>  {
+        this.setState({showInfo: true, tokenInfo: info,  showLoading: true})
+         let provider = new ethers.providers.Web3Provider(window.ethereum)
+        const chainid = (await provider.getNetwork()).chainId
+        if (chainid.toString() !== info.chainid) {
+            await this.changeNetwork(info.chainid)
+            provider = new ethers.providers.Web3Provider(window.ethereum)
+        }
+        await provider.send("eth_requestAccounts", [])
+        const signer = await provider.getSigner()
+        const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
+        const tokenUsual = Token.attach(info.address)  
+        const totalSupply = BigInt((await tokenUsual.totalSupply()).toString())
+
+        let cap;
+        let mintTokenAvailableToMint = BigInt(0);
+        try {
+            cap = await tokenUsual.cap()
+            cap = BigInt(cap.toString())
+            mintTokenAvailableToMint = cap - totalSupply
+        } catch (error) {
+            cap = BigInt(0)
+        }
+
+        this.setState({
+        showLoading: false, tokenInfo: {...this.state.tokenInfo, totalSupply: ethers.utils.formatEther(totalSupply.toString())}, 
+        mintTokenAvailableToMint: ethers.utils.formatEther(mintTokenAvailableToMint.toString()),
+        mintTokenMaxSupply: ethers.utils.formatEther(cap.toString())
+        })
     }
     handleCloseInfo = () =>  this.setState({showInfo: false})
 
@@ -1696,16 +1723,23 @@ class Tokens extends Component {
                                         The contract balance: (soon)<img src={info} className="form__icon-info"/>
                                     </li>
                                     <li className="modal-text">
-                                        Total supply: (soon)<img src={info} className="form__icon-info"/>
+                                    Total supply: {this.state.tokenInfo.totalSupply} {this.state.tokenInfo.symbol}  <img src={info} className="form__icon-info"/>
                                     </li>
                                     <li className="modal-text">
-                                        Max supply: {this.state.tokenInfo.max_supply ? this.state.tokenInfo.max_supply : '-'} <img src={info} className="form__icon-info"/>
+                                    Max supply: {
+                                            this.state.mintTokenMaxSupply === '0.0'
+                                            ?
+                                            `Infinity`
+                                            :
+                                            `${this.state.mintTokenMaxSupply} ${this.state.tokenInfo.symbol}`
+                                        }  
+                                     <img src={info} className="form__icon-info"/>
                                     </li>
                                     <li className="modal-text">
                                         Circulating Supply: (soon) <img src={info} className="form__icon-info"/>
                                     </li>
                                     <li className="modal-text">
-                                        Available to mint: (soon) <a className="info__content-mint_medium info__content-mint">{'[mint]'}</a> <img src={info} className="form__icon-info"/>
+                                        Available to mint: {this.state.mintTokenAvailableToMint} {this.state.tokenInfo.symbol} <a className="info__content-mint_medium info__content-mint">{'[mint]'}</a> <img src={info} className="form__icon-info"/>
                                     </li>
                                 </ol>
                             </div>
