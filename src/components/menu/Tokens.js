@@ -32,6 +32,7 @@ import { Dropdown } from "react-bootstrap";
 import loader from '../../media/common/loader.svg'
 import LineChart from "../charts/LineChart";
 import { newUser } from "../../data/data";
+import errors from "../../errors";
 
 //TODO: Как-то добавлять провайдера и signer сразу
 
@@ -65,7 +66,7 @@ class Tokens extends Component {
             name: null,
             symbol: null,
             provider: null,
-            chainid: null,
+            chainid: networks[config.status === "test" ? '80001' : '137'].chainid,
             signer: null,
             address: null,
             showCreate: false,
@@ -83,6 +84,7 @@ class Tokens extends Component {
             showError: false,
             successName: null,
             successText: null,
+            errorName: null,
             errorText: null,
             confirmName: null,
             confirmText: null,
@@ -96,7 +98,7 @@ class Tokens extends Component {
             mintTokenMaxSupply: null,
             mintTokenAvailableToMint: null,
             tokens: [],
-            network: networks[config.status === "test" ? '5' : '1'],
+            network: networks[config.status === "test" ? '80001' : '137'],
             emissionType: emissionTypes[0].value,
             initialSupply: null,
             maxSupply: null,
@@ -394,17 +396,24 @@ class Tokens extends Component {
                 this.setState({
                     tokens: _tokens,
                 })
-            } else {
-                alert('Something went wrong')
-            }
-            contract.deployed().then(() => {
-                this.handleCloseProgress()
-                this.handleShowSuccess(`${symbol} token created`, `The contract creation was successful`)
-                this.setState({
-                    showCreate: false,
-                    stageOfCreateToken: 0,
+                contract.deployed().then(() => {
+                    this.handleCloseProgress()
+                    this.handleShowSuccess(`${symbol} token created`, `The contract creation was successful`)
+                    this.setState({
+                        showCreate: false,
+                        stageOfCreateToken: 0,
+                    })
                 })
-            })
+            } else {
+                this.handleCloseProgress()
+                const json = await res.json()
+                const errroMessage = json.error.message
+                const parsedMessage = errors[errroMessage] ? errors[errroMessage] : errroMessage
+                this.setState({
+                    showError: true,
+                    errorName: parsedMessage
+                })
+            }
         } catch (error) {
             this.customError(error)
         }
@@ -946,9 +955,9 @@ class Tokens extends Component {
                                     <label className="form__label">Blockchain * <img src={info} className="form__icon-info" /></label>
                                     <div className="input-group">
                                         <select onChange={e => this.changeNetwork(e.target.value)} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                            <option value={config.status === "test" ? '5' : '1'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '5' : '1')) : false}>{networks[config.status === "test" ? '5' : '1'].name}</option>
-                                            <option value={config.status === "test" ? '97' : '56'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '97' : '56')) : false}>{networks[config.status === "test" ? '97' : '56'].name}</option>
                                             <option value={config.status === "test" ? '80001' : '137'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '80001' : '137')) : false}>{networks[config.status === "test" ? '80001' : '137'].name}</option>
+                                            <option value={config.status === "test" ? '97' : '56'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '97' : '56')) : false}>{networks[config.status === "test" ? '97' : '56'].name}</option>
+                                            <option value={config.status === "test" ? '5' : '1'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '5' : '1')) : false}>{networks[config.status === "test" ? '5' : '1'].name}</option>
                                             <option value={config.status === "test" ? '420' : '10'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '420' : '10')) : false} disabled={config.status === "test" ? true : false} >{networks[config.status === "test" ? '420' : '10'].name}</option>
                                             <option value={config.status === "test" ? '43113' : '43114'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '43113' : '43114')) : false}>{networks[config.status === "test" ? '43113' : '43114'].name}</option>
                                             <option value={config.status === "test" ? '421613' : '42161'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '421613' : '42161')) : false}>{networks[config.status === "test" ? '421613' : '42161'].name}</option>
@@ -1640,6 +1649,7 @@ class Tokens extends Component {
                 <ErrorModal 
                     showError={this.state.showError}
                     handleCloseError={this.handleCloseError}
+                    errorName={this.state.errorName}
                     errorText={this.state.errorText}
                 />
                            </>
