@@ -51,6 +51,11 @@ const emissionTypes = [
     },
 ]
 
+const destinationToSend = {
+    contract: 'contract',
+    wallet: 'wallet'
+}
+
 const burnAddressType = {
     current: 'current',
     other: 'other'
@@ -84,6 +89,7 @@ class Tokens extends Component {
             showError: false,
             successName: null,
             successText: null,
+            successTitle: null,
             errorName: null,
             errorText: null,
             confirmName: null,
@@ -117,6 +123,9 @@ class Tokens extends Component {
             editMintingManagersElements: [],
             tokenInfo: {},
             hasLoad: false,
+            chosen_mint_type: null,
+            addressToDeliveryMint: null,
+            isInvalidAddress: false,
             totalUserData: {
                 labels: newUser.map(data => data.time),
                 datasets: [{
@@ -437,14 +446,17 @@ class Tokens extends Component {
             const signer = await provider.getSigner()
             const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
             const token = Token.attach(currentTokenAddress)
-            this.handleShowConfirm('Mint', `Confirm the minting of ${mintTokenAmount} ${currentTokenSymbol} tokens`, `Please, confirm transaction in your wallet`)
+            this.handleShowConfirm(`Mint ${currentTokenSymbol} tokens`, `Confirm the minting of ${mintTokenAmount} ${currentTokenSymbol} tokens`, `Please, confirm transaction in your wallet`)
             const tx = await token.mint(ethers.utils.parseEther(mintTokenAmount))
             this.handleCloseConfirm()
-            this.handleShowProgress()
+            this.handleShowProgress(`Mint ${currentTokenSymbol} tokens`)
             tx.wait()
                 .then(() => {
                     this.handleCloseProgress()
-                    this.handleShowSuccess(`Token minted`, `You have successfully minted ${mintTokenAmount} ${currentTokenSymbol} tokens`)
+                    this.handleShowSuccess(`Mint ${currentTokenSymbol} tokens`, `Token minted`, `You have successfully minted ${mintTokenAmount} ${currentTokenSymbol} tokens`)
+                    this.setState({
+                        mintTokenAmount: null
+                    })
                 })
         } catch (error) {
             this.customError(error)
@@ -636,6 +648,35 @@ class Tokens extends Component {
         console.log(error)
     } 
 
+    changeType(event) {
+        this.setState({
+            chosen_mint_type: event.target.value
+        })
+    }
+
+    handleAddressToDeliveryMint(event) {
+        const validateAddress = (address) => {
+            if(!address) {
+                return true
+            }
+            return address.match(
+                /^0x[a-fA-F0-9]{40}$/g
+            );
+          };
+        if(validateAddress(event.target.value)) {
+            this.setState({
+                addressToDeliveryMint: event.target.value,
+                isInvalidAddress: false
+            })
+        }
+        else{
+            this.setState({
+                addressToDeliveryMint: event.target.value,
+                isInvalidAddress: true
+            })
+        }
+    }
+
     handleCloseCreate = () => this.setState({showCreate: false})
     handleShowCreate = () => {
         this.setState({showCreate: true, stageOfCreateToken: 1})
@@ -669,7 +710,7 @@ class Tokens extends Component {
             showLoading: false, mintTokenAvailableToMint: ethers.utils.formatEther(mintTokenAvailableToMint.toString())
         })
     }
-    handleCloseMint = () => this.setState({showMint: false})
+    handleCloseMint = () => this.setState({showMint: false, mintTokenAmount: null, chosen_mint_type: null})
 
     handleShowBlacklist = async (currentTokenSymbol, currentTokenAddress, currentTokenChainid) => {
         try {
@@ -773,9 +814,9 @@ class Tokens extends Component {
     handleClosePause = () => this.setState({showPause: false})
     handleShowConfirm = (confirmTitle, confirmName, confirmText) => this.setState({showConfirm: true, confirmTitle, confirmName, confirmText})
     handleCloseConfirm = () => this.setState({showConfirm: false, confirmName: null, confirmText: null})
-    handleShowProgress = () => this.setState({showProgress: true})
+    handleShowProgress = (progressTitle) => this.setState({showProgress: true, progressTitle})
     handleCloseProgress = () => this.setState({showProgress: false})
-    handleShowSuccess = (successName, successText) => this.setState({showSuccess: true, successName, successText})
+    handleShowSuccess = (successTitle, successName, successText) => this.setState({showSuccess: true, successTitle, successName, successText})
     handleCloseSuccess = () => this.setState({showSuccess: false, successName: null, successText: null})
     handleShowError = (errorText) => this.setState({showError: true, errorText})
     handleCloseError = () => this.setState({showError: false})
@@ -847,6 +888,8 @@ class Tokens extends Component {
     burn = this.burn.bind(this)
     onChangeOtherBurnAddress = this.onChangeOtherBurnAddress.bind(this)
     onChangeBurnAmount = this.onChangeBurnAmount.bind(this)
+    changeType = this.changeType.bind(this)
+    handleAddressToDeliveryMint = this.handleAddressToDeliveryMint.bind(this)
 
     render() {
         return (
@@ -1282,46 +1325,72 @@ class Tokens extends Component {
                             <div className="form_col_last form_col">
                                 <label className="form__label">Amount to mint * <img src={info} className="form__icon-info"/></label>
                                     <div className="input-group">
-                                        <input type="number" onChange={this.onChangeMintTokenAmount} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        <input type="number" placeholder="10" onChange={this.onChangeMintTokenAmount} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                     </div>
-                                    <div className="form__prompt" id="basic-addon4">Enter the number of the ABC tokens you want to create</div>
+                                    <div className="form__prompt" id="basic-addon4">{`Enter the number of the ${this.state.currentTokenSymbol} tokens you want to create`}</div>
                             </div>
                             </div>
                             <div className="form_row">
                                 <div className="form_col">
-                                    <label className="form__label">Destination to send:</label>
+                                    <label className="form__label">Destination to send * :</label>
                                 </div>
                             </div>
                             <div className="form_row mb-4">
                                 <div className="form_col_flex form_col">
                                     <div className="form-check custom-control custom-radio custom-control-inline">
-                                            <input type="radio" id="rd_1" name="rd" value="Contract balance"/>
+                                            <input checked={this.state.chosen_mint_type === destinationToSend.contract ? true : false}
+                                              onChange={this.changeType}  type="radio" id="rd_1" name="rd" value="contract"/>
                                             <label className="form-check-label custom-control-label green" for="rd_1">
                                                 Contract balance <img src={info} className="form__icon-info"/>
                                             </label>
                                         </div>
                                         <div className="form-check custom-control custom-radio custom-control-inline">
-                                            <input type="radio" id="rd_2" name="rd" value="External wallet" />
+                                            <input checked={this.state.chosen_mint_type === destinationToSend.wallet ? true : false}
+                                              onChange={this.changeType} type="radio" id="rd_2" name="rd" value="wallet" />
                                             <label className="form-check-label custom-control-label red" for="rd_2">
                                                 External wallet <img src={info} className="form__icon-info"/>
                                             </label>
                                         </div>
                                 </div>
                             </div>
-                            <div className="form_row mb-4">
+                            {
+                                this.state.isInvalidAddress ? <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
-                                    <label className="form__label">Send to:</label>
+                                    <label className="form__label">Send to * :</label>
                                     <div className="input-group">
-                                        <input type="text" placeholder="Address" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        <input maxlength="42" type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.handleAddressToDeliveryMint} className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                     </div>
-                                    <div className="form__prompt" id="basic-addon4">Enter a wallet to deliver the tokens to</div>
+                                    <div className="form__prompt_error form__prompt" id="basic-addon4">Invalid wallet address format. Example: 0x71C7656EC7ab88b098defB751B7401B5f6d8976F</div>
                                 </div>
+                            </div> 
+                            : <div className="form_row mb-4">
+                            <div className="form_col_last form_col">
+                                <label className="form__label">Send to * :</label>
+                                <div className="input-group">
+                                    <input maxlength="42" type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.handleAddressToDeliveryMint} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                </div>
+                                <div className="form__prompt" id="basic-addon4">Enter a wallet to deliver the tokens to</div>
                             </div>
+                        </div>
+                            }
                             </>
                         }
                     </Modal.Body>
                     <Modal.Footer>
-                        <button onClick={this.mint} type="button" className="btn btn_secondary btn_orange">Mint</button>
+                        {
+                            Number(this.state.mintTokenAmount) > 0 && Number(this.state.mintTokenAmount) <= Number(this.state.mintTokenAvailableToMint) && this.state.chosen_mint_type && this.state.addressToDeliveryMint && !this.state.isInvalidAddress
+                            ?     <button  type="button" className="btn btn_secondary btn_orange" onClick={this.mint}>
+                            Mint
+                            </button>
+                             : Number(this.state.mintTokenAmount) > 0 && this.state.mintTokenAvailableToMint === '0.0' && this.state.chosen_mint_type && this.state.addressToDeliveryMint && !this.state.isInvalidAddress
+                             ? 
+                             <button  type="button" className="btn btn_secondary btn_orange" onClick={this.mint}>
+                             Mint
+                             </button>
+                            :   <button className="btn btn_secondary btn_orange btn_disabled">
+                            Mint
+                            </button>
+                        }
                     </Modal.Footer>
                 </Modal>
                 <Modal show={this.state.showPause} onHide={this.handleClosePause} centered>
@@ -1639,10 +1708,11 @@ class Tokens extends Component {
                     confirmName={this.state.confirmName}
                     confirmText={this.state.confirmText}
                 />
-                <ProgressModal showProgress={this.state.showProgress} handleCloseProgress={this.handleCloseProgress}/>
+                <ProgressModal progressTitle={this.state.progressTitle} showProgress={this.state.showProgress} handleCloseProgress={this.handleCloseProgress}/>
                 <SuccessModal 
                     showSuccess={this.state.showSuccess} 
                     handleCloseSuccess={this.handleCloseSuccess}
+                    successTitle={this.state.successTitle}
                     successName={this.state.successName} 
                     successText={this.state.successText}
                 />
