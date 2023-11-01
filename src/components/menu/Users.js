@@ -72,6 +72,7 @@ class Users extends Component {
             errorName: null,
             hasLoad: false,
             isInvalidEmail: false,
+            isInvalidAddress: false,
             newUserData: {
                 labels: newUser.map(data => data.time),
                 datasets: [{
@@ -155,9 +156,27 @@ class Users extends Component {
     }
 
     onChangeWallet(event) {
-        this.setState({
-            add_wallet: event.target.value
-        })
+        const validateAddress = (address) => {
+            if(!address) {
+                return true
+            }
+            return address.match(
+                /^0x[a-fA-F0-9]{40}$/g
+            );
+          };
+        if(validateAddress(event.target.value)) {
+            this.setState({
+                add_wallet: event.target.value,
+                isInvalidAddress: false
+            })
+        }
+        else{
+            this.setState({
+                add_wallet: event.target.value,
+                isInvalidAddress: true
+            })
+          
+        }
     }
 
     async addUser() {
@@ -523,7 +542,15 @@ class Users extends Component {
     }
 
     handleShowAdd = () => this.setState({showAdd: true})
-    handleCloseAdd = () => this.setState({showAdd: false})
+    handleCloseAdd = () => this.setState({
+        showAdd: false,
+        add_externalID: null,
+        add_email: null,
+        add_wallet: null,
+        add_notes: null,
+        isInvalidAddress: false,
+        isInvalidEmail: false
+    })
     handleShowToReward = (external_id, id) => this.setState({chosen_user_id: id, chosen_user_external_id: external_id, showToReward: true})
     handleCloseToReward = () => this.setState({showToReward: false})
     handleShowEdit = (user) => {
@@ -589,7 +616,12 @@ class Users extends Component {
         })
     }
 
-    handleCloseEdit = () => this.setState({showEdit: false, edit_user: {}, basic_edit_user: {}, editPropertiesElements: [], editStatsElements: []})
+    handleCloseEdit = () => this.setState({
+        showEdit: false, edit_user: {}, basic_edit_user: {}, 
+        editPropertiesElements: [], editStatsElements: [],
+        isInvalidAddress: false,
+        isInvalidEmail: false
+    })
     handleCloseStats = () => this.setState({showStats: false, edit_user: {}, basic_edit_user: {}, editPropertiesElements: [], editStatsElements: []})
     handleShowDelete = (chosen_user_external_id, chosen_user_id) => this.setState({showDelete: true, chosen_user_external_id, chosen_user_id})
     handleCloseDelete = () => this.setState({showDelete: false, chosen_user_external_id: null, chosen_user_id: null})
@@ -763,9 +795,28 @@ class Users extends Component {
     changeEditWallet(event) {
         let edit_user = this.state.edit_user
         edit_user.wallet = event.target.value
-        this.setState({
-            edit_user
-        })
+
+        const validateAddress = (address) => {
+            if(!address) {
+                return true
+            }
+            return address.match(
+                /^0x[a-fA-F0-9]{40}$/g
+            );
+          };
+        if(validateAddress(edit_user.wallet)) {
+            this.setState({
+                edit_user,
+                isInvalidAddress: false
+            })
+        }
+        else{
+            this.setState({
+                edit_user,
+                isInvalidAddress: true
+            })
+          
+        }
     }
     changeEditmIage(event) {
         console.log('changeEditImage', event)
@@ -893,13 +944,24 @@ class Users extends Component {
                             </div>
                             {/*<div className="form__prompt_disabled form__prompt" id="basic-addon4">File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>*/}
                         </div>
-                        <div className="mb-4">
+                        {
+                                this.state.isInvalidAddress ? 
+                                
+                                <div className="mb-4">
+                                <label className="form__label">Wallet* : <img className="form__icon-info" src={info} /></label>
+                                <div className="input-group">
+                                    <input maxLength="42" placeholder="0x0000000000000000000000000000000000000000" type="text" onChange={this.onChangeWallet} className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                </div>
+                                <div className="form__prompt_error form__prompt" id="basic-addon4">Invalid wallet address format. Example: 0x71C7656EC7ab88b098defB751B7401B5f6d8976F</div>
+                            </div>
+                            : <div className="mb-4">
                             <label className="form__label">Wallet* : <img className="form__icon-info" src={info} /></label>
                             <div className="input-group">
                                 <input placeholder="0x0000000000000000000000000000000000000000" type="text" onChange={this.onChangeWallet} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
                             <div className="form__prompt" id="basic-addon4">Specify ethereum wallet to receive rewards</div>
                         </div>
+                            }
                         <div className="mb-4">
                             <label className="form__label">Notes: <img className="form__icon-info" src={info} /></label>
                             <div className="input-group">
@@ -982,7 +1044,7 @@ class Users extends Component {
                         Back
                     </button>
                     {   
-                        this.state.add_externalID && this.state.add_wallet && this.state.add_email && !this.state.isInvalidEmail
+                        this.state.add_externalID && this.state.add_wallet && this.state.add_email && !this.state.isInvalidEmail && !this.state.isInvalidAddress
                         ?
                         <button className="btn btn_primary btn_orange" onClick={this.addUser}>
                             Create
@@ -1164,13 +1226,26 @@ class Users extends Component {
                             </div>
                            {/*<div className="form__prompt_disabled form__prompt" id="basic-addon4">File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>*/}
                         </div>
-                        <div className="mb-4">
+                        {
+                                this.state.isInvalidAddress ? 
+                                
+                                <div className="mb-4">
+                                <label className="form__label">Wallet* : <img className="form__icon-info" src={info} /></label>
+                                <div className="input-group">
+                                    <input maxLength="42" placeholder="0x0000000000000000000000000000000000000000" type="text" value={this.state.edit_user.wallet} onChange={this.changeEditWallet} className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                </div>
+                                <div className="form__prompt_error form__prompt" id="basic-addon4">Invalid wallet address format. Example: 0x71C7656EC7ab88b098defB751B7401B5f6d8976F</div>
+                            </div>
+                            : <div className="mb-4">
                             <label className="form__label">Wallet* : <img src={info} /></label>
                             <div className="input-group">
                                 <input placeholder="0xhjfg7...9fdf" type="text" value={this.state.edit_user.wallet} onChange={this.changeEditWallet} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
                             <div className="form__prompt" id="basic-addon4">Specify ethereum wallet to receive rewards</div>
                         </div>
+                            }
+
+    
                         <div className="mb-4">
                             <label className="form__label">Notes: <img className="form__icon-info" src={info} /></label>
                             <div className="input-group">
@@ -1266,7 +1341,7 @@ class Users extends Component {
                         Back
                     </button>
                     {   
-                        this.state.edit_user.external_id && this.state.edit_user.wallet && this.state.edit_user.email && !this.state.isInvalidEmail
+                        this.state.edit_user.external_id && this.state.edit_user.wallet && this.state.edit_user.email && !this.state.isInvalidEmail && !this.state.isInvalidAddress
                         ?
                         <button className="btn btn_primary btn_orange" onClick={this.edit}>
                             Edit
