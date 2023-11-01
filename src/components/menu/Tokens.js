@@ -36,6 +36,9 @@ import errors from "../../errors";
 
 //TODO: Как-то добавлять провайдера и signer сразу
 
+let mintingManagersElementsLength = 0
+let financialManagersElementsLength = 0
+
 const emissionTypes = [
     {
         name: 'Capped',
@@ -60,8 +63,6 @@ const burnAddressType = {
     current: 'current',
     other: 'other'
 }
-
-let editMintingManagersElementsLength = 0
 
 class Tokens extends Component {
 
@@ -120,11 +121,12 @@ class Tokens extends Component {
             burnAmount: null,
             otherBurnAddress: null,
             stageOfCreateToken: 0,
-            editMintingManagersElements: [],
+            mintingManagersElements: [],
+            financelManagersElements: [],
             tokenInfo: {},
             hasLoad: false,
             chosen_mint_type: null,
-            addressToDeliveryMint: null,
+            destinationAddress: null,
             isInvalidAddress: false,
             totalUserData: {
                 labels: newUser.map(data => data.time),
@@ -654,7 +656,7 @@ class Tokens extends Component {
         })
     }
 
-    handleAddressToDeliveryMint(event) {
+    handleDestinationAddress(event) {
         const validateAddress = (address) => {
             if(!address) {
                 return true
@@ -665,13 +667,13 @@ class Tokens extends Component {
           };
         if(validateAddress(event.target.value)) {
             this.setState({
-                addressToDeliveryMint: event.target.value,
+                destinationAddress: event.target.value,
                 isInvalidAddress: false
             })
         }
         else{
             this.setState({
-                addressToDeliveryMint: event.target.value,
+                destinationAddress: event.target.value,
                 isInvalidAddress: true
             })
         }
@@ -710,7 +712,7 @@ class Tokens extends Component {
             showLoading: false, mintTokenAvailableToMint: ethers.utils.formatEther(mintTokenAvailableToMint.toString())
         })
     }
-    handleCloseMint = () => this.setState({showMint: false, mintTokenAmount: null, chosen_mint_type: null})
+    handleCloseMint = () => this.setState({showMint: false, mintTokenAmount: null, chosen_mint_type: null, destinationAddress: null, isInvalidAddress: false})
 
     handleShowBlacklist = async (currentTokenSymbol, currentTokenAddress, currentTokenChainid) => {
         try {
@@ -765,7 +767,6 @@ class Tokens extends Component {
 
     handleShowRoles = (token) => {
         const mintingManagers = []
-        // Добавить на реально созданном токене
         /*token.minting.forEach(v => {
             const mintingId = editMintingManagersElementsLength
             mintingManagers.push(
@@ -790,7 +791,93 @@ class Tokens extends Component {
         })*/
         this.setState({showRoles: true})
     }
-    handleCloseRoles = () => this.setState({showRoles: false})
+    handleCloseRoles = () => this.setState({showRoles: false, destinationAddress: null, isInvalidAddress: false})
+
+    deleteMintingManagerInput = (index) => {
+        console.log(index)
+        let mintingManagersElements = this.state.mintingManagersElements
+        mintingManagersElements.forEach(v => {if (v.id === index) v.work = false})
+        this.setState({
+            mintingManagersElements
+        })
+    }
+
+    addMintingManagers = () => {
+        const mintingManagersElements = this.state.mintingManagersElements
+        const id = mintingManagersElementsLength
+        mintingManagersElements.push(
+            {
+                id,
+                element: 
+                <div className="user-custom-params">
+                            <div className="input-group">
+                                <input type="text" id={`property-name-${id}`} onChange={this.changeMintinglValue} className="form-control" placeholder="0x0000000000000000000000000000000000000000"/>
+                            </div>
+                    <button type="button" className="btn btn_secondary btn_orange" onClick={() => this.deleteMintingManagerInput(id)}>Revoke</button>
+                </div>,
+                name: undefined,
+                value: undefined,
+                work: true
+            }
+        )
+        mintingManagersElementsLength += 1
+        this.setState({mintingManagersElements})
+    }
+
+    deleteFinancelManagerInput = (index) => {
+        console.log(index)
+        let financelManagersElements = this.state.financelManagersElements
+        financelManagersElements.forEach(v => {if (v.id === index) v.work = false})
+        this.setState({
+            financelManagersElements
+        })
+    }
+
+    addFinancelManagers = () => {
+        const financelManagersElements = this.state.financelManagersElements
+        const id = financialManagersElementsLength
+        financelManagersElements.push(
+            {
+                id,
+                element: 
+                <div className="user-custom-params">
+                            <div className="input-group">
+                                <input type="text" id={`financel-name-${id}`} onChange={this.changeFinancelValue} className="form-control" placeholder="0x0000000000000000000000000000000000000000"/>
+                            </div>
+                    <button type="button" className="btn btn_secondary btn_orange" onClick={() => this.deleteFinancelManagerInput(id)}>Revoke</button>
+                </div>,
+                name: undefined,
+                value: undefined,
+                work: true
+            }
+        )
+        financialManagersElementsLength += 1
+        this.setState({financelManagersElements})
+    }
+
+    changeMintinglValue = (event) => {
+        let mintingManagersElements = this.state.mintingManagersElements
+        const idFull = event.target.id.split('-')
+        const id = parseInt(idFull[idFull.length - 1])
+        mintingManagersElements.forEach(v => {
+            if (v.id === id) v.value = event.target.value
+        }) 
+        this.setState({
+            mintingManagersElements
+        })
+    }
+
+    changeFinancelValue = (event) => {
+        let financelManagersElements = this.state.financelManagersElements
+        const idFull = event.target.id.split('-')
+        const id = parseInt(idFull[idFull.length - 1])
+        financelManagersElements.forEach(v => {
+            if (v.id === id) v.value = event.target.value
+        }) 
+        this.setState({
+            financelManagersElements
+        })
+    }
 
     handleShowInfo = (info) =>  {
         this.setState({showInfo: true, tokenInfo: info})
@@ -889,7 +976,13 @@ class Tokens extends Component {
     onChangeOtherBurnAddress = this.onChangeOtherBurnAddress.bind(this)
     onChangeBurnAmount = this.onChangeBurnAmount.bind(this)
     changeType = this.changeType.bind(this)
-    handleAddressToDeliveryMint = this.handleAddressToDeliveryMint.bind(this)
+    handleDestinationAddress = this.handleDestinationAddress.bind(this)
+    addMintingManagers = this.addMintingManagers.bind(this)
+    deleteMintingManagerInput = this.deleteMintingManagerInput.bind(this)
+    addFinancelManagers = this.addFinancelManagers.bind(this)
+    deleteFinancelManagerInput = this.deleteFinancelManagerInput.bind(this)
+    changeFinancelValue = this.changeFinancelValue.bind(this)
+    changeMintinglValue = this.changeMintinglValue.bind(this)
 
     render() {
         return (
@@ -1358,7 +1451,7 @@ class Tokens extends Component {
                                 <div className="form_col_last form_col">
                                     <label className="form__label">Send to * :</label>
                                     <div className="input-group">
-                                        <input maxlength="42" type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.handleAddressToDeliveryMint} className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        <input maxlength="42" type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.handleDestinationAddress} className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                     </div>
                                     <div className="form__prompt_error form__prompt" id="basic-addon4">Invalid wallet address format. Example: 0x71C7656EC7ab88b098defB751B7401B5f6d8976F</div>
                                 </div>
@@ -1367,7 +1460,7 @@ class Tokens extends Component {
                             <div className="form_col_last form_col">
                                 <label className="form__label">Send to * :</label>
                                 <div className="input-group">
-                                    <input maxlength="42" type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.handleAddressToDeliveryMint} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    <input maxlength="42" type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.handleDestinationAddress} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                 </div>
                                 <div className="form__prompt" id="basic-addon4">Enter a wallet to deliver the tokens to</div>
                             </div>
@@ -1378,11 +1471,11 @@ class Tokens extends Component {
                     </Modal.Body>
                     <Modal.Footer>
                         {
-                            Number(this.state.mintTokenAmount) > 0 && Number(this.state.mintTokenAmount) <= Number(this.state.mintTokenAvailableToMint) && this.state.chosen_mint_type && this.state.addressToDeliveryMint && !this.state.isInvalidAddress
+                            Number(this.state.mintTokenAmount) > 0 && Number(this.state.mintTokenAmount) <= Number(this.state.mintTokenAvailableToMint) && this.state.chosen_mint_type && this.state.destinationAddress && !this.state.isInvalidAddress
                             ?     <button  type="button" className="btn btn_secondary btn_orange" onClick={this.mint}>
                             Mint
                             </button>
-                             : Number(this.state.mintTokenAmount) > 0 && this.state.mintTokenAvailableToMint === '0.0' && this.state.chosen_mint_type && this.state.addressToDeliveryMint && !this.state.isInvalidAddress
+                             : Number(this.state.mintTokenAmount) > 0 && this.state.mintTokenAvailableToMint === '0.0' && this.state.chosen_mint_type && this.state.destinationAddress && !this.state.isInvalidAddress
                              ? 
                              <button  type="button" className="btn btn_secondary btn_orange" onClick={this.mint}>
                              Mint
@@ -1500,16 +1593,29 @@ class Tokens extends Component {
                         </Modal.Header>
                         <Modal.Body>
                         <div className="form__groups">
-                            <div className="form_row mb-4">
+
+                             {
+                                this.state.isInvalidAddress ? <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
-                                    <label className="form__label"><img src={infoRed} className="form__icon-info_left form__icon-info"/> Transfer ownership * <img src={info} className="form__icon-info"/></label>
-                                    <div className="input-group_absolute input-group">
-                                        <input type="text"placeholder="Address" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                <label className="form__label"><img src={infoRed} className="form__icon-info_left form__icon-info"/> Transfer ownership * <img src={info} className="form__icon-info"/></label>
+                                    <div className="input-group">
+                                        <input maxlength="42" type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.handleDestinationAddress} className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                         <button className="btn_wide btn btn_primary btn_orange ms-2">Transfer ownership</button>
                                     </div>
-                                    <div className="form__prompt form__prompt_absolute" id="basic-addon4">Enter a wallet to transfer ownership of the contract</div>
+                                    <div className="form__prompt_error form__prompt" id="basic-addon4">Invalid wallet address format. Example: 0x71C7656EC7ab88b098defB751B7401B5f6d8976F</div>
                                 </div>
+                            </div> 
+                            : <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                    <label className="form__label">Send to * :</label>
+                                    <div className="input-group">
+                                        <input maxlength="42" type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.handleDestinationAddress} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        <button className="btn_wide btn btn_primary btn_orange ms-2">Transfer ownership</button>
+                                    </div>
+                                    <div className="form__prompt" id="basic-addon4">Enter a wallet to deliver the tokens to</div>
+                                    </div>
                             </div>
+                            }
 
                             <div className="form__group mb-4">
                             <div className="form__group_top-row">
@@ -1520,24 +1626,18 @@ class Tokens extends Component {
                                         <div className="form__prompt" id="basic-addon4">Textual traits that show up as rectangles</div>
                                     </div>
                                 </div>
-                                <button type="button" className="btn btn_primary btn_orange btn__add-form">Add</button>
+                                <button type="button" className="btn btn_primary btn_orange btn__add-form" onClick={this.addMintingManagers}>Add</button>
                             </div>
                             <div className="form__group_bottom-row">
                             {
-                                            /* Добавить на созданном токене
                                             <div id="user-properties">
                                             {
-                                                this.state.editPropertiesElements ?
-                                                this.state.editPropertiesElements.map(v => v.work ? v.element : null) :
+                                                this.state.mintingManagersElements ?
+                                                this.state.mintingManagersElements.map(v => v.work ? v.element : null) :
                                                 null
                                             }
-                                        </div>*/
+                                        </div>
                                         }
-                                <div className="form__group_bottom-row-last">
-                                    <div className="input-group_full input-group">
-                                        <input type="text" placeholder="Address" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                    </div>
-                                </div>
                             </div>
                             
                         </div>
@@ -1551,31 +1651,33 @@ class Tokens extends Component {
                                         <div className="form__prompt" id="basic-addon4">Textual traits that show up as rectangles</div>
                                     </div>
                                 </div>
-                                <button type="button" className="btn btn_primary btn_orange btn__add-form">Add</button>
+                                <button type="button" className="btn btn_primary btn_orange btn__add-form" onClick={this.addFinancelManagers}>Add</button>
                             </div>
                             <div className="form__group_bottom-row">
                             {
-                                            /* Добавить на созданном токене
                                             <div id="user-properties">
                                             {
-                                                this.state.editPropertiesElements ?
-                                                this.state.editPropertiesElements.map(v => v.work ? v.element : null) :
+                                                this.state.financelManagersElements ?
+                                                this.state.financelManagersElements.map(v => v.work ? v.element : null) :
                                                 null
                                             }
-                                        </div>*/
+                                        </div>
                                         }
-                                <div className="form__group_bottom-row-last">
-                                    <div className="input-group_full input-group">
-                                        <input type="text" placeholder="Address" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                    </div>
-                                </div>
                             </div>
                             
                         </div>
                          </div>
                         </Modal.Body>
                         <Modal.Footer>
-                            <button className="btn btn_secondary btn_disabled" onClick={this.addToBlacklist}>Save</button>
+                        {
+                           this.state.destinationAddress && !this.state.isInvalidAddress
+                            ?     <button  type="button" className="btn btn_secondary btn_orange">
+                            Save
+                            </button>
+                            :   <button className="btn btn_secondary btn_orange btn_disabled">
+                            Save
+                            </button>
+                        }
                         </Modal.Footer>
                 </Modal>
                 <Modal show={this.state.showInfo} onHide={this.handleCloseInfo} centered>
