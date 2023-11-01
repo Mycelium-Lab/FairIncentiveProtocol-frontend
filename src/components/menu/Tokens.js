@@ -484,7 +484,7 @@ class Tokens extends Component {
             const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
             const token = Token.attach(currentTokenAddress)
             let tx;
-            this.handleShowConfirm('Pause'`Confirm ${!isCurrentTokenPaused ? 'pausing' : 'unpausing'} ${currentTokenSymbol} token`, `Please, confirm transaction in your wallet`)
+            this.handleShowConfirm('Pause', `Confirm ${!isCurrentTokenPaused ? 'pausing' : 'unpausing'} ${currentTokenSymbol} token`, `Please, confirm transaction in your wallet`)
             if (!isCurrentTokenPaused) {
                 tx = await token.pause()
             } else {
@@ -896,7 +896,7 @@ class Tokens extends Component {
         const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
         const token = Token.attach(currentTokenAddress)
         const paused = await token.paused()
-        this.setState({showPause: true, currentTokenSymbol, currentTokenAddress, isCurrentTokenPaused: paused})
+        this.setState({showPause: true, currentTokenSymbol, currentTokenAddress, isCurrentTokenPaused: paused, currentTokenChainid})
     }
     handleClosePause = () => this.setState({showPause: false})
     handleShowConfirm = (confirmTitle, confirmName, confirmText) => this.setState({showConfirm: true, confirmTitle, confirmName, confirmText})
