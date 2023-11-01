@@ -26,6 +26,8 @@ import total from '../../media/dashboard/total_rewards.svg'
 import rewarded from '../../media/dashboard/rewarded.svg'
 import newRewards from '../../media/dashboard/new_rewards.svg'
 import SuccessModal from "../common/modals/success";
+import ErrorModal from "../common/modals/error";
+import errors from "../../errors";
 
 const types = {
     token: 'token',
@@ -554,7 +556,14 @@ class Rewards extends Component {
                     successName: `The token reward "${currentReward.name}" event was successfully added for ${this.state.chosen_user.label}`
                 })
             }
-            else alert('Something went wrong')
+            else {
+                const errroMessage = json.error.message
+                const parsedMessage = errors[errroMessage] ? errors[errroMessage] : errroMessage
+                this.setState({
+                    showError: true,
+                    errorName: parsedMessage
+                })
+            }
         } catch (error) {
             console.log(error)
         }
@@ -591,7 +600,14 @@ class Rewards extends Component {
                     successName: `The NFT reward "${currentReward.nft_name}" event was successfully added for ${this.state.chosen_user.label}`
                 })
             }
-            else alert('Something went wrong')
+            else {
+                const errroMessage = json.error.message
+                const parsedMessage = errors[errroMessage] ? errors[errroMessage] : errroMessage
+                this.setState({
+                    showError: true,
+                    errorName: parsedMessage
+                })
+            }
         } catch (error) {
             console.log(error)
         }
@@ -933,6 +949,7 @@ class Rewards extends Component {
         showEditReward: false
     })
     handleCloseSuccess = () => this.setState({showSuccess: false})
+    handleCloseError = () => this.setState({showError: false})
 
     handleShowDelete = (reward_type, reward_id, reward_name) => this.setState({showDelete: true, reward_id, reward_name, reward_type})
     handleCloseDelete = () => this.setState({showDelete: false, reward_name: null, reward_id: null, reward_type: null})
@@ -975,6 +992,7 @@ class Rewards extends Component {
     changeNFTRewardStatus = this.changeNFTRewardStatus.bind(this)
     saveEdit = this.saveEdit.bind(this)
     handleCloseSuccess = this.handleCloseSuccess.bind(this)
+    handleCloseError = () => this.setState({showError: false})
 
     render() {
         return (
@@ -1045,7 +1063,7 @@ class Rewards extends Component {
                                  <tr>
                                           <td>   
                                                 <label className="switch">
-                                                    <input type="checkbox" checked={v.status == 0} onChange={() => v.nft_id ? this.changeNFTRewardStatus(v.id, v.status) : this.changeTokenRewardStatus(v.id, v.status)} role="switch"></input>
+                                                    <input type="checkbox" checked={v.status == 1} onChange={() => v.nft_id ? this.changeNFTRewardStatus(v.id, v.status) : this.changeTokenRewardStatus(v.id, v.status)} role="switch"></input>
                                                     <span className="slider round"></span>
                                                 </label>  
                                           </td>
@@ -1072,7 +1090,7 @@ class Rewards extends Component {
                                             
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowStats(v.name)}>Stat</Dropdown.Item>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowEditReward(v.name, v.id, v.count, v.description, v.amount, v.nft_id ? types.nft :types.token, v.address, v.nft_id , v.symbol, v.nft_name)}>Edit</Dropdown.Item>
-                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowReward(v.name, v.id, v.nft_id)} disabled={v.status}>To reward</Dropdown.Item>
+                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowReward(v.name, v.id, v.nft_id)} disabled={!v.status}>To reward</Dropdown.Item>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowDelete(v.nft_id ? types.nft : types.token, v.id, v.name)}>Delete</Dropdown.Item>
 
                                             </FPDropdown>
@@ -1254,7 +1272,7 @@ class Rewards extends Component {
                     </Modal.Footer>
                 </Modal>
 
-                <Modal show={this.state.showReward} onHide={this.handleCloseReward} centered>
+                <Modal id="rewardFromReward" show={this.state.showReward} onHide={this.handleCloseReward} centered>
                     <Modal.Header  className="modal-newuser__title modal-title" closeButton>
                         Rewarding {this.state.reward_name}
                     </Modal.Header>
@@ -1522,6 +1540,11 @@ class Rewards extends Component {
                     handleCloseSuccess={this.handleCloseSuccess}
                     successTitle={this.state.successTitle} 
                     successName={this.state.successName} 
+                />
+                   <ErrorModal 
+                    showError={this.state.showError}
+                    handleCloseError={this.handleCloseError}
+                    errorName={this.state.errorName}
                 />
                      </>
                 }

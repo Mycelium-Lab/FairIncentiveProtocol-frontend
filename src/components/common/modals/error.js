@@ -12,8 +12,11 @@ class ErrorModal extends Component {
         const createUser = document.getElementById('createUser')
         const editUser = document.getElementById('editUser')
         const blackList = document.getElementById('blackList')
+        const rewardFromUser = document.getElementById('rewardFromUser')
+        const rewardFromReward = document.getElementById('rewardFromReward')
         const modal = mint?.parentElement || createUser?.parentElement 
-        || editUser?.parentElement || blackList?.parentElement
+        || editUser?.parentElement || blackList?.parentElement || rewardFromUser?.parentElement
+        || rewardFromReward?.parentElement
         if(modal) {
             modal.style.zIndex = '1049'
         }
@@ -24,8 +27,11 @@ class ErrorModal extends Component {
         const createUser = document.getElementById('createUser')
         const editUser = document.getElementById('editUser')
         const blackList = document.getElementById('blackList')
+        const rewardFromUser = document.getElementById('rewardFromUser')
+        const rewardFromReward = document.getElementById('rewardFromReward')
         const modal = mint?.parentElement || createUser?.parentElement 
-        || editUser?.parentElement || blackList?.parentElement
+        || editUser?.parentElement || blackList?.parentElement || rewardFromUser?.parentElement
+        || rewardFromReward?.parentElement
         if(modal) {
             modal.style.zIndex = '1050'
         }
