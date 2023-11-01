@@ -358,7 +358,7 @@ class Tokens extends Component {
                 address
             } = this.state
             const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
-            this.handleShowConfirm('Purchace', `Confirm ${symbol} token creation`, `Please, confirm contract creation in your wallet`)
+            this.handleShowConfirm('Create token', `Confirm ${symbol} token creation`, `Please, confirm contract creation in your wallet`)
             const contract = await Token.deploy(
                 name,
                 symbol,

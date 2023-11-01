@@ -95,6 +95,8 @@ class NFTCollections extends Component {
             stageOfAddNft: 0,
             hasLoad: false,
             collectionOptions: null,
+            isInvalidAddress: false,
+            isInvalidRoyalties: false
         }
     }
 
@@ -174,15 +176,49 @@ class NFTCollections extends Component {
     }
 
     onChangeBeneficialAddress(event) {
-        this.setState({
-            beneficialAddress: event.target.value
-        })
+        const validateAddress = (address) => {
+            if(!address) {
+                return true
+            }
+            return address.match(
+                /^0x[a-fA-F0-9]{40}$/g
+            );
+          };
+          if (!ethers.utils.isAddress(event.target.value) ) {
+            this.setState({
+                beneficialAddress: event.target.value,
+                isInvalidAddress: true
+            })
+        }
+        else if(validateAddress(event.target.value)) {
+            this.setState({
+                beneficialAddress: event.target.value,
+                isInvalidAddress: false
+            })
+        }
+        else{
+            this.setState({
+                beneficialAddress: event.target.value,
+                isInvalidAddress: true
+            })
+          
+        }
     }
 
     onChangeRoyalties(event) {
-        this.setState({
-            royalties: event.target.value
-        })
+        if(Number(event.target.value) >= 0.5 && Number(event.target.value) <= 10) 
+        {
+            this.setState({
+                royalties: event.target.value,
+                isInvalidRoyalties: false
+            })
+        }
+        else {
+            this.setState({
+                royalties: event.target.value,
+                isInvalidRoyalties: true
+            })
+        }
     }
 
     onChangeWebsite = (event) => this.setState({website: event.target.value})
@@ -301,7 +337,7 @@ class NFTCollections extends Component {
             if (discord) links.push({link: discord})
             if (other) links.push({link: other})
             let NFT, contract
-            this.handleShowConfirm('Purchace', `Confirm ${symbol} collection creation`, `Please, confirm contract creation in your wallet`)
+            this.handleShowConfirm('Create NFT', `Confirm ${symbol} collection creation`, `Please, confirm contract creation in your wallet`)
             if (beneficialType === beneficialTypes.company) {
                 NFT = new ethers.ContractFactory(ERC721DefaultRoyalty.abi, ERC721DefaultRoyalty.bytecode, this.state.signer)
                 contract = await NFT.deploy(this.state.name, this.state.symbol, config.signerAddress, beneficialAddress, royalties);
@@ -457,10 +493,10 @@ class NFTCollections extends Component {
                 element: 
                 <div className="user-custom-params">
                             <div className="input-group">
-                                <input type="text" id={`property-name-${id}`} onChange={(event) => this.changePropertyName(id, event.target.value)} className="form-control" placeholder="Property name"/>
+                                <input type="text" id={`property-name-${id}`} onChange={this.changePropertyName} className="form-control" placeholder="Property name"/>
                             </div>
                             <div className="input-group">
-                                <input type="text" id={`property-value-${id}`} onChange={(event) => this.changePropertyValue(id, event.target.value)} className="form-control" placeholder="Default value"/>
+                                <input type="text" id={`property-value-${id}`} onChange={this.changePropertyValue} className="form-control" placeholder="Default value"/>
                             </div>
                     <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={() => this.deletePropertyInput(id)}>-</button>
                 </div>,
@@ -837,25 +873,45 @@ class NFTCollections extends Component {
                                 <div className="form_row mb-4">
                               
                                         {
-                                            this.state.beneficialType === beneficialTypes.company
+                                            this.state.beneficialType === beneficialTypes.company && this.state.isInvalidAddress
                                             ?
                                             <div className="form_col">
                                             <label className="form__label">Beneficiary address:</label>
                                             <div className="input-group">
-                                                <input type="text" placeholder="Address" onChange={this.onChangeBeneficialAddress} value={this.state.beneficialAddress}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                <input maxLength={42}  type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.onChangeBeneficialAddress} value={this.state.beneficialAddress}  className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                            </div>
+                                            <div className="form__prompt_error form__prompt" id="basic-addon4">Invalid wallet address format. Example: 0x71C7656EC7ab88b098defB751B7401B5f6d8976F</div>
+                                        </div>
+                                            : this.state.beneficialType === beneficialTypes.company && !this.state.isInvalidAddress
+                                            ? 
+                                            <div className="form_col">
+                                            <label className="form__label">Beneficiary address:</label>
+                                            <div className="input-group">
+                                                <input maxLength={42}  type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.onChangeBeneficialAddress} value={this.state.beneficialAddress}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                             </div>
                                             <div className="form__prompt" id="basic-addon4">Wallet for receiving commissions from re-sales of the collection items</div>
                                         </div>
-                                            :
-                                            null
+                                            : null
                                         }
-                                     <div className="form_col_last form_col">
+                                        
+                                   {
+                                    this.state.isInvalidRoyalties 
+                                    ?     <div className="form_col_last form_col">
                                     <label className="form__label">Resale royalties: <img src={info} className="form__icon-info"/></label>
                                     <div className="input-group">
-                                    <input type="number" placeholder="20%" onChange={this.onChangeRoyalties} value={this.state.royalties}  min={0.5} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    <input type="number" placeholder="5%" onChange={this.onChangeRoyalties} value={this.state.royalties} className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                    <div className="form__prompt_error form__prompt" id="basic-addon4">Total creator earnings must be between 0.5% and 10%</div>
+                                </div> 
+                                    :   <div className="form_col_last form_col">
+                                    <label className="form__label">Resale royalties: <img src={info} className="form__icon-info"/></label>
+                                    <div className="input-group">
+                                    <input type="number" placeholder="5%" onChange={this.onChangeRoyalties} value={this.state.royalties}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                     </div>
                                     <div className="form__prompt" id="basic-addon4">Total creator earnings must be between 0.5% and 10%</div>
-                                </div>
+                                </div> 
+                                    
+                                   }
                                 </div>
                             <div className="form_row mb-4">
                             <div className="form_col_action_left form_col_last form_col">
@@ -863,17 +919,19 @@ class NFTCollections extends Component {
                                     Back
                             </button>
                                 {
+                                   (
+                                    this.state.royalties === null
+                                    ||
+                                    this.state.royalties === ''
+                                    || this.state.isInvalidRoyalties 
+                                    || this.state.isInvalidAddress
+                                    ||
                                     (
-                                        this.state.royalties === null
-                                        ||
-                                        this.state.royalties === ''
-                                        ||
-                                        (
-                                            this.state.beneficialType === beneficialTypes.company ? 
-                                            !ethers.utils.isAddress(this.state.beneficialAddress) 
-                                            : false
-                                        )
+                                        this.state.beneficialType === beneficialTypes.company ? 
+                                        !ethers.utils.isAddress(this.state.beneficialAddress) 
+                                        : false
                                     )
+                                )
                                     ?
                                     <button type="button" className="btn btn_pre-sm  btn_primary btn_orange btn_disabled" disabled onClick={this.nextStage}>Next</button>
                                     :
@@ -920,26 +978,45 @@ class NFTCollections extends Component {
                                 </div>
                                 <div className="form_row mb-4">
                               
-                                        {
-                                            this.state.beneficialType === beneficialTypes.company
+                                {
+                                            this.state.beneficialType === beneficialTypes.company && this.state.isInvalidAddress
                                             ?
                                             <div className="form_col">
                                             <label className="form__label">Beneficiary address:</label>
                                             <div className="input-group">
-                                                <input type="text" placeholder="Address" onChange={this.onChangeBeneficialAddress} value={this.state.beneficialAddress}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                <input maxLength={42}  type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.onChangeBeneficialAddress} value={this.state.beneficialAddress}  className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                            </div>
+                                            <div className="form__prompt_error form__prompt" id="basic-addon4">Invalid wallet address format. Example: 0x71C7656EC7ab88b098defB751B7401B5f6d8976F</div>
+                                        </div>
+                                            : this.state.beneficialType === beneficialTypes.company && !this.state.isInvalidAddress
+                                            ? 
+                                            <div className="form_col">
+                                            <label className="form__label">Beneficiary address:</label>
+                                            <div className="input-group">
+                                                <input maxLength={42} type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.onChangeBeneficialAddress} value={this.state.beneficialAddress}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                             </div>
                                             <div className="form__prompt" id="basic-addon4">Wallet for receiving commissions from re-sales of the collection items</div>
                                         </div>
-                                            :
-                                            null
+                                            : null
                                         }
-                                     <div className="form_col_last form_col">
+                                     {
+                                    this.state.isInvalidRoyalties 
+                                    ?     <div className="form_col_last form_col">
                                     <label className="form__label">Resale royalties: <img src={info} className="form__icon-info"/></label>
                                     <div className="input-group">
-                                    <input type="number" placeholder="20%" onChange={this.onChangeRoyalties} value={this.state.royalties}  min={0.5} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    <input type="number" placeholder="5%" onChange={this.onChangeRoyalties} value={this.state.royalties} className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                    <div className="form__prompt_error form__prompt" id="basic-addon4">Total creator earnings must be between 0.5% and 10%</div>
+                                </div> 
+                                    :   <div className="form_col_last form_col">
+                                    <label className="form__label">Resale royalties: <img src={info} className="form__icon-info"/></label>
+                                    <div className="input-group">
+                                    <input type="number" placeholder="5%" onChange={this.onChangeRoyalties} value={this.state.royalties}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                     </div>
                                     <div className="form__prompt" id="basic-addon4">Total creator earnings must be between 0.5% and 10%</div>
-                                </div>
+                                </div> 
+                                    
+                                   }
                                 </div>
                             <div className="form_row mb-4">
                             <div className="form_col_action_left form_col_last form_col">
@@ -951,6 +1028,8 @@ class NFTCollections extends Component {
                                         this.state.royalties === null
                                         ||
                                         this.state.royalties === ''
+                                        || this.state.isInvalidRoyalties 
+                                        || this.state.isInvalidAddress
                                         ||
                                         (
                                             this.state.beneficialType === beneficialTypes.company ? 
