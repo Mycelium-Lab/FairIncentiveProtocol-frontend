@@ -17,7 +17,9 @@ import { newUser } from "../../data/data";
 import empty from "../../media/common/empty_icon.svg"
 import customTokeSymbol from '../../media/common/custom_toke_symbol.svg'
 import SuccessModal from "../common/modals/success";
+import ErrorModal from "../common/modals/error";
 import loader from '../../media/common/loader.svg'
+import errors from "../../errors";
 
 let propertiesElementsLength = 0
 let statsElementsLength = 0
@@ -66,6 +68,8 @@ class Users extends Component {
             showEditUser: false,
             showSuccess: false,
             successName: null,
+            showError: false,
+            errorName: null,
             hasLoad: false,
             isInvalidEmail: false,
             newUserData: {
@@ -208,7 +212,12 @@ class Users extends Component {
                     showAdd: false
                 })
             } else {
-                alert('Something went wrong')
+                const errroMessage = json.error.message
+                const parsedMessage = errors[errroMessage] ? errors[errroMessage] : errroMessage
+                this.setState({
+                    showError: true,
+                    errorName: parsedMessage
+                })
             }
         } catch (error) {
             alert(error)
@@ -361,8 +370,8 @@ class Users extends Component {
                 email: edit_user.email,
                 external_id: edit_user.external_id,
                 id: edit_user.id,
-                image: edit_user.image,
-                notes: edit_user.notes,
+                image: edit_user.image === '' ? null : edit_user.image,
+                notes: edit_user.notes === '' ? null : edit_user.notes,
                 properties: edit_user.properties,
                 stats: edit_user.stats,
                 wallet: edit_user.wallet
@@ -374,6 +383,7 @@ class Users extends Component {
                 redirect: 'follow'
               };
             const res = await fetch(`${config.api}/users/update`, requestOptions)
+            const json = await res.json()
             if (res.status === 200) {
                 let users = this.state.users
                 users = users.map(v => {
@@ -388,7 +398,14 @@ class Users extends Component {
                     successName: `The user was successfully edited`
                 })
                 
-            } else alert('Something went wrong')
+            } else {
+                const errroMessage = json.error.message
+                const parsedMessage = errors[errroMessage] ? errors[errroMessage] : errroMessage
+                this.setState({
+                    showError: true,
+                    errorName: parsedMessage
+                })
+            }
         } catch (error) {
             console.log(error)
         }
@@ -577,6 +594,7 @@ class Users extends Component {
     handleShowDelete = (chosen_user_external_id, chosen_user_id) => this.setState({showDelete: true, chosen_user_external_id, chosen_user_id})
     handleCloseDelete = () => this.setState({showDelete: false, chosen_user_external_id: null, chosen_user_id: null})
     handleCloseSuccess = () => this.setState({showSuccess: false})
+    handleCloseError = () => this.setState({showError: false})
 
     handleCopy(event) {
         const tooltipText = event.target.children[0]
@@ -841,6 +859,7 @@ class Users extends Component {
     changeEditStatName = this.changeEditStatName.bind(this)
     changeEditStatValue = this.changeEditStatValue.bind(this)
     handleCloseSuccess = this.handleCloseSuccess.bind(this)
+    handleCloseError = this.handleCloseError.bind(this)
 
     render() {
         return (
@@ -855,7 +874,7 @@ class Users extends Component {
                     this.state.hasLoad ?  <img className="modal__loader_view modal__loader" src={loader}></img>
                     : 
                     <>
-                    <Modal show={this.state.showAdd} onHide={this.handleCloseAdd} centered>
+                    <Modal id="createUser" show={this.state.showAdd} onHide={this.handleCloseAdd} centered>
                     <Modal.Header closeButton>
                     <Modal.Title className="modal-newuser__title">Add new user</Modal.Title>
                     </Modal.Header>
@@ -1110,7 +1129,7 @@ class Users extends Component {
                     </button>
                     </Modal.Footer>
                 </Modal>
-                <Modal show={this.state.showEdit} onHide={this.handleCloseEdit} centered>
+                <Modal id="editUser" show={this.state.showEdit} onHide={this.handleCloseEdit} centered>
                     <Modal.Header closeButton>
                         <div className="modal-newuser__title modal-title">
                             Edit {this.state.edit_user.external_id}
@@ -1384,6 +1403,11 @@ class Users extends Component {
                     showSuccess={this.state.showSuccess} 
                     handleCloseSuccess={this.handleCloseSuccess}
                     successName={this.state.successName} 
+                />
+                 <ErrorModal 
+                    showError={this.state.showError}
+                    handleCloseError={this.handleCloseError}
+                    errorName={this.state.errorName}
                 />
                 </>
                 }

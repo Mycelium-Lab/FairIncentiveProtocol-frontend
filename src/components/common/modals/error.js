@@ -9,16 +9,20 @@ class ErrorModal extends Component {
 
     entering() {
         const mint = document.getElementById('mint')
-        if(mint) {
-            const modal = mint.parentElement
+        const createUser = document.getElementById('createUser')
+        const editUser = document.getElementById('editUser')
+        const modal = mint?.parentElement || createUser?.parentElement || editUser?.parentElement
+        if(modal) {
             modal.style.zIndex = '1049'
         }
     }
 
     entered() {
         const mint = document.getElementById('mint')
-        if(mint) {
-            const modal = mint.parentElement
+        const createUser = document.getElementById('createUser')
+        const editUser = document.getElementById('editUser')
+        const modal = mint?.parentElement || createUser?.parentElement || editUser?.parentElement
+        if(modal) {
             modal.style.zIndex = '1050'
         }
     }
