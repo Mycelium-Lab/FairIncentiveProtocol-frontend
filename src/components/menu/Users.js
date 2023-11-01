@@ -358,7 +358,15 @@ class Users extends Component {
               };
             const res = await fetch(`${config.api}/rewards/reward/${chosen_type === types.token ? 'token' : 'nft'}`, requestOptions)
             if (res.status === 200) alert('Done')
-            else alert('Something went wrong')
+            else {
+                const json = await res.json()
+                const errroMessage = json.error.message
+                const parsedMessage = errors[errroMessage] ? errors[errroMessage] : errroMessage
+                this.setState({
+                    showError: true,
+                    errorName: parsedMessage
+                })
+            }
         } catch (error) {
             alert(error)
         }
@@ -552,7 +560,7 @@ class Users extends Component {
         isInvalidEmail: false
     })
     handleShowToReward = (external_id, id) => this.setState({chosen_user_id: id, chosen_user_external_id: external_id, showToReward: true})
-    handleCloseToReward = () => this.setState({showToReward: false})
+    handleCloseToReward = () => this.setState({showToReward: false, comment: null})
     handleShowEdit = (user) => {
         const propertiesElements = []
         const statsElements = []
@@ -1091,7 +1099,7 @@ class Users extends Component {
                                                   v.nft_rewards?.length && v.token_rewards?.length 
                                                   ? <>
                                                       <div>
-                                                          {v.nft_rewards?.length ? v.nft_rewards.map((reward, i, arr) => 
+                                                          NFTs: {v.nft_rewards?.length ? v.nft_rewards.map((reward, i, arr) => 
                                                           `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
                                                               ): null}
                                                           </div>
@@ -1127,7 +1135,7 @@ class Users extends Component {
                           : null 
                     }
                 </div>
-                <Modal show={this.state.showToReward} onHide={this.handleCloseToReward} centered>
+                <Modal id="rewardFromUser" show={this.state.showToReward} onHide={this.handleCloseToReward} centered>
                     <Modal.Header closeButton>
                         <div className="modal-newuser__title modal-title h4">
                             Reward {this.state.chosen_user_external_id} (FAIR id: {createLongStrView(this.state.chosen_user_id ? this.state.chosen_user_id : '')})
@@ -1373,83 +1381,94 @@ class Users extends Component {
                                 </button>
                             </div>
                         </div>
-                        <div className="mb-4">
+                        {
+                            this.state.edit_user?.nft_rewards?.length || this.state.edit_user?.nft_rewards?.length
+                            ?   <div className="mb-4">
                             <label className="form__label_group form__label">
                                 Rewarded: <img className="form__icon-info" src={info} />
                             </label>
                             <div className="form__prompt" id="basic-addon4">Total number of distributed rewards</div>
                         </div>
+                            :  <label className="form__label_group form__label">
+                           No  Rewarded
+                        </label>
+                        }
+                      
                         <div className="mb-4">
                             <FPTable notHead={true}>
-                                <tr>
-                                    <td>
-                                            <div className="token-name">
-                                                <img src={customTokeSymbol}></img>
-                                                <div>
+                                {
+                                    this.state.edit_user?.token_rewards?.length ?
+                                     this.state.edit_user.token_rewards.map(v => 
+                                        <tr>
+                                            <td>
+                                                <div className="token-name">
+                                                    <img src={customTokeSymbol}></img>
                                                     <div>
-                                                        ABC
-                                                    </div>
-                                                    <div>
-                                                        Token name
-                                                    </div>
-                                                </div>
-                                            </div>
-                                    </td>
-                                    <td>
-                                        <div>
-                                            1000 received
-                                        </div>
-                                        <div>
-                                            520 available
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                    <div className="token-name">
-                                                <img src={customTokeSymbol}></img>
-                                                <div>
-                                                    <div>
-                                                        ABC
-                                                    </div>
-                                                    <div>
-                                                        Token name
+                                                        {/*<div>
+                                                            ABC
+                                                        </div>
+                                                        */}
+                                                        <div>
+                                                            {v.token_name}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                    </td>
-                                    <td>
-                                        <div>
-                                                1000 received
-                                        </div>
-                                        <div>
-                                                520 available
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                    <div className="token-name">
-                                                <img src={customTokeSymbol}></img>
+                                            </td>
+                                            <td>
                                                 <div>
+                                                {v.count} received
+                                                </div>
+                                                {/*<div>
+                                                        520 available
+                                                </div>
+                                                */}
+                                            </td>
+                                        </tr>
+                                        )
+                            
+                                    : null
+                            
+                                }
+                                   {
+                                    this.state.edit_user?.nft_rewards?.length ?
+                                     this.state.edit_user.nft_rewards.map(v => 
+                                        <tr>
+                                            <td>
+                                                <div className="token-name">
+                                                    <img src={customTokeSymbol}></img>
                                                     <div>
-                                                        NFT name
-                                                    </div>
-                                                    <div>
-                                                        Collection name
+                                                        <div>
+                                                            {v.nft_name}
+                                                        </div>
+                                                        <div>
+                                                        {v.collection_name}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                    </td>
-                                    <td>
-                                        <div>Received</div>
-                                    </td>
-                                </tr>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                {v.count} received
+                                                </div>
+                                                {/*<div>
+                                                        520 available
+                                                </div>
+                                                */}
+                                            </td>
+                                        </tr>
+                                        )
+                                    : null
+                                }
+    
                             </FPTable>
                         </div>
 
-
-                        <div className="dashboard__chart mb-4">
+                        {
+                            /* 
+                            /* Выводить график, когда буду получать статистику по периоду
+                            this.state.edit_user?.token_rewards?.length 
+                            ?  
+                            <div className="dashboard__chart mb-4">
                             <div className="dashboard__chart_reward">
                                 <label className="chart__label">Token reward statistic</label>
                                 <div className="mb-4" style={{position: 'relative', width:'100%', display: 'flex', justifyContent: 'center', padding: '0 24px'}}>
@@ -1462,7 +1481,10 @@ class Users extends Component {
                                 <LineChart chartData={this.state.totalUserData}></LineChart>
                                 </div>
                             </div>
-                        </div>
+                        </div> 
+                            : null
+                            */
+                        }      
                     </Modal.Body>
                 </Modal>
                 <Modal show={this.state.showDelete} onHide={this.handleCloseDelete} centered>
