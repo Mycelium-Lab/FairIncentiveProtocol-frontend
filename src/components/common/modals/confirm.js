@@ -10,7 +10,9 @@ class ConfirmModal extends Component {
         const mint = document.getElementById('mint')
         const createUser = document.getElementById('createUser')
         const editUser = document.getElementById('editUser')
-        const modal = mint?.parentElement || createUser?.parentElement || editUser?.parentElement
+        const blackList = document.getElementById('blackList')
+        const modal = mint?.parentElement || createUser?.parentElement 
+        || editUser?.parentElement || blackList?.parentElement
         if(modal) {
             modal.style.zIndex = '1049'
         }
@@ -20,7 +22,9 @@ class ConfirmModal extends Component {
         const mint = document.getElementById('mint')
         const createUser = document.getElementById('createUser')
         const editUser = document.getElementById('editUser')
-        const modal = mint?.parentElement || createUser?.parentElement || editUser?.parentElement
+        const blackList = document.getElementById('blackList')
+        const modal = mint?.parentElement || createUser?.parentElement 
+        || editUser?.parentElement || blackList?.parentElement
         if(modal) {
             modal.style.zIndex = '1050'
         }

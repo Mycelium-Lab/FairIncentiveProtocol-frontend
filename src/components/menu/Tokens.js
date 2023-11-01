@@ -1514,52 +1514,24 @@ class Tokens extends Component {
                             </div>
                             :
                             (
-                                /*<table className="table table-bordered border-dark">
-                                <thead>
-                                    <tr className="table-secondary" >
-                                    <th className="table-secondary" scope="col">Select</th>
-                                    <th className="table-secondary" scope="col">Wallet</th>
-                                    <th className="table-secondary" scope="col">Block Date</th>
+                                this.state.currentTokenBlacklist.length ?  <FPTable data={blacklistTable}>
+                                {
+                                    this.state.currentTokenBlacklist.map(v => 
+                                    <tr>
+                                        <td>
+                                            <input onChange={() => this.onChangeBlacklistRemove(v.address)} className="form-checkbox" type="checkbox" value="" id="flexCheckChecked"/>
+                                        </td>
+                                        <td>
+                                            <span className="table-text">{createLongStrView(v.address)}</span>
+                                        </td>
+                                        <td>
+                                            <span className="table-text">{`${v.time.toLocaleDateString()} ${v.time.toLocaleTimeString().slice(0,5)}`}</span>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-
-                                    {
-                                    this.state.currentTokenBlacklist.map(
-                                        v => {
-                                            return (
-                                                <tr className="table-secondary">
-                                                    <td className="table-secondary">
-                                                        <div className="form-check">
-                                                            <input onChange={() => this.onChangeBlacklistRemove(v.address)} className="form-check-input" type="checkbox" value="" id="flexCheckChecked"/>
-                                                        </div>
-                                                    </td>
-                                                    <td className="table-secondary">
-                                                        {createLongStrView(v.address)}
-                                                    </td>
-                                                    <td className="table-secondary">
-                                                        {
-                                                            `${v.time.toLocaleDateString()} ${v.time.toLocaleTimeString().slice(0,5)}`
-                                                        }
-                                                    </td>
-                                                </tr>
-                                            )
-                                        }
-                                        )
-                                    }
-                                </tbody>
-                                </table>*/
-                                <FPTable data={blacklistTable}>
-                                    <td>
-                                        <input  className="form-checkbox" type="checkbox" value="" id="flexCheckChecked"/>
-                                    </td>
-                                    <td>
-                                        <span className="table-text">0xE8265C...F98319c4</span>
-                                    </td>
-                                    <td>
-                                        <span className="table-text">22.08.2023 22:11</span>
-                                    </td>
-                                </FPTable>
+                                )
+                                }
+                            </FPTable> : null
+                               
                             )
                         }
                     </Modal.Body>
@@ -1568,7 +1540,7 @@ class Tokens extends Component {
                         <button className="btn btn_primary btn_orange" onClick={this.handleShowBlacklistAdd}>Add new</button>
                     </Modal.Footer>
                 </Modal>
-                <Modal show={this.state.showBlacklistAdd} onHide={this.handleCloseBlacklistAdd} centered>
+                <Modal id="blackList" show={this.state.showBlacklistAdd} onHide={this.handleCloseBlacklistAdd} centered>
                         <Modal.Header className="modal-newuser__title modal-title modal-header" closeButton>
                             Add to blacklist
                         </Modal.Header>
