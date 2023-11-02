@@ -244,8 +244,8 @@ class Dashboard extends Component {
                 <div className="dashboard__tab">
                     <Tabs defaultActiveKey="users">
                         <Tab eventKey="users" title="Users">
-                            <DatePicker changeNewUsersRange={this.changeNewUsersRange} type={typesOfDashboard.users}></DatePicker>
                             <UserInfo></UserInfo>
+                            <DatePicker changeNewUsersRange={this.changeNewUsersRange} type={typesOfDashboard.users}></DatePicker>
                             <div className="dashboard__chart mb-4">
                                 <div className="dashboard__chart_dashboard-info">
                                     <label className="chart__label">New Users</label>
@@ -262,8 +262,8 @@ class Dashboard extends Component {
                             </div>
                         </Tab>
                         <Tab eventKey="rewards" title="Rewards">
-                            <DatePicker changeRewardsRange={this.changeRewardsRange} type={typesOfDashboard.rewards}></DatePicker>
                             <RewardsInfo total={this.state.rewards_total_count}></RewardsInfo>
+                            <DatePicker changeRewardsRange={this.changeRewardsRange} type={typesOfDashboard.rewards}></DatePicker>
                             <div className="dashboard__chart_dashboard-info  mb-4">
                             <label className="chart__label">Rewards</label>
                                 <div className="dashboard__chart_wrapper mb-4" style={{position: 'relative', height:'358px', display: 'flex', justifyContent: 'center'}}>
@@ -287,8 +287,8 @@ class Dashboard extends Component {
             
                         </Tab>
                         <Tab eventKey="tokens" title="Tokens">
-                            <DatePicker></DatePicker>
                             <TokensInfo></TokensInfo>
+                            <DatePicker></DatePicker>
                             <div className="dashboard__chart_dashboard-info  mb-4">
                                 <label className="chart__label">                Token distribution </label>
                                 <div className="dashboard__chart_wrapper mb-4"  style={{position: 'relative', height:'358px', display: 'flex', justifyContent: 'center'}}>
@@ -311,8 +311,8 @@ class Dashboard extends Component {
                             </div>
                         </Tab>
                         <Tab eventKey="NFTs" title="NFTs">
-                            <DatePicker></DatePicker>
                             <NftsInfo></NftsInfo>
+                            <DatePicker></DatePicker>
                             <div className="dashboard__chart_dashboard-info  mb-4">
                             <label className="chart__label">NFTs distribution </label>
                             <div className="dashboard__chart_wrapper mb-4" style={{position: 'relative', height:'358px', display: 'flex', justifyContent: 'center'}}>
