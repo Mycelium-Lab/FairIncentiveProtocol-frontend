@@ -1418,7 +1418,7 @@ class Users extends Component {
                             </div>
                         </div>
                         {
-                            this.state.edit_user?.nft_rewards?.length || this.state.edit_user?.nft_rewards?.length
+                            this.state.edit_user?.nft_rewards?.length || this.state.edit_user?.token_rewards?.length
                             ?   <div className="mb-4">
                             <label className="form__label_group form__label">
                                 Rewarded: <img className="form__icon-info" src={info} />
@@ -1426,7 +1426,7 @@ class Users extends Component {
                             <div className="form__prompt" id="basic-addon4">Total number of distributed rewards</div>
                         </div>
                             :  <label className="form__label_group form__label">
-                           No  Rewarded
+                           No Rewarded
                         </label>
                         }
                       
