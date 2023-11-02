@@ -736,7 +736,7 @@ class Rewards extends Component {
     }
 
     changeUser(selectedOption) {
-        if(selectedOption.label === 'create user') {
+        if(selectedOption.label === 'Create new one') {
             this.props.onSwitch(this.props.switcher.users)
             this.props.goToCreationPage('create user')
             return 
