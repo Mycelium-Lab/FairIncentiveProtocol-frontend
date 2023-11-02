@@ -328,7 +328,7 @@ class Users extends Component {
               };
             const res = await fetch(`${config.api}/rewards/get/nfts`, requestOptions)
             const json = await res.json()
-            json.body.data = json.body.data.filter(v => v.status !== 1)
+            json.body.data = json.body.data.filter(v => v.status === 1)
             this.setState({
                 nftRewards: json.body.data,
                 chosen_reward_nft: json.body.data[0] ? json.body.data[0].id : null
@@ -786,6 +786,11 @@ class Users extends Component {
         })
     }
     changeRewardNFT(event) {
+        if(event.target.value === 'create reward') {
+            this.props.onSwitch(this.props.switcher.rewards)
+            this.props.goToCreationPage('create reward')
+            return 
+        }
         this.setState({
             chosen_reward_nft: event.target.value
         })
@@ -1164,27 +1169,56 @@ class Users extends Component {
                                 </label>
                             </div>
                         </div>*/}
+                        <div className="form_row mb-4">
+                        <div className="form_col">
+                                    <label className="form__label">Choose a reward mode:</label>
+                                        <div className="input-group">
+                                        <div className="form-check custom-control custom-radio custom-control-inline">
+                                            <input  
+                                            checked={this.state.chosen_type === types.token ? true : false}
+                                            onChange={this.changeType} 
+                                            type="radio" id="rd_1" name="rd" value={types.token}/>
+                                            <label className="form-check-label custom-control-label green" for="rd_1">
+                                            Tokens <img src={info} className="form__icon-info"/>
+                                            </label>
+                                        </div>
+                                        <div className="form-check custom-control custom-radio custom-control-inline ms-3">
+                                            <input 
+                                                checked={this.state.chosen_type === types.nft ? true : false}
+                                              onChange={this.changeType} 
+                                            type="radio" id="rd_2" name="rd" value={types.nft} />
+                                            <label className="form-check-label custom-control-label red" for="rd_2">
+                                            NFTs <img src={info} className="form__icon-info"/>
+                                            </label>
+                                        </div>
+                                        </div>   
+                                    </div>
+                                  
+                        </div>
                         <label className="form__label">Select reward: <img className="form__icon-info" src={info}></img></label>
                         <div className="input-group mb-4">
+                        <select onChange={this.state.chosen_type === types.token ? this.changeRewardToken : this.changeRewardNFT} disabled={this.state.chosen_type ? false : true} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
                             {
-                                  this.state.chosen_type === types.token && this.state.tokenRewards.length
-                                  ?  <select onChange={this.state.chosen_type === types.token ? this.changeRewardToken : this.changeRewardNFT} disabled={this.state.chosen_type ? false : true} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                  {
-                                      this.state.chosen_type === types.token
+                                
+                                      this.state.chosen_type === types.token && this.state.tokenRewards.length
                                       ?
                                       <>
                                        <option value="" disabled selected>Select reward</option>
                                         { this.state.tokenRewards.map(v => <option value={v.id}>{v.name}</option>) }
                                       </>
-                                      :
-                                      this.state.nftRewards.map(v => <option value={v.id}>{v.name}</option>)
-                                  }
-                              </select>
-                              : <select onChange={this.state.chosen_type === types.token ? this.changeRewardToken : this.changeRewardNFT} disabled={this.state.chosen_type ? false : true} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                <option value="" disabled selected>Select Reward</option>
-                                <option value='create reward'>Create new one</option>
-                          </select>
+                                      : this.state.chosen_type === types.nft && this.state.nftRewards.length
+                                      ? 
+                                      <>
+                                       <option value="" disabled selected>Select reward</option>
+                                       {this.state.nftRewards.map(v => <option value={v.id}>{v.name}</option>)}
+                                      </>
+                                      : <>
+                                        <option value="" disabled selected>Select reward</option>
+                                        <option value='create reward'>Create new one</option>
+                                      </>
+                                  
                             }
+                             </select>
                         </div>
                         <div className="mb-4">
                             <label className="form__label">Comment: <img className="form__icon-info" src={info}></img></label>

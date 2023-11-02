@@ -941,11 +941,11 @@ class Rewards extends Component {
         description: null,
         amount: null,
         show: false,
-        chosen_token: {value: this.state.tokens[0].address, label: this.state.tokens[0].symbol},
-        reward_nft_name: !this.state.nfts[0].nfts.length ? null : this.state.nfts[0].nfts[0],
-        chosen_nft_collection: {value: this.state.nftCollections[0].address, label: this.state.nftCollections[0].name},
+        chosen_token: {value: this.state?.tokens[0]?.address, label: this.state.tokens[0].symbol},
+        reward_nft_name: !this.state?.nfts[0]?.nfts?.length ? null : this.state.nfts[0].nfts[0],
+        chosen_nft_collection: {value: this.state?.nftCollections[0]?.address, label: this.state?.nftCollections[0]?.name},
         chosen_type: 'token',
-        current_nfts: !this.state.nfts[0].nfts.length ? [] : this.state.current_nfts,
+        current_nfts: !this.state?.nfts[0]?.nfts.length ? [] : this.state?.current_nfts,
         showEditReward: false
     })
     handleCloseSuccess = () => this.setState({showSuccess: false})
