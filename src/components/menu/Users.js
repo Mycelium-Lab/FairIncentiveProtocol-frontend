@@ -306,7 +306,7 @@ class Users extends Component {
               };
             const res = await fetch(`${config.api}/rewards/get/token`, requestOptions)
             const json = await res.json()
-            json.body.data = json.body.data.filter(v => v.status === 1)
+            json.body.data = json.body.data.filter(v => v.status !== 1)
             this.setState({
                 tokenRewards: json.body.data,
                 chosen_reward_token: json.body.data[0] ? json.body.data[0].id : null
@@ -328,7 +328,7 @@ class Users extends Component {
               };
             const res = await fetch(`${config.api}/rewards/get/nfts`, requestOptions)
             const json = await res.json()
-            json.body.data = json.body.data.filter(v => v.status === 1)
+            json.body.data = json.body.data.filter(v => v.status !== 1)
             this.setState({
                 nftRewards: json.body.data,
                 chosen_reward_nft: json.body.data[0] ? json.body.data[0].id : null

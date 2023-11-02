@@ -1063,7 +1063,7 @@ class Rewards extends Component {
                                  <tr>
                                           <td>   
                                                 <label className="switch">
-                                                    <input type="checkbox" checked={v.status == 1} onChange={() => v.nft_id ? this.changeNFTRewardStatus(v.id, v.status) : this.changeTokenRewardStatus(v.id, v.status)} role="switch"></input>
+                                                    <input type="checkbox" checked={v.status == 0} onChange={() => v.nft_id ? this.changeNFTRewardStatus(v.id, v.status) : this.changeTokenRewardStatus(v.id, v.status)} role="switch"></input>
                                                     <span className="slider round"></span>
                                                 </label>  
                                           </td>
@@ -1090,7 +1090,7 @@ class Rewards extends Component {
                                             
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowStats(v.name)}>Stat</Dropdown.Item>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowEditReward(v.name, v.id, v.count, v.description, v.amount, v.nft_id ? types.nft :types.token, v.address, v.nft_id , v.symbol, v.nft_name)}>Edit</Dropdown.Item>
-                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowReward(v.name, v.id, v.nft_id)} disabled={!v.status}>To reward</Dropdown.Item>
+                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowReward(v.name, v.id, v.nft_id)} disabled={v.status}>To reward</Dropdown.Item>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowDelete(v.nft_id ? types.nft : types.token, v.id, v.name)}>Delete</Dropdown.Item>
 
                                             </FPDropdown>
