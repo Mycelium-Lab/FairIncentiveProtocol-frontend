@@ -1716,7 +1716,7 @@ class Tokens extends Component {
                                 
                             <ol className="mint-token-info-list">
                                     <li className="modal-text">
-                                        Contracts: (soon) <img src={info} className="form__icon-info"/>
+                                        Contracts: <a target="_blank" ref="norefferer" href={this.state.tokenInfo.chainid ? `${networks[this.state.tokenInfo.chainid].explorer}/address/${this.state.tokenInfo.address}` : '#'}>{this.state.tokenInfo.address}</a> <img src={info} className="form__icon-info"/>
                                        {/*<ul className="unlist">
                                             <li className="custom-marker_circle_black"><a className="link__primary">0x2170ed0880ac9a755fd29b2688956bd959f933f8</a> <img src={copy} className="form__icon-info"></img></li>
                                             </ul>*/}
