@@ -67,6 +67,7 @@ class Users extends Component {
             tabelData: userTable,
             showEditUser: false,
             showSuccess: false,
+            successTitle: null,
             successName: null,
             showError: false,
             errorName: null,
@@ -422,6 +423,7 @@ class Users extends Component {
                 this.setState({
                     users, showEdit: false,
                     showSuccess: true,
+                    successTitle: 'Edit user',
                     successName: `The user was successfully edited`
                 })
                 
@@ -1498,6 +1500,7 @@ class Users extends Component {
                 </Modal>
                 <SuccessModal 
                     showSuccess={this.state.showSuccess} 
+                    successTitle={this.state.successTitle}
                     handleCloseSuccess={this.handleCloseSuccess}
                     successName={this.state.successName} 
                 />

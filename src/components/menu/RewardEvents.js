@@ -13,8 +13,10 @@ import FPDropdown from "../common/FPDropdown";
 import FPTable from "../common/FPTable";
 import { rewardEventsTable } from "../../data/tables";
 import SuccessModal from "../common/modals/success";
+import ErrorModal from "../common/modals/error";
 import loader from '../../media/common/loader.svg'
 import empty from "../../media/common/empty_icon.svg"
+import errors from "../../errors";
 
 const types = {
     token: 'token',
@@ -44,6 +46,7 @@ class RewardEvents extends Component {
             tokenRewardsName: [],
             tokenRewards: [],
             showSuccess: false,
+            successTitile: null,
             successName: null,
             hasLoad: false,
         }
@@ -180,6 +183,7 @@ class RewardEvents extends Component {
     }
 
     changeRewardToken(event) {
+        console.log(event.target.value)
         if(event.target.value === 'create reward') {
             this.props.onSwitch(this.props.switcher.rewards)
             return 
@@ -214,7 +218,15 @@ class RewardEvents extends Component {
                 })
                 this.handleCloseRevoke()
             }
-            else alert('Something went wrong')
+            else {
+                const json = await res.json()
+                const errroMessage = json.error.message
+                const parsedMessage = errors[errroMessage] ? errors[errroMessage] : errroMessage
+                this.setState({
+                    showError: true,
+                    errorName: parsedMessage
+                })
+            }
         } catch (error) {
             console.log(error)
         }
@@ -245,7 +257,15 @@ class RewardEvents extends Component {
                 })
                 this.handleCloseRevoke()
             }
-            else alert('Something went wrong')
+            else {
+                const json = await res.json()
+                const errroMessage = json.error.message
+                const parsedMessage = errors[errroMessage] ? errors[errroMessage] : errroMessage
+                this.setState({
+                    showError: true,
+                    errorName: parsedMessage
+                })
+            }
         } catch (error) {
             console.log(error)
         }
@@ -298,10 +318,18 @@ class RewardEvents extends Component {
                 this.setState({
                     showReward: false,
                     showSuccess: true,
+                    successTitle: 'Reward event',
                     successName: `The "${tokenRewards.find(v => v.id === this.state.reward_id).name}" event was successfully added`
                 })
             }
-            else alert('Something went wrong')
+            else {
+                const errroMessage = json.error.message
+                const parsedMessage = errors[errroMessage] ? errors[errroMessage] : errroMessage
+                this.setState({
+                    showError: true,
+                    errorName: parsedMessage
+                })
+            }
         } catch (error) {
             console.log(error)
         }
@@ -311,11 +339,12 @@ class RewardEvents extends Component {
     handleShowRevoke = (revoke_event_id, revoke_event_type) => this.setState({showRevoke: true, revoke_event_id, revoke_event_type})
     handleCloseRevoke = () => this.setState({showRevoke: false, revoke_event_id: null, revoke_event_type: null})
     handleShowReward = () => this.setState({showReward: true})
-    handleCloseReward = () => this.setState({showReward: false})
+    handleCloseReward = () => this.setState({showReward: false, reward_id: null})
     handleShowAdd = () => {
         this.props.onSwitch(this.props.switcher.rewards)
     }
     handleCloseSuccess = () => this.setState({showSuccess: false, successName: null})
+    handleCloseError = () => this.setState({showError: false})
     changeUser = this.changeUser.bind(this)
     changeComment = this.changeComment.bind(this)
     changeRewardToken = this.changeRewardToken.bind(this)
@@ -332,6 +361,7 @@ class RewardEvents extends Component {
     handleCloseReward = this.handleCloseReward.bind(this)
     rewardWithToken = this.rewardWithToken.bind(this)
     handleCloseSuccess = this.handleCloseSuccess.bind(this)
+    handleCloseError = this.handleCloseError.bind(this)
 
     render() {
 
@@ -545,21 +575,20 @@ class RewardEvents extends Component {
                 </table>
                 */
                 }
-                 <Modal show={this.state.showReward} onHide={this.handleCloseReward} centered>
+                 <Modal id="rewarding" show={this.state.showReward} onHide={this.handleCloseReward} centered>
                     <Modal.Header  className="modal-newuser__title modal-title" closeButton>
                         Rewarding {this.state.reward_name}
                     </Modal.Header>
                     <Modal.Body>
                     <div className="form_row ">
                                 <div className="form_col_last form_col">
-                                <label className="form__label">Select reward: <img className="form__icon-info" src={info}></img></label>
+                                <label className="form__label">Select reward * <img className="form__icon-info" src={info}></img></label>
                                 <div className="input-group mb-4">
                                     <select onChange={this.changeRewardToken} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-
+                                    <option value="" disabled selected>Select token</option>
                                         {
                                             !this.state.tokenRewardsName.length
                                              ? <>
-                                               <option value="" disabled selected>Select token</option>
                                                <option value='create reward'>Create new one</option>
                                              </>
                                             :
@@ -604,9 +633,17 @@ class RewardEvents extends Component {
                     <button className="btn btn_primary btn_gray" onClick={this.handleCloseReward}>
                         Cancel
                     </button>
-                    <button className="btn btn_primary btn_orange" onClick={this.state.switcher === types.token ? this.rewardWithToken : this.rewardWithNFT}>
+
+                    {
+                        !this.state.reward_id
+                        ? <button className="btn btn_primary btn_orange btn_disabled">
                         Reward
                     </button>
+                    :
+                    <button className="btn btn_primary btn_orange"  onClick={this.state.switcher === types.token ? this.rewardWithToken : this.rewardWithNFT}>
+                        Reward
+                    </button>
+                    }
                     </Modal.Footer>
                 </Modal>
                 <Modal show={this.state.showRevoke} onHide={this.handleCloseRevoke} centered>
@@ -626,7 +663,13 @@ class RewardEvents extends Component {
                 <SuccessModal 
                     showSuccess={this.state.showSuccess} 
                     handleCloseSuccess={this.handleCloseSuccess}
+                    successTitile={this.state.successTitile}
                     successName={this.state.successName} 
+                />
+                   <ErrorModal 
+                    showError={this.state.showError}
+                    handleCloseError={this.handleCloseError}
+                    errorName={this.state.errorName}
                 />
                      </>
                 }
