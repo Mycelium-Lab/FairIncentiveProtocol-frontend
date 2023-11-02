@@ -1194,7 +1194,7 @@ class Rewards extends Component {
                             ?
                             <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
-                                    <label className="form__label" style={this.state.reward_count != 0 ? {color: "grey"}: null}>Amount* : <img className="form__icon-info" src={info}/> </label>
+                                    <label className="form__label">Amount* : <img className="form__icon-info" src={info}/> </label>
                                     <div className="input-group">
                                         <input type="number" className="form-control" onChange={this.changeAmount} placeholder="e.g. 5" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default"/>
                                     </div>
@@ -1350,12 +1350,11 @@ class Rewards extends Component {
                 
                     <div className="form_row  mb-4">
                                     <div className="form_col">
-                                    <label className="form__label" style={this.state.reward_count != 0 ? {color: "grey"} : null}>Choose a reward mode:</label>
+                                    <label className="form__label" >Choose a reward mode:</label>
                                         <div className="input-group">
                                         <div className="form-check custom-control custom-radio custom-control-inline">
                                             <input  
                                             onChange={this.changeType} checked={this.state.reward_type === types.token ? true : false}
-                                            disabled={this.state.reward_count != 0 || this.state.reward_type === types.nft ? true : false} 
                                             type="radio" id="rd_1" name="rd" value={types.token}/>
                                             <label className="form-check-label custom-control-label green" for="rd_1">
                                             Tokens <img src={info} className="form__icon-info"/>
@@ -1364,7 +1363,6 @@ class Rewards extends Component {
                                         <div className="form-check custom-control custom-radio custom-control-inline ms-3">
                                             <input 
                                               onChange={this.changeType} checked={this.state.reward_type === types.nft ? true : false}
-                                              disabled={this.state.reward_count != 0 || this.state.reward_type === types.token ? true : false}
                                             type="radio" id="rd_2" name="rd" value={types.nft} />
                                             <label className="form-check-label custom-control-label red" for="rd_2">
                                             NFTs <img src={info} className="form__icon-info"/>
@@ -1377,7 +1375,7 @@ class Rewards extends Component {
 
                      <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
-                                    <label style={this.state.reward_count != 0 ? {color: "grey"} : null} className="form__label">Select { this.state.reward_type === types.token ? 'token' : 'NFT collection'}:<img className="form__icon-info" src={info}/> </label>
+                                    <label className="form__label">Select { this.state.reward_type === types.token ? 'token' : 'NFT collection'}:<img className="form__icon-info" src={info}/> </label>
                                     <div className="input-group ">
                                       {
                                         this.state.reward_type === types.token ?
@@ -1409,9 +1407,9 @@ class Rewards extends Component {
                             ?
                             <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
-                                    <label className="form__label" style={this.state.reward_count != 0 ? {color: "grey"}: null}>Amount: <img className="form__icon-info" src={info}/> </label>
+                                    <label className="form__label">Amount: <img className="form__icon-info" src={info}/> </label>
                                     <div className="input-group">
-                                        <input style={this.state.reward_count != 0 ? {color: "grey"}: null } type="number" defaultValue={this.state.reward_amount ? this.state.reward_amount : '0'} disabled={this.state.reward_count != 0 ? true : false} className="form-control" onChange={this.changeRewardAmount} aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default"/>
+                                        <input  type="number" defaultValue={this.state.reward_amount ? this.state.reward_amount : '0'} className="form-control" onChange={this.changeRewardAmount} aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default"/>
                                     </div>
                                     <div className="form__prompt" id="basic-addon4">Enter the amount of tokens for each reward</div>
                                 </div>
@@ -1419,9 +1417,8 @@ class Rewards extends Component {
                             :
                             <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
-                                    <label className="form__label" style={this.state.reward_count != 0 ? {color: "grey"} : null}>Select token from collection: <img className="form__icon-info" src={info}/> </label>
+                                    <label className="form__label">Select token from collection: <img className="form__icon-info" src={info}/> </label>
                                   <Select
-                                        style={this.state.reward_count != 0 ? {color: "grey"} : null} disabled={this.state.reward_count != 0 ? true : false}
                                         className="w-100"
                                         value={!this.state.current_nfts.length ? 'create token from collection:' : this.state.reward_nft_name }
                                         placeholder={"Choose nfts"}
@@ -1466,7 +1463,7 @@ class Rewards extends Component {
                         </div>
                     </Modal.Body>
                     <Modal.Footer>
-                    <button className="btn btn_primary btn_gray" onClick={this.handleClose}>
+                    <button className="btn btn_primary btn_gray" onClick={this.handleCloseEditReward}>
                         Cancel
                     </button>
                     <button className="btn btn_primary btn_orange" onClick={this.saveEdit}>
