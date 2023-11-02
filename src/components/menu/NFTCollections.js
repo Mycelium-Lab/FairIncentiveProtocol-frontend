@@ -51,6 +51,7 @@ class NFTCollections extends Component {
             name: null,
             symbol: null,
             description: null,
+            description2: null,
             chainid: networks[config.status === "test" ? '80001' : '137'].chainid,
             provider: null,
             signer: null,
@@ -166,6 +167,12 @@ class NFTCollections extends Component {
     onChangeDescription(event) {
         this.setState({
             description: event.target.value
+        })
+    }
+
+    onChangeDescription2(event) {
+        this.setState({
+            description2: event.target.value
         })
     }
 
@@ -383,7 +390,7 @@ class NFTCollections extends Component {
                 })
                 contract.deployed().then(() => {
                     this.handleCloseProgress()
-                    this.handleShowSuccess(`${symbol} collection created`, `The contract creation was successful`)
+                    this.handleShowSuccess('Create NFT', `${symbol} collection created`, `The contract creation was successful`)
                     this.setState({
                         showCreate: false,
                         stageOfCreateToken: 0,
@@ -419,6 +426,7 @@ class NFTCollections extends Component {
                 this.setState({
                     showAddNFT: false,
                     showSuccess: true,
+                    successTitle: 'Create NFT',
                     successName: `The NFT "${this.state.addNFTName}" was successfully created`
                 })
             }
@@ -617,7 +625,7 @@ class NFTCollections extends Component {
     handleCloseConfirm = () => this.setState({showConfirm: false, confirmName: null, confirmText: null})
     handleShowProgress = () => this.setState({showProgress: true})
     handleCloseProgress = () => this.setState({showProgress: false})
-    handleShowSuccess = (successName, successText) => this.setState({showSuccess: true, successName, successText})
+    handleShowSuccess = (successTitle, successName, successText) => this.setState({showSuccess: true, successName, successText, successTitle})
     handleCloseSuccess = () => this.setState({showSuccess: false, successName: null, successText: null})
     handleShowError = (errorText) => this.setState({showError: true, errorText})
     handleCloseError = () => this.setState({showError: false})
@@ -642,6 +650,7 @@ class NFTCollections extends Component {
     changeNetwork = this.changeNetwork.bind(this)
     changeCollection = this.changeCollection.bind(this)
     onChangeDescription = this.onChangeDescription.bind(this)
+    onChangeDescription2 = this.onChangeDescription2.bind(this)
     handleCloseCreateImagesPage = this.handleCloseCreateImagesPage.bind(this)
     handleShowCreateImagesPage = this.handleShowCreateImagesPage.bind(this)
     handleCloseCreateBeneficialPage = this.handleCloseCreateBeneficialPage.bind(this)
@@ -1495,7 +1504,7 @@ class NFTCollections extends Component {
                                                 </label>  
                                                     </div>
                                                     <div input-group>
-                                                        <textarea type="text" value={this.state.description} onChange={this.onChangeDescription} className="form__textarea form__textarea_desct-nft-collection" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
+                                                        <textarea type="text" value={this.state.description2} onChange={this.onChangeDescription2} className="form__textarea form__textarea_desct-nft-collection" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
                                                     </div>
                                             </div>
                                         </div>
@@ -1524,6 +1533,7 @@ class NFTCollections extends Component {
                     showSuccess={this.state.showSuccess} 
                     handleCloseSuccess={this.handleCloseSuccess}
                     successName={this.state.successName} 
+                    successTitle={this.state.successTitle}
                     successText={this.state.successText}
                 />
                 <ErrorModal
