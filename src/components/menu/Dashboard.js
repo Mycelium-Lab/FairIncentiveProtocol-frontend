@@ -150,7 +150,6 @@ class Dashboard extends Component {
                     color: 'rgba(255, 159, 64, 1)'
                 },
             ]
-            console.log(typeOfRewards, json.body.data.erc20)
             this.setState({
                 typeOfRewardsData: !typeOfRewards[0]?.value
                     ?  this.state.typeOfRewardsMockData 
@@ -207,6 +206,7 @@ class Dashboard extends Component {
     }
 
     async changeNewUsersRange(startDate, endDate) {
+        const isTodayOrYesterday = startDate.getDate() === endDate.getDate() && startDate.getMonth() === endDate.getMonth()
         try {
             const headers = new Headers();
             headers.append("Authorization", getBearerHeader())
@@ -221,7 +221,7 @@ class Dashboard extends Component {
             const res = await fetch(`${config.api}/stat/new_users_range?` + query.toString(), requestOptions)
             const json = await res.json()
             const range = {
-                labels: json.body.data.map(v => `${new Date(v.date_interval_end).toLocaleDateString()} ${new Date(v.date_interval_end).toLocaleTimeString()}`),
+                labels: json.body.data.map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "")  : new Date(v.date_interval_end).toLocaleDateString()} `),
                 datasets: [{
                     data: json.body.data.map(v => parseInt(v.count)),
                     backgroundColor: ['rgba(255, 159, 67, 0.85)']
@@ -230,7 +230,7 @@ class Dashboard extends Component {
             const resTotal = await fetch(`${config.api}/stat/total_users_range?` + query.toString(), requestOptions)
             const jsonTotal = await resTotal.json()
             const rangeTotal = {
-                labels: jsonTotal.body.data.map(v => `${new Date(v.end_date).toLocaleDateString()} ${new Date(v.end_date).toLocaleTimeString()}`),
+                labels: jsonTotal.body.data.map(v => `${isTodayOrYesterday ? new Date(v.end_date).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "") : new Date(v.end_date).toLocaleDateString()} `),
                 datasets: [{
                     data: jsonTotal.body.data.map(v => parseInt(v.count)),
                     backgroundColor: ['rgba(255, 159, 67, 0.85)']
@@ -246,6 +246,7 @@ class Dashboard extends Component {
     }
 
     async changeRewardsRange(startDate, endDate) {
+        const isTodayOrYesterday = startDate.getDate() === endDate.getDate() && startDate.getMonth() === endDate.getMonth()
         try {
             const headers = new Headers();
             headers.append("Authorization", getBearerHeader())
@@ -260,7 +261,7 @@ class Dashboard extends Component {
             const res = await fetch(`${config.api}/stat/rewards_range?` + query.toString(), requestOptions)
             const json = await res.json()
             const range = {
-                labels: json.body.data.map(v => `${new Date(v.date_interval_end).toLocaleDateString()} ${new Date(v.date_interval_end).toLocaleTimeString()}`),
+                labels: json.body.data.map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "") : new Date(v.date_interval_end).toLocaleDateString()}`),
                 datasets: [{
                     data: json.body.data.map(v => parseInt(v.count)),
                     backgroundColor: ['rgba(255, 159, 67, 0.85)']
