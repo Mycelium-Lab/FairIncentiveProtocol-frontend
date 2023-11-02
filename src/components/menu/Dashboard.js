@@ -19,19 +19,55 @@ class Dashboard extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            newUserData: {
-                labels: newUser.map(data => data.time),
+            distributionOfRewardsMockData: {
+                labels: ['Reward name'],
                 datasets: [{
-                    data: newUser.map(data => data.amount),
+                    data: [100],
                     backgroundColor: ['rgba(255, 159, 67, 0.85)']
                 }]
             },
-            totalUserData: {
-                labels: newUser.map(data => data.time),
+            typeOfRewardsMockData: {
+                labels: ['Tokens', 'NFTs'],
                 datasets: [{
-                    data: newUser.map(data => data.amount),
-                    borderColor: ['rgba(255, 159, 67, 0.85)'],
+                    data: [100, 100],
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)', 'rgba(255, 159, 67, 0.85)']
                 }]
+            },
+            tokensIssuesMockData: {
+                labels: ['Claimed', 'Distributed', 'Available'],
+                datasets: [{
+                    data: [100, 100, 100],
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)', 'rgba(255, 159, 67, 0.85)', 'rgba(255, 159, 67, 0.85)']
+                }]
+            },
+            tokensSupplyMockData: {
+                labels: ['Tokens', 'NFTs'],
+                datasets: [{
+                    data: [100, 100],
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)', 'rgba(255, 159, 67, 0.85)']
+                }]
+            },
+            collectionIssueMockData: {
+                labels: ['Claimed', 'Distributed', 'Available'],
+                datasets: [{
+                    data: [100, 100, 100],
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)', 'rgba(255, 159, 67, 0.85)', 'rgba(255, 159, 67, 0.85)']
+                }]
+            },
+            collectionSupplyMockData: {
+                labels: ['Tokens', 'NFTs'],
+                datasets: [{
+                    data: [100, 100],
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)', 'rgba(255, 159, 67, 0.85)']
+                }]
+            },
+            newUserData: {
+                labels: [],
+                datasets: []
+            },
+            totalUserData: {
+                labels: [],
+                datasets: []
             },
             rewardsRange: {
                 labels: [],
@@ -114,8 +150,11 @@ class Dashboard extends Component {
                     color: 'rgba(255, 159, 64, 1)'
                 },
             ]
+            console.log(typeOfRewards, json.body.data.erc20)
             this.setState({
-                typeOfRewardsData: {
+                typeOfRewardsData: !typeOfRewards[0]?.value
+                    ?  this.state.typeOfRewardsMockData 
+                    : {
                     labels: typeOfRewards.map(data => data.name),
                     datasets: [{
                         data: typeOfRewards.map(data => data.value),
@@ -152,7 +191,9 @@ class Dashboard extends Component {
                 }
             })
             this.setState({
-                distributionOfRewardsData: {
+                distributionOfRewardsData: !distributionOfRewards.length 
+                ? this.state.distributionOfRewardsMockData 
+                :{
                     labels: distributionOfRewards.map(data => data.name),
                     datasets: [{
                         data: distributionOfRewards.map(data => data.value),
@@ -299,13 +340,13 @@ class Dashboard extends Component {
                                 <div className="dashboard__chart_dashboard-info  mb-4">
                                     <label className="chart__label">Tokens issue</label>
                                     <div style={{position: 'relative', height:'358px', display: 'flex', justifyContent: 'center'}}>
-                                        <DonutChart chartData={this.state.tokensIssuesData}></DonutChart>
+                                        <DonutChart chartData={this.state.tokensIssuesMockData}></DonutChart>
                                     </div>
                                 </div>
                                 <div className="dashboard__chart_dashboard-info  mb-4">
                                     <label className="chart__label">Tokens supply</label>
                                     <div style={{position: 'relative', height:'358px', display: 'flex', justifyContent: 'center'}}>
-                                        <DonutChart chartData={this.state.typeOfRewardsData}></DonutChart>
+                                        <DonutChart chartData={this.state.tokensSupplyMockData}></DonutChart>
                                     </div>
                                 </div>
                             </div>
@@ -323,13 +364,13 @@ class Dashboard extends Component {
                                 <div className="dashboard__chart_dashboard-info  mb-4">
                                     <label className="chart__label">Collection issue</label>
                                     <div style={{position: 'relative', height:'358px', display: 'flex', justifyContent: 'center'}}>
-                                        <DonutChart chartData={this.state.collectionIssueData}></DonutChart>
+                                        <DonutChart chartData={this.state.collectionIssueMockData}></DonutChart>
                                     </div>
                                 </div>
                                 <div className="dashboard__chart_dashboard-info  mb-4">
                                     <label className="chart__label">Collection supply</label>
                                     <div style={{position: 'relative', height:'358px', display: 'flex', justifyContent: 'center'}}>
-                                        <DonutChart chartData={this.state.typeOfRewardsData}></DonutChart>
+                                        <DonutChart chartData={this.state.collectionSupplyMockData}></DonutChart>
                                     </div>
                                 </div>
                             </div>
