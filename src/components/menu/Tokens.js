@@ -1441,44 +1441,47 @@ class Tokens extends Component {
                                     </li>
                                 </ol>
                             </div>
-                            <div className="form_row mb-4">
-                            <div className="form_col_last form_col">
-                                <label className="form__label">Amount to mint * <img src={info} className="form__icon-info"/></label>
-                                    <div className="input-group">
-                                        <input type="number" placeholder="10" onChange={this.onChangeMintTokenAmount} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                    </div>
-                                    <div className="form__prompt" id="basic-addon4">{`Enter the number of the ${this.state.currentTokenSymbol} tokens you want to create`}</div>
-                            </div>
-                            </div>
-                            <div className="form_row">
-                                <div className="form_col">
-                                    <label className="form__label">Destination to send * :</label>
-                                </div>
-                            </div>
-                            <div className="form_row mb-4">
-                                <div className="form_col_flex form_col">
-                                    <div className="form-check custom-control custom-radio custom-control-inline">
-                                            <input checked={this.state.chosen_mint_type === destinationToSend.contract ? true : false}
-                                              onChange={this.changeType}  type="radio" id="rd_1" name="rd" value="contract"/>
-                                            <label className="form-check-label custom-control-label green" for="rd_1">
-                                                Contract balance <img src={info} className="form__icon-info"/>
-                                            </label>
-                                        </div>
-                                        <div className="form-check custom-control custom-radio custom-control-inline">
-                                            <input checked={this.state.chosen_mint_type === destinationToSend.wallet ? true : false}
-                                              onChange={this.changeType} type="radio" id="rd_2" name="rd" value="wallet" />
-                                            <label className="form-check-label custom-control-label red" for="rd_2">
-                                                External wallet <img src={info} className="form__icon-info"/>
-                                            </label>
-                                        </div>
-                                </div>
-                            </div>
                             {
+                                Number(this.state.mintTokenAvailableToMint) >= 0
+                                ? <>
+                                  <div className="form_row mb-4">
+                                        <div className="form_col_last form_col">
+                                            <label className="form__label">Amount to mint * <img src={info} className="form__icon-info"/></label>
+                                                <div className="input-group">
+                                                    <input type="number" placeholder="10" onChange={this.onChangeMintTokenAmount} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                </div>
+                                                <div className="form__prompt" id="basic-addon4">{`Enter the number of the ${this.state.currentTokenSymbol} tokens you want to create`}</div>
+                                        </div>
+                                    </div> 
+                                    <div className="form_row">
+                                    <div className="form_col">
+                                        <label className="form__label">Destination to send * :</label>
+                                    </div>
+                                </div>
+                                <div className="form_row mb-4">
+                                    <div className="form_col_flex form_col">
+                                        <div className="form-check custom-control custom-radio custom-control-inline">
+                                                <input checked={this.state.chosen_mint_type === destinationToSend.contract ? true : false}
+                                                  onChange={this.changeType}  type="radio" id="rd_1" name="rd" value="contract"/>
+                                                <label className="form-check-label custom-control-label green" for="rd_1">
+                                                    Contract balance <img src={info} className="form__icon-info"/>
+                                                </label>
+                                            </div>
+                                            <div className="form-check custom-control custom-radio custom-control-inline">
+                                                <input checked={this.state.chosen_mint_type === destinationToSend.wallet ? true : false}
+                                                  onChange={this.changeType} type="radio" id="rd_2" name="rd" value="wallet" />
+                                                <label className="form-check-label custom-control-label red" for="rd_2">
+                                                    External wallet <img src={info} className="form__icon-info"/>
+                                                </label>
+                                            </div>
+                                    </div>
+                                </div>
+                                {
                                 this.state.isInvalidAddress ? <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
                                     <label className="form__label">Send to * :</label>
                                     <div className="input-group">
-                                        <input maxlength="42" type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.handleDestinationAddress} className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        <input maxLength="42" type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.handleDestinationAddress} className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                     </div>
                                     <div className="form__prompt_error form__prompt" id="basic-addon4">Invalid wallet address format. Example: 0x71C7656EC7ab88b098defB751B7401B5f6d8976F</div>
                                 </div>
@@ -1487,26 +1490,31 @@ class Tokens extends Component {
                             <div className="form_col_last form_col">
                                 <label className="form__label">Send to * :</label>
                                 <div className="input-group">
-                                    <input maxlength="42" type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.handleDestinationAddress} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    <input maxLength="42" type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.handleDestinationAddress} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                 </div>
                                 <div className="form__prompt" id="basic-addon4">Enter a wallet to deliver the tokens to</div>
                             </div>
                         </div>
                             }
+                                </>
+                                : null
+                            }
                             </>
                         }
                     </Modal.Body>
                     <Modal.Footer>
+
                         {
-                            Number(this.state.mintTokenAmount) > 0 && Number(this.state.mintTokenAmount) <= Number(this.state.mintTokenAvailableToMint) && this.state.chosen_mint_type && this.state.destinationAddress && !this.state.isInvalidAddress
+                            Number(this.state.mintTokenAvailableToMint) < 0 ? null
+                            : Number(this.state.mintTokenAmount) > 0 && Number(this.state.mintTokenAmount) <= Number(this.state.mintTokenAvailableToMint) && this.state.chosen_mint_type && this.state.destinationAddress && !this.state.isInvalidAddress
                             ?     <button  type="button" className="btn btn_secondary btn_orange" onClick={this.mint}>
                             Mint
                             </button>
-                             : Number(this.state.mintTokenAmount) > 0 && this.state.mintTokenAvailableToMint === '0.0' && this.state.chosen_mint_type && this.state.destinationAddress && !this.state.isInvalidAddress
-                             ? 
-                             <button  type="button" className="btn btn_secondary btn_orange" onClick={this.mint}>
-                             Mint
-                             </button>
+                              : Number(this.state.mintTokenAmount) > 0 && this.state.mintTokenAvailableToMint === '0.0' && this.state.chosen_mint_type && this.state.destinationAddress && !this.state.isInvalidAddress
+                              ? 
+                              <button  type="button" className="btn btn_secondary btn_orange" onClick={this.mint}>
+                              Mint
+                              </button>
                             :   <button className="btn btn_secondary btn_orange btn_disabled">
                             Mint
                             </button>
@@ -1598,7 +1606,7 @@ class Tokens extends Component {
                                 <div className="form_col_last form_col">
                                 <label className="form__label"><img src={infoRed} className="form__icon-info_left form__icon-info"/> Transfer ownership * <img src={info} className="form__icon-info"/></label>
                                     <div className="input-group">
-                                        <input maxlength="42" type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.handleDestinationAddress} className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        <input maxLength="42" type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.handleDestinationAddress} className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                         <button className="btn_wide btn btn_primary btn_orange ms-2">Transfer ownership</button>
                                     </div>
                                     <div className="form__prompt_error form__prompt" id="basic-addon4">Invalid wallet address format. Example: 0x71C7656EC7ab88b098defB751B7401B5f6d8976F</div>
@@ -1608,7 +1616,7 @@ class Tokens extends Component {
                                 <div className="form_col_last form_col">
                                     <label className="form__label">Send to * :</label>
                                     <div className="input-group">
-                                        <input maxlength="42" type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.handleDestinationAddress} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        <input maxLength="42" type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.handleDestinationAddress} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                         <button className="btn_wide btn btn_primary btn_orange ms-2">Transfer ownership</button>
                                     </div>
                                     <div className="form__prompt" id="basic-addon4">Enter a wallet to deliver the tokens to</div>
@@ -1739,7 +1747,10 @@ class Tokens extends Component {
                                         Circulating Supply: (soon) <img src={info} className="form__icon-info"/>
                                     </li>
                                     <li className="modal-text">
-                                        Available to mint: {this.state.mintTokenAvailableToMint} {this.state.tokenInfo.symbol} <a className="info__content-mint_medium info__content-mint">{'[mint]'}</a> <img src={info} className="form__icon-info"/>
+                                        Available to mint: {this.state.mintTokenAvailableToMint} {this.state.tokenInfo.symbol} <a className="info__content-mint_medium info__content-mint" onClick={() => {
+                                            this.handleCloseInfo()
+                                            this.handleShowMint(this.state.tokenInfo.symbol, this.state.tokenInfo.address, this.state.tokenInfo.chainid)
+                                        }}>{'[mint]'}</a> <img src={info} className="form__icon-info"/>
                                     </li>
                                 </ol>
                             </div>
