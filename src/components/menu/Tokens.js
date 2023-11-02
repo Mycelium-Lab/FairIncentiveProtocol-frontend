@@ -32,8 +32,12 @@ import { Dropdown } from "react-bootstrap";
 import loader from '../../media/common/loader.svg'
 import LineChart from "../charts/LineChart";
 import { newUser } from "../../data/data";
+import errors from "../../errors";
 
 //TODO: Как-то добавлять провайдера и signer сразу
+
+let mintingManagersElementsLength = 0
+let financialManagersElementsLength = 0
 
 const emissionTypes = [
     {
@@ -50,12 +54,15 @@ const emissionTypes = [
     },
 ]
 
+const destinationToSend = {
+    contract: 'contract',
+    wallet: 'wallet'
+}
+
 const burnAddressType = {
     current: 'current',
     other: 'other'
 }
-
-let editMintingManagersElementsLength = 0
 
 class Tokens extends Component {
 
@@ -65,7 +72,7 @@ class Tokens extends Component {
             name: null,
             symbol: null,
             provider: null,
-            chainid: null,
+            chainid: networks[config.status === "test" ? '80001' : '137'].chainid,
             signer: null,
             address: null,
             showCreate: false,
@@ -83,6 +90,8 @@ class Tokens extends Component {
             showError: false,
             successName: null,
             successText: null,
+            successTitle: null,
+            errorName: null,
             errorText: null,
             confirmName: null,
             confirmText: null,
@@ -96,7 +105,7 @@ class Tokens extends Component {
             mintTokenMaxSupply: null,
             mintTokenAvailableToMint: null,
             tokens: [],
-            network: networks[config.status === "test" ? '5' : '1'],
+            network: networks[config.status === "test" ? '80001' : '137'],
             emissionType: emissionTypes[0].value,
             initialSupply: null,
             maxSupply: null,
@@ -112,9 +121,13 @@ class Tokens extends Component {
             burnAmount: null,
             otherBurnAddress: null,
             stageOfCreateToken: 0,
-            editMintingManagersElements: [],
+            mintingManagersElements: [],
+            financelManagersElements: [],
             tokenInfo: {},
             hasLoad: false,
+            chosen_mint_type: null,
+            destinationAddress: null,
+            isInvalidAddress: false,
             totalUserData: {
                 labels: newUser.map(data => data.time),
                 datasets: [{
@@ -345,7 +358,7 @@ class Tokens extends Component {
                 address
             } = this.state
             const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
-            this.handleShowConfirm('Purchace', `Confirm ${symbol} token creation`, `Please, confirm contract creation in your wallet`)
+            this.handleShowConfirm('Create token', `Confirm ${symbol} token creation`, `Please, confirm contract creation in your wallet`)
             const contract = await Token.deploy(
                 name,
                 symbol,
@@ -394,17 +407,24 @@ class Tokens extends Component {
                 this.setState({
                     tokens: _tokens,
                 })
-            } else {
-                alert('Something went wrong')
-            }
-            contract.deployed().then(() => {
-                this.handleCloseProgress()
-                this.handleShowSuccess(`${symbol} token created`, `The contract creation was successful`)
-                this.setState({
-                    showCreate: false,
-                    stageOfCreateToken: 0,
+                contract.deployed().then(() => {
+                    this.handleCloseProgress()
+                    this.handleShowSuccess(`${symbol} token created`, `The contract creation was successful`)
+                    this.setState({
+                        showCreate: false,
+                        stageOfCreateToken: 0,
+                    })
                 })
-            })
+            } else {
+                this.handleCloseProgress()
+                const json = await res.json()
+                const errroMessage = json.error.message
+                const parsedMessage = errors[errroMessage] ? errors[errroMessage] : errroMessage
+                this.setState({
+                    showError: true,
+                    errorName: parsedMessage
+                })
+            }
         } catch (error) {
             this.customError(error)
         }
@@ -428,14 +448,17 @@ class Tokens extends Component {
             const signer = await provider.getSigner()
             const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
             const token = Token.attach(currentTokenAddress)
-            this.handleShowConfirm('Mint', `Confirm the minting of ${mintTokenAmount} ${currentTokenSymbol} tokens`, `Please, confirm transaction in your wallet`)
+            this.handleShowConfirm(`Mint ${currentTokenSymbol} tokens`, `Confirm the minting of ${mintTokenAmount} ${currentTokenSymbol} tokens`, `Please, confirm transaction in your wallet`)
             const tx = await token.mint(ethers.utils.parseEther(mintTokenAmount))
             this.handleCloseConfirm()
-            this.handleShowProgress()
+            this.handleShowProgress(`Mint ${currentTokenSymbol} tokens`)
             tx.wait()
                 .then(() => {
                     this.handleCloseProgress()
-                    this.handleShowSuccess(`Token minted`, `You have successfully minted ${mintTokenAmount} ${currentTokenSymbol} tokens`)
+                    this.handleShowSuccess(`Mint ${currentTokenSymbol} tokens`, `Token minted`, `You have successfully minted ${mintTokenAmount} ${currentTokenSymbol} tokens`)
+                    this.setState({
+                        mintTokenAmount: null
+                    })
                 })
         } catch (error) {
             this.customError(error)
@@ -461,7 +484,7 @@ class Tokens extends Component {
             const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
             const token = Token.attach(currentTokenAddress)
             let tx;
-            this.handleShowConfirm('Pause'`Confirm ${!isCurrentTokenPaused ? 'pausing' : 'unpausing'} ${currentTokenSymbol} token`, `Please, confirm transaction in your wallet`)
+            this.handleShowConfirm('Pause', `Confirm ${!isCurrentTokenPaused ? 'pausing' : 'unpausing'} ${currentTokenSymbol} token`, `Please, confirm transaction in your wallet`)
             if (!isCurrentTokenPaused) {
                 tx = await token.pause()
             } else {
@@ -627,6 +650,35 @@ class Tokens extends Component {
         console.log(error)
     } 
 
+    changeType(event) {
+        this.setState({
+            chosen_mint_type: event.target.value
+        })
+    }
+
+    handleDestinationAddress(event) {
+        const validateAddress = (address) => {
+            if(!address) {
+                return true
+            }
+            return address.match(
+                /^0x[a-fA-F0-9]{40}$/g
+            );
+          };
+        if(validateAddress(event.target.value)) {
+            this.setState({
+                destinationAddress: event.target.value,
+                isInvalidAddress: false
+            })
+        }
+        else{
+            this.setState({
+                destinationAddress: event.target.value,
+                isInvalidAddress: true
+            })
+        }
+    }
+
     handleCloseCreate = () => this.setState({showCreate: false})
     handleShowCreate = () => {
         this.setState({showCreate: true, stageOfCreateToken: 1})
@@ -660,7 +712,7 @@ class Tokens extends Component {
             showLoading: false, mintTokenAvailableToMint: ethers.utils.formatEther(mintTokenAvailableToMint.toString())
         })
     }
-    handleCloseMint = () => this.setState({showMint: false})
+    handleCloseMint = () => this.setState({showMint: false, mintTokenAmount: null, chosen_mint_type: null, destinationAddress: null, isInvalidAddress: false})
 
     handleShowBlacklist = async (currentTokenSymbol, currentTokenAddress, currentTokenChainid) => {
         try {
@@ -715,7 +767,6 @@ class Tokens extends Component {
 
     handleShowRoles = (token) => {
         const mintingManagers = []
-        // Добавить на реально созданном токене
         /*token.minting.forEach(v => {
             const mintingId = editMintingManagersElementsLength
             mintingManagers.push(
@@ -740,10 +791,123 @@ class Tokens extends Component {
         })*/
         this.setState({showRoles: true})
     }
-    handleCloseRoles = () => this.setState({showRoles: false})
+    handleCloseRoles = () => this.setState({showRoles: false, destinationAddress: null, isInvalidAddress: false})
 
-    handleShowInfo = (info) =>  {
-        this.setState({showInfo: true, tokenInfo: info})
+    deleteMintingManagerInput = (index) => {
+        console.log(index)
+        let mintingManagersElements = this.state.mintingManagersElements
+        mintingManagersElements.forEach(v => {if (v.id === index) v.work = false})
+        this.setState({
+            mintingManagersElements
+        })
+    }
+
+    addMintingManagers = () => {
+        const mintingManagersElements = this.state.mintingManagersElements
+        const id = mintingManagersElementsLength
+        mintingManagersElements.push(
+            {
+                id,
+                element: 
+                <div className="user-custom-params">
+                            <div className="input-group">
+                                <input type="text" id={`property-name-${id}`} onChange={this.changeMintinglValue} className="form-control" placeholder="0x0000000000000000000000000000000000000000"/>
+                            </div>
+                    <button type="button" className="btn btn_secondary btn_orange" onClick={() => this.deleteMintingManagerInput(id)}>Revoke</button>
+                </div>,
+                name: undefined,
+                value: undefined,
+                work: true
+            }
+        )
+        mintingManagersElementsLength += 1
+        this.setState({mintingManagersElements})
+    }
+
+    deleteFinancelManagerInput = (index) => {
+        console.log(index)
+        let financelManagersElements = this.state.financelManagersElements
+        financelManagersElements.forEach(v => {if (v.id === index) v.work = false})
+        this.setState({
+            financelManagersElements
+        })
+    }
+
+    addFinancelManagers = () => {
+        const financelManagersElements = this.state.financelManagersElements
+        const id = financialManagersElementsLength
+        financelManagersElements.push(
+            {
+                id,
+                element: 
+                <div className="user-custom-params">
+                            <div className="input-group">
+                                <input type="text" id={`financel-name-${id}`} onChange={this.changeFinancelValue} className="form-control" placeholder="0x0000000000000000000000000000000000000000"/>
+                            </div>
+                    <button type="button" className="btn btn_secondary btn_orange" onClick={() => this.deleteFinancelManagerInput(id)}>Revoke</button>
+                </div>,
+                name: undefined,
+                value: undefined,
+                work: true
+            }
+        )
+        financialManagersElementsLength += 1
+        this.setState({financelManagersElements})
+    }
+
+    changeMintinglValue = (event) => {
+        let mintingManagersElements = this.state.mintingManagersElements
+        const idFull = event.target.id.split('-')
+        const id = parseInt(idFull[idFull.length - 1])
+        mintingManagersElements.forEach(v => {
+            if (v.id === id) v.value = event.target.value
+        }) 
+        this.setState({
+            mintingManagersElements
+        })
+    }
+
+    changeFinancelValue = (event) => {
+        let financelManagersElements = this.state.financelManagersElements
+        const idFull = event.target.id.split('-')
+        const id = parseInt(idFull[idFull.length - 1])
+        financelManagersElements.forEach(v => {
+            if (v.id === id) v.value = event.target.value
+        }) 
+        this.setState({
+            financelManagersElements
+        })
+    }
+
+    handleShowInfo = async (info) =>  {
+        this.setState({showInfo: true, tokenInfo: info,  showLoading: true})
+         let provider = new ethers.providers.Web3Provider(window.ethereum)
+        const chainid = (await provider.getNetwork()).chainId
+        if (chainid.toString() !== info.chainid) {
+            await this.changeNetwork(info.chainid)
+            provider = new ethers.providers.Web3Provider(window.ethereum)
+        }
+        await provider.send("eth_requestAccounts", [])
+        const signer = await provider.getSigner()
+        const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
+        const tokenUsual = Token.attach(info.address)  
+        const totalSupply = BigInt((await tokenUsual.totalSupply()).toString())
+
+        let cap;
+        let mintTokenAvailableToMint = BigInt(0);
+        try {
+            cap = await tokenUsual.cap()
+            cap = BigInt(cap.toString())
+            mintTokenAvailableToMint = cap - totalSupply
+        } catch (error) {
+            cap = BigInt(0)
+        }
+
+        this.setState({
+        showLoading: false, tokenInfo: {...this.state.tokenInfo, totalSupply: ethers.utils.formatEther(totalSupply.toString())}, 
+        mintTokenAvailableToMint: ethers.utils.formatEther(mintTokenAvailableToMint.toString()),
+        mintTokenMaxSupply: ethers.utils.formatEther(cap.toString())
+        })
     }
     handleCloseInfo = () =>  this.setState({showInfo: false})
 
@@ -759,14 +923,14 @@ class Tokens extends Component {
         const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
         const token = Token.attach(currentTokenAddress)
         const paused = await token.paused()
-        this.setState({showPause: true, currentTokenSymbol, currentTokenAddress, isCurrentTokenPaused: paused})
+        this.setState({showPause: true, currentTokenSymbol, currentTokenAddress, isCurrentTokenPaused: paused, currentTokenChainid})
     }
     handleClosePause = () => this.setState({showPause: false})
     handleShowConfirm = (confirmTitle, confirmName, confirmText) => this.setState({showConfirm: true, confirmTitle, confirmName, confirmText})
     handleCloseConfirm = () => this.setState({showConfirm: false, confirmName: null, confirmText: null})
-    handleShowProgress = () => this.setState({showProgress: true})
+    handleShowProgress = (progressTitle) => this.setState({showProgress: true, progressTitle})
     handleCloseProgress = () => this.setState({showProgress: false})
-    handleShowSuccess = (successName, successText) => this.setState({showSuccess: true, successName, successText})
+    handleShowSuccess = (successTitle, successName, successText) => this.setState({showSuccess: true, successTitle, successName, successText})
     handleCloseSuccess = () => this.setState({showSuccess: false, successName: null, successText: null})
     handleShowError = (errorText) => this.setState({showError: true, errorText})
     handleCloseError = () => this.setState({showError: false})
@@ -838,6 +1002,14 @@ class Tokens extends Component {
     burn = this.burn.bind(this)
     onChangeOtherBurnAddress = this.onChangeOtherBurnAddress.bind(this)
     onChangeBurnAmount = this.onChangeBurnAmount.bind(this)
+    changeType = this.changeType.bind(this)
+    handleDestinationAddress = this.handleDestinationAddress.bind(this)
+    addMintingManagers = this.addMintingManagers.bind(this)
+    deleteMintingManagerInput = this.deleteMintingManagerInput.bind(this)
+    addFinancelManagers = this.addFinancelManagers.bind(this)
+    deleteFinancelManagerInput = this.deleteFinancelManagerInput.bind(this)
+    changeFinancelValue = this.changeFinancelValue.bind(this)
+    changeMintinglValue = this.changeMintinglValue.bind(this)
 
     render() {
         return (
@@ -946,9 +1118,9 @@ class Tokens extends Component {
                                     <label className="form__label">Blockchain * <img src={info} className="form__icon-info" /></label>
                                     <div className="input-group">
                                         <select onChange={e => this.changeNetwork(e.target.value)} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                            <option value={config.status === "test" ? '5' : '1'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '5' : '1')) : false}>{networks[config.status === "test" ? '5' : '1'].name}</option>
-                                            <option value={config.status === "test" ? '97' : '56'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '97' : '56')) : false}>{networks[config.status === "test" ? '97' : '56'].name}</option>
                                             <option value={config.status === "test" ? '80001' : '137'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '80001' : '137')) : false}>{networks[config.status === "test" ? '80001' : '137'].name}</option>
+                                            <option value={config.status === "test" ? '97' : '56'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '97' : '56')) : false}>{networks[config.status === "test" ? '97' : '56'].name}</option>
+                                            <option value={config.status === "test" ? '5' : '1'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '5' : '1')) : false}>{networks[config.status === "test" ? '5' : '1'].name}</option>
                                             <option value={config.status === "test" ? '420' : '10'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '420' : '10')) : false} disabled={config.status === "test" ? true : false} >{networks[config.status === "test" ? '420' : '10'].name}</option>
                                             <option value={config.status === "test" ? '43113' : '43114'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '43113' : '43114')) : false}>{networks[config.status === "test" ? '43113' : '43114'].name}</option>
                                             <option value={config.status === "test" ? '421613' : '42161'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '421613' : '42161')) : false}>{networks[config.status === "test" ? '421613' : '42161'].name}</option>
@@ -1269,50 +1441,84 @@ class Tokens extends Component {
                                     </li>
                                 </ol>
                             </div>
-                            <div className="form_row mb-4">
-                            <div className="form_col_last form_col">
-                                <label className="form__label">Amount to mint * <img src={info} className="form__icon-info"/></label>
-                                    <div className="input-group">
-                                        <input type="number" onChange={this.onChangeMintTokenAmount} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                    </div>
-                                    <div className="form__prompt" id="basic-addon4">Enter the number of the ABC tokens you want to create</div>
-                            </div>
-                            </div>
-                            <div className="form_row">
-                                <div className="form_col">
-                                    <label className="form__label">Destination to send:</label>
-                                </div>
-                            </div>
-                            <div className="form_row mb-4">
-                                <div className="form_col_flex form_col">
-                                    <div className="form-check custom-control custom-radio custom-control-inline">
-                                            <input type="radio" id="rd_1" name="rd" value="Contract balance"/>
-                                            <label className="form-check-label custom-control-label green" for="rd_1">
-                                                Contract balance <img src={info} className="form__icon-info"/>
-                                            </label>
+                            {
+                                Number(this.state.mintTokenAvailableToMint) >= 0
+                                ? <>
+                                  <div className="form_row mb-4">
+                                        <div className="form_col_last form_col">
+                                            <label className="form__label">Amount to mint * <img src={info} className="form__icon-info"/></label>
+                                                <div className="input-group">
+                                                    <input type="number" placeholder="10" onChange={this.onChangeMintTokenAmount} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                </div>
+                                                <div className="form__prompt" id="basic-addon4">{`Enter the number of the ${this.state.currentTokenSymbol} tokens you want to create`}</div>
                                         </div>
+                                    </div> 
+                                    <div className="form_row">
+                                    <div className="form_col">
+                                        <label className="form__label">Destination to send * :</label>
+                                    </div>
+                                </div>
+                                <div className="form_row mb-4">
+                                    <div className="form_col_flex form_col">
                                         <div className="form-check custom-control custom-radio custom-control-inline">
-                                            <input type="radio" id="rd_2" name="rd" value="External wallet" />
-                                            <label className="form-check-label custom-control-label red" for="rd_2">
-                                                External wallet <img src={info} className="form__icon-info"/>
-                                            </label>
-                                        </div>
-                                </div>
-                            </div>
-                            <div className="form_row mb-4">
-                                <div className="form_col_last form_col">
-                                    <label className="form__label">Send to:</label>
-                                    <div className="input-group">
-                                        <input type="text" placeholder="Address" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                <input checked={this.state.chosen_mint_type === destinationToSend.contract ? true : false}
+                                                  onChange={this.changeType}  type="radio" id="rd_1" name="rd" value="contract"/>
+                                                <label className="form-check-label custom-control-label green" for="rd_1">
+                                                    Contract balance <img src={info} className="form__icon-info"/>
+                                                </label>
+                                            </div>
+                                            <div className="form-check custom-control custom-radio custom-control-inline">
+                                                <input checked={this.state.chosen_mint_type === destinationToSend.wallet ? true : false}
+                                                  onChange={this.changeType} type="radio" id="rd_2" name="rd" value="wallet" />
+                                                <label className="form-check-label custom-control-label red" for="rd_2">
+                                                    External wallet <img src={info} className="form__icon-info"/>
+                                                </label>
+                                            </div>
                                     </div>
-                                    <div className="form__prompt" id="basic-addon4">Enter a wallet to deliver the tokens to</div>
                                 </div>
+                                {
+                                this.state.isInvalidAddress ? <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                    <label className="form__label">Send to * :</label>
+                                    <div className="input-group">
+                                        <input maxLength="42" type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.handleDestinationAddress} className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                    <div className="form__prompt_error form__prompt" id="basic-addon4">Invalid wallet address format. Example: 0x71C7656EC7ab88b098defB751B7401B5f6d8976F</div>
+                                </div>
+                            </div> 
+                            : <div className="form_row mb-4">
+                            <div className="form_col_last form_col">
+                                <label className="form__label">Send to * :</label>
+                                <div className="input-group">
+                                    <input maxLength="42" type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.handleDestinationAddress} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                </div>
+                                <div className="form__prompt" id="basic-addon4">Enter a wallet to deliver the tokens to</div>
                             </div>
+                        </div>
+                            }
+                                </>
+                                : null
+                            }
                             </>
                         }
                     </Modal.Body>
                     <Modal.Footer>
-                        <button onClick={this.mint} type="button" className="btn btn_secondary btn_orange">Mint</button>
+
+                        {
+                            Number(this.state.mintTokenAvailableToMint) < 0 ? null
+                            : Number(this.state.mintTokenAmount) > 0 && Number(this.state.mintTokenAmount) <= Number(this.state.mintTokenAvailableToMint) && this.state.chosen_mint_type && this.state.destinationAddress && !this.state.isInvalidAddress
+                            ?     <button  type="button" className="btn btn_secondary btn_orange" onClick={this.mint}>
+                            Mint
+                            </button>
+                              : Number(this.state.mintTokenAmount) > 0 && this.state.mintTokenAvailableToMint === '0.0' && this.state.chosen_mint_type && this.state.destinationAddress && !this.state.isInvalidAddress
+                              ? 
+                              <button  type="button" className="btn btn_secondary btn_orange" onClick={this.mint}>
+                              Mint
+                              </button>
+                            :   <button className="btn btn_secondary btn_orange btn_disabled">
+                            Mint
+                            </button>
+                        }
                     </Modal.Footer>
                 </Modal>
                 <Modal show={this.state.showPause} onHide={this.handleClosePause} centered>
@@ -1343,52 +1549,24 @@ class Tokens extends Component {
                             </div>
                             :
                             (
-                                /*<table className="table table-bordered border-dark">
-                                <thead>
-                                    <tr className="table-secondary" >
-                                    <th className="table-secondary" scope="col">Select</th>
-                                    <th className="table-secondary" scope="col">Wallet</th>
-                                    <th className="table-secondary" scope="col">Block Date</th>
+                                this.state.currentTokenBlacklist.length ?  <FPTable data={blacklistTable}>
+                                {
+                                    this.state.currentTokenBlacklist.map(v => 
+                                    <tr>
+                                        <td>
+                                            <input onChange={() => this.onChangeBlacklistRemove(v.address)} className="form-checkbox" type="checkbox" value="" id="flexCheckChecked"/>
+                                        </td>
+                                        <td>
+                                            <span className="table-text">{createLongStrView(v.address)}</span>
+                                        </td>
+                                        <td>
+                                            <span className="table-text">{`${v.time.toLocaleDateString()} ${v.time.toLocaleTimeString().slice(0,5)}`}</span>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-
-                                    {
-                                    this.state.currentTokenBlacklist.map(
-                                        v => {
-                                            return (
-                                                <tr className="table-secondary">
-                                                    <td className="table-secondary">
-                                                        <div className="form-check">
-                                                            <input onChange={() => this.onChangeBlacklistRemove(v.address)} className="form-check-input" type="checkbox" value="" id="flexCheckChecked"/>
-                                                        </div>
-                                                    </td>
-                                                    <td className="table-secondary">
-                                                        {createLongStrView(v.address)}
-                                                    </td>
-                                                    <td className="table-secondary">
-                                                        {
-                                                            `${v.time.toLocaleDateString()} ${v.time.toLocaleTimeString().slice(0,5)}`
-                                                        }
-                                                    </td>
-                                                </tr>
-                                            )
-                                        }
-                                        )
-                                    }
-                                </tbody>
-                                </table>*/
-                                <FPTable data={blacklistTable}>
-                                    <td>
-                                        <input  className="form-checkbox" type="checkbox" value="" id="flexCheckChecked"/>
-                                    </td>
-                                    <td>
-                                        <span className="table-text">0xE8265C...F98319c4</span>
-                                    </td>
-                                    <td>
-                                        <span className="table-text">22.08.2023 22:11</span>
-                                    </td>
-                                </FPTable>
+                                )
+                                }
+                            </FPTable> : null
+                               
                             )
                         }
                     </Modal.Body>
@@ -1397,7 +1575,7 @@ class Tokens extends Component {
                         <button className="btn btn_primary btn_orange" onClick={this.handleShowBlacklistAdd}>Add new</button>
                     </Modal.Footer>
                 </Modal>
-                <Modal show={this.state.showBlacklistAdd} onHide={this.handleCloseBlacklistAdd} centered>
+                <Modal id="blackList" show={this.state.showBlacklistAdd} onHide={this.handleCloseBlacklistAdd} centered>
                         <Modal.Header className="modal-newuser__title modal-title modal-header" closeButton>
                             Add to blacklist
                         </Modal.Header>
@@ -1422,16 +1600,29 @@ class Tokens extends Component {
                         </Modal.Header>
                         <Modal.Body>
                         <div className="form__groups">
-                            <div className="form_row mb-4">
+
+                             {
+                                this.state.isInvalidAddress ? <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
-                                    <label className="form__label"><img src={infoRed} className="form__icon-info_left form__icon-info"/> Transfer ownership * <img src={info} className="form__icon-info"/></label>
-                                    <div className="input-group_absolute input-group">
-                                        <input type="text"placeholder="Address" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                <label className="form__label"><img src={infoRed} className="form__icon-info_left form__icon-info"/> Transfer ownership * <img src={info} className="form__icon-info"/></label>
+                                    <div className="input-group">
+                                        <input maxLength="42" type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.handleDestinationAddress} className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                         <button className="btn_wide btn btn_primary btn_orange ms-2">Transfer ownership</button>
                                     </div>
-                                    <div className="form__prompt form__prompt_absolute" id="basic-addon4">Enter a wallet to transfer ownership of the contract</div>
+                                    <div className="form__prompt_error form__prompt" id="basic-addon4">Invalid wallet address format. Example: 0x71C7656EC7ab88b098defB751B7401B5f6d8976F</div>
                                 </div>
+                            </div> 
+                            : <div className="form_row mb-4">
+                                <div className="form_col_last form_col">
+                                    <label className="form__label">Send to * :</label>
+                                    <div className="input-group">
+                                        <input maxLength="42" type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.handleDestinationAddress} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        <button className="btn_wide btn btn_primary btn_orange ms-2">Transfer ownership</button>
+                                    </div>
+                                    <div className="form__prompt" id="basic-addon4">Enter a wallet to deliver the tokens to</div>
+                                    </div>
                             </div>
+                            }
 
                             <div className="form__group mb-4">
                             <div className="form__group_top-row">
@@ -1442,24 +1633,18 @@ class Tokens extends Component {
                                         <div className="form__prompt" id="basic-addon4">Textual traits that show up as rectangles</div>
                                     </div>
                                 </div>
-                                <button type="button" className="btn btn_primary btn_orange btn__add-form">Add</button>
+                                <button type="button" className="btn btn_primary btn_orange btn__add-form" onClick={this.addMintingManagers}>Add</button>
                             </div>
                             <div className="form__group_bottom-row">
                             {
-                                            /* Добавить на созданном токене
                                             <div id="user-properties">
                                             {
-                                                this.state.editPropertiesElements ?
-                                                this.state.editPropertiesElements.map(v => v.work ? v.element : null) :
+                                                this.state.mintingManagersElements ?
+                                                this.state.mintingManagersElements.map(v => v.work ? v.element : null) :
                                                 null
                                             }
-                                        </div>*/
+                                        </div>
                                         }
-                                <div className="form__group_bottom-row-last">
-                                    <div className="input-group_full input-group">
-                                        <input type="text" placeholder="Address" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                    </div>
-                                </div>
                             </div>
                             
                         </div>
@@ -1473,31 +1658,33 @@ class Tokens extends Component {
                                         <div className="form__prompt" id="basic-addon4">Textual traits that show up as rectangles</div>
                                     </div>
                                 </div>
-                                <button type="button" className="btn btn_primary btn_orange btn__add-form">Add</button>
+                                <button type="button" className="btn btn_primary btn_orange btn__add-form" onClick={this.addFinancelManagers}>Add</button>
                             </div>
                             <div className="form__group_bottom-row">
                             {
-                                            /* Добавить на созданном токене
                                             <div id="user-properties">
                                             {
-                                                this.state.editPropertiesElements ?
-                                                this.state.editPropertiesElements.map(v => v.work ? v.element : null) :
+                                                this.state.financelManagersElements ?
+                                                this.state.financelManagersElements.map(v => v.work ? v.element : null) :
                                                 null
                                             }
-                                        </div>*/
+                                        </div>
                                         }
-                                <div className="form__group_bottom-row-last">
-                                    <div className="input-group_full input-group">
-                                        <input type="text" placeholder="Address" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                    </div>
-                                </div>
                             </div>
                             
                         </div>
                          </div>
                         </Modal.Body>
                         <Modal.Footer>
-                            <button className="btn btn_secondary btn_disabled" onClick={this.addToBlacklist}>Save</button>
+                        {
+                           this.state.destinationAddress && !this.state.isInvalidAddress
+                            ?     <button  type="button" className="btn btn_secondary btn_orange">
+                            Save
+                            </button>
+                            :   <button className="btn btn_secondary btn_orange btn_disabled">
+                            Save
+                            </button>
+                        }
                         </Modal.Footer>
                 </Modal>
                 <Modal show={this.state.showInfo} onHide={this.handleCloseInfo} centered>
@@ -1544,16 +1731,26 @@ class Tokens extends Component {
                                         The contract balance: (soon)<img src={info} className="form__icon-info"/>
                                     </li>
                                     <li className="modal-text">
-                                        Total supply: (soon)<img src={info} className="form__icon-info"/>
+                                    Total supply: {this.state.tokenInfo.totalSupply} {this.state.tokenInfo.symbol}  <img src={info} className="form__icon-info"/>
                                     </li>
                                     <li className="modal-text">
-                                        Max supply: {this.state.tokenInfo.max_supply ? this.state.tokenInfo.max_supply : '-'} <img src={info} className="form__icon-info"/>
+                                    Max supply: {
+                                            this.state.mintTokenMaxSupply === '0.0'
+                                            ?
+                                            `Infinity`
+                                            :
+                                            `${this.state.mintTokenMaxSupply} ${this.state.tokenInfo.symbol}`
+                                        }  
+                                     <img src={info} className="form__icon-info"/>
                                     </li>
                                     <li className="modal-text">
                                         Circulating Supply: (soon) <img src={info} className="form__icon-info"/>
                                     </li>
                                     <li className="modal-text">
-                                        Available to mint: (soon) <a className="info__content-mint_medium info__content-mint">{'[mint]'}</a> <img src={info} className="form__icon-info"/>
+                                        Available to mint: {this.state.mintTokenAvailableToMint} {this.state.tokenInfo.symbol} <a className="info__content-mint_medium info__content-mint" onClick={() => {
+                                            this.handleCloseInfo()
+                                            this.handleShowMint(this.state.tokenInfo.symbol, this.state.tokenInfo.address, this.state.tokenInfo.chainid)
+                                        }}>{'[mint]'}</a> <img src={info} className="form__icon-info"/>
                                     </li>
                                 </ol>
                             </div>
@@ -1630,16 +1827,18 @@ class Tokens extends Component {
                     confirmName={this.state.confirmName}
                     confirmText={this.state.confirmText}
                 />
-                <ProgressModal showProgress={this.state.showProgress} handleCloseProgress={this.handleCloseProgress}/>
+                <ProgressModal progressTitle={this.state.progressTitle} showProgress={this.state.showProgress} handleCloseProgress={this.handleCloseProgress}/>
                 <SuccessModal 
                     showSuccess={this.state.showSuccess} 
                     handleCloseSuccess={this.handleCloseSuccess}
+                    successTitle={this.state.successTitle}
                     successName={this.state.successName} 
                     successText={this.state.successText}
                 />
                 <ErrorModal 
                     showError={this.state.showError}
                     handleCloseError={this.handleCloseError}
+                    errorName={this.state.errorName}
                     errorText={this.state.errorText}
                 />
                            </>

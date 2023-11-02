@@ -45,7 +45,7 @@ export const networks = {
         chainid: "42161",
         currency_symbol: "ETH",
         explorer: "https://arbiscan.io",
-        fpmanager: ""
+        fpmanager: "0xe435Cf187A6479DeA943651c7710f042e079Cdcb"
     },
     5: {
         name: "Goerli",
@@ -53,7 +53,7 @@ export const networks = {
         chainid: "5",
         currency_symbol: "tETH",
         explorer: "https://goerli.etherscan.io/",
-        fpmanager: ""
+        fpmanager: "0xe435Cf187A6479DeA943651c7710f042e079Cdcb"
     },
     97: {
         name: "BNB Test",
@@ -61,7 +61,7 @@ export const networks = {
         chainid: "97",
         currency_symbol: "tBNB",
         explorer: "https://testnet.bscscan.com/",
-        fpmanager: ""
+        fpmanager: "0xe435Cf187A6479DeA943651c7710f042e079Cdcb"
     },
     80001: {
         name: "Mumbai",
@@ -85,7 +85,7 @@ export const networks = {
         chainid: "43113",
         currency_symbol: "tAVAX",
         explorer: "https://testnet.snowtrace.io/",
-        fpmanager: ""
+        fpmanager: "0xe435Cf187A6479DeA943651c7710f042e079Cdcb"
     },
     421613: {
         name: "Arbitrum Goerli",
@@ -93,6 +93,6 @@ export const networks = {
         chainid: "421613",
         currency_symbol: "tETH",
         explorer: "https://goerli.arbiscan.io/",
-        fpmanager: ""
+        fpmanager: "0xe435Cf187A6479DeA943651c7710f042e079Cdcb"
     }
 }

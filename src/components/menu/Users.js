@@ -17,7 +17,9 @@ import { newUser } from "../../data/data";
 import empty from "../../media/common/empty_icon.svg"
 import customTokeSymbol from '../../media/common/custom_toke_symbol.svg'
 import SuccessModal from "../common/modals/success";
+import ErrorModal from "../common/modals/error";
 import loader from '../../media/common/loader.svg'
+import errors from "../../errors";
 
 let propertiesElementsLength = 0
 let statsElementsLength = 0
@@ -65,9 +67,13 @@ class Users extends Component {
             tabelData: userTable,
             showEditUser: false,
             showSuccess: false,
+            successTitle: null,
             successName: null,
+            showError: false,
+            errorName: null,
             hasLoad: false,
             isInvalidEmail: false,
+            isInvalidAddress: false,
             newUserData: {
                 labels: newUser.map(data => data.time),
                 datasets: [{
@@ -151,9 +157,27 @@ class Users extends Component {
     }
 
     onChangeWallet(event) {
-        this.setState({
-            add_wallet: event.target.value
-        })
+        const validateAddress = (address) => {
+            if(!address) {
+                return true
+            }
+            return address.match(
+                /^0x[a-fA-F0-9]{40}$/g
+            );
+          };
+        if(validateAddress(event.target.value)) {
+            this.setState({
+                add_wallet: event.target.value,
+                isInvalidAddress: false
+            })
+        }
+        else{
+            this.setState({
+                add_wallet: event.target.value,
+                isInvalidAddress: true
+            })
+          
+        }
     }
 
     async addUser() {
@@ -208,7 +232,12 @@ class Users extends Component {
                     showAdd: false
                 })
             } else {
-                alert('Something went wrong')
+                const errroMessage = json.error.message
+                const parsedMessage = errors[errroMessage] ? errors[errroMessage] : errroMessage
+                this.setState({
+                    showError: true,
+                    errorName: parsedMessage
+                })
             }
         } catch (error) {
             alert(error)
@@ -299,7 +328,7 @@ class Users extends Component {
               };
             const res = await fetch(`${config.api}/rewards/get/nfts`, requestOptions)
             const json = await res.json()
-            json.body.data = json.body.data.filter(v => v.status !== 1)
+            json.body.data = json.body.data.filter(v => v.status === 1)
             this.setState({
                 nftRewards: json.body.data,
                 chosen_reward_nft: json.body.data[0] ? json.body.data[0].id : null
@@ -330,7 +359,15 @@ class Users extends Component {
               };
             const res = await fetch(`${config.api}/rewards/reward/${chosen_type === types.token ? 'token' : 'nft'}`, requestOptions)
             if (res.status === 200) alert('Done')
-            else alert('Something went wrong')
+            else {
+                const json = await res.json()
+                const errroMessage = json.error.message
+                const parsedMessage = errors[errroMessage] ? errors[errroMessage] : errroMessage
+                this.setState({
+                    showError: true,
+                    errorName: parsedMessage
+                })
+            }
         } catch (error) {
             alert(error)
         }
@@ -361,8 +398,8 @@ class Users extends Component {
                 email: edit_user.email,
                 external_id: edit_user.external_id,
                 id: edit_user.id,
-                image: edit_user.image,
-                notes: edit_user.notes,
+                image: edit_user.image === '' ? null : edit_user.image,
+                notes: edit_user.notes === '' ? null : edit_user.notes,
                 properties: edit_user.properties,
                 stats: edit_user.stats,
                 wallet: edit_user.wallet
@@ -374,6 +411,7 @@ class Users extends Component {
                 redirect: 'follow'
               };
             const res = await fetch(`${config.api}/users/update`, requestOptions)
+            const json = await res.json()
             if (res.status === 200) {
                 let users = this.state.users
                 users = users.map(v => {
@@ -385,10 +423,18 @@ class Users extends Component {
                 this.setState({
                     users, showEdit: false,
                     showSuccess: true,
+                    successTitle: 'Edit user',
                     successName: `The user was successfully edited`
                 })
                 
-            } else alert('Something went wrong')
+            } else {
+                const errroMessage = json.error.message
+                const parsedMessage = errors[errroMessage] ? errors[errroMessage] : errroMessage
+                this.setState({
+                    showError: true,
+                    errorName: parsedMessage
+                })
+            }
         } catch (error) {
             console.log(error)
         }
@@ -506,9 +552,17 @@ class Users extends Component {
     }
 
     handleShowAdd = () => this.setState({showAdd: true})
-    handleCloseAdd = () => this.setState({showAdd: false})
+    handleCloseAdd = () => this.setState({
+        showAdd: false,
+        add_externalID: null,
+        add_email: null,
+        add_wallet: null,
+        add_notes: null,
+        isInvalidAddress: false,
+        isInvalidEmail: false
+    })
     handleShowToReward = (external_id, id) => this.setState({chosen_user_id: id, chosen_user_external_id: external_id, showToReward: true})
-    handleCloseToReward = () => this.setState({showToReward: false})
+    handleCloseToReward = () => this.setState({showToReward: false, comment: null})
     handleShowEdit = (user) => {
         const propertiesElements = []
         const statsElements = []
@@ -572,11 +626,17 @@ class Users extends Component {
         })
     }
 
-    handleCloseEdit = () => this.setState({showEdit: false, edit_user: {}, basic_edit_user: {}, editPropertiesElements: [], editStatsElements: []})
+    handleCloseEdit = () => this.setState({
+        showEdit: false, edit_user: {}, basic_edit_user: {}, 
+        editPropertiesElements: [], editStatsElements: [],
+        isInvalidAddress: false,
+        isInvalidEmail: false
+    })
     handleCloseStats = () => this.setState({showStats: false, edit_user: {}, basic_edit_user: {}, editPropertiesElements: [], editStatsElements: []})
     handleShowDelete = (chosen_user_external_id, chosen_user_id) => this.setState({showDelete: true, chosen_user_external_id, chosen_user_id})
     handleCloseDelete = () => this.setState({showDelete: false, chosen_user_external_id: null, chosen_user_id: null})
     handleCloseSuccess = () => this.setState({showSuccess: false})
+    handleCloseError = () => this.setState({showError: false})
 
     handleCopy(event) {
         const tooltipText = event.target.children[0]
@@ -726,6 +786,11 @@ class Users extends Component {
         })
     }
     changeRewardNFT(event) {
+        if(event.target.value === 'create reward') {
+            this.props.onSwitch(this.props.switcher.rewards)
+            this.props.goToCreationPage('create reward')
+            return 
+        }
         this.setState({
             chosen_reward_nft: event.target.value
         })
@@ -745,9 +810,28 @@ class Users extends Component {
     changeEditWallet(event) {
         let edit_user = this.state.edit_user
         edit_user.wallet = event.target.value
-        this.setState({
-            edit_user
-        })
+
+        const validateAddress = (address) => {
+            if(!address) {
+                return true
+            }
+            return address.match(
+                /^0x[a-fA-F0-9]{40}$/g
+            );
+          };
+        if(validateAddress(edit_user.wallet)) {
+            this.setState({
+                edit_user,
+                isInvalidAddress: false
+            })
+        }
+        else{
+            this.setState({
+                edit_user,
+                isInvalidAddress: true
+            })
+          
+        }
     }
     changeEditmIage(event) {
         console.log('changeEditImage', event)
@@ -841,6 +925,7 @@ class Users extends Component {
     changeEditStatName = this.changeEditStatName.bind(this)
     changeEditStatValue = this.changeEditStatValue.bind(this)
     handleCloseSuccess = this.handleCloseSuccess.bind(this)
+    handleCloseError = this.handleCloseError.bind(this)
 
     render() {
         return (
@@ -855,7 +940,7 @@ class Users extends Component {
                     this.state.hasLoad ?  <img className="modal__loader_view modal__loader" src={loader}></img>
                     : 
                     <>
-                    <Modal show={this.state.showAdd} onHide={this.handleCloseAdd} centered>
+                    <Modal id="createUser" show={this.state.showAdd} onHide={this.handleCloseAdd} centered>
                     <Modal.Header closeButton>
                     <Modal.Title className="modal-newuser__title">Add new user</Modal.Title>
                     </Modal.Header>
@@ -874,13 +959,24 @@ class Users extends Component {
                             </div>
                             {/*<div className="form__prompt_disabled form__prompt" id="basic-addon4">File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>*/}
                         </div>
-                        <div className="mb-4">
+                        {
+                                this.state.isInvalidAddress ? 
+                                
+                                <div className="mb-4">
+                                <label className="form__label">Wallet* : <img className="form__icon-info" src={info} /></label>
+                                <div className="input-group">
+                                    <input maxLength="42" placeholder="0x0000000000000000000000000000000000000000" type="text" onChange={this.onChangeWallet} className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                </div>
+                                <div className="form__prompt_error form__prompt" id="basic-addon4">Invalid wallet address format. Example: 0x71C7656EC7ab88b098defB751B7401B5f6d8976F</div>
+                            </div>
+                            : <div className="mb-4">
                             <label className="form__label">Wallet* : <img className="form__icon-info" src={info} /></label>
                             <div className="input-group">
                                 <input placeholder="0x0000000000000000000000000000000000000000" type="text" onChange={this.onChangeWallet} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
                             <div className="form__prompt" id="basic-addon4">Specify ethereum wallet to receive rewards</div>
                         </div>
+                            }
                         <div className="mb-4">
                             <label className="form__label">Notes: <img className="form__icon-info" src={info} /></label>
                             <div className="input-group">
@@ -963,7 +1059,7 @@ class Users extends Component {
                         Back
                     </button>
                     {   
-                        this.state.add_externalID && this.state.add_wallet && this.state.add_email && !this.state.isInvalidEmail
+                        this.state.add_externalID && this.state.add_wallet && this.state.add_email && !this.state.isInvalidEmail && !this.state.isInvalidAddress
                         ?
                         <button className="btn btn_primary btn_orange" onClick={this.addUser}>
                             Create
@@ -1010,7 +1106,7 @@ class Users extends Component {
                                                   v.nft_rewards?.length && v.token_rewards?.length 
                                                   ? <>
                                                       <div>
-                                                          {v.nft_rewards?.length ? v.nft_rewards.map((reward, i, arr) => 
+                                                          NFTs: {v.nft_rewards?.length ? v.nft_rewards.map((reward, i, arr) => 
                                                           `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
                                                               ): null}
                                                           </div>
@@ -1046,7 +1142,7 @@ class Users extends Component {
                           : null 
                     }
                 </div>
-                <Modal show={this.state.showToReward} onHide={this.handleCloseToReward} centered>
+                <Modal id="rewardFromUser" show={this.state.showToReward} onHide={this.handleCloseToReward} centered>
                     <Modal.Header closeButton>
                         <div className="modal-newuser__title modal-title h4">
                             Reward {this.state.chosen_user_external_id} (FAIR id: {createLongStrView(this.state.chosen_user_id ? this.state.chosen_user_id : '')})
@@ -1073,27 +1169,56 @@ class Users extends Component {
                                 </label>
                             </div>
                         </div>*/}
+                        <div className="form_row mb-4">
+                        <div className="form_col">
+                                    <label className="form__label">Choose a reward mode:</label>
+                                        <div className="input-group">
+                                        <div className="form-check custom-control custom-radio custom-control-inline">
+                                            <input  
+                                            checked={this.state.chosen_type === types.token ? true : false}
+                                            onChange={this.changeType} 
+                                            type="radio" id="rd_1" name="rd" value={types.token}/>
+                                            <label className="form-check-label custom-control-label green" for="rd_1">
+                                            Tokens <img src={info} className="form__icon-info"/>
+                                            </label>
+                                        </div>
+                                        <div className="form-check custom-control custom-radio custom-control-inline ms-3">
+                                            <input 
+                                                checked={this.state.chosen_type === types.nft ? true : false}
+                                              onChange={this.changeType} 
+                                            type="radio" id="rd_2" name="rd" value={types.nft} />
+                                            <label className="form-check-label custom-control-label red" for="rd_2">
+                                            NFTs <img src={info} className="form__icon-info"/>
+                                            </label>
+                                        </div>
+                                        </div>   
+                                    </div>
+                                  
+                        </div>
                         <label className="form__label">Select reward: <img className="form__icon-info" src={info}></img></label>
                         <div className="input-group mb-4">
+                        <select onChange={this.state.chosen_type === types.token ? this.changeRewardToken : this.changeRewardNFT} disabled={this.state.chosen_type ? false : true} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
                             {
-                                  this.state.chosen_type === types.token && this.state.tokenRewards.length
-                                  ?  <select onChange={this.state.chosen_type === types.token ? this.changeRewardToken : this.changeRewardNFT} disabled={this.state.chosen_type ? false : true} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                  {
-                                      this.state.chosen_type === types.token
+                                
+                                      this.state.chosen_type === types.token && this.state.tokenRewards.length
                                       ?
                                       <>
                                        <option value="" disabled selected>Select reward</option>
                                         { this.state.tokenRewards.map(v => <option value={v.id}>{v.name}</option>) }
                                       </>
-                                      :
-                                      this.state.nftRewards.map(v => <option value={v.id}>{v.name}</option>)
-                                  }
-                              </select>
-                              : <select onChange={this.state.chosen_type === types.token ? this.changeRewardToken : this.changeRewardNFT} disabled={this.state.chosen_type ? false : true} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                <option value="" disabled selected>Select Reward</option>
-                                <option value='create reward'>Create new one</option>
-                          </select>
+                                      : this.state.chosen_type === types.nft && this.state.nftRewards.length
+                                      ? 
+                                      <>
+                                       <option value="" disabled selected>Select reward</option>
+                                       {this.state.nftRewards.map(v => <option value={v.id}>{v.name}</option>)}
+                                      </>
+                                      : <>
+                                        <option value="" disabled selected>Select reward</option>
+                                        <option value='create reward'>Create new one</option>
+                                      </>
+                                  
                             }
+                             </select>
                         </div>
                         <div className="mb-4">
                             <label className="form__label">Comment: <img className="form__icon-info" src={info}></img></label>
@@ -1110,7 +1235,7 @@ class Users extends Component {
                     </button>
                     </Modal.Footer>
                 </Modal>
-                <Modal show={this.state.showEdit} onHide={this.handleCloseEdit} centered>
+                <Modal id="editUser" show={this.state.showEdit} onHide={this.handleCloseEdit} centered>
                     <Modal.Header closeButton>
                         <div className="modal-newuser__title modal-title">
                             Edit {this.state.edit_user.external_id}
@@ -1145,13 +1270,26 @@ class Users extends Component {
                             </div>
                            {/*<div className="form__prompt_disabled form__prompt" id="basic-addon4">File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>*/}
                         </div>
-                        <div className="mb-4">
+                        {
+                                this.state.isInvalidAddress ? 
+                                
+                                <div className="mb-4">
+                                <label className="form__label">Wallet* : <img className="form__icon-info" src={info} /></label>
+                                <div className="input-group">
+                                    <input maxLength="42" placeholder="0x0000000000000000000000000000000000000000" type="text" value={this.state.edit_user.wallet} onChange={this.changeEditWallet} className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                </div>
+                                <div className="form__prompt_error form__prompt" id="basic-addon4">Invalid wallet address format. Example: 0x71C7656EC7ab88b098defB751B7401B5f6d8976F</div>
+                            </div>
+                            : <div className="mb-4">
                             <label className="form__label">Wallet* : <img src={info} /></label>
                             <div className="input-group">
                                 <input placeholder="0xhjfg7...9fdf" type="text" value={this.state.edit_user.wallet} onChange={this.changeEditWallet} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                             </div>
                             <div className="form__prompt" id="basic-addon4">Specify ethereum wallet to receive rewards</div>
                         </div>
+                            }
+
+    
                         <div className="mb-4">
                             <label className="form__label">Notes: <img className="form__icon-info" src={info} /></label>
                             <div className="input-group">
@@ -1247,7 +1385,7 @@ class Users extends Component {
                         Back
                     </button>
                     {   
-                        this.state.edit_user.external_id && this.state.edit_user.wallet && this.state.edit_user.email && !this.state.isInvalidEmail
+                        this.state.edit_user.external_id && this.state.edit_user.wallet && this.state.edit_user.email && !this.state.isInvalidEmail && !this.state.isInvalidAddress
                         ?
                         <button className="btn btn_primary btn_orange" onClick={this.edit}>
                             Edit
@@ -1279,83 +1417,94 @@ class Users extends Component {
                                 </button>
                             </div>
                         </div>
-                        <div className="mb-4">
+                        {
+                            this.state.edit_user?.nft_rewards?.length || this.state.edit_user?.nft_rewards?.length
+                            ?   <div className="mb-4">
                             <label className="form__label_group form__label">
                                 Rewarded: <img className="form__icon-info" src={info} />
                             </label>
                             <div className="form__prompt" id="basic-addon4">Total number of distributed rewards</div>
                         </div>
+                            :  <label className="form__label_group form__label">
+                           No  Rewarded
+                        </label>
+                        }
+                      
                         <div className="mb-4">
                             <FPTable notHead={true}>
-                                <tr>
-                                    <td>
-                                            <div className="token-name">
-                                                <img src={customTokeSymbol}></img>
-                                                <div>
+                                {
+                                    this.state.edit_user?.token_rewards?.length ?
+                                     this.state.edit_user.token_rewards.map(v => 
+                                        <tr>
+                                            <td>
+                                                <div className="token-name">
+                                                    <img src={customTokeSymbol}></img>
                                                     <div>
-                                                        ABC
-                                                    </div>
-                                                    <div>
-                                                        Token name
-                                                    </div>
-                                                </div>
-                                            </div>
-                                    </td>
-                                    <td>
-                                        <div>
-                                            1000 received
-                                        </div>
-                                        <div>
-                                            520 available
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                    <div className="token-name">
-                                                <img src={customTokeSymbol}></img>
-                                                <div>
-                                                    <div>
-                                                        ABC
-                                                    </div>
-                                                    <div>
-                                                        Token name
+                                                        {/*<div>
+                                                            ABC
+                                                        </div>
+                                                        */}
+                                                        <div>
+                                                            {v.token_name}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                    </td>
-                                    <td>
-                                        <div>
-                                                1000 received
-                                        </div>
-                                        <div>
-                                                520 available
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                    <div className="token-name">
-                                                <img src={customTokeSymbol}></img>
+                                            </td>
+                                            <td>
                                                 <div>
+                                                {v.count} received
+                                                </div>
+                                                {/*<div>
+                                                        520 available
+                                                </div>
+                                                */}
+                                            </td>
+                                        </tr>
+                                        )
+                            
+                                    : null
+                            
+                                }
+                                   {
+                                    this.state.edit_user?.nft_rewards?.length ?
+                                     this.state.edit_user.nft_rewards.map(v => 
+                                        <tr>
+                                            <td>
+                                                <div className="token-name">
+                                                    <img src={customTokeSymbol}></img>
                                                     <div>
-                                                        NFT name
-                                                    </div>
-                                                    <div>
-                                                        Collection name
+                                                        <div>
+                                                            {v.nft_name}
+                                                        </div>
+                                                        <div>
+                                                        {v.collection_name}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                    </td>
-                                    <td>
-                                        <div>Received</div>
-                                    </td>
-                                </tr>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                {v.count} received
+                                                </div>
+                                                {/*<div>
+                                                        520 available
+                                                </div>
+                                                */}
+                                            </td>
+                                        </tr>
+                                        )
+                                    : null
+                                }
+    
                             </FPTable>
                         </div>
 
-
-                        <div className="dashboard__chart mb-4">
+                        {
+                            /* 
+                            /* Выводить график, когда буду получать статистику по периоду
+                            this.state.edit_user?.token_rewards?.length 
+                            ?  
+                            <div className="dashboard__chart mb-4">
                             <div className="dashboard__chart_reward">
                                 <label className="chart__label">Token reward statistic</label>
                                 <div className="mb-4" style={{position: 'relative', width:'100%', display: 'flex', justifyContent: 'center', padding: '0 24px'}}>
@@ -1368,7 +1517,10 @@ class Users extends Component {
                                 <LineChart chartData={this.state.totalUserData}></LineChart>
                                 </div>
                             </div>
-                        </div>
+                        </div> 
+                            : null
+                            */
+                        }      
                     </Modal.Body>
                 </Modal>
                 <Modal show={this.state.showDelete} onHide={this.handleCloseDelete} centered>
@@ -1382,8 +1534,14 @@ class Users extends Component {
                 </Modal>
                 <SuccessModal 
                     showSuccess={this.state.showSuccess} 
+                    successTitle={this.state.successTitle}
                     handleCloseSuccess={this.handleCloseSuccess}
                     successName={this.state.successName} 
+                />
+                 <ErrorModal 
+                    showError={this.state.showError}
+                    handleCloseError={this.handleCloseError}
+                    errorName={this.state.errorName}
                 />
                 </>
                 }

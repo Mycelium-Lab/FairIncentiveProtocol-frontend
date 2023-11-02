@@ -9,16 +9,32 @@ class ErrorModal extends Component {
 
     entering() {
         const mint = document.getElementById('mint')
-        if(mint) {
-            const modal = mint.parentElement
+        const createUser = document.getElementById('createUser')
+        const editUser = document.getElementById('editUser')
+        const blackList = document.getElementById('blackList')
+        const rewardFromUser = document.getElementById('rewardFromUser')
+        const rewardFromReward = document.getElementById('rewardFromReward')
+        const rewarding = document.getElementById('rewarding')
+        const modal = mint?.parentElement || createUser?.parentElement 
+        || editUser?.parentElement || blackList?.parentElement || rewardFromUser?.parentElement
+        || rewardFromReward?.parentElement || rewarding?.parentElement
+        if(modal) {
             modal.style.zIndex = '1049'
         }
     }
 
     entered() {
         const mint = document.getElementById('mint')
-        if(mint) {
-            const modal = mint.parentElement
+        const createUser = document.getElementById('createUser')
+        const editUser = document.getElementById('editUser')
+        const blackList = document.getElementById('blackList')
+        const rewardFromUser = document.getElementById('rewardFromUser')
+        const rewardFromReward = document.getElementById('rewardFromReward')
+        const rewarding = document.getElementById('rewarding')
+        const modal = mint?.parentElement || createUser?.parentElement 
+        || editUser?.parentElement || blackList?.parentElement || rewardFromUser?.parentElement
+        || rewardFromReward?.parentElement || rewarding?.parentElement
+        if(modal) {
             modal.style.zIndex = '1050'
         }
     }

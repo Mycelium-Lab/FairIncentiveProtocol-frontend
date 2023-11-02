@@ -19,19 +19,63 @@ class Dashboard extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            newUserData: {
-                labels: newUser.map(data => data.time),
+            distributionOfRewardsMockData: {
+                labels: ['Reward name'],
                 datasets: [{
-                    data: newUser.map(data => data.amount),
+                    data: [100],
                     backgroundColor: ['rgba(255, 159, 67, 0.85)']
                 }]
             },
-            totalUserData: {
-                labels: newUser.map(data => data.time),
+            typeOfRewardsMockData: {
+                labels: ['Tokens', 'NFTs'],
                 datasets: [{
-                    data: newUser.map(data => data.amount),
-                    borderColor: ['rgba(255, 159, 67, 0.85)'],
+                    data: [100, 100],
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)', 'rgba(255, 159, 67, 0.85)']
                 }]
+            },
+            tokensIssuesMockData: {
+                labels: ['Claimed', 'Distributed', 'Available'],
+                datasets: [{
+                    data: [100, 100, 100],
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)', 'rgba(255, 159, 67, 0.85)', 'rgba(255, 159, 67, 0.85)']
+                }]
+            },
+            tokensSupplyMockData: {
+                labels: ['Tokens', 'NFTs'],
+                datasets: [{
+                    data: [100, 100],
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)', 'rgba(255, 159, 67, 0.85)']
+                }]
+            },
+            collectionIssueMockData: {
+                labels: ['Claimed', 'Distributed', 'Available'],
+                datasets: [{
+                    data: [100, 100, 100],
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)', 'rgba(255, 159, 67, 0.85)', 'rgba(255, 159, 67, 0.85)']
+                }]
+            },
+            collectionSupplyMockData: {
+                labels: ['Tokens', 'NFTs'],
+                datasets: [{
+                    data: [100, 100],
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)', 'rgba(255, 159, 67, 0.85)']
+                }]
+            },
+            tokenDistributionMockDdata: {
+                labels: [],
+                datasets: []
+            },
+            nftsDistributionMockDdata: {
+                labels: [],
+                datasets: []
+            },
+            newUserData: {
+                labels: [],
+                datasets: []
+            },
+            totalUserData: {
+                labels: [],
+                datasets: []
             },
             rewardsRange: {
                 labels: [],
@@ -115,7 +159,9 @@ class Dashboard extends Component {
                 },
             ]
             this.setState({
-                typeOfRewardsData: {
+                typeOfRewardsData: !typeOfRewards[0]?.value
+                    ?  this.state.typeOfRewardsMockData 
+                    : {
                     labels: typeOfRewards.map(data => data.name),
                     datasets: [{
                         data: typeOfRewards.map(data => data.value),
@@ -152,7 +198,9 @@ class Dashboard extends Component {
                 }
             })
             this.setState({
-                distributionOfRewardsData: {
+                distributionOfRewardsData: !distributionOfRewards.length 
+                ? this.state.distributionOfRewardsMockData 
+                :{
                     labels: distributionOfRewards.map(data => data.name),
                     datasets: [{
                         data: distributionOfRewards.map(data => data.value),
@@ -166,6 +214,7 @@ class Dashboard extends Component {
     }
 
     async changeNewUsersRange(startDate, endDate) {
+        const isTodayOrYesterday = startDate.getDate() === endDate.getDate() && startDate.getMonth() === endDate.getMonth()
         try {
             const headers = new Headers();
             headers.append("Authorization", getBearerHeader())
@@ -180,7 +229,7 @@ class Dashboard extends Component {
             const res = await fetch(`${config.api}/stat/new_users_range?` + query.toString(), requestOptions)
             const json = await res.json()
             const range = {
-                labels: json.body.data.map(v => `${new Date(v.date_interval_end).toLocaleDateString()} ${new Date(v.date_interval_end).toLocaleTimeString()}`),
+                labels: json.body.data.map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "")  : new Date(v.date_interval_end).toLocaleDateString()} `),
                 datasets: [{
                     data: json.body.data.map(v => parseInt(v.count)),
                     backgroundColor: ['rgba(255, 159, 67, 0.85)']
@@ -189,7 +238,7 @@ class Dashboard extends Component {
             const resTotal = await fetch(`${config.api}/stat/total_users_range?` + query.toString(), requestOptions)
             const jsonTotal = await resTotal.json()
             const rangeTotal = {
-                labels: jsonTotal.body.data.map(v => `${new Date(v.end_date).toLocaleDateString()} ${new Date(v.end_date).toLocaleTimeString()}`),
+                labels: jsonTotal.body.data.map(v => `${isTodayOrYesterday ? new Date(v.end_date).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "") : new Date(v.end_date).toLocaleDateString()} `),
                 datasets: [{
                     data: jsonTotal.body.data.map(v => parseInt(v.count)),
                     backgroundColor: ['rgba(255, 159, 67, 0.85)']
@@ -197,6 +246,20 @@ class Dashboard extends Component {
             }
             this.setState({
                 newUserData: range,
+                tokenDistributionMockDdata: {
+                    labels: json.body.data.map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "")  : new Date(v.date_interval_end).toLocaleDateString()} `),
+                    datasets: [{
+                        data: [],
+                        backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                    }]
+                },
+                nftsDistributionMockDdata : {
+                    labels: json.body.data.map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "")  : new Date(v.date_interval_end).toLocaleDateString()} `),
+                    datasets: [{
+                        data: [],
+                        backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                    }]
+                },
                 totalUserData: rangeTotal
             })
         } catch (error) {
@@ -205,6 +268,7 @@ class Dashboard extends Component {
     }
 
     async changeRewardsRange(startDate, endDate) {
+        const isTodayOrYesterday = startDate.getDate() === endDate.getDate() && startDate.getMonth() === endDate.getMonth()
         try {
             const headers = new Headers();
             headers.append("Authorization", getBearerHeader())
@@ -219,7 +283,7 @@ class Dashboard extends Component {
             const res = await fetch(`${config.api}/stat/rewards_range?` + query.toString(), requestOptions)
             const json = await res.json()
             const range = {
-                labels: json.body.data.map(v => `${new Date(v.date_interval_end).toLocaleDateString()} ${new Date(v.date_interval_end).toLocaleTimeString()}`),
+                labels: json.body.data.map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "") : new Date(v.date_interval_end).toLocaleDateString()}`),
                 datasets: [{
                     data: json.body.data.map(v => parseInt(v.count)),
                     backgroundColor: ['rgba(255, 159, 67, 0.85)']
@@ -244,8 +308,8 @@ class Dashboard extends Component {
                 <div className="dashboard__tab">
                     <Tabs defaultActiveKey="users">
                         <Tab eventKey="users" title="Users">
-                            <DatePicker changeNewUsersRange={this.changeNewUsersRange} type={typesOfDashboard.users}></DatePicker>
                             <UserInfo></UserInfo>
+                            <DatePicker changeNewUsersRange={this.changeNewUsersRange} type={typesOfDashboard.users}></DatePicker>
                             <div className="dashboard__chart mb-4">
                                 <div className="dashboard__chart_dashboard-info">
                                     <label className="chart__label">New Users</label>
@@ -262,8 +326,8 @@ class Dashboard extends Component {
                             </div>
                         </Tab>
                         <Tab eventKey="rewards" title="Rewards">
-                            <DatePicker changeRewardsRange={this.changeRewardsRange} type={typesOfDashboard.rewards}></DatePicker>
                             <RewardsInfo total={this.state.rewards_total_count}></RewardsInfo>
+                            <DatePicker changeRewardsRange={this.changeRewardsRange} type={typesOfDashboard.rewards}></DatePicker>
                             <div className="dashboard__chart_dashboard-info  mb-4">
                             <label className="chart__label">Rewards</label>
                                 <div className="dashboard__chart_wrapper mb-4" style={{position: 'relative', height:'358px', display: 'flex', justifyContent: 'center'}}>
@@ -287,49 +351,49 @@ class Dashboard extends Component {
             
                         </Tab>
                         <Tab eventKey="tokens" title="Tokens">
-                            <DatePicker></DatePicker>
                             <TokensInfo></TokensInfo>
+                            <DatePicker></DatePicker>
                             <div className="dashboard__chart_dashboard-info  mb-4">
-                                <label className="chart__label">                Token distribution </label>
+                                <label className="chart__label"> Token distribution </label>
                                 <div className="dashboard__chart_wrapper mb-4"  style={{position: 'relative', height:'358px', display: 'flex', justifyContent: 'center'}}>
-                                    <BarChart chartData={this.state.newUserData}></BarChart>
+                                    <BarChart chartData={this.state.tokenDistributionMockDdata}></BarChart>
                                 </div>
                             </div>
                             <div className="chart__group">
                                 <div className="dashboard__chart_dashboard-info  mb-4">
                                     <label className="chart__label">Tokens issue</label>
                                     <div style={{position: 'relative', height:'358px', display: 'flex', justifyContent: 'center'}}>
-                                        <DonutChart chartData={this.state.tokensIssuesData}></DonutChart>
+                                        <DonutChart chartData={this.state.tokensIssuesMockData}></DonutChart>
                                     </div>
                                 </div>
                                 <div className="dashboard__chart_dashboard-info  mb-4">
                                     <label className="chart__label">Tokens supply</label>
                                     <div style={{position: 'relative', height:'358px', display: 'flex', justifyContent: 'center'}}>
-                                        <DonutChart chartData={this.state.typeOfRewardsData}></DonutChart>
+                                        <DonutChart chartData={this.state.tokensSupplyMockData}></DonutChart>
                                     </div>
                                 </div>
                             </div>
                         </Tab>
                         <Tab eventKey="NFTs" title="NFTs">
-                            <DatePicker></DatePicker>
                             <NftsInfo></NftsInfo>
+                            <DatePicker></DatePicker>
                             <div className="dashboard__chart_dashboard-info  mb-4">
                             <label className="chart__label">NFTs distribution </label>
                             <div className="dashboard__chart_wrapper mb-4" style={{position: 'relative', height:'358px', display: 'flex', justifyContent: 'center'}}>
-                                <BarChart chartData={this.state.newUserData}></BarChart>
+                                <BarChart chartData={this.state.nftsDistributionMockDdata}></BarChart>
                             </div>
                             </div>
                             <div className="chart__group">
                                 <div className="dashboard__chart_dashboard-info  mb-4">
                                     <label className="chart__label">Collection issue</label>
                                     <div style={{position: 'relative', height:'358px', display: 'flex', justifyContent: 'center'}}>
-                                        <DonutChart chartData={this.state.collectionIssueData}></DonutChart>
+                                        <DonutChart chartData={this.state.collectionIssueMockData}></DonutChart>
                                     </div>
                                 </div>
                                 <div className="dashboard__chart_dashboard-info  mb-4">
                                     <label className="chart__label">Collection supply</label>
                                     <div style={{position: 'relative', height:'358px', display: 'flex', justifyContent: 'center'}}>
-                                        <DonutChart chartData={this.state.typeOfRewardsData}></DonutChart>
+                                        <DonutChart chartData={this.state.collectionSupplyMockData}></DonutChart>
                                     </div>
                                 </div>
                             </div>

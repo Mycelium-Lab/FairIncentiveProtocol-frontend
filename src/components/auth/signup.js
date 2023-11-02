@@ -5,6 +5,8 @@ import Select from "react-select";
 import DefaultAuth from "../../layouts/defaultAuth";
 import { config } from "../../utils/config"
 import email from "../../media/common/email.svg";
+import ErrorModal from "../common/modals/error";
+import errors from "../../errors";
 import passwordHide from "../../media/common/password_hide.svg";
 import passwordShow from "../../media/common/password_show.svg";
 import { countries } from "../../utils/countries";
@@ -30,7 +32,9 @@ class SignUp extends Component {
             isInvalidPassword: false,
             isInvalidRepeatPassword: false,
             showPassword: false,
-            showRepeatPassword: false
+            showRepeatPassword: false,
+            showError: false,
+            errorName: null
         }
     }
 
@@ -68,7 +72,12 @@ class SignUp extends Component {
                 // alert(`${json.message}. Now you can signin.`)
                 this.handleSwitch(ev, this.props.switcher)
             } else {
-                alert(json.error.message)
+                const errroMessage = json.error.message
+                const parsedMessage = errors[errroMessage] ? errors[errroMessage] : errroMessage
+                this.setState({
+                    showError: true,
+                    errorName: parsedMessage
+                })
             }
         } catch (error) {
             console.log(error)
@@ -167,6 +176,8 @@ class SignUp extends Component {
     handleSwitch(event, value) {
         this.props.switch(event, value)
     }
+    
+    handleCloseError = () => this.setState({showError: false})
 
     handleSwitch = this.handleSwitch.bind(this)
 
@@ -180,6 +191,7 @@ class SignUp extends Component {
     goToStep2 = this.goToStep2.bind(this)
     onChangeCountry = this.onChangeCountry.bind(this)
     onChangeRepname = this.onChangeRepname.bind(this)
+    handleCloseError = this.handleCloseError.bind(this)
 
     render() {
         const { switcher, switcherText } = this.props;
@@ -343,6 +355,11 @@ class SignUp extends Component {
                     </div>
                 </div>
                 </Container>
+                <ErrorModal 
+                    showError={this.state.showError}
+                    handleCloseError={this.handleCloseError}
+                    errorName={this.state.errorName}
+                />
             </>
         )
     }

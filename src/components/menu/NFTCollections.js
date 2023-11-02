@@ -51,9 +51,9 @@ class NFTCollections extends Component {
             name: null,
             symbol: null,
             description: null,
-            chainid: 1,
+            description2: null,
+            chainid: networks[config.status === "test" ? '80001' : '137'].chainid,
             provider: null,
-            chainid: null,
             signer: null,
             address: null,
             showCreate: false,
@@ -81,7 +81,7 @@ class NFTCollections extends Component {
             propertiesElements: [],
             statsElements: [],
             levelsElements: [],
-            network: networks[config.status === "test" ? '5' : '1'],
+            network: networks[config.status === "test" ? '80001' : '137'],
             beneficialAddress: this.props.auth.wallet,
             beneficialType: beneficialTypes.company,
             royalties: null,
@@ -96,6 +96,8 @@ class NFTCollections extends Component {
             stageOfAddNft: 0,
             hasLoad: false,
             collectionOptions: null,
+            isInvalidAddress: false,
+            isInvalidRoyalties: false
         }
     }
 
@@ -168,6 +170,12 @@ class NFTCollections extends Component {
         })
     }
 
+    onChangeDescription2(event) {
+        this.setState({
+            description2: event.target.value
+        })
+    }
+
     onChangeBeneficialType(event) {
         this.setState({
             beneficialType: event.target.value
@@ -175,15 +183,49 @@ class NFTCollections extends Component {
     }
 
     onChangeBeneficialAddress(event) {
-        this.setState({
-            beneficialAddress: event.target.value
-        })
+        const validateAddress = (address) => {
+            if(!address) {
+                return true
+            }
+            return address.match(
+                /^0x[a-fA-F0-9]{40}$/g
+            );
+          };
+          if (!ethers.utils.isAddress(event.target.value) ) {
+            this.setState({
+                beneficialAddress: event.target.value,
+                isInvalidAddress: true
+            })
+        }
+        else if(validateAddress(event.target.value)) {
+            this.setState({
+                beneficialAddress: event.target.value,
+                isInvalidAddress: false
+            })
+        }
+        else{
+            this.setState({
+                beneficialAddress: event.target.value,
+                isInvalidAddress: true
+            })
+          
+        }
     }
 
     onChangeRoyalties(event) {
-        this.setState({
-            royalties: event.target.value
-        })
+        if(Number(event.target.value) >= 0.5 && Number(event.target.value) <= 10) 
+        {
+            this.setState({
+                royalties: event.target.value,
+                isInvalidRoyalties: false
+            })
+        }
+        else {
+            this.setState({
+                royalties: event.target.value,
+                isInvalidRoyalties: true
+            })
+        }
     }
 
     onChangeWebsite = (event) => this.setState({website: event.target.value})
@@ -302,7 +344,7 @@ class NFTCollections extends Component {
             if (discord) links.push({link: discord})
             if (other) links.push({link: other})
             let NFT, contract
-            this.handleShowConfirm('Purchace', `Confirm ${symbol} collection creation`, `Please, confirm contract creation in your wallet`)
+            this.handleShowConfirm('Create NFT', `Confirm ${symbol} collection creation`, `Please, confirm contract creation in your wallet`)
             if (beneficialType === beneficialTypes.company) {
                 NFT = new ethers.ContractFactory(ERC721DefaultRoyalty.abi, ERC721DefaultRoyalty.bytecode, this.state.signer)
                 contract = await NFT.deploy(this.state.name, this.state.symbol, config.signerAddress, beneficialAddress, royalties);
@@ -348,7 +390,7 @@ class NFTCollections extends Component {
                 })
                 contract.deployed().then(() => {
                     this.handleCloseProgress()
-                    this.handleShowSuccess(`${symbol} collection created`, `The contract creation was successful`)
+                    this.handleShowSuccess('Create NFT', `${symbol} collection created`, `The contract creation was successful`)
                     this.setState({
                         showCreate: false,
                         stageOfCreateToken: 0,
@@ -384,6 +426,7 @@ class NFTCollections extends Component {
                 this.setState({
                     showAddNFT: false,
                     showSuccess: true,
+                    successTitle: 'Create NFT',
                     successName: `The NFT "${this.state.addNFTName}" was successfully created`
                 })
             }
@@ -458,10 +501,10 @@ class NFTCollections extends Component {
                 element: 
                 <div className="user-custom-params">
                             <div className="input-group">
-                                <input type="text" id={`property-name-${id}`} onChange={(event) => this.changePropertyName(id, event.target.value)} className="form-control" placeholder="Property name"/>
+                                <input type="text" id={`property-name-${id}`} onChange={this.changePropertyName} className="form-control" placeholder="Property name"/>
                             </div>
                             <div className="input-group">
-                                <input type="text" id={`property-value-${id}`} onChange={(event) => this.changePropertyValue(id, event.target.value)} className="form-control" placeholder="Default value"/>
+                                <input type="text" id={`property-value-${id}`} onChange={this.changePropertyValue} className="form-control" placeholder="Default value"/>
                             </div>
                     <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={() => this.deletePropertyInput(id)}>-</button>
                 </div>,
@@ -582,7 +625,7 @@ class NFTCollections extends Component {
     handleCloseConfirm = () => this.setState({showConfirm: false, confirmName: null, confirmText: null})
     handleShowProgress = () => this.setState({showProgress: true})
     handleCloseProgress = () => this.setState({showProgress: false})
-    handleShowSuccess = (successName, successText) => this.setState({showSuccess: true, successName, successText})
+    handleShowSuccess = (successTitle, successName, successText) => this.setState({showSuccess: true, successName, successText, successTitle})
     handleCloseSuccess = () => this.setState({showSuccess: false, successName: null, successText: null})
     handleShowError = (errorText) => this.setState({showError: true, errorText})
     handleCloseError = () => this.setState({showError: false})
@@ -607,6 +650,7 @@ class NFTCollections extends Component {
     changeNetwork = this.changeNetwork.bind(this)
     changeCollection = this.changeCollection.bind(this)
     onChangeDescription = this.onChangeDescription.bind(this)
+    onChangeDescription2 = this.onChangeDescription2.bind(this)
     handleCloseCreateImagesPage = this.handleCloseCreateImagesPage.bind(this)
     handleShowCreateImagesPage = this.handleShowCreateImagesPage.bind(this)
     handleCloseCreateBeneficialPage = this.handleCloseCreateBeneficialPage.bind(this)
@@ -686,9 +730,9 @@ class NFTCollections extends Component {
                                      <label className="form-label">Blockchain *</label>
                                      <div className="input-group">
                                          <select onChange={this.changeNetwork} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                             <option value={config.status === "test" ? '5' : '1'} selected={this.state.network.chainid === (config.status === "test" ? '5' : '1')}>{networks[config.status === "test" ? '5' : '1'].name}</option>
-                                             <option value={config.status === "test" ? '97' : '56'} selected={this.state.network.chainid === (config.status === "test" ? '97' : '56')}>{networks[config.status === "test" ? '97' : '56'].name}</option>
                                              <option value={config.status === "test" ? '80001' : '137'} selected={this.state.network.chainid === (config.status === "test" ? '80001' : '137')}>{networks[config.status === "test" ? '80001' : '137'].name}</option>
+                                             <option value={config.status === "test" ? '97' : '56'} selected={this.state.network.chainid === (config.status === "test" ? '97' : '56')}>{networks[config.status === "test" ? '97' : '56'].name}</option>
+                                             <option value={config.status === "test" ? '5' : '1'} selected={this.state.network.chainid === (config.status === "test" ? '5' : '1')}>{networks[config.status === "test" ? '5' : '1'].name}</option>
                                              <option value={config.status === "test" ? '420' : '10'} selected={this.state.network.chainid === (config.status === "test" ? '420' : '10')} disabled={config.status === "test" ? true : false} >{networks[config.status === "test" ? '420' : '10'].name}</option>
                                              <option value={config.status === "test" ? '43113' : '43114'} selected={this.state.network.chainid === (config.status === "test" ? '43113' : '43114')}>{networks[config.status === "test" ? '43113' : '43114'].name}</option>
                                              <option value={config.status === "test" ? '421613' : '42161'} selected={this.state.network.chainid === (config.status === "test" ? '421613' : '42161')}>{networks[config.status === "test" ? '421613' : '42161'].name}</option>
@@ -703,9 +747,9 @@ class NFTCollections extends Component {
                                      <label className="form-label">Blockchain *</label>
                                      <div className="input-group">
                                          <select onChange={this.changeNetwork} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
-                                             <option value={config.status === "test" ? '5' : '1'} selected={this.state.network.chainid === (config.status === "test" ? '5' : '1')}>{networks[config.status === "test" ? '5' : '1'].name}</option>
-                                             <option value={config.status === "test" ? '97' : '56'} selected={this.state.network.chainid === (config.status === "test" ? '97' : '56')}>{networks[config.status === "test" ? '97' : '56'].name}</option>
                                              <option value={config.status === "test" ? '80001' : '137'} selected={this.state.network.chainid === (config.status === "test" ? '80001' : '137')}>{networks[config.status === "test" ? '80001' : '137'].name}</option>
+                                             <option value={config.status === "test" ? '97' : '56'} selected={this.state.network.chainid === (config.status === "test" ? '97' : '56')}>{networks[config.status === "test" ? '97' : '56'].name}</option>
+                                             <option value={config.status === "test" ? '5' : '1'} selected={this.state.network.chainid === (config.status === "test" ? '5' : '1')}>{networks[config.status === "test" ? '5' : '1'].name}</option>
                                              <option value={config.status === "test" ? '420' : '10'} selected={this.state.network.chainid === (config.status === "test" ? '420' : '10')} disabled={config.status === "test" ? true : false} >{networks[config.status === "test" ? '420' : '10'].name}</option>
                                              <option value={config.status === "test" ? '43113' : '43114'} selected={this.state.network.chainid === (config.status === "test" ? '43113' : '43114')}>{networks[config.status === "test" ? '43113' : '43114'].name}</option>
                                              <option value={config.status === "test" ? '421613' : '42161'} selected={this.state.network.chainid === (config.status === "test" ? '421613' : '42161')}>{networks[config.status === "test" ? '421613' : '42161'].name}</option>
@@ -838,25 +882,45 @@ class NFTCollections extends Component {
                                 <div className="form_row mb-4">
                               
                                         {
-                                            this.state.beneficialType === beneficialTypes.company
+                                            this.state.beneficialType === beneficialTypes.company && this.state.isInvalidAddress
                                             ?
                                             <div className="form_col">
                                             <label className="form__label">Beneficiary address:</label>
                                             <div className="input-group">
-                                                <input type="text" placeholder="Address" onChange={this.onChangeBeneficialAddress} value={this.state.beneficialAddress}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                <input maxLength={42}  type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.onChangeBeneficialAddress} value={this.state.beneficialAddress}  className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                            </div>
+                                            <div className="form__prompt_error form__prompt" id="basic-addon4">Invalid wallet address format. Example: 0x71C7656EC7ab88b098defB751B7401B5f6d8976F</div>
+                                        </div>
+                                            : this.state.beneficialType === beneficialTypes.company && !this.state.isInvalidAddress
+                                            ? 
+                                            <div className="form_col">
+                                            <label className="form__label">Beneficiary address:</label>
+                                            <div className="input-group">
+                                                <input maxLength={42}  type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.onChangeBeneficialAddress} value={this.state.beneficialAddress}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                             </div>
                                             <div className="form__prompt" id="basic-addon4">Wallet for receiving commissions from re-sales of the collection items</div>
                                         </div>
-                                            :
-                                            null
+                                            : null
                                         }
-                                     <div className="form_col_last form_col">
+                                        
+                                   {
+                                    this.state.isInvalidRoyalties 
+                                    ?     <div className="form_col_last form_col">
                                     <label className="form__label">Resale royalties: <img src={info} className="form__icon-info"/></label>
                                     <div className="input-group">
-                                    <input type="number" placeholder="20%" onChange={this.onChangeRoyalties} value={this.state.royalties}  min={0.5} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    <input type="number" placeholder="5%" onChange={this.onChangeRoyalties} value={this.state.royalties} className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                    <div className="form__prompt_error form__prompt" id="basic-addon4">Total creator earnings must be between 0.5% and 10%</div>
+                                </div> 
+                                    :   <div className="form_col_last form_col">
+                                    <label className="form__label">Resale royalties: <img src={info} className="form__icon-info"/></label>
+                                    <div className="input-group">
+                                    <input type="number" placeholder="5%" onChange={this.onChangeRoyalties} value={this.state.royalties}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                     </div>
                                     <div className="form__prompt" id="basic-addon4">Total creator earnings must be between 0.5% and 10%</div>
-                                </div>
+                                </div> 
+                                    
+                                   }
                                 </div>
                             <div className="form_row mb-4">
                             <div className="form_col_action_left form_col_last form_col">
@@ -864,17 +928,19 @@ class NFTCollections extends Component {
                                     Back
                             </button>
                                 {
+                                   (
+                                    this.state.royalties === null
+                                    ||
+                                    this.state.royalties === ''
+                                    || this.state.isInvalidRoyalties 
+                                    || this.state.isInvalidAddress
+                                    ||
                                     (
-                                        this.state.royalties === null
-                                        ||
-                                        this.state.royalties === ''
-                                        ||
-                                        (
-                                            this.state.beneficialType === beneficialTypes.company ? 
-                                            !ethers.utils.isAddress(this.state.beneficialAddress) 
-                                            : false
-                                        )
+                                        this.state.beneficialType === beneficialTypes.company ? 
+                                        !ethers.utils.isAddress(this.state.beneficialAddress) 
+                                        : false
                                     )
+                                )
                                     ?
                                     <button type="button" className="btn btn_pre-sm  btn_primary btn_orange btn_disabled" disabled onClick={this.nextStage}>Next</button>
                                     :
@@ -921,26 +987,45 @@ class NFTCollections extends Component {
                                 </div>
                                 <div className="form_row mb-4">
                               
-                                        {
-                                            this.state.beneficialType === beneficialTypes.company
+                                {
+                                            this.state.beneficialType === beneficialTypes.company && this.state.isInvalidAddress
                                             ?
                                             <div className="form_col">
                                             <label className="form__label">Beneficiary address:</label>
                                             <div className="input-group">
-                                                <input type="text" placeholder="Address" onChange={this.onChangeBeneficialAddress} value={this.state.beneficialAddress}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                <input maxLength={42}  type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.onChangeBeneficialAddress} value={this.state.beneficialAddress}  className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                            </div>
+                                            <div className="form__prompt_error form__prompt" id="basic-addon4">Invalid wallet address format. Example: 0x71C7656EC7ab88b098defB751B7401B5f6d8976F</div>
+                                        </div>
+                                            : this.state.beneficialType === beneficialTypes.company && !this.state.isInvalidAddress
+                                            ? 
+                                            <div className="form_col">
+                                            <label className="form__label">Beneficiary address:</label>
+                                            <div className="input-group">
+                                                <input maxLength={42} type="text" placeholder="0x0000000000000000000000000000000000000000" onChange={this.onChangeBeneficialAddress} value={this.state.beneficialAddress}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                             </div>
                                             <div className="form__prompt" id="basic-addon4">Wallet for receiving commissions from re-sales of the collection items</div>
                                         </div>
-                                            :
-                                            null
+                                            : null
                                         }
-                                     <div className="form_col_last form_col">
+                                     {
+                                    this.state.isInvalidRoyalties 
+                                    ?     <div className="form_col_last form_col">
                                     <label className="form__label">Resale royalties: <img src={info} className="form__icon-info"/></label>
                                     <div className="input-group">
-                                    <input type="number" placeholder="20%" onChange={this.onChangeRoyalties} value={this.state.royalties}  min={0.5} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    <input type="number" placeholder="5%" onChange={this.onChangeRoyalties} value={this.state.royalties} className="auth__form-fields-input_error form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                    </div>
+                                    <div className="form__prompt_error form__prompt" id="basic-addon4">Total creator earnings must be between 0.5% and 10%</div>
+                                </div> 
+                                    :   <div className="form_col_last form_col">
+                                    <label className="form__label">Resale royalties: <img src={info} className="form__icon-info"/></label>
+                                    <div className="input-group">
+                                    <input type="number" placeholder="5%" onChange={this.onChangeRoyalties} value={this.state.royalties}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                     </div>
                                     <div className="form__prompt" id="basic-addon4">Total creator earnings must be between 0.5% and 10%</div>
-                                </div>
+                                </div> 
+                                    
+                                   }
                                 </div>
                             <div className="form_row mb-4">
                             <div className="form_col_action_left form_col_last form_col">
@@ -952,6 +1037,8 @@ class NFTCollections extends Component {
                                         this.state.royalties === null
                                         ||
                                         this.state.royalties === ''
+                                        || this.state.isInvalidRoyalties 
+                                        || this.state.isInvalidAddress
                                         ||
                                         (
                                             this.state.beneficialType === beneficialTypes.company ? 
@@ -1417,7 +1504,7 @@ class NFTCollections extends Component {
                                                 </label>  
                                                     </div>
                                                     <div input-group>
-                                                        <textarea type="text" value={this.state.description} onChange={this.onChangeDescription} className="form__textarea form__textarea_desct-nft-collection" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
+                                                        <textarea type="text" value={this.state.description2} onChange={this.onChangeDescription2} className="form__textarea form__textarea_desct-nft-collection" id="basic-url" aria-describedby="basic-addon3 basic-addon4"></textarea>
                                                     </div>
                                             </div>
                                         </div>
@@ -1446,6 +1533,7 @@ class NFTCollections extends Component {
                     showSuccess={this.state.showSuccess} 
                     handleCloseSuccess={this.handleCloseSuccess}
                     successName={this.state.successName} 
+                    successTitle={this.state.successTitle}
                     successText={this.state.successText}
                 />
                 <ErrorModal

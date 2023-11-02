@@ -6,8 +6,36 @@ class ConfirmModal extends Component {
         super(props)
     }
 
+    entering() {
+        const mint = document.getElementById('mint')
+        const createUser = document.getElementById('createUser')
+        const editUser = document.getElementById('editUser')
+        const blackList = document.getElementById('blackList')
+        const modal = mint?.parentElement || createUser?.parentElement 
+        || editUser?.parentElement || blackList?.parentElement
+        if(modal) {
+            modal.style.zIndex = '1049'
+        }
+    }
+
+    entered() {
+        const mint = document.getElementById('mint')
+        const createUser = document.getElementById('createUser')
+        const editUser = document.getElementById('editUser')
+        const blackList = document.getElementById('blackList')
+        const modal = mint?.parentElement || createUser?.parentElement 
+        || editUser?.parentElement || blackList?.parentElement
+        if(modal) {
+            modal.style.zIndex = '1050'
+        }
+    }
+
+    entering = this.entering.bind(this)
+    entered = this.entered.bind(this)
+
+
     render() {
-        return <Modal show={this.props.showConfirm} onHide={this.props.handleCloseConfirm} centered>
+        return <Modal onEntering={this.entering} onEntered={this.entered} show={this.props.showConfirm} onHide={this.props.handleCloseConfirm} centered>
              <Modal.Header  className="modal-newuser__title modal-title" closeButton>
              {this.props.confirmTitle}
             </Modal.Header>
