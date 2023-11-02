@@ -12,7 +12,7 @@ export const networks = {
         rpc: "https://bsc-dataseed.binance.org",
         chainid: "56",
         currency_symbol: "BNB",
-        explorer: "https://bscscan.com/",
+        explorer: "https://bscscan.com",
         fpmanager: ""
     },
     137: {
@@ -52,7 +52,7 @@ export const networks = {
         rpc: "https://rpc.ankr.com/eth_goerli	",
         chainid: "5",
         currency_symbol: "tETH",
-        explorer: "https://goerli.etherscan.io/",
+        explorer: "https://goerli.etherscan.io",
         fpmanager: "0xe435Cf187A6479DeA943651c7710f042e079Cdcb"
     },
     97: {
@@ -60,7 +60,7 @@ export const networks = {
         rpc: "https://bsc-testnet.publicnode.com",
         chainid: "97",
         currency_symbol: "tBNB",
-        explorer: "https://testnet.bscscan.com/",
+        explorer: "https://testnet.bscscan.com",
         fpmanager: "0xe435Cf187A6479DeA943651c7710f042e079Cdcb"
     },
     80001: {
@@ -68,7 +68,7 @@ export const networks = {
         rpc: "https://rpc-mumbai.maticvigil.com",
         chainid: "80001",
         currency_symbol: "tMATIC",
-        explorer: "https://mumbai.polygonscan.com/",
+        explorer: "https://mumbai.polygonscan.com",
         fpmanager: "0xe435Cf187A6479DeA943651c7710f042e079Cdcb"
     },
     420: {
@@ -84,7 +84,7 @@ export const networks = {
         rpc: "https://endpoints.omniatech.io/v1/avax/fuji/public",
         chainid: "43113",
         currency_symbol: "tAVAX",
-        explorer: "https://testnet.snowtrace.io/",
+        explorer: "https://testnet.snowtrace.io",
         fpmanager: "0xe435Cf187A6479DeA943651c7710f042e079Cdcb"
     },
     421613: {
@@ -92,7 +92,7 @@ export const networks = {
         rpc: "https://endpoints.omniatech.io/v1/arbitrum/goerli/public",
         chainid: "421613",
         currency_symbol: "tETH",
-        explorer: "https://goerli.arbiscan.io/",
+        explorer: "https://goerli.arbiscan.io",
         fpmanager: "0xe435Cf187A6479DeA943651c7710f042e079Cdcb"
     }
 }
