@@ -61,6 +61,14 @@ class Dashboard extends Component {
                     backgroundColor: ['rgba(255, 159, 67, 0.85)', 'rgba(255, 159, 67, 0.85)']
                 }]
             },
+            tokenDistributionMockDdata: {
+                labels: [],
+                datasets: []
+            },
+            nftsDistributionMockDdata: {
+                labels: [],
+                datasets: []
+            },
             newUserData: {
                 labels: [],
                 datasets: []
@@ -238,6 +246,20 @@ class Dashboard extends Component {
             }
             this.setState({
                 newUserData: range,
+                tokenDistributionMockDdata: {
+                    labels: json.body.data.map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "")  : new Date(v.date_interval_end).toLocaleDateString()} `),
+                    datasets: [{
+                        data: [],
+                        backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                    }]
+                },
+                nftsDistributionMockDdata : {
+                    labels: json.body.data.map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "")  : new Date(v.date_interval_end).toLocaleDateString()} `),
+                    datasets: [{
+                        data: [],
+                        backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                    }]
+                },
                 totalUserData: rangeTotal
             })
         } catch (error) {
@@ -332,9 +354,9 @@ class Dashboard extends Component {
                             <TokensInfo></TokensInfo>
                             <DatePicker></DatePicker>
                             <div className="dashboard__chart_dashboard-info  mb-4">
-                                <label className="chart__label">                Token distribution </label>
+                                <label className="chart__label"> Token distribution </label>
                                 <div className="dashboard__chart_wrapper mb-4"  style={{position: 'relative', height:'358px', display: 'flex', justifyContent: 'center'}}>
-                                    <BarChart chartData={this.state.newUserData}></BarChart>
+                                    <BarChart chartData={this.state.tokenDistributionMockDdata}></BarChart>
                                 </div>
                             </div>
                             <div className="chart__group">
@@ -358,7 +380,7 @@ class Dashboard extends Component {
                             <div className="dashboard__chart_dashboard-info  mb-4">
                             <label className="chart__label">NFTs distribution </label>
                             <div className="dashboard__chart_wrapper mb-4" style={{position: 'relative', height:'358px', display: 'flex', justifyContent: 'center'}}>
-                                <BarChart chartData={this.state.newUserData}></BarChart>
+                                <BarChart chartData={this.state.nftsDistributionMockDdata}></BarChart>
                             </div>
                             </div>
                             <div className="chart__group">
