@@ -20,6 +20,7 @@ import SuccessModal from "../common/modals/success";
 import ErrorModal from "../common/modals/error";
 import loader from '../../media/common/loader.svg'
 import errors from "../../errors";
+import { ethers } from "ethers";
 
 let propertiesElementsLength = 0
 let statsElementsLength = 0
@@ -815,9 +816,7 @@ class Users extends Component {
             if(!address) {
                 return true
             }
-            return address.match(
-                /^0x[a-fA-F0-9]{40}$/g
-            );
+            return ethers.utils.isAddress(address)
           };
         if(validateAddress(edit_user.wallet)) {
             this.setState({
