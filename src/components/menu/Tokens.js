@@ -880,6 +880,7 @@ class Tokens extends Component {
     }
 
     handleShowInfo = async (info) =>  {
+        console.log(info)
         this.setState({showInfo: true, tokenInfo: info,  showLoading: true})
          let provider = new ethers.providers.Web3Provider(window.ethereum)
         const chainid = (await provider.getNetwork()).chainId
@@ -1751,6 +1752,9 @@ class Tokens extends Component {
                                             this.handleCloseInfo()
                                             this.handleShowMint(this.state.tokenInfo.symbol, this.state.tokenInfo.address, this.state.tokenInfo.chainid)
                                         }}>{'[mint]'}</a> <img src={info} className="form__icon-info"/>
+                                    </li>
+                                    <li className="modal-text">
+                                        Supply type: {this.state.tokenInfo.supply_type_name} <img src={info} className="form__icon-info"/>
                                     </li>
                                 </ol>
                             </div>

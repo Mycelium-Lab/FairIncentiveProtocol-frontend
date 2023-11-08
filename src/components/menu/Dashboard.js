@@ -14,6 +14,7 @@ import { config } from "../../utils/config";
 import { getRandomRGBAColor } from "../../utils/color";
 import { subDays } from "date-fns";
 import { typesOfDashboard } from "../../utils/constants";
+import { ethers } from "ethers";
 
 class Dashboard extends Component {
     constructor(props) {
@@ -129,6 +130,7 @@ class Dashboard extends Component {
         await this.getRewardDistribution()
         await this.changeNewUsersRange(nowSub7, now)
         await this.changeRewardsRange(nowSub7, now)
+        await this.changeTokensRange(nowSub7, now)
     }
 
     async getTypeOfRewards() {
@@ -289,7 +291,6 @@ class Dashboard extends Component {
                     backgroundColor: ['rgba(255, 159, 67, 0.85)']
                 }]
             }
-            console.log(json)
             this.setState({
                 rewardsRange: range
             })
@@ -298,8 +299,42 @@ class Dashboard extends Component {
         }
     }
 
+    async changeTokensRange(startDate, endDate) {
+        const isTodayOrYesterday = startDate.getDate() === endDate.getDate() && startDate.getMonth() === endDate.getMonth()
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+            let query = new URLSearchParams();
+            query.append("startDate", startDate.toString())
+            query.append("endDate", endDate.toString())
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/stat/tokens_dist_range?` + query.toString(), requestOptions)
+            const json = await res.json()
+            const range = {
+                labels: json.body.data.map(v => {
+                    v.count = ethers.utils.formatEther(v.count)
+                    return v
+                }).map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "") : new Date(v.date_interval_end).toLocaleDateString()}`),
+                datasets: [{
+                    data: json.body.data.map(v => parseInt(v.count)),
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                }]
+            }
+            this.setState({
+                tokenDistributionMockDdata: range
+            })
+        } catch (error) {
+            
+        }
+    }
+
     changeNewUsersRange = this.changeNewUsersRange.bind(this)
     changeRewardsRange = this.changeRewardsRange.bind(this)
+    changeTokensRange = this.changeTokensRange.bind(this)
 
     render() {
         return (
@@ -352,7 +387,7 @@ class Dashboard extends Component {
                         </Tab>
                         <Tab eventKey="tokens" title="Tokens">
                             <TokensInfo></TokensInfo>
-                            <DatePicker></DatePicker>
+                            <DatePicker changeTokensRange={this.changeTokensRange} type={typesOfDashboard.tokens}></DatePicker>
                             <div className="dashboard__chart_dashboard-info  mb-4">
                                 <label className="chart__label"> Token distribution </label>
                                 <div className="dashboard__chart_wrapper mb-4"  style={{position: 'relative', height:'358px', display: 'flex', justifyContent: 'center'}}>

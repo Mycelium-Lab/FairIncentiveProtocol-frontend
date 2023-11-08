@@ -59,6 +59,9 @@ class DatePicker extends React.Component {
         if (this.props.type === typesOfDashboard.rewards) {
             this.props.changeRewardsRange(range[0].startDate, range[0].endDate)
         }
+        if (this.props.type === typesOfDashboard.tokens) {
+            this.props.changeTokensRange(range[0].startDate, range[0].endDate)
+        }
         this.setState({range})
     }
      
