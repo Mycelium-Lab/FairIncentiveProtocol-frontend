@@ -1096,13 +1096,13 @@ class Tokens extends Component {
                                     <div className="input-group">
                                     <input onChange={this.onChangeInitialSupply} type="number" placeholder="1 000 000" className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                     </div>
-                                    <div className="form__prompt" id="basic-addon4">The number of coins minted during the creation of the contrac</div>
+                                    <div className="form__prompt" id="basic-addon4">The number of coins minted during the creation of the contract</div>
                                 </div>
                             </div>
 
                             <div className="form_row mb-4">
                                 {
-                                    this.state.emissionType !== "2" 
+                                    (this.state.emissionType !== "2" && this.state.emissionType !== "1")  
                                     ? <div className="form_col">
                                     <label className="form__label">Maximum supply * <img src={info} className="form__icon-info" /></label>
                                     <div className="input-group">
