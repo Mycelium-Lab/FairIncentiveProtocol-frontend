@@ -9,12 +9,14 @@ class TokensInfo extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            total: 0
+            total: 0,
+            total_24h: 0
         }
     }
 
     async componentDidMount() {
         await this.getTotal()
+        await this.getTotal24h()
     }
 
     async getTotal() {
@@ -31,6 +33,26 @@ class TokensInfo extends Component {
             const json = await res.json()
             this.setState({
                 total: json.body.data
+            })
+        } catch (error) {
+            alert(error)
+        }
+    }
+
+    async getTotal24h() {
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/stat/total_tokens_24h`, requestOptions)
+            const json = await res.json()
+            this.setState({
+                total_24h: json.body.data
             })
         } catch (error) {
             alert(error)
@@ -64,7 +86,7 @@ class TokensInfo extends Component {
                 <li className="info__list-item_dark-blue info__list-item">
                     <div className="info__content_left">
                         <div className="info__content-amount-info_new info__content-amount-info">
-                            <span className="info__content-amount">77 824</span><span className="info__content-dymanic_positive info__content-dymanic">15.4%</span>
+                            <span className="info__content-amount">{this.state.total_24h}</span><span className="info__content-dymanic_positive info__content-dymanic">15.4%</span>
                         </div>
                         <span className="info__content-desc">Distributed last 24h</span>
                     </div>
