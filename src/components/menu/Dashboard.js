@@ -131,6 +131,7 @@ class Dashboard extends Component {
         await this.changeNewUsersRange(nowSub7, now)
         await this.changeRewardsRange(nowSub7, now)
         await this.changeTokensRange(nowSub7, now)
+        await this.changeNftsRange(nowSub7, now)
     }
 
     async getTypeOfRewards() {
@@ -332,9 +333,41 @@ class Dashboard extends Component {
         }
     }
 
+    async changeNftsRange(startDate, endDate) {
+        const isTodayOrYesterday = startDate.getDate() === endDate.getDate() && startDate.getMonth() === endDate.getMonth()
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+            let query = new URLSearchParams();
+            query.append("startDate", startDate.toString())
+            query.append("endDate", endDate.toString())
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/stat/nfts_dist_range?` + query.toString(), requestOptions)
+            const json = await res.json()
+            console.log(json)
+            const range = {
+                labels: json.body.data.map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "") : new Date(v.date_interval_end).toLocaleDateString()}`),
+                datasets: [{
+                    data: json.body.data.map(v => parseInt(v.count)),
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                }]
+            }
+            this.setState({
+                nftsDistributionMockDdata: range
+            })
+        } catch (error) {
+            
+        }
+    }
+
     changeNewUsersRange = this.changeNewUsersRange.bind(this)
     changeRewardsRange = this.changeRewardsRange.bind(this)
     changeTokensRange = this.changeTokensRange.bind(this)
+    changeNftsRange = this.changeNftsRange.bind(this)
 
     render() {
         return (
@@ -411,7 +444,7 @@ class Dashboard extends Component {
                         </Tab>
                         <Tab eventKey="NFTs" title="NFTs">
                             <NftsInfo></NftsInfo>
-                            <DatePicker></DatePicker>
+                            <DatePicker changeNftsRange={this.changeNftsRange} type={typesOfDashboard.nfts}></DatePicker>
                             <div className="dashboard__chart_dashboard-info  mb-4">
                             <label className="chart__label">NFTs distribution </label>
                             <div className="dashboard__chart_wrapper mb-4" style={{position: 'relative', height:'358px', display: 'flex', justifyContent: 'center'}}>
