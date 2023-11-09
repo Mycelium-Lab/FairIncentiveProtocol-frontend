@@ -10,7 +10,8 @@ class TokensInfo extends Component {
         super(props)
         this.state = {
             total: 0,
-            total_24h: 0
+            total_24h: 0,
+            percent_24h: 0
         }
     }
 
@@ -51,8 +52,12 @@ class TokensInfo extends Component {
               };
             const res = await fetch(`${config.api}/stat/total_tokens_24h`, requestOptions)
             const json = await res.json()
+            const twentyFourHoursAgo = parseFloat(json.body.data.twentyFourHoursAgo)
+            const fortyEightHoursAgo = parseFloat(json.body.data.fortyEightHoursAgo)
+            const percent24h = (twentyFourHoursAgo * 100 / fortyEightHoursAgo) - 100
             this.setState({
-                total_24h: json.body.data
+                total_24h: json.body.data.twentyFourHoursAgo,
+                percent_24h: percent24h
             })
         } catch (error) {
             alert(error)
@@ -86,7 +91,7 @@ class TokensInfo extends Component {
                 <li className="info__list-item_dark-blue info__list-item">
                     <div className="info__content_left">
                         <div className="info__content-amount-info_new info__content-amount-info">
-                            <span className="info__content-amount">{this.state.total_24h}</span><span className="info__content-dymanic_positive info__content-dymanic">15.4%</span>
+                            <span className="info__content-amount">{this.state.total_24h}</span><span className="info__content-dymanic_positive info__content-dymanic">{this.state.percent_24h}%</span>
                         </div>
                         <span className="info__content-desc">Distributed last 24h</span>
                     </div>
