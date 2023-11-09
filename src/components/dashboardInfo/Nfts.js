@@ -2,18 +2,49 @@ import { Component } from "react";
 import totalNfts from '../../media/dashboard/total_nfts.svg'
 import nftsAvalible from '../../media/dashboard/nft_available.svg'
 import newNfts from '../../media/dashboard/nft_new.svg'
+import { getBearerHeader } from "../../utils/getBearerHeader";
+import { config } from "../../utils/config";
 
 class NftsInfo extends Component {
     constructor(props) {
         super(props)
+        this.state = {
+            total: 0,
+            total_24h: 0
+        }
     }
+
+    async componentDidMount() {
+        await this.getTotal()
+    }
+
+    async getTotal() {
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/stat/total_nfts`, requestOptions)
+            const json = await res.json()
+            this.setState({
+                total: json.body.data
+            })
+        } catch (error) {
+            alert(error)
+        }
+    }
+
     render() {
         return (
             <>
              <ul className="info__list unlist">
                 <li className="info__list-item_blue info__list-item">
                     <div className="info__content_left">
-                        <span className="info__content-amount">125 576</span>
+                        <span className="info__content-amount">{this.state.total}</span>
                         <span className="info__content-desc">Total distributed</span>
                     </div>
                     <div className="info__content_right">
