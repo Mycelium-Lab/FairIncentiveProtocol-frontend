@@ -882,31 +882,41 @@ class Tokens extends Component {
     handleShowInfo = async (info) =>  {
         console.log(info)
         this.setState({showInfo: true, tokenInfo: info,  showLoading: true})
-         let provider = new ethers.providers.Web3Provider(window.ethereum)
-        const chainid = (await provider.getNetwork()).chainId
-        if (chainid.toString() !== info.chainid) {
-            await this.changeNetwork(info.chainid)
-            provider = new ethers.providers.Web3Provider(window.ethereum)
-        }
-        await provider.send("eth_requestAccounts", [])
-        const signer = await provider.getSigner()
-        const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
+        let provider = new ethers.providers.JsonRpcProvider(networks[`${info.chainid}`].rpc)
+        let justCallWallet = new ethers.Wallet(networks[`${info.chainid}`].justCallSigner, provider)
+        const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, justCallWallet)
         const tokenUsual = Token.attach(info.address)  
-        const totalSupply = BigInt((await tokenUsual.totalSupply()).toString())
-
+        const owner = await tokenUsual.owner()
+        const balance = await tokenUsual.balanceOf(owner)
+        let totalSupply
+        try {
+            totalSupply = BigInt((await tokenUsual.totalSupply()).toString())
+        } catch (error) {
+            console.log(error)
+        }
         let cap;
         let mintTokenAvailableToMint = BigInt(0);
+        if (info.supply_type_name == 'Unlimited') {
+            mintTokenAvailableToMint = '∞'
+        } else if (info.supply_type_name == 'Capped') {
+            try {
+                mintTokenAvailableToMint = BigInt(info.max_supply) - totalSupply
+            } catch (error) {
+                mintTokenAvailableToMint = BigInt(info.max_supply) - BigInt(info.initial_supply)
+                console.log(mintTokenAvailableToMint)
+            }
+        } 
         try {
             cap = await tokenUsual.cap()
             cap = BigInt(cap.toString())
-            mintTokenAvailableToMint = cap - totalSupply
+            // mintTokenAvailableToMint = cap - totalSupply
         } catch (error) {
             cap = BigInt(0)
         }
 
         this.setState({
-        showLoading: false, tokenInfo: {...this.state.tokenInfo, totalSupply: ethers.utils.formatEther(totalSupply.toString())}, 
-        mintTokenAvailableToMint: ethers.utils.formatEther(mintTokenAvailableToMint.toString()),
+        showLoading: false, tokenInfo: {...this.state.tokenInfo, totalSupply: ethers.utils.formatEther(totalSupply ? totalSupply.toString() : '0'), balance: ethers.utils.formatEther(balance)}, 
+        mintTokenAvailableToMint,
         mintTokenMaxSupply: ethers.utils.formatEther(cap.toString())
         })
     }
@@ -1729,7 +1739,7 @@ class Tokens extends Component {
                                         Decimals: {this.state.tokenInfo.decimals ? this.state.tokenInfo.decimals : '-'} <img src={info} className="form__icon-info"/>
                                     </li>
                                     <li className="modal-text">
-                                        The contract balance: (soon)<img src={info} className="form__icon-info"/>
+                                        The contract balance: {this.state.tokenInfo.balance}<img src={info} className="form__icon-info"/>
                                     </li>
                                     <li className="modal-text">
                                     Total supply: {this.state.tokenInfo.totalSupply} {this.state.tokenInfo.symbol}  <img src={info} className="form__icon-info"/>
@@ -1748,7 +1758,7 @@ class Tokens extends Component {
                                         Circulating Supply: (soon) <img src={info} className="form__icon-info"/>
                                     </li>
                                     <li className="modal-text">
-                                        Available to mint: {this.state.mintTokenAvailableToMint} {this.state.tokenInfo.symbol} <a className="info__content-mint_medium info__content-mint" onClick={() => {
+                                        Available to mint: {this.state.mintTokenAvailableToMint ? this.state.mintTokenAvailableToMint.toString() : '0'} {this.state.tokenInfo.symbol} <a className="info__content-mint_medium info__content-mint" onClick={() => {
                                             this.handleCloseInfo()
                                             this.handleShowMint(this.state.tokenInfo.symbol, this.state.tokenInfo.address, this.state.tokenInfo.chainid)
                                         }}>{'[mint]'}</a> <img src={info} className="form__icon-info"/>
