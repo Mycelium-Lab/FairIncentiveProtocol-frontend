@@ -880,7 +880,6 @@ class Tokens extends Component {
     }
 
     handleShowInfo = async (info) =>  {
-        console.log(info)
         this.setState({showInfo: true, tokenInfo: info,  showLoading: true})
          let provider = new ethers.providers.Web3Provider(window.ethereum)
         const chainid = (await provider.getNetwork()).chainId
@@ -892,21 +891,36 @@ class Tokens extends Component {
         const signer = await provider.getSigner()
         const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
         const tokenUsual = Token.attach(info.address)  
-        const totalSupply = BigInt((await tokenUsual.totalSupply()).toString())
+        let totalSupply
+        try {
+            totalSupply = BigInt((await tokenUsual.totalSupply()).toString())
+        } catch (error) {
+            
+        }
 
         let cap;
         let mintTokenAvailableToMint = BigInt(0);
+        if (info.supply_type_name == 'Unlimited') {
+            mintTokenAvailableToMint = '∞'
+        } else if (info.supply_type_name == 'Capped') {
+            try {
+                mintTokenAvailableToMint = BigInt(info.max_supply) - totalSupply
+            } catch (error) {
+                mintTokenAvailableToMint = BigInt(info.max_supply) - BigInt(info.initial_supply)
+                console.log(mintTokenAvailableToMint)
+            }
+        } 
         try {
             cap = await tokenUsual.cap()
             cap = BigInt(cap.toString())
-            mintTokenAvailableToMint = cap - totalSupply
+            // mintTokenAvailableToMint = cap - totalSupply
         } catch (error) {
             cap = BigInt(0)
         }
 
         this.setState({
-        showLoading: false, tokenInfo: {...this.state.tokenInfo, totalSupply: ethers.utils.formatEther(totalSupply.toString())}, 
-        mintTokenAvailableToMint: ethers.utils.formatEther(mintTokenAvailableToMint.toString()),
+        showLoading: false, tokenInfo: {...this.state.tokenInfo, totalSupply: ethers.utils.formatEther(totalSupply ? totalSupply.toString() : '0')}, 
+        mintTokenAvailableToMint,
         mintTokenMaxSupply: ethers.utils.formatEther(cap.toString())
         })
     }
@@ -1748,7 +1762,7 @@ class Tokens extends Component {
                                         Circulating Supply: (soon) <img src={info} className="form__icon-info"/>
                                     </li>
                                     <li className="modal-text">
-                                        Available to mint: {this.state.mintTokenAvailableToMint} {this.state.tokenInfo.symbol} <a className="info__content-mint_medium info__content-mint" onClick={() => {
+                                        Available to mint: {this.state.mintTokenAvailableToMint ? this.state.mintTokenAvailableToMint.toString() : '0'} {this.state.tokenInfo.symbol} <a className="info__content-mint_medium info__content-mint" onClick={() => {
                                             this.handleCloseInfo()
                                             this.handleShowMint(this.state.tokenInfo.symbol, this.state.tokenInfo.address, this.state.tokenInfo.chainid)
                                         }}>{'[mint]'}</a> <img src={info} className="form__icon-info"/>
