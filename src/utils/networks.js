@@ -17,7 +17,7 @@ export const networks = {
     },
     137: {
         name: "Polygon",
-        rpc: "https://polygon.llamarpc.com",
+        rpc: "https://polygon-rpc.com",
         chainid: "137",
         currency_symbol: "MATIC",
         explorer: "https://polygonscan.com",
