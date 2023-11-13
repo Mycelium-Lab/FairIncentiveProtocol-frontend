@@ -881,23 +881,16 @@ class Tokens extends Component {
 
     handleShowInfo = async (info) =>  {
         this.setState({showInfo: true, tokenInfo: info,  showLoading: true})
-         let provider = new ethers.providers.Web3Provider(window.ethereum)
-        const chainid = (await provider.getNetwork()).chainId
-        if (chainid.toString() !== info.chainid) {
-            await this.changeNetwork(info.chainid)
-            provider = new ethers.providers.Web3Provider(window.ethereum)
-        }
-        await provider.send("eth_requestAccounts", [])
-        const signer = await provider.getSigner()
-        const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
+        let provider = new ethers.providers.JsonRpcProvider(networks[`${info.chainid}`].rpc)
+        let justCallWallet = new ethers.Wallet(networks[`${info.chainid}`].justCallSigner, provider)
+        const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, justCallWallet)
         const tokenUsual = Token.attach(info.address)  
         let totalSupply
         try {
             totalSupply = BigInt((await tokenUsual.totalSupply()).toString())
         } catch (error) {
-            
+            console.log(error)
         }
-
         let cap;
         let mintTokenAvailableToMint = BigInt(0);
         if (info.supply_type_name == 'Unlimited') {
