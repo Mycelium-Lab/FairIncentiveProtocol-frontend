@@ -880,11 +880,14 @@ class Tokens extends Component {
     }
 
     handleShowInfo = async (info) =>  {
+        console.log(info)
         this.setState({showInfo: true, tokenInfo: info,  showLoading: true})
         let provider = new ethers.providers.JsonRpcProvider(networks[`${info.chainid}`].rpc)
         let justCallWallet = new ethers.Wallet(networks[`${info.chainid}`].justCallSigner, provider)
         const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, justCallWallet)
         const tokenUsual = Token.attach(info.address)  
+        const owner = await tokenUsual.owner()
+        const balance = await tokenUsual.balanceOf(owner)
         let totalSupply
         try {
             totalSupply = BigInt((await tokenUsual.totalSupply()).toString())
@@ -912,7 +915,7 @@ class Tokens extends Component {
         }
 
         this.setState({
-        showLoading: false, tokenInfo: {...this.state.tokenInfo, totalSupply: ethers.utils.formatEther(totalSupply ? totalSupply.toString() : '0')}, 
+        showLoading: false, tokenInfo: {...this.state.tokenInfo, totalSupply: ethers.utils.formatEther(totalSupply ? totalSupply.toString() : '0'), balance: ethers.utils.formatEther(balance)}, 
         mintTokenAvailableToMint,
         mintTokenMaxSupply: ethers.utils.formatEther(cap.toString())
         })
@@ -1736,7 +1739,7 @@ class Tokens extends Component {
                                         Decimals: {this.state.tokenInfo.decimals ? this.state.tokenInfo.decimals : '-'} <img src={info} className="form__icon-info"/>
                                     </li>
                                     <li className="modal-text">
-                                        The contract balance: (soon)<img src={info} className="form__icon-info"/>
+                                        The contract balance: {this.state.tokenInfo.balance}<img src={info} className="form__icon-info"/>
                                     </li>
                                     <li className="modal-text">
                                     Total supply: {this.state.tokenInfo.totalSupply} {this.state.tokenInfo.symbol}  <img src={info} className="form__icon-info"/>
