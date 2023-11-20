@@ -135,6 +135,7 @@ class Tokens extends Component {
                     borderColor: ['rgba(255, 159, 67, 0.85)'],
                 }]
             },
+            file: null
         }
     }
 
@@ -355,7 +356,8 @@ class Tokens extends Component {
                 pausable,
                 signer,
                 network,
-                address
+                address,
+                file
             } = this.state
             const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
             this.handleShowConfirm('Create token', `Confirm ${symbol} token creation`, `Please, confirm contract creation in your wallet`)
@@ -374,32 +376,28 @@ class Tokens extends Component {
             this.handleCloseConfirm()
             this.handleShowProgress()
             const contractAdddress = contract.address
-            const headers = new Headers();
-            headers.append("Content-Type", "application/json");
-            headers.append("Authorization", getBearerHeader())
-            const raw = JSON.stringify({
-                "address": contractAdddress,
-                "name": name,
-                "symbol": symbol,
-                "chainid": chainid.toString(),
-                "supply_type": emissionType,
-                "max_supply": maxSupply ? ethers.utils.parseEther(maxSupply).toString() : null,
-                "initial_supply": initialSupply ? ethers.utils.parseEther(initialSupply).toString() : null,
-                "pausable": pausable,
-                "burnable": burnable,
-                "blacklist": blacklist,
-                "recoverable": recoverable,
-                "verified": verified,
-                "fpmanager": network.fpmanager
-                // "image"
-            });
-            const requestOptions = {
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('symbol', symbol);
+            formData.append('supply_type', emissionType);
+            formData.append('initial_supply', initialSupply ? ethers.utils.parseEther(initialSupply).toString() : null);
+            formData.append('max_supply', maxSupply ? ethers.utils.parseEther(maxSupply).toString() : null);
+            formData.append('burnable', burnable);
+            formData.append('blacklist', blacklist);
+            formData.append('recoverable', recoverable);
+            formData.append('verified', verified);
+            formData.append('chainid', network.chainid);
+            formData.append('pausable', pausable);
+            formData.append('fpmanager', network.fpmanager);
+            formData.append('address', contractAdddress);
+            formData.append('image', file);
+            const res = await fetch(`${config.api}/tokens/add`, {
                 method: 'POST',
-                headers: headers,
-                body: raw,
-                redirect: 'follow'
-              };
-            const res = await fetch(`${config.api}/tokens/add`, requestOptions)
+                headers: {
+                    'Authorization': getBearerHeader(),
+                },
+                body: formData,
+            })
             if (res.status === 200) {
                 const token = (await res.json()).body.data
                 const _tokens = this.state.tokens
@@ -960,6 +958,10 @@ class Tokens extends Component {
         this.setState({showLoading: false, currentTokenSymbol, currentTokenAddress, currentTokenChainid, currentToken: token})
     }
     handleCloseBurn = () => this.setState({showBurn: false, currentTokenSymbol: null, currentTokenAddress: null, currentTokenChainid: null, currentToken: null})
+    handleImage = (file) => {
+        this.setState({file})
+    }
+    handleImage = this.handleImage.bind(this)
     onChangeName = this.onChangeName.bind(this)
     onChangeSymbol = this.onChangeSymbol.bind(this)
     onChangeEmissionType = this.onChangeEmissionType.bind(this)
@@ -1144,7 +1146,7 @@ class Tokens extends Component {
                             <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
                                 <label className="form__label_disbaled form__label">Upload a picture of the token </label>
-                                    <FileUpload disabled></FileUpload>
+                                    <FileUpload handleImage={this.handleImage}></FileUpload>
                                 </div>
                             </div>
                         </div>
