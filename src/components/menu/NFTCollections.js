@@ -98,7 +98,10 @@ class NFTCollections extends Component {
             collectionOptions: null,
             isInvalidAddress: false,
             isInvalidRoyalties: false,
-            nftFile: null
+            nftFile: null,
+            logoImage: null,
+            featuredImage: null,
+            bannerImage: null
         }
     }
 
@@ -334,7 +337,8 @@ class NFTCollections extends Component {
                 beneficialAddress,
                 beneficialType,
                 royalties,
-                website, instagram, telegram, medium, facebook, discord, other
+                website, instagram, telegram, medium, facebook, discord, other,
+                logoImage, featuredImage, bannerImage
             } = this.state
             const links = []
             if (website) links.push({link: website})
@@ -355,27 +359,26 @@ class NFTCollections extends Component {
             } 
             this.handleCloseConfirm()
             this.handleShowProgress()
-            const contractAdddress = contract.address
-            const headers = new Headers();
-            headers.append("Content-Type", "application/json");
-            headers.append("Authorization", getBearerHeader())
-            const raw = JSON.stringify({
-                "address": contractAdddress,
-                name,
-                symbol,
-                "chainid": network.chainid.toString(),
-                description,
-                links,
-                beneficiary: beneficialAddress || null,
-                royalties
-            });
-            const requestOptions = {
+            const contractAddress = contract.address
+            const formData = new FormData()
+            formData.append('address', contractAddress)
+            formData.append('name', name)
+            formData.append('symbol', symbol)
+            formData.append('chainid', network.chainid)
+            formData.append('description', description)
+            formData.append('links', JSON.stringify(links))
+            formData.append('beneficiary', beneficialAddress || null)
+            formData.append('royalties', royalties)
+            formData.append('logo_image', logoImage)
+            formData.append('featured_image', featuredImage)
+            formData.append('banner_image', bannerImage)
+            const res = await fetch(`${config.api}/nfts/add/collection`, {
                 method: 'POST',
-                headers: headers,
-                body: raw,
-                redirect: 'follow'
-              };
-            const res = await fetch(`${config.api}/nfts/add/collection`, requestOptions)
+                headers: {
+                    'Authorization': getBearerHeader(),
+                },
+                body: formData
+            })
             if (res.status === 200) {
                 const collection = (await res.json()).body.data
                 const _nfts = this.state.nftCollections
@@ -621,6 +624,16 @@ class NFTCollections extends Component {
         console.log(error)
     } 
 
+    handleLogoImage = (file) => {
+        this.setState({logoImage: file})
+    }
+    handleFeaturedImage = (file) => {
+        this.setState({featuredImage: file})
+    }
+    handleBannerImage = (file) => {
+        this.setState({bannerImage: file})
+    }
+
     handleCloseAddNFT = () => this.setState({showAddNFT: false})
     handleShowAddNFT = (nft) => this.setState({showAddNFT: true, stageOfAddNft: 1, stageOfCreateNftCollection: 0, addNFTAddress: nft})
     handleShowConfirm = (confirmTitle, confirmName, confirmText) => this.setState({showConfirm: true, confirmTitle, confirmName, confirmText})
@@ -632,6 +645,9 @@ class NFTCollections extends Component {
     handleShowError = (errorText) => this.setState({showError: true, errorText})
     handleCloseError = () => this.setState({showError: false})
     
+    handleLogoImage = this.handleLogoImage.bind(this)
+    handleFeaturedImage = this.handleFeaturedImage.bind(this)
+    handleBannerImage = this.handleBannerImage.bind(this)
     nextStage = this.nextStage.bind(this)
     prevStage = this.prevStage.bind(this)
     nextStageAddNft = this.nextStageAddNft.bind(this)
@@ -1207,6 +1223,41 @@ class NFTCollections extends Component {
                                             </div>
                                         </div>
                                 </div>
+                        </div>
+                        <div className="form_row mb-4">
+                            <div className="form_col_action_left form_col_last form_col">
+                            <button className="btn btn_pre-sm  btn_primary btn_gray" onClick={this.prevStage}>
+                                    Back
+                                </button>
+                                <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.nextStage}>
+                                    Next
+                                </button>
+                            </div>
+                         </div>
+                    </div>
+                 : null   
+                }
+                {
+                 this.state.showCreate && this.state.stageOfCreateNftCollection === 5
+                 ?  <div className="content__wrap">
+                         <h4 className="menu__title-secondary mb-4">Collection graphics</h4>
+                         <div className="form_row mb-4">
+                            <div className="form_col_last form_col">
+                            <label className="form__label_disbaled form__label">Logo image *</label>
+                                <FileUpload handleLogoImage={this.handleLogoImage} handleId={'handleLogoImage'}></FileUpload>
+                            </div>
+                        </div>
+                        <div className="form_row mb-4">
+                            <div className="form_col_last form_col">
+                            <label className="form__label_disbaled form__label">Featured image *</label>
+                                <FileUpload handleFeaturedImage={this.handleFeaturedImage} handleId={'handleFeaturedImage'}></FileUpload>
+                            </div>
+                        </div>
+                        <div className="form_row mb-4">
+                            <div className="form_col_last form_col">
+                            <label className="form__label_disbaled form__label">Banner image *</label>
+                                <FileUpload handleBannerImage={this.handleBannerImage} handleId={'handleBannerImage'}></FileUpload>
+                            </div>
                         </div>
                         <div className="form_row mb-4">
                             <div className="form_col_action_left form_col_last form_col">
