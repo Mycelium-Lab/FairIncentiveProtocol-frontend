@@ -89,6 +89,7 @@ class Users extends Component {
                     borderColor: ['rgba(255, 159, 67, 0.85)'],
                 }]
             },
+            file: null
         }
     }
 
@@ -121,11 +122,8 @@ class Users extends Component {
         })
     }
 
-    onChangeImage(event) {
-        console.log('changeEditImage', event[0].name)
-            this.setState({
-                add_image:event[0].name
-            })
+    onChangeImage(file) {
+        this.setState({file})
     }
 
     onChangeNotes(event) {
@@ -197,25 +195,21 @@ class Users extends Component {
                     value: v.value
                 }
             })
-            const headers = new Headers();
-            headers.append("Content-Type", "application/json");
-            headers.append("Authorization", getBearerHeader())
-
-            const raw = JSON.stringify({
-                "external_id": this.state.add_externalID,
-                "email": this.state.add_email,
-                "wallet": this.state.add_wallet,
-                "notes": this.state.add_notes,
-                "properties": propertiesElements,
-                "stats": statsElements
-            });
-            const requestOptions = {
+            const formData = new FormData()
+            formData.append("external_id", this.state.add_externalID)
+            formData.append("email", this.state.add_email)
+            formData.append("wallet", this.state.add_wallet)
+            formData.append("notes", this.state.add_notes)
+            formData.append("properties", JSON.stringify(propertiesElements))
+            formData.append("stats", JSON.stringify(statsElements))
+            formData.append('image', this.state.file);
+            const res = await fetch(`${config.api}/users/add`, {
                 method: 'POST',
-                headers: headers,
-                body: raw,
-                redirect: 'follow'
-              };
-            const res = await fetch(`${config.api}/users/add`, requestOptions)
+                headers: {
+                    'Authorization': getBearerHeader(),
+                },
+                body: formData,
+            })
             const json = await res.json()
             if (res.status === 200) {
                 const _users = this.state.users
@@ -241,7 +235,7 @@ class Users extends Component {
                 })
             }
         } catch (error) {
-            alert(error)
+            console.log(error)
         }
     }
 
@@ -954,7 +948,7 @@ class Users extends Component {
                         <div className="mb-4">
                             <label className="form__label_disbaled form__label">Profile image</label>
                             <div className="input-group">
-                                <FileUpload handleImage={this.onChangeImage} disabled></FileUpload>
+                                <FileUpload handleImage={this.onChangeImage}></FileUpload>
                             </div>
                             {/*<div className="form__prompt_disabled form__prompt" id="basic-addon4">File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>*/}
                         </div>
