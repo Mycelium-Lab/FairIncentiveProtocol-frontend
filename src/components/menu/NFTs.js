@@ -48,6 +48,7 @@ class NFTs extends Component {
             this.setState({
                 nftCollection: json.body.data.filter(v => v.address === this.props.address)[0]
             })
+            console.log(json.body.data.filter(v => v.address === this.props.address)[0])
         } catch (error) {
             alert(error)
         }
@@ -135,9 +136,8 @@ class NFTs extends Component {
                 <div className="content__wrap">
                   <div className="collection-detail__wrap">
                     <div className="profile__head">
-                        <div className="profile__cover">
-                            <div className="profile__photo"></div>
-                        </div>
+                        <img src={this.state.nftCollection.banner_image}/>
+                        <img src={this.state.nftCollection.logo_image}/>
                     </div>
                     <div className="profile__social">
                         <ul className="profile__social-list unlist">
