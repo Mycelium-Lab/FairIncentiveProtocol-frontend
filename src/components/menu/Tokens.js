@@ -1374,7 +1374,7 @@ class Tokens extends Component {
                                       return <tr>
                                           <td>
                                             <div className="token-name">
-                                                <img src={customTokeSymbol}></img>
+                                                <img src={v.image}></img>
                                                 <div>
                                                     <div>
                                                         {v.symbol}
