@@ -97,7 +97,8 @@ class NFTCollections extends Component {
             hasLoad: false,
             collectionOptions: null,
             isInvalidAddress: false,
-            isInvalidRoyalties: false
+            isInvalidRoyalties: false,
+            nftFile: null
         }
     }
 
@@ -406,22 +407,20 @@ class NFTCollections extends Component {
 
     async createNFT() {
         try {
-            const headers = new Headers();
-            headers.append("Content-Type", "application/json");
-            headers.append("Authorization", getBearerHeader())
-            const raw = JSON.stringify({
-                "address": this.state.addNFTAddress.value,
-                "amount": this.state.addNFTAmount,
-                "name": this.state.addNFTName,
-                "description": this.state.addNFTDescription
-            });
-            const requestOptions = {
+            const formData = new FormData();
+            formData.append("address", this.state.addNFTAddress.value)
+            formData.append("amount", this.state.addNFTAmount)
+            formData.append("name", this.state.addNFTName)
+            formData.append("description", this.state.addNFTDescription)
+            formData.append("chainid", '137')
+            formData.append("image", this.state.nftFile)
+            const res = await fetch(`${config.api}/nfts/add/nft`, {
                 method: 'POST',
-                headers: headers,
-                body: raw,
-                redirect: 'follow'
-              };
-            const res = await fetch(`${config.api}/nfts/add/nft`, requestOptions)
+                headers: {
+                    'Authorization': getBearerHeader(),
+                },
+                body: formData,
+            })
             if (res.status === 200){
                 this.setState({
                     showAddNFT: false,
@@ -464,7 +463,10 @@ class NFTCollections extends Component {
             alert(error)
         }
     }
-
+    handleNftImage = (file) => {
+        this.setState({nftFile: file})
+    }
+    handleNftImage = this.handleNftImage.bind(this)
     handleCloseCreate = () => this.setState({showCreate: false})
     handleShowCreate = () => {
         this.setState({showCreate: true, stageOfCreateNftCollection: 1})
@@ -1349,7 +1351,7 @@ class NFTCollections extends Component {
                                             <div className="form_row mb-4">
                                                 <div className="form_col_last form_col">
                                                 <label className="form__label_disbaled form__label">Logo image</label>
-                                                    <FileUpload disabled></FileUpload>
+                                                    <FileUpload handleImage={this.handleNftImage}></FileUpload>
                                                     {/*<div className="form__prompt" id="basic-addon4">This image will appear at the top of your collection page. File types supported: JPG, PNG, GIF, SVG. Max size: 100 MB</div>*/}
                                                 </div>
                                             </div>
