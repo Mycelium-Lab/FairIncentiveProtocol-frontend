@@ -40,10 +40,9 @@ class FileUpload extends Component {
 
     // triggers when file is selected with click
     handleChange (e) {
-        console.log(this.props)
         e.preventDefault();
         if (e.target.files && e.target.files[0]) {
-            this.handleFile(e.target.files);
+            this.handleFile(e.target.files, e.target.id);
         }
     };
 
@@ -52,9 +51,14 @@ class FileUpload extends Component {
         this.input.current.click();
     };
 
-    handleFile(files) {
-        // console.log(this.props)
-        this.props.handleImage(files[0])
+    handleFile(files, id) {
+        if (id === 'handleLogoImage') {
+            this.props.handleLogoImage(files[0])
+        } else if (id === 'handleFeaturedImage') {
+            this.props.handleFeaturedImage(files[0])
+        } else if (id === 'handleBannerImage') {
+            this.props.handleBannerImage(files[0])
+        } else this.props.handleImage(files[0])
     }
 
     handleDrag = this.handleDrop.bind(this)
@@ -82,12 +86,12 @@ class FileUpload extends Component {
                 </form>
                 :
                 <form id="form-file-upload" onDragEnter={this.handleDrag} onSubmit={(e) => e.preventDefault()}>
-                <input ref={this.input} type="file" id="input-file-upload" multiple={true} onChange={this.handleChange} />
-                <label id="label-file-upload" htmlFor="input-file-upload" className={this.dragActive ? "drag-active" : "" }>
+                <input ref={this.input} type="file" id={this.props.handleId ? this.props.handleId : 'input-file-upload'} multiple={true} onChange={this.handleChange} />
+                <label id="label-file-upload" htmlFor={this.props.handleId ? this.props.handleId : 'input-file-upload'} className={this.dragActive ? "drag-active" : "" }>
                     <div className="form-file-upload__inner">
                     <img src={uploadIcon}></img>
                     <p className="form-file-upload__prompt">Recommended size: 350 x 350</p>
-                    <button className="upload-button" onClick={this.onButtonClick}></button>
+                    <button className="upload-button" onClick={this.onButtonClick} ></button>
                     </div> 
                 </label>
                 { this.dragActive && <div id="drag-file-element" onDragEnter={this.handleDrag} onDragLeave={this.handleDrag} onDragOver={this.handleDrag} onDrop={this.handleDrop}></div> }
