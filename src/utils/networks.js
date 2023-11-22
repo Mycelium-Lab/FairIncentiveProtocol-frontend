@@ -108,3 +108,114 @@ export const networks = {
         justCallSigner: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
     }
 }
+
+export const networksNames = {
+    'Ethereum': {
+        name: "Ethereum",
+        rpc: "https://mainnet.infura.io/v3/",
+        chainid: "1",
+        currency_symbol: "ETH",
+        explorer: "https://etherscan.io",
+        fpmanager: "",
+        justCallSigner: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+    },
+    'BNB': {
+        name: "BNB",
+        rpc: "https://bsc-dataseed.binance.org",
+        chainid: "56",
+        currency_symbol: "BNB",
+        explorer: "https://bscscan.com",
+        fpmanager: "",
+        justCallSigner: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+    },
+    'Polygon': {
+        name: "Polygon",
+        rpc: "https://polygon-rpc.com",
+        chainid: "137",
+        currency_symbol: "MATIC",
+        explorer: "https://polygonscan.com",
+        fpmanager: "",
+        justCallSigner: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+    },
+    'Optimism': {
+        name: "Optimism",
+        rpc: "https://endpoints.omniatech.io/v1/op/mainnet/public",
+        chainid: "10",
+        currency_symbol: "ETH",
+        explorer: "https://optimistic.etherscan.io",
+        fpmanager: "",
+        justCallSigner: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+    },
+    'Avalanche': {
+        name: "Avalanche",
+        rpc: "https://endpoints.omniatech.io/v1/avax/mainnet/public",
+        chainid: "43114",
+        currency_symbol: "AVAX",
+        explorer: "https://snowtrace.io",
+        fpmanager: "",
+        justCallSigner: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+    },
+    'Arbitrum': {
+        name: "Arbitrum",
+        rpc: "https://endpoints.omniatech.io/v1/arbitrum/one/public",
+        chainid: "42161",
+        currency_symbol: "ETH",
+        explorer: "https://arbiscan.io",
+        fpmanager: "0xe435Cf187A6479DeA943651c7710f042e079Cdcb",
+        justCallSigner: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+    },
+    'Goerli': {
+        name: "Goerli",
+        rpc: "https://rpc.ankr.com/eth_goerli	",
+        chainid: "5",
+        currency_symbol: "tETH",
+        explorer: "https://goerli.etherscan.io",
+        fpmanager: "0xe435Cf187A6479DeA943651c7710f042e079Cdcb",
+        justCallSigner: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+    },
+    'BNB Test': {
+        name: "BNB Test",
+        rpc: "https://bsc-testnet.publicnode.com",
+        chainid: "97",
+        currency_symbol: "tBNB",
+        explorer: "https://testnet.bscscan.com",
+        fpmanager: "0xe435Cf187A6479DeA943651c7710f042e079Cdcb",
+        justCallSigner: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+    },
+    'Mumbai': {
+        name: "Mumbai",
+        rpc: "https://rpc-mumbai.maticvigil.com",
+        chainid: "80001",
+        currency_symbol: "tMATIC",
+        explorer: "https://mumbai.polygonscan.com",
+        fpmanager: "0xe435Cf187A6479DeA943651c7710f042e079Cdcb",
+        justCallSigner: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+    },
+    'Optimism Goerli': {
+        name: "Optimism Goerli",
+        rpc: "",
+        chainid: "",
+        currency_symbol: "",
+        explorer: "",
+        fpmanager: "",
+        justCallSigner: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+    },
+    'Avalanche Fuji Testnet': {
+        name: "Avalanche Fuji Testnet",
+        rpc: "https://endpoints.omniatech.io/v1/avax/fuji/public",
+        chainid: "43113",
+        currency_symbol: "tAVAX",
+        explorer: "https://testnet.snowtrace.io",
+        fpmanager: "0xe435Cf187A6479DeA943651c7710f042e079Cdcb",
+        justCallSigner: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+    },
+    'Arbitrum Goerli': {
+        name: "Arbitrum Goerli",
+        rpc: "https://endpoints.omniatech.io/v1/arbitrum/goerli/public",
+        chainid: "421613",
+        currency_symbol: "tETH",
+        explorer: "https://goerli.arbiscan.io",
+        fpmanager: "0xe435Cf187A6479DeA943651c7710f042e079Cdcb",
+        justCallSigner: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+    }
+} 

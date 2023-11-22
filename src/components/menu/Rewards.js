@@ -28,6 +28,7 @@ import newRewards from '../../media/dashboard/new_rewards.svg'
 import SuccessModal from "../common/modals/success";
 import ErrorModal from "../common/modals/error";
 import errors from "../../errors";
+import { networks, networksNames } from "../../utils/networks";
 
 const types = {
     token: 'token',
@@ -144,8 +145,8 @@ class Rewards extends Component {
             const json = await res.json()
             this.setState({
                 tokens: json.body.data,
-                chosen_token: json.body.data.length > 0 ? {value: json.body.data[0].address, label: json.body.data[0].symbol} : null,
-                optionTokens: json.body.data.map(v => ({value: v.address, label: v.symbol}))
+                chosen_token: json.body.data.length > 0 ? {value: json.body.data[0].address, label: `${json.body.data[0].symbol} (${networks[`${json.body.data[0].chainid}`].name})`} : null,
+                optionTokens: json.body.data.map(v => ({value: v.address, label: `${v.symbol} (${networks[`${v.chainid}`].name})`}))
             })
         } catch (error) {
             console.log(error)
@@ -166,8 +167,8 @@ class Rewards extends Component {
             const json = await res.json()
             this.setState({
                 nftCollections: json.body.data,
-                chosen_nft_collection: json.body.data.length > 0 ? {value: json.body.data[0].address, label: json.body.data[0].name} : null,
-                optionNftCollection: json.body.data.map(v => ({value: v.address, label: v.symbol}))
+                chosen_nft_collection: json.body.data.length > 0 ? {value: json.body.data[0].address, label: `${json.body.data[0].name} (${networks[`${json.body.data[0].chainid}`].name})`} : null,
+                optionNftCollection: json.body.data.map(v => ({value: v.address, label: `${v.name} (${networks[`${v.chainid}`].name})`}))
             })
         } catch (error) {
             console.log(error)
@@ -386,13 +387,15 @@ class Rewards extends Component {
             const headers = new Headers();
             headers.append("Content-Type", "application/json");
             headers.append("Authorization", getBearerHeader())
-
+            const networkName = chosen_token.label.split('(')[1].split(')')[0]
+            const _network = networksNames[`${networkName}`] 
             const raw = JSON.stringify(
                 {
                     name, 
                     description,
                     address: chosen_token.value,
-                    amount: utils.parseEther(amount).toString()
+                    amount: utils.parseEther(amount).toString(),
+                    chainid: _network.chainid
                 }
             );
             const requestOptions = {
@@ -1074,9 +1077,9 @@ class Rewards extends Component {
                                             {
                                             v.nft_id
                                             ?
-                                            `${v.nft_name} from ${v.symbol} collection`
+                                            `${v.nft_name} from ${v.symbol} (${networks[`${v.chainid}`].name}) collection`
                                             :
-                                            `${ethers.utils.formatEther(v.amount)} ${v.symbol}`
+                                            `${ethers.utils.formatEther(v.amount)} ${v.symbol} (${networks[`${v.chainid}`].name})`
                                             }
                                           </td>
                                           <td>
@@ -1231,7 +1234,7 @@ class Rewards extends Component {
                                     </div>
                                 </div>
                                 <label className="switch_center switch">
-                                        <input type="checkbox"></input>
+                                        <input type="checkbox" disabled></input>
                                         <span className="slider round"></span>
                                     </label>  
                         </div>
@@ -1247,7 +1250,7 @@ class Rewards extends Component {
                                     </div>
                                 </div>
                                 <label className="switch_center switch">
-                                            <input type="checkbox"></input>
+                                            <input type="checkbox" disabled></input>
                                             <span className="slider round"></span>
                                     </label>  
                         </div>

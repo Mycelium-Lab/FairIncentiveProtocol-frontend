@@ -15,6 +15,7 @@ import nft4 from '../../media/collectionDetail/default_nft_4.png'
 import { Card } from "react-bootstrap";
 import Modal from 'react-bootstrap/Modal';
 import { createLongStrView } from "../../utils/longStrView";
+import { networks } from "../../utils/networks";
 
 class NFTs extends Component {
 
@@ -22,36 +23,18 @@ class NFTs extends Component {
         super()
         this.state = {
             nfts: [],
-            nftCollection: {},
+            nftCollection: null,
             showNFT: false,
             activeNft: null
         }
     }
 
     async componentDidMount() {
-        await this.getNFTs()
-        await this.getNFTCollections()
-    }
-
-    async getNFTCollections() {
-        try {
-            const headers = new Headers();
-            headers.append("Authorization", getBearerHeader())
-
-            const requestOptions = {
-                method: 'GET',
-                headers: headers,
-                redirect: 'follow'
-              };
-            const res = await fetch(`${config.api}/nfts/collections`, requestOptions)
-            const json = await res.json()
-            this.setState({
-                nftCollection: json.body.data.filter(v => v.address === this.props.address)[0]
-            })
-            console.log(json.body.data.filter(v => v.address === this.props.address)[0])
-        } catch (error) {
-            alert(error)
-        }
+        this.setState({
+            nftCollection: this.props.collection
+        }, async () => {
+            await this.getNFTs()
+        })
     }
 
     handleBackToCollections() {
@@ -62,13 +45,15 @@ class NFTs extends Component {
         try {
             const headers = new Headers();
             headers.append("Authorization", getBearerHeader())
-
+            let query = new URLSearchParams();
+            query.append("address", this.state.nftCollection.address)
+            query.append("chainid", this.state.nftCollection.chainid)
             const requestOptions = {
                 method: 'GET',
                 headers: headers,
                 redirect: 'follow'
               };
-            const res = await fetch(`${config.api}/nfts/nfts`, requestOptions)
+            const res = await fetch(`${config.api}/nfts/nfts/one?` + query.toString(), requestOptions)
             const json = await res.json()
             /*const keys = Object.keys(json.body.data)
             for (let i = 0; i < keys.length; i++) {
@@ -82,9 +67,8 @@ class NFTs extends Component {
                     nfts.push(nft)
                 } 
             }*/
-            const nfts = json.body.data.filter(v => v.collection_address === this.props.address)[0]?.nfts
             this.setState({
-                nfts
+                nfts: json.body.data
             })
         } catch (error) {
             alert(error)
@@ -120,7 +104,6 @@ class NFTs extends Component {
     handleCloseMFT = () => { this.setState({showNFT: false})}
 
     getNFTs = this.getNFTs.bind(this)
-    getNFTCollections = this.getNFTCollections.bind(this)
     deleteNFT = this.deleteNFT.bind(this)
     handleShowNFT = this.handleShowNFT.bind(this)
     handleCloseMFT = this.handleCloseMFT.bind(this)
@@ -136,8 +119,8 @@ class NFTs extends Component {
                 <div className="content__wrap">
                   <div className="collection-detail__wrap">
                     <div className="profile__head">
-                        <img src={this.state.nftCollection.banner_image}/>
-                        <img src={this.state.nftCollection.logo_image}/>
+                        <img src={this.state.nftCollection ? this.state.nftCollection.banner_image : ''}/>
+                        <img src={this.state.nftCollection ? this.state.nftCollection.logo_image : ''}/>
                     </div>
                     <div className="profile__social">
                         <ul className="profile__social-list unlist">
@@ -182,18 +165,18 @@ class NFTs extends Component {
                         </ul>
                     </div>
                     <div className="profile__decs">
-                        <h4 className="menu__title-secondary">{this.state.nftCollection.symbol} collection</h4>
+                        <h4 className="menu__title-secondary">{this.state.nftCollection ? this.state.nftCollection.symbol : ''} collection</h4>
                         <ul className="profile__decs_stats unlist">
                             <li className="profile__decs_stats-item">
                                 <span className="text_gray text_primary">Items {this.state.nfts.length}</span></li>
                                 <li className="profile__decs_stats-item_decor profile__decs_stats-item"><span className="text_gray text_primary">Distributed 500</span></li>
                                 <li className="profile__decs_stats-item_decor profile__decs_stats-item"><span className="text_gray text_primary">Available to distribution 500</span></li>
                                 <li className="profile__decs_stats-item_decor profile__decs_stats-item"><span className="text_gray text_primary">Created Mar 2023</span></li>
-                                <li className="profile__decs_stats-item_decor profile__decs_stats-item"><span className="text_gray text_primary">Creator earnings 7.5%</span></li>
-                                <li className="profile__decs_stats-item_decor profile__decs_stats-item"><span className="text_gray text_primary">Chain: Ethereum</span></li>
+                                <li className="profile__decs_stats-item_decor profile__decs_stats-item"><span className="text_gray text_primary">Creator earnings {this.state?.nftCollection?.royalty_percent}%</span></li>
+                                <li className="profile__decs_stats-item_decor profile__decs_stats-item"><span className="text_gray text_primary">Chain: {this.state.nftCollection ? networks[`${this.state.nftCollection.chainid}`].name : ''}</span></li>
                         </ul>
                         <p className="text_gray text_primary">
-                        {this.state.nftCollection.description}
+                        {this.state.nftCollection ? this.state.nftCollection.description  : ''}
                         </p>
                     </div>
                     <div className="profile__nfts">
@@ -202,11 +185,11 @@ class NFTs extends Component {
                                 this.state.nfts.map(v => 
                                     <li key={v.id} className="profile__nfts-list-item" onClick={() => this.handleShowNFT(v)}>
                                     <Card className="profile__nfts-card">
-                                        <Card.Img variant="top" src={nft1} />
+                                        <Card.Img variant="top" src={v.image} />
                                         <Card.Body>
-                                            <Card.Title className="title_secondary ">{v.name}</Card.Title>
+                                            <Card.Title className="title_secondary ">{v.nft_name}</Card.Title>
                                             <Card.Text className="text_gray text_card text_primary">
-                                                {v.description}
+                                                {v.nft_description}
                                             </Card.Text>
                                             </Card.Body>
                                         </Card>
@@ -255,25 +238,25 @@ class NFTs extends Component {
                 </div>
                 <Modal className="modal__nft" show={this.state.showNFT} onHide={this.handleCloseMFT} centered>
                     <Modal.Header className="modal-newuser__title modal-title" closeButton>
-                    {this.state.nftCollection.symbol} collection
+                    {this.state.nftCollection ? this.state.nftCollection.symbol  : ''} collection
                     </Modal.Header>
                     <Modal.Body className="modal__nft-body">
                             <div className="modal__nft-top">
-                                <img className="modal__nft-img" src={nft1}></img>
+                                <img className="modal__nft-img" src={this.state?.activeNft?.image}></img>
                                 <div className="modal__nft-top-left">
                                     <div className="mb-3">
-                                        <span className="title_primary"> {this.state.nftCollection.symbol} collection</span>
-                                        <h4 className="title_preLgTitile">Pepemigos #3357</h4>
-                                        <span className="text_gray modal-text_regular modal-text">Owned by User <a className="text_gray link__primary">#123</a></span>
+                                        <span className="title_primary"> {this.state.nftCollection ? this.state.nftCollection.symbol : ''} collection</span>
+                                        <h4 className="title_preLgTitile">{this.state?.activeNft?.nft_name}</h4>
+                                        {/* <span className="text_gray modal-text_regular modal-text">Owned by User <a className="text_gray link__primary">#123</a></span> */}
                                     </div>
                                     <div className="modal-text">
-                                        <p className="modal__nft-text">Status: -</p>
+                                        {/* <p className="modal__nft-text">Status: -</p> */}
                                         {/*<p className="modal__nft-text">Contract Address: <a className="link__primary">0x06f8...fe4c</a></p>*/}
-                                         {<p className="modal__nft-text">Contract Address: -</p>}
-                                        <p className="modal__nft-text">Token ID: <a className="link__primary"> {createLongStrView(this?.state?.activeNft?.id)}</a></p>
+                                         {<p className="modal__nft-text">Contract Address: <a className="link__primary" ref='norefferer' target="_blank" href={`${this.state.nftCollection ? networks[`${this.state?.nftCollection?.chainid}`].explorer : ''}/address/${this.state?.nftCollection?.address}`}>{createLongStrView(this.state?.nftCollection?.address)}</a></p>}
+                                        <p className="modal__nft-text">ID: {createLongStrView(this?.state?.activeNft?.nft_id)}</p>
                                         <p className="modal__nft-text">Token Standard: ERC-721</p>
-                                        <p className="modal__nft-text">Chain: -</p>
-                                        <p className="modal__nft-text">Creator Earnings info: -</p>
+                                        <p className="modal__nft-text">Chain: {this.state.nftCollection ? networks[`${this.state.nftCollection.chainid}`].name : ''}</p>
+                                        <p className="modal__nft-text">Creator Earnings info: {this.state.nftCollection ? `${this.state.nftCollection.royalty_percent}%` : ''}</p>
                                     </div>
                                 </div>
                             </div>
