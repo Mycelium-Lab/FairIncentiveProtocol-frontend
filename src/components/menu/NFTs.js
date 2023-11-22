@@ -172,8 +172,8 @@ class NFTs extends Component {
                                 <li className="profile__decs_stats-item_decor profile__decs_stats-item"><span className="text_gray text_primary">Distributed 500</span></li>
                                 <li className="profile__decs_stats-item_decor profile__decs_stats-item"><span className="text_gray text_primary">Available to distribution 500</span></li>
                                 <li className="profile__decs_stats-item_decor profile__decs_stats-item"><span className="text_gray text_primary">Created Mar 2023</span></li>
-                                <li className="profile__decs_stats-item_decor profile__decs_stats-item"><span className="text_gray text_primary">Creator earnings 7.5%</span></li>
-                                <li className="profile__decs_stats-item_decor profile__decs_stats-item"><span className="text_gray text_primary">Chain: Ethereum</span></li>
+                                <li className="profile__decs_stats-item_decor profile__decs_stats-item"><span className="text_gray text_primary">Creator earnings {this.state?.nftCollection?.royalty_percent}%</span></li>
+                                <li className="profile__decs_stats-item_decor profile__decs_stats-item"><span className="text_gray text_primary">Chain: {this.state.nftCollection ? networks[`${this.state.nftCollection.chainid}`].name : ''}</span></li>
                         </ul>
                         <p className="text_gray text_primary">
                         {this.state.nftCollection ? this.state.nftCollection.description  : ''}
@@ -187,9 +187,9 @@ class NFTs extends Component {
                                     <Card className="profile__nfts-card">
                                         <Card.Img variant="top" src={v.image} />
                                         <Card.Body>
-                                            <Card.Title className="title_secondary ">{v.name}</Card.Title>
+                                            <Card.Title className="title_secondary ">{v.nft_name}</Card.Title>
                                             <Card.Text className="text_gray text_card text_primary">
-                                                {v.description}
+                                                {v.nft_description}
                                             </Card.Text>
                                             </Card.Body>
                                         </Card>
