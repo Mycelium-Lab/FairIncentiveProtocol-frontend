@@ -15,6 +15,7 @@ import nft4 from '../../media/collectionDetail/default_nft_4.png'
 import { Card } from "react-bootstrap";
 import Modal from 'react-bootstrap/Modal';
 import { createLongStrView } from "../../utils/longStrView";
+import { networks } from "../../utils/networks";
 
 class NFTs extends Component {
 
@@ -241,21 +242,21 @@ class NFTs extends Component {
                     </Modal.Header>
                     <Modal.Body className="modal__nft-body">
                             <div className="modal__nft-top">
-                                <img className="modal__nft-img" src={nft1}></img>
+                                <img className="modal__nft-img" src={this.state?.activeNft?.image}></img>
                                 <div className="modal__nft-top-left">
                                     <div className="mb-3">
                                         <span className="title_primary"> {this.state.nftCollection ? this.state.nftCollection.symbol : ''} collection</span>
-                                        <h4 className="title_preLgTitile">Pepemigos #3357</h4>
-                                        <span className="text_gray modal-text_regular modal-text">Owned by User <a className="text_gray link__primary">#123</a></span>
+                                        <h4 className="title_preLgTitile">{this.state?.activeNft?.nft_name}</h4>
+                                        {/* <span className="text_gray modal-text_regular modal-text">Owned by User <a className="text_gray link__primary">#123</a></span> */}
                                     </div>
                                     <div className="modal-text">
-                                        <p className="modal__nft-text">Status: -</p>
+                                        {/* <p className="modal__nft-text">Status: -</p> */}
                                         {/*<p className="modal__nft-text">Contract Address: <a className="link__primary">0x06f8...fe4c</a></p>*/}
-                                         {<p className="modal__nft-text">Contract Address: -</p>}
-                                        <p className="modal__nft-text">Token ID: <a className="link__primary"> {createLongStrView(this?.state?.activeNft?.id)}</a></p>
+                                         {<p className="modal__nft-text">Contract Address: <a className="link__primary" ref='norefferer' target="_blank" href={`${this.state.nftCollection ? networks[`${this.state?.nftCollection?.chainid}`].explorer : ''}/address/${this.state?.nftCollection?.address}`}>{createLongStrView(this.state?.nftCollection?.address)}</a></p>}
+                                        <p className="modal__nft-text">ID: {createLongStrView(this?.state?.activeNft?.nft_id)}</p>
                                         <p className="modal__nft-text">Token Standard: ERC-721</p>
-                                        <p className="modal__nft-text">Chain: -</p>
-                                        <p className="modal__nft-text">Creator Earnings info: -</p>
+                                        <p className="modal__nft-text">Chain: {this.state.nftCollection ? networks[`${this.state.nftCollection.chainid}`].name : ''}</p>
+                                        <p className="modal__nft-text">Creator Earnings info: {this.state.nftCollection ? `${this.state.nftCollection.royalty_percent}%` : ''}</p>
                                     </div>
                                 </div>
                             </div>
