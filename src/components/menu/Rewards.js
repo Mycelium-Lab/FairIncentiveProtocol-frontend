@@ -167,8 +167,8 @@ class Rewards extends Component {
             const json = await res.json()
             this.setState({
                 nftCollections: json.body.data,
-                chosen_nft_collection: json.body.data.length > 0 ? {value: json.body.data[0].address, label: json.body.data[0].name} : null,
-                optionNftCollection: json.body.data.map(v => ({value: v.address, label: v.symbol}))
+                chosen_nft_collection: json.body.data.length > 0 ? {value: json.body.data[0].address, label: `${json.body.data[0].name} (${networks[`${json.body.data[0].chainid}`].name})`} : null,
+                optionNftCollection: json.body.data.map(v => ({value: v.address, label: `${v.name} (${networks[`${v.chainid}`].name})`}))
             })
         } catch (error) {
             console.log(error)
@@ -1077,9 +1077,9 @@ class Rewards extends Component {
                                             {
                                             v.nft_id
                                             ?
-                                            `${v.nft_name} from ${v.symbol} collection`
+                                            `${v.nft_name} from ${v.symbol} (${networks[`${v.chainid}`].name}) collection`
                                             :
-                                            `${ethers.utils.formatEther(v.amount)} ${v.symbol}`
+                                            `${ethers.utils.formatEther(v.amount)} ${v.symbol} (${networks[`${v.chainid}`].name})`
                                             }
                                           </td>
                                           <td>
