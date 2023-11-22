@@ -484,9 +484,9 @@ class NFTCollections extends Component {
     handleCloseCreateLinkPage = () => this.setState({showCreateLinkPage: false})
     handleShowCreateLinkPage = () => this.setState({showCreateLinkPage: true})
 
-    handleShowNFTDetail = (event, active, address) => {
+    handleShowNFTDetail = (event, active, collection) => {
         event.stopPropagation();
-        this.props.getNeftCollection(address)
+        this.props.getNeftCollection(collection)
         this.props.onSwitch(active)
         this.setState({showNFTDetail: true})
     }
@@ -1297,7 +1297,7 @@ class NFTCollections extends Component {
                                             <td>
                                                 <FPDropdown icon={more}>
                                                     <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowAddNFT({value: v.address, label: v.symbol})}>Add NFT</Dropdown.Item>
-                                                    <Dropdown.Item className="dropdown__menu-item" onClick={(event) => this.handleShowNFTDetail(event, switcher.nft, v.address)}>Collection details</Dropdown.Item>
+                                                    <Dropdown.Item className="dropdown__menu-item" onClick={(event) => this.handleShowNFTDetail(event, switcher.nft, v)}>Collection details</Dropdown.Item>
                                                 </FPDropdown>
                                             </td>
                                         </tr>
