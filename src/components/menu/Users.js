@@ -202,7 +202,9 @@ class Users extends Component {
             formData.append("notes", this.state.add_notes)
             formData.append("properties", JSON.stringify(propertiesElements))
             formData.append("stats", JSON.stringify(statsElements))
-            formData.append('image', this.state.file);
+            if (this.state.file) {
+                formData.append('image', this.state.file);
+            }
             const res = await fetch(`${config.api}/users/add`, {
                 method: 'POST',
                 headers: {
@@ -224,7 +226,8 @@ class Users extends Component {
                 })
                 this.setState({
                     users: _users,
-                    showAdd: false
+                    showAdd: false,
+                    file: null
                 })
             } else {
                 const errroMessage = json.error.message
