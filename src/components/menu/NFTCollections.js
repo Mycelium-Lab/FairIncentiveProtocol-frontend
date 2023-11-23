@@ -1287,7 +1287,7 @@ class NFTCollections extends Component {
                                             </div>
                                             </td>
                                             <td>
-                                                (soon)
+                                                {v.nft_count} <a href="#" className="link__primary" onClick={() => this.handleShowAddNFT({value: v.address, label: v.symbol, chainid: v.chainid})}>Add NFT</a>
                                             </td>
                                             <td>
                                                 (soon)
