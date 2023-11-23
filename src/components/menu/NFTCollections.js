@@ -1280,7 +1280,7 @@ class NFTCollections extends Component {
                                         return<tr>
                                             <td>
                                             <div className="nft__collection-name">
-                                                <img src={customTokeSymbol}></img>
+                                                <img src={v.logo_image || customTokeSymbol}></img>
                                                 <span>
                                                     {v.symbol} collection
                                                 </span>
