@@ -21,6 +21,7 @@ import ErrorModal from "../common/modals/error";
 import loader from '../../media/common/loader.svg'
 import errors from "../../errors";
 import { ethers } from "ethers";
+import ProgressModal from "../common/modals/progress";
 
 let propertiesElementsLength = 0
 let statsElementsLength = 0
@@ -89,7 +90,8 @@ class Users extends Component {
                     borderColor: ['rgba(255, 159, 67, 0.85)'],
                 }]
             },
-            file: null
+            file: null,
+            showProgress: false
         }
     }
 
@@ -203,6 +205,7 @@ class Users extends Component {
             formData.append("properties", JSON.stringify(propertiesElements))
             formData.append("stats", JSON.stringify(statsElements))
             if (this.state.file) {
+                this.handleShowProgress()
                 formData.append('image', this.state.file);
             }
             const res = await fetch(`${config.api}/users/add`, {
@@ -213,6 +216,7 @@ class Users extends Component {
                 body: formData,
             })
             const json = await res.json()
+            this.handleCloseProgress()
             if (res.status === 200) {
                 const _users = this.state.users
                 _users.push({
@@ -549,6 +553,8 @@ class Users extends Component {
         })
     }
 
+    handleShowProgress = () => this.setState({showProgress: true})
+    handleCloseProgress = () => this.setState({showProgress: false})
     handleShowAdd = () => this.setState({showAdd: true})
     handleCloseAdd = () => this.setState({
         showAdd: false,
@@ -1539,6 +1545,7 @@ class Users extends Component {
                     handleCloseError={this.handleCloseError}
                     errorName={this.state.errorName}
                 />
+                <ProgressModal showProgress={this.state.showProgress} handleCloseProgress={this.handleCloseProgress}/>
                 </>
                 }
             </>
