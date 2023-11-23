@@ -420,6 +420,7 @@ class NFTCollections extends Component {
             formData.append("description", this.state.addNFTDescription)
             formData.append("chainid", this.state.addNFTAddress.chainid)
             formData.append("image", this.state.nftFile)
+            this.handleShowProgress()
             const res = await fetch(`${config.api}/nfts/add/nft`, {
                 method: 'POST',
                 headers: {
@@ -428,11 +429,19 @@ class NFTCollections extends Component {
                 body: formData,
             })
             if (res.status === 200){
+                this.handleCloseProgress()
+                const nftCollections = this.state.nftCollections.map(v => {
+                    if (v.chainid === this.state.addNFTAddress.chainid && v.address === this.state.addNFTAddress.value) {
+                        v.nft_count = parseInt(v.nft_count) + 1
+                    }
+                    return v
+                })
                 this.setState({
                     showAddNFT: false,
                     showSuccess: true,
                     successTitle: 'Create NFT',
-                    successName: `The NFT "${this.state.addNFTName}" was successfully created`
+                    successName: `The NFT "${this.state.addNFTName}" was successfully created`,
+                    nftCollections
                 })
             }
             else{
