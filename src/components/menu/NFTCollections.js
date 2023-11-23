@@ -445,12 +445,14 @@ class NFTCollections extends Component {
                 })
             }
             else{
+                this.handleCloseProgress()
                 this.setState({
                     showError: true,
                     errorName: 'Something went wrong'
                 })
             }
         } catch (error) {
+            this.handleCloseProgress()
             this.setState({
                 showError: true,
                 errorName: 'Something went wrong'
