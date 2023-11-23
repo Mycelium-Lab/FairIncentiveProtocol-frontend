@@ -348,6 +348,9 @@ class NFTCollections extends Component {
             if (facebook) links.push({link: facebook})
             if (discord) links.push({link: discord})
             if (other) links.push({link: other})
+            if (!logoImage) throw Error('Logo image cannot be null')
+            if (!featuredImage) throw Error('Featured image cannot be null')
+            if (!bannerImage) throw Error('Banner image cannot be null')
             let NFT, contract
             this.handleShowConfirm('Create NFT', `Confirm ${symbol} collection creation`, `Please, confirm contract creation in your wallet`)
             if (beneficialType === beneficialTypes.company) {
@@ -602,26 +605,21 @@ class NFTCollections extends Component {
         this.handleCloseProgress()
         if (error.message.includes('user rejected transaction')) {
             this.handleShowError('User rejected transaction')
-        }
-        if (error.message.includes('insufficient allowance')) {
+        } else if (error.message.includes('insufficient allowance')) {
             this.handleShowError('Insufficient allowance')
-        }
-        if (error.message.includes('User in blacklist')) {
+        } else if (error.message.includes('User in blacklist')) {
             this.handleShowError('User in blacklist')
-        }
-        if (error.message.includes('Cap exceeded')) {
+        } else if (error.message.includes('Cap exceeded')) {
             this.handleShowError('Maximum supply exceeded')
-        }
-        if (error.message.includes('Empty list')) {
+        } else if (error.message.includes('Empty list')) {
             this.handleShowError('Empty removing list')
-        }
-        if (error.message.includes('Cap is 0')) {
+        } else if (error.message.includes('Cap is 0')) {
             this.handleShowError('The maximum supply is not set')
-        }
-        if (error.message.includes('Initial supply is 0')) {
+        } else if (error.message.includes('Initial supply is 0')) {
             this.handleShowError('The initial supply is not set')
+        } else {
+            this.handleShowError(error.message)
         }
-        console.log(error)
     } 
 
     handleLogoImage = (file) => {
