@@ -348,6 +348,9 @@ class NFTCollections extends Component {
             if (facebook) links.push({link: facebook})
             if (discord) links.push({link: discord})
             if (other) links.push({link: other})
+            if (!logoImage) throw Error('Logo image cannot be null')
+            if (!featuredImage) throw Error('Featured image cannot be null')
+            if (!bannerImage) throw Error('Banner image cannot be null')
             let NFT, contract
             this.handleShowConfirm('Create NFT', `Confirm ${symbol} collection creation`, `Please, confirm contract creation in your wallet`)
             if (beneficialType === beneficialTypes.company) {
@@ -417,6 +420,7 @@ class NFTCollections extends Component {
             formData.append("description", this.state.addNFTDescription)
             formData.append("chainid", this.state.addNFTAddress.chainid)
             formData.append("image", this.state.nftFile)
+            this.handleShowProgress()
             const res = await fetch(`${config.api}/nfts/add/nft`, {
                 method: 'POST',
                 headers: {
@@ -425,20 +429,30 @@ class NFTCollections extends Component {
                 body: formData,
             })
             if (res.status === 200){
+                this.handleCloseProgress()
+                const nftCollections = this.state.nftCollections.map(v => {
+                    if (v.chainid === this.state.addNFTAddress.chainid && v.address === this.state.addNFTAddress.value) {
+                        v.nft_count = parseInt(v.nft_count) + 1
+                    }
+                    return v
+                })
                 this.setState({
                     showAddNFT: false,
                     showSuccess: true,
                     successTitle: 'Create NFT',
-                    successName: `The NFT "${this.state.addNFTName}" was successfully created`
+                    successName: `The NFT "${this.state.addNFTName}" was successfully created`,
+                    nftCollections
                 })
             }
             else{
+                this.handleCloseProgress()
                 this.setState({
                     showError: true,
                     errorName: 'Something went wrong'
                 })
             }
         } catch (error) {
+            this.handleCloseProgress()
             this.setState({
                 showError: true,
                 errorName: 'Something went wrong'
@@ -602,26 +616,21 @@ class NFTCollections extends Component {
         this.handleCloseProgress()
         if (error.message.includes('user rejected transaction')) {
             this.handleShowError('User rejected transaction')
-        }
-        if (error.message.includes('insufficient allowance')) {
+        } else if (error.message.includes('insufficient allowance')) {
             this.handleShowError('Insufficient allowance')
-        }
-        if (error.message.includes('User in blacklist')) {
+        } else if (error.message.includes('User in blacklist')) {
             this.handleShowError('User in blacklist')
-        }
-        if (error.message.includes('Cap exceeded')) {
+        } else if (error.message.includes('Cap exceeded')) {
             this.handleShowError('Maximum supply exceeded')
-        }
-        if (error.message.includes('Empty list')) {
+        } else if (error.message.includes('Empty list')) {
             this.handleShowError('Empty removing list')
-        }
-        if (error.message.includes('Cap is 0')) {
+        } else if (error.message.includes('Cap is 0')) {
             this.handleShowError('The maximum supply is not set')
-        }
-        if (error.message.includes('Initial supply is 0')) {
+        } else if (error.message.includes('Initial supply is 0')) {
             this.handleShowError('The initial supply is not set')
+        } else {
+            this.handleShowError(error.message)
         }
-        console.log(error)
     } 
 
     handleLogoImage = (file) => {
@@ -1282,14 +1291,14 @@ class NFTCollections extends Component {
                                         return<tr>
                                             <td>
                                             <div className="nft__collection-name">
-                                                <img src={customTokeSymbol}></img>
+                                                <img src={v.logo_image || customTokeSymbol}></img>
                                                 <span>
                                                     {v.symbol} collection
                                                 </span>
                                             </div>
                                             </td>
                                             <td>
-                                                (soon)
+                                                {v.nft_count} <a href="#" className="link__primary" onClick={() => this.handleShowAddNFT({value: v.address, label: v.symbol, chainid: v.chainid})}>Add NFT</a>
                                             </td>
                                             <td>
                                                 (soon)
