@@ -419,6 +419,22 @@ class NFTCollections extends Component {
             formData.append("name", this.state.addNFTName)
             formData.append("description", this.state.addNFTDescription)
             formData.append("chainid", this.state.addNFTAddress.chainid)
+            let propertiesElements = this.state.propertiesElements
+            let statsElements = this.state.statsElements
+            propertiesElements = propertiesElements.filter(v => v.work).map(v => {
+                return {
+                    name: v.name,
+                    value: v.value
+                }
+            })
+            statsElements = statsElements.filter(v => v.work).map(v => {
+                return {
+                    name: v.name,
+                    value: v.value
+                }
+            })
+            formData.append("properties", JSON.stringify(propertiesElements))
+            formData.append("stats", JSON.stringify(statsElements))
             formData.append("image", this.state.nftFile)
             this.handleShowProgress()
             const res = await fetch(`${config.api}/nfts/add/nft`, {
@@ -520,10 +536,10 @@ class NFTCollections extends Component {
                 element: 
                 <div className="user-custom-params">
                             <div className="input-group">
-                                <input type="text" id={`property-name-${id}`} onChange={this.changePropertyName} className="form-control" placeholder="Property name"/>
+                                <input type="text" id={`property-name-${id}`} onChange={(event) => this.changePropertyName(id, event.target.value)} className="form-control" placeholder="Property name"/>
                             </div>
                             <div className="input-group">
-                                <input type="text" id={`property-value-${id}`} onChange={this.changePropertyValue} className="form-control" placeholder="Default value"/>
+                                <input type="text" id={`property-value-${id}`} onChange={(event) => this.changePropertyValue(id, event.target.value)} className="form-control" placeholder="Default value"/>
                             </div>
                     <button type="button" className="btn btn_primary btn_orange btn__counter" onClick={() => this.deletePropertyInput(id)}>-</button>
                 </div>,
@@ -534,6 +550,27 @@ class NFTCollections extends Component {
         )
         propertiesElementsLength += 1
         this.setState({propertiesElements})
+    }
+    
+    changePropertyName(id, value) {
+        let propertiesElements = this.state.propertiesElements
+        propertiesElements.forEach(v => {
+            if (v.id === id) v.name = value
+        })
+        document.getElementById(`property-name-${id}`).value = value
+        this.setState({
+            propertiesElements
+        })
+    }
+
+    changePropertyValue(id, value) {
+        let propertiesElements = this.state.propertiesElements
+        propertiesElements.forEach(v => {
+            if (v.id === id) v.value = value
+        }) 
+        this.setState({
+            propertiesElements
+        })
     }
 
     deletePropertyInput = (index) => {
@@ -574,6 +611,30 @@ class NFTCollections extends Component {
         let statsElements = this.state.statsElements
         statsElements.forEach(v => { if (v.id === index) v.work = false});
         this.setState({statsElements})
+    }
+
+    changeStatName(event) {
+        let statsElements = this.state.statsElements
+        const idFull = event.target.id.split('-')
+        const id = parseInt(idFull[idFull.length - 1])
+        statsElements.forEach(v => {
+            if (v.id === id) v.name = event.target.value
+        }) 
+        this.setState({
+            statsElements
+        })
+    }
+
+    changeStatValue(event) {
+        let statsElements = this.state.statsElements
+        const idFull = event.target.id.split('-')
+        const id = parseInt(idFull[idFull.length - 1])
+        statsElements.forEach(v => {
+            if (v.id === id) v.value = event.target.value
+        }) 
+        this.setState({
+            statsElements
+        })
     }
 
     addLevelInput = () => {
@@ -653,7 +714,11 @@ class NFTCollections extends Component {
     handleCloseSuccess = () => this.setState({showSuccess: false, successName: null, successText: null})
     handleShowError = (errorText) => this.setState({showError: true, errorText})
     handleCloseError = () => this.setState({showError: false})
-    
+
+    changeStatName = this.changeStatName.bind(this)
+    changeStatValue = this.changeStatValue.bind(this)
+    changePropertyName = this.changePropertyName.bind(this)
+    changePropertyValue = this.changePropertyValue.bind(this)
     handleLogoImage = this.handleLogoImage.bind(this)
     handleFeaturedImage = this.handleFeaturedImage.bind(this)
     handleBannerImage = this.handleBannerImage.bind(this)
