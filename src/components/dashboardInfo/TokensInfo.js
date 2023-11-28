@@ -77,17 +77,18 @@ class TokensInfo extends Component {
                         <img src={totalTOkens}></img>
                     </div>
                 </li>
-                <li className="info__list-item_light-blue info__list-item">
+                {/* <li className="info__list-item_light-blue info__list-item">
                     <div className="info__content_left">
                         <div className="info__content-amount-info">
-                            <span className="info__content-amount">1 000 500</span><a className="info__content-mint">[mint]</a>
+                            <span className="info__content-amount">1 000 500</span>
+                            <a className="info__content-mint">[mint]</a>
                         </div>
                         <span className="info__content-desc">Available to distribute</span>
                     </div>
                     <div className="info__content_right">
                         <img src={tokensAvalible}></img>
                     </div>
-                </li>
+                </li> */}
                 <li className="info__list-item_dark-blue info__list-item">
                     <div className="info__content_left">
                         <div className="info__content-amount-info_new info__content-amount-info">

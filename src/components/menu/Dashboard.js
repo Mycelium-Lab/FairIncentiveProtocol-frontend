@@ -427,7 +427,7 @@ class Dashboard extends Component {
                                     <BarChart chartData={this.state.tokenDistributionMockDdata}></BarChart>
                                 </div>
                             </div>
-                            <div className="chart__group">
+                            {/* <div className="chart__group">
                                 <div className="dashboard__chart_dashboard-info  mb-4">
                                     <label className="chart__label">Tokens issue</label>
                                     <div style={{position: 'relative', height:'358px', display: 'flex', justifyContent: 'center'}}>
@@ -440,7 +440,7 @@ class Dashboard extends Component {
                                         <DonutChart chartData={this.state.tokensSupplyMockData}></DonutChart>
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
                         </Tab>
                         <Tab eventKey="NFTs" title="NFTs">
                             <NftsInfo></NftsInfo>
@@ -451,7 +451,7 @@ class Dashboard extends Component {
                                 <BarChart chartData={this.state.nftsDistributionMockDdata}></BarChart>
                             </div>
                             </div>
-                            <div className="chart__group">
+                            {/* <div className="chart__group">
                                 <div className="dashboard__chart_dashboard-info  mb-4">
                                     <label className="chart__label">Collection issue</label>
                                     <div style={{position: 'relative', height:'358px', display: 'flex', justifyContent: 'center'}}>
@@ -464,7 +464,7 @@ class Dashboard extends Component {
                                         <DonutChart chartData={this.state.collectionSupplyMockData}></DonutChart>
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
                         </Tab>
                     </Tabs>
                 </div>
