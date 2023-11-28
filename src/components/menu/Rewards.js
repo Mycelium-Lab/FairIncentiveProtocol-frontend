@@ -103,7 +103,9 @@ class Rewards extends Component {
                     }]
             },
             combinedRewards: [],
-            toRewardNftId: null
+            toRewardNftId: null,
+            rewardForStat: null,
+            rewardForStatTotal: 0
         }
     }
 
@@ -892,7 +894,24 @@ class Rewards extends Component {
     }
 
     handleCloseStats = () => this.setState({showStats: false});
-    handleShowStats = (reward_name) => this.setState({showStats: true, reward_name});
+    handleShowStats = async (reward) => {
+        try {
+            // const headers = new Headers();
+            // headers.append("Authorization", getBearerHeader())
+            // let query = new URLSearchParams();
+            // query.append('id', reward.id)
+            // const requestOptions = {
+            //     method: 'GET',
+            //     headers: headers,
+            //     redirect: 'follow'
+            //   };
+            // const res = await fetch(`${config.api}/stat/total_rewards/${reward.nft_id ? 'erc721' : 'erc20'}?` + query.toString(), requestOptions)
+            // const json = await res.json()
+            this.setState({showStats: true, rewardForStat: reward, rewardForStatTotal: reward.count})
+        } catch (error) {
+            console.log(error)
+        }
+    };
 
     handleClose = () => this.setState({
         name: '',
@@ -1091,7 +1110,7 @@ class Rewards extends Component {
                                           <td>
                                             <FPDropdown icon={more}>
                                             
-                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowStats(v.name)}>Stat</Dropdown.Item>
+                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowStats(v)}>Stat</Dropdown.Item>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowEditReward(v.name, v.id, v.count, v.description, v.amount, v.nft_id ? types.nft :types.token, v.address, v.nft_id , v.symbol, v.nft_name)}>Edit</Dropdown.Item>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowReward(v.name, v.id, v.nft_id)} disabled={v.status}>To reward</Dropdown.Item>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowDelete(v.nft_id ? types.nft : types.token, v.id, v.name)}>Delete</Dropdown.Item>
@@ -1477,13 +1496,13 @@ class Rewards extends Component {
 
                 <Modal dialogClassName="modal__info-rewards" show={this.state.showStats} onHide={this.handleCloseStats} centered>
                     <Modal.Header  className="modal-newuser__title modal-title" closeButton>
-                        {`"${this.state.reward_name}" reward statistics`}
+                        {`"${this.state?.rewardForStat?.name}" reward statistics`}
                     </Modal.Header>
                     <Modal.Body>
                     <ul className="info__list_rewards info__list unlist">
                         <li className="info__list-item_rewards info__list-item_blue info__list-item">
                             <div className="info__content_left">
-                                <span className="info__content-amount">125 576</span>
+                                <span className="info__content-amount">{this.state.rewardForStatTotal}</span>
                                 <span className="info__content-desc">The total number of rewards</span>
                             </div>
                             <div className="info__content_right">
