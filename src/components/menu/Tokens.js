@@ -1266,7 +1266,7 @@ class Tokens extends Component {
                            <div className="form_col_last form_col">
                                <label className="form__label">Chief administrator of the token (owner) * <img src={info} className="form__icon-info"/></label>
                                <div className="input-group">
-                                   <input type="text" value={this.state.network.fpmanager || this.state.address} onChange={this.onChangeFpManager} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                   <input disabled type="text" value={this.state.network.fpmanager || this.state.address} onChange={this.onChangeFpManager} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                </div>
                                <div className="form__prompt_warning form__prompt" id="basic-addon4">Attention: the wallet with this role has the right to carry out any actions</div>
                            </div>
@@ -1296,7 +1296,7 @@ class Tokens extends Component {
                                 <div className="form_col_last form_col">
                                     <label className="form__label">Chief administrator of the token (owner) * <img src={info} className="form__icon-info"/></label>
                                     <div className="input-group">
-                                        <input type="text" value={this.state.network.fpmanager || this.state.address} onChange={this.onChangeFpManager} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        <input disabled type="text" value={this.state.network.fpmanager || this.state.address} onChange={this.onChangeFpManager} className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                     </div>
                                     <div className="form__prompt_warning form__prompt" id="basic-addon4">Attention: the wallet with this role has the right to carry out any actions</div>
                                 </div>
