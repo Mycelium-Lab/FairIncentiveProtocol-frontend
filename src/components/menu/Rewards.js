@@ -31,6 +31,7 @@ import errors from "../../errors";
 import { networks, networksNames } from "../../utils/networks";
 import DatePicker from "../DatePicker";
 import { subDays } from "date-fns";
+import { typesOfDashboard } from "../../utils/constants";
 
 const types = {
     token: 'token',
@@ -897,6 +898,57 @@ class Rewards extends Component {
         }
     }
 
+    async changeOneRewardRanges(startDate, endDate) {
+        try {
+            const now = endDate
+            const nowSub7 = startDate
+            const isTodayOrYesterday = nowSub7.getDate() === now.getDate() && nowSub7.getMonth() === now.getMonth()
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+            let queryWithDate = new URLSearchParams()
+            queryWithDate.append('id', this.state.rewardForStat.id)
+            queryWithDate.append("startDate", nowSub7.toString())
+            queryWithDate.append("endDate", now.toString())
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const promises = [
+                fetch(`${config.api}/stat/rewards_range/${this.state.rewardForStat.nft_id ? 'erc721' : 'erc20'}?` + queryWithDate.toString(), requestOptions),
+                fetch(`${config.api}/stat/rewards_distribution/${this.state.rewardForStat.nft_id ? 'erc721' : 'erc20'}?` + queryWithDate.toString(), requestOptions)
+            ]
+            const responses = await Promise.all(promises)
+            const promisesJson = [
+                responses[0].json(),
+                responses[1].json()
+            ]
+            const jsons = await Promise.all(promisesJson)
+            const jsonRange = jsons[0]
+            const jsonDist = jsons[1]
+            const range = {
+                labels: jsonRange.body.data.map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "") : new Date(v.date_interval_end).toLocaleDateString()}`),
+                datasets: [{
+                    data: jsonRange.body.data.map(v => parseInt(v.count)),
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                }]
+            }
+            const dist = {
+                labels: jsonDist.body.data.map(v => `${isTodayOrYesterday ? new Date(v.end_date).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "") : new Date(v.end_date).toLocaleDateString()} `),
+                datasets: [{
+                    data: jsonDist.body.data.map(v => parseInt(v.count)),
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                }]
+            }
+            this.setState({
+                rewardRangeStat: range,
+                rewardDistStat: dist
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     handleCloseStats = () => this.setState({showStats: false});
     handleShowStats = async (reward) => {
         try {
@@ -1063,6 +1115,7 @@ class Rewards extends Component {
     changeNFTRewardStatus = this.changeNFTRewardStatus.bind(this)
     saveEdit = this.saveEdit.bind(this)
     handleCloseSuccess = this.handleCloseSuccess.bind(this)
+    changeOneRewardRanges = this.changeOneRewardRanges.bind(this)
     handleCloseError = () => this.setState({showError: false})
 
     render() {
@@ -1578,7 +1631,7 @@ class Rewards extends Component {
                         </li>
                     </ul>
                         <div className="dashboard__chart mb-4">
-                            <DatePicker></DatePicker>
+                            <DatePicker changeOneRewardRanges={this.changeOneRewardRanges} type={typesOfDashboard.reward_range}></DatePicker>
                             <div className="dashboard__chart_reward">
                                 <label className="chart__label">Distribution statistic</label>
                                 <div className="dashboard__chart_reward_wrapper mb-4" style={{position: 'relative', height:'356px', display: 'flex', justifyContent: 'center'}}>

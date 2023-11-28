@@ -3,6 +3,5 @@ export const typesOfDashboard = {
     rewards: 'rewards',
     tokens: 'tokens',
     nfts: 'nfts',
-    reward_distribution: 'reward_distribution',
     reward_range: 'reward_range'
 } 
