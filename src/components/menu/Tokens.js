@@ -895,7 +895,7 @@ class Tokens extends Component {
         let cap;
         let mintTokenAvailableToMint = BigInt(0);
         if (info.supply_type_name == 'Unlimited') {
-            mintTokenAvailableToMint = '∞'
+            mintTokenAvailableToMint = 'Infinity'
         } else if (info.supply_type_name == 'Capped') {
             try {
                 mintTokenAvailableToMint = BigInt(info.max_supply) - totalSupply
