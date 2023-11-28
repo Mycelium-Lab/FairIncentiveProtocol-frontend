@@ -68,7 +68,7 @@ export const networks = {
         chainid: "97",
         currency_symbol: "tBNB",
         explorer: "https://testnet.bscscan.com",
-        fpmanager: "0xe435Cf187A6479DeA943651c7710f042e079Cdcb",
+        fpmanager: "0x87b8BAe3f9C64d53167Ebc560FD73D0899215241",
         justCallSigner: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
     },
     80001: {
@@ -77,7 +77,7 @@ export const networks = {
         chainid: "80001",
         currency_symbol: "tMATIC",
         explorer: "https://mumbai.polygonscan.com",
-        fpmanager: "0xe435Cf187A6479DeA943651c7710f042e079Cdcb",
+        fpmanager: "0x87b8BAe3f9C64d53167Ebc560FD73D0899215241",
         justCallSigner: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
     },
     420: {
