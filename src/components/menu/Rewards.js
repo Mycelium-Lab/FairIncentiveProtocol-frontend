@@ -29,6 +29,8 @@ import SuccessModal from "../common/modals/success";
 import ErrorModal from "../common/modals/error";
 import errors from "../../errors";
 import { networks, networksNames } from "../../utils/networks";
+import DatePicker from "../DatePicker";
+import { subDays } from "date-fns";
 
 const types = {
     token: 'token',
@@ -88,7 +90,7 @@ class Rewards extends Component {
             successTitle: null,
             successName: null,
             hasLoad: false,
-            newUserData: {
+            rewardRangeStat: {
                     labels: newUser.map(data => data.time),
                     datasets: [{
                         data: newUser.map(data => data.amount),
@@ -898,10 +900,17 @@ class Rewards extends Component {
     handleCloseStats = () => this.setState({showStats: false});
     handleShowStats = async (reward) => {
         try {
+            const now = new Date()
+            const nowSub7 = subDays(new Date(), 7)
+            const isTodayOrYesterday = nowSub7.getDate() === now.getDate() && nowSub7.getMonth() === now.getMonth()
             const headers = new Headers();
             headers.append("Authorization", getBearerHeader())
             let query = new URLSearchParams();
             query.append('id', reward.id)
+            let queryWithDate = new URLSearchParams()
+            queryWithDate.append('id', reward.id)
+            queryWithDate.append("startDate", nowSub7.toString())
+            queryWithDate.append("endDate", now.toString())
             const requestOptions = {
                 method: 'GET',
                 headers: headers,
@@ -909,22 +918,33 @@ class Rewards extends Component {
               };
             const promises = [
                 fetch(`${config.api}/stat/rewarded_users/${reward.nft_id ? 'erc721' : 'erc20'}?` + query.toString(), requestOptions),
-                fetch(`${config.api}/stat/rewarded_24h/${reward.nft_id ? 'erc721' : 'erc20'}?` + query.toString(), requestOptions)
+                fetch(`${config.api}/stat/rewarded_24h/${reward.nft_id ? 'erc721' : 'erc20'}?` + query.toString(), requestOptions),
+                fetch(`${config.api}/stat/rewards_range/${reward.nft_id ? 'erc721' : 'erc20'}?` + queryWithDate.toString(), requestOptions)
             ]
             const responses = await Promise.all(promises)
             const promisesJson = [
                 responses[0].json(),
-                responses[1].json()
+                responses[1].json(),
+                responses[2].json()
             ]
             const jsons = await Promise.all(promisesJson)
             const jsonUsersTotal = jsons[0]
             const json24hTotal = jsons[1]
+            const jsonRange = jsons[2]
+            const range = {
+                labels: jsonRange.body.data.map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "") : new Date(v.date_interval_end).toLocaleDateString()}`),
+                datasets: [{
+                    data: jsonRange.body.data.map(v => parseInt(v.count)),
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                }]
+            }
             this.setState({
                 showStats: true, 
                 rewardForStat: reward, 
                 rewardForStatTotal: reward.count, 
                 rewardForStatUserTotal: jsonUsersTotal.body.data,
                 rewardForStatUser24h: json24hTotal.body.data,
+                rewardRangeStat: range
             })
         } catch (error) {
             console.log(error)
@@ -1547,8 +1567,9 @@ class Rewards extends Component {
                         </li>
                     </ul>
                         <div className="dashboard__chart mb-4">
+                            <DatePicker></DatePicker>
                             <div className="dashboard__chart_reward">
-                                <label className="chart__label">Token distribution statistic</label>
+                                <label className="chart__label">Distribution statistic</label>
                                 <div className="dashboard__chart_reward_wrapper mb-4" style={{position: 'relative', height:'356px', display: 'flex', justifyContent: 'center'}}>
                                     <LineChart chartData={this.state.totalUserData}></LineChart>
                                 </div>
@@ -1556,7 +1577,7 @@ class Rewards extends Component {
                             <div className="dashboard__chart_reward">
                                 <label className="chart__label">Statistics of the amount of awards</label>
                                 <div className="dashboard__chart_reward_wrapper mb-4" style={{position: 'relative', height:'356px', display: 'flex', justifyContent: 'center'}}>
-                                        <BarChart chartData={this.state.newUserData}></BarChart>
+                                        <BarChart chartData={this.state.rewardRangeStat}></BarChart>
                                 </div>
                             </div>
                         </div>
