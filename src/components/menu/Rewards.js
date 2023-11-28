@@ -106,7 +106,8 @@ class Rewards extends Component {
             toRewardNftId: null,
             rewardForStat: null,
             rewardForStatTotal: 0,
-            rewardForStatUserTotal: 0
+            rewardForStatUserTotal: 0,
+            rewardForStatUser24h: 0
         }
     }
 
@@ -907,19 +908,23 @@ class Rewards extends Component {
                 redirect: 'follow'
               };
             const promises = [
-                fetch(`${config.api}/stat/rewarded_users/${reward.nft_id ? 'erc721' : 'erc20'}?` + query.toString(), requestOptions)
+                fetch(`${config.api}/stat/rewarded_users/${reward.nft_id ? 'erc721' : 'erc20'}?` + query.toString(), requestOptions),
+                fetch(`${config.api}/stat/rewarded_24h/${reward.nft_id ? 'erc721' : 'erc20'}?` + query.toString(), requestOptions)
             ]
             const responses = await Promise.all(promises)
             const promisesJson = [
-                responses[0].json()
+                responses[0].json(),
+                responses[1].json()
             ]
             const jsons = await Promise.all(promisesJson)
             const jsonUsersTotal = jsons[0]
+            const json24hTotal = jsons[1]
             this.setState({
                 showStats: true, 
                 rewardForStat: reward, 
                 rewardForStatTotal: reward.count, 
-                rewardForStatUserTotal: jsonUsersTotal.body.data
+                rewardForStatUserTotal: jsonUsersTotal.body.data,
+                rewardForStatUser24h: json24hTotal.body.data,
             })
         } catch (error) {
             console.log(error)
@@ -1533,7 +1538,7 @@ class Rewards extends Component {
                         </li>
                         <li className="info__list-item_rewards info__list-item_dark-blue info__list-item">
                             <div className="info__content_left">
-                                <span className="info__content-amount">7 824</span>
+                                <span className="info__content-amount">{this.state.rewardForStatUser24h}</span>
                                 <span className="info__content-desc">Rewards in the last 24 hours</span>
                             </div>
                             <div className="info__content_right">
