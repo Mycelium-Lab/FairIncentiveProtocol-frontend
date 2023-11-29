@@ -78,7 +78,7 @@ class Users extends Component {
             hasLoad: false,
             isInvalidEmail: false,
             isInvalidAddress: false,
-            newUserData: {
+            tokenRewardRangeChart: {
                 labels: newUser.map(data => data.time),
                 datasets: [{
                     data: newUser.map(data => data.amount),
@@ -642,23 +642,23 @@ class Users extends Component {
               };
             const promises = [
                 fetch(`${config.api}/stat/rewards_distribution/erc721/user?` + queryWithDate.toString(), requestOptions),
-                // fetch(`${config.api}/stat/rewards_range/${reward.nft_id ? 'erc721' : 'erc20'}?` + queryWithDate.toString(), requestOptions),
+                fetch(`${config.api}/stat/rewards_range/erc20/user?` + queryWithDate.toString(), requestOptions),
             ]
             const responses = await Promise.all(promises)
             const promisesJson = [
                 responses[0].json(),
-                // responses[1].json()
+                responses[1].json()
             ]
             const jsons = await Promise.all(promisesJson)
             const jsonDist = jsons[0]
-            // const jsonRange = jsons[1]
-            // const range = {
-            //     labels: jsonRange.body.data.map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "") : new Date(v.date_interval_end).toLocaleDateString()}`),
-            //     datasets: [{
-            //         data: jsonRange.body.data.map(v => parseInt(v.count)),
-            //         backgroundColor: ['rgba(255, 159, 67, 0.85)']
-            //     }]
-            // }
+            const jsonRange = jsons[1]
+            const range = {
+                labels: jsonRange.body.data.map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "") : new Date(v.date_interval_end).toLocaleDateString()}`),
+                datasets: [{
+                    data: jsonRange.body.data.map(v => parseInt(v.count)),
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                }]
+            }
             const dist = {
                 labels: jsonDist.body.data.map(v => `${isTodayOrYesterday ? new Date(v.end_date).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "") : new Date(v.end_date).toLocaleDateString()} `),
                 datasets: [{
@@ -670,6 +670,7 @@ class Users extends Component {
             this.setState({
                 showStats: true,
                 edit_user: {...user},
+                tokenRewardRangeChart: range,
                 nftRewardDistChart: dist
             })
         } catch (error) {
@@ -1570,7 +1571,7 @@ class Users extends Component {
                             <div className="dashboard__chart_reward">
                                 <label className="chart__label">Token reward statistic</label>
                                 <div className="mb-4" style={{position: 'relative', width:'100%', display: 'flex', justifyContent: 'center', padding: '0 24px'}}>
-                                <BarChart chartData={this.state.newUserData}></BarChart>
+                                <BarChart chartData={this.state.tokenRewardRangeChart}></BarChart>
                                 </div>
                             </div>
                             <div className="dashboard__chart_reward">
