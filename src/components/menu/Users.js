@@ -22,6 +22,7 @@ import loader from '../../media/common/loader.svg'
 import errors from "../../errors";
 import { ethers } from "ethers";
 import ProgressModal from "../common/modals/progress";
+import DatePicker from "../DatePicker";
 
 let propertiesElementsLength = 0
 let statsElementsLength = 0
@@ -1105,20 +1106,38 @@ class Users extends Component {
                                           </td>
                                           <td>
                                               {
-                                                  v.nft_rewards?.length && v.token_rewards?.length 
-                                                  ? <>
-                                                      <div>
-                                                          NFTs: {v.nft_rewards?.length ? v.nft_rewards.map((reward, i, arr) => 
-                                                          `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
-                                                              ): null}
-                                                          </div>
-                                                          <div>
-                                                              Tokens: {v.token_rewards?.length ? v.token_rewards.map((reward, i, arr) => 
-                                                                  `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
-                                                              ): null}
-                                                          </div>
-                                                      </>
-                                              : '-'
+                                                v.nft_rewards?.length
+                                                ? 
+                                                <>
+                                                    <div>
+                                                        NFTs: {v.nft_rewards?.length ? v.nft_rewards.map((reward, i, arr) => 
+                                                        `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
+                                                            ): null}
+                                                        </div>
+                                                    
+                                                </>
+                                                : 
+                                                null
+                                              }
+                                              {
+                                                v.token_rewards?.length 
+                                                ?
+                                                <>
+                                                    <div>
+                                                    Tokens: {v.token_rewards?.length ? v.token_rewards.map((reward, i, arr) => 
+                                                        `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
+                                                    ): null}
+                                                    </div>
+                                                </>
+                                                :
+                                                null
+                                              }
+                                              {
+                                                !v.nft_rewards?.length && !v.token_rewards?.length 
+                                                ?
+                                                '-'
+                                                :
+                                                null
                                               }
                                           </td>
                                           <td>
@@ -1500,13 +1519,8 @@ class Users extends Component {
     
                             </FPTable>
                         </div>
-
-                        {
-                            /* 
-                            /* Выводить график, когда буду получать статистику по периоду
-                            this.state.edit_user?.token_rewards?.length 
-                            ?  
-                            <div className="dashboard__chart mb-4">
+                        <DatePicker></DatePicker>
+                        <div className="dashboard__chart mb-4">
                             <div className="dashboard__chart_reward">
                                 <label className="chart__label">Token reward statistic</label>
                                 <div className="mb-4" style={{position: 'relative', width:'100%', display: 'flex', justifyContent: 'center', padding: '0 24px'}}>
@@ -1520,9 +1534,7 @@ class Users extends Component {
                                 </div>
                             </div>
                         </div> 
-                            : null
-                            */
-                        }      
+                           
                     </Modal.Body>
                 </Modal>
                 <Modal show={this.state.showDelete} onHide={this.handleCloseDelete} centered>
