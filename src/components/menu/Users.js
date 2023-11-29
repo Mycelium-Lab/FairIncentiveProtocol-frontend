@@ -22,6 +22,9 @@ import loader from '../../media/common/loader.svg'
 import errors from "../../errors";
 import { ethers } from "ethers";
 import ProgressModal from "../common/modals/progress";
+import DatePicker from "../DatePicker";
+import { subDays } from "date-fns";
+import { typesOfDashboard } from "../../utils/constants";
 
 let propertiesElementsLength = 0
 let statsElementsLength = 0
@@ -76,14 +79,14 @@ class Users extends Component {
             hasLoad: false,
             isInvalidEmail: false,
             isInvalidAddress: false,
-            newUserData: {
+            tokenRewardRangeChart: {
                 labels: newUser.map(data => data.time),
                 datasets: [{
                     data: newUser.map(data => data.amount),
                     backgroundColor: ['rgba(255, 159, 67, 0.85)'],
                 }]
             },
-            totalUserData: {
+            nftRewardDistChart: {
                 labels: newUser.map(data => data.time),
                 datasets: [{
                     data: newUser.map(data => data.amount),
@@ -622,12 +625,111 @@ class Users extends Component {
             editStatsElements: statsElements
         })
     }
-    handleShowStats = (user) => {
-        this.getTokenRewards()
-        this.setState({
-            showStats: true,
-            edit_user: {...user} 
-        })
+
+    async changeOneUserRewardRanges(startDate, endDate) {
+        try {
+            const now = endDate
+            const nowSub7 = startDate
+            const isTodayOrYesterday = nowSub7.getDate() === now.getDate() && nowSub7.getMonth() === now.getMonth()
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+            let queryWithDate = new URLSearchParams()
+            queryWithDate.append('id', this.state.edit_user.id)
+            queryWithDate.append("startDate", nowSub7.toString())
+            queryWithDate.append("endDate", now.toString())
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+            };
+            const promises = [
+                fetch(`${config.api}/stat/rewards_distribution/erc721/user?` + queryWithDate.toString(), requestOptions),
+                fetch(`${config.api}/stat/rewards_range/erc20/user?` + queryWithDate.toString(), requestOptions),
+            ]
+            const responses = await Promise.all(promises)
+            const promisesJson = [
+                responses[0].json(),
+                responses[1].json()
+            ]
+            const jsons = await Promise.all(promisesJson)
+            const jsonDist = jsons[0]
+            const jsonRange = jsons[1]
+            const range = {
+                labels: jsonRange.body.data.map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "") : new Date(v.date_interval_end).toLocaleDateString()}`),
+                datasets: [{
+                    data: jsonRange.body.data.map(v => parseInt(v.count)),
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                }]
+            }
+            const dist = {
+                labels: jsonDist.body.data.map(v => `${isTodayOrYesterday ? new Date(v.end_date).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "") : new Date(v.end_date).toLocaleDateString()} `),
+                datasets: [{
+                    data: jsonDist.body.data.map(v => parseInt(v.count)),
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                }]
+            }
+            this.getTokenRewards()
+            this.setState({
+                tokenRewardRangeChart: range,
+                nftRewardDistChart: dist
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    handleShowStats = async (user) => {
+        try {
+            const now = new Date()
+            const nowSub7 = subDays(new Date(), 7)
+            const isTodayOrYesterday = nowSub7.getDate() === now.getDate() && nowSub7.getMonth() === now.getMonth()
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+            let queryWithDate = new URLSearchParams()
+            queryWithDate.append('id', user.id)
+            queryWithDate.append("startDate", nowSub7.toString())
+            queryWithDate.append("endDate", now.toString())
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const promises = [
+                fetch(`${config.api}/stat/rewards_distribution/erc721/user?` + queryWithDate.toString(), requestOptions),
+                fetch(`${config.api}/stat/rewards_range/erc20/user?` + queryWithDate.toString(), requestOptions),
+            ]
+            const responses = await Promise.all(promises)
+            const promisesJson = [
+                responses[0].json(),
+                responses[1].json()
+            ]
+            const jsons = await Promise.all(promisesJson)
+            const jsonDist = jsons[0]
+            const jsonRange = jsons[1]
+            const range = {
+                labels: jsonRange.body.data.map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "") : new Date(v.date_interval_end).toLocaleDateString()}`),
+                datasets: [{
+                    data: jsonRange.body.data.map(v => parseInt(v.count)),
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                }]
+            }
+            const dist = {
+                labels: jsonDist.body.data.map(v => `${isTodayOrYesterday ? new Date(v.end_date).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "") : new Date(v.end_date).toLocaleDateString()} `),
+                datasets: [{
+                    data: jsonDist.body.data.map(v => parseInt(v.count)),
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                }]
+            }
+            this.getTokenRewards()
+            this.setState({
+                showStats: true,
+                edit_user: {...user},
+                tokenRewardRangeChart: range,
+                nftRewardDistChart: dist
+            })
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     handleCloseEdit = () => this.setState({
@@ -877,6 +979,7 @@ class Users extends Component {
         }
     }
 
+    changeOneUserRewardRanges = this.changeOneUserRewardRanges.bind(this)
     handleCopy = this.handleCopy.bind(this)
     handleOutTooltip = this.handleOutTooltip.bind(this)
     onChangeExternalID = this.onChangeExternalID.bind(this)
@@ -1105,20 +1208,38 @@ class Users extends Component {
                                           </td>
                                           <td>
                                               {
-                                                  v.nft_rewards?.length && v.token_rewards?.length 
-                                                  ? <>
-                                                      <div>
-                                                          NFTs: {v.nft_rewards?.length ? v.nft_rewards.map((reward, i, arr) => 
-                                                          `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
-                                                              ): null}
-                                                          </div>
-                                                          <div>
-                                                              Tokens: {v.token_rewards?.length ? v.token_rewards.map((reward, i, arr) => 
-                                                                  `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
-                                                              ): null}
-                                                          </div>
-                                                      </>
-                                              : '-'
+                                                v.nft_rewards?.length
+                                                ? 
+                                                <>
+                                                    <div>
+                                                        NFTs: {v.nft_rewards?.length ? v.nft_rewards.map((reward, i, arr) => 
+                                                        `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
+                                                            ): null}
+                                                        </div>
+                                                    
+                                                </>
+                                                : 
+                                                null
+                                              }
+                                              {
+                                                v.token_rewards?.length 
+                                                ?
+                                                <>
+                                                    <div>
+                                                    Tokens: {v.token_rewards?.length ? v.token_rewards.map((reward, i, arr) => 
+                                                        `${reward.count} ${reward.count === 1 ? 'time' : 'times'} ${reward.reward_name}${i === (arr.length - 1) ? '.' : ';'}\n`
+                                                    ): null}
+                                                    </div>
+                                                </>
+                                                :
+                                                null
+                                              }
+                                              {
+                                                !v.nft_rewards?.length && !v.token_rewards?.length 
+                                                ?
+                                                '-'
+                                                :
+                                                null
                                               }
                                           </td>
                                           <td>
@@ -1500,29 +1621,22 @@ class Users extends Component {
     
                             </FPTable>
                         </div>
-
-                        {
-                            /* 
-                            /* Выводить график, когда буду получать статистику по периоду
-                            this.state.edit_user?.token_rewards?.length 
-                            ?  
-                            <div className="dashboard__chart mb-4">
+                        <DatePicker changeOneUserRewardRanges={this.changeOneUserRewardRanges} type={typesOfDashboard.user_ranges}></DatePicker>
+                        <div className="dashboard__chart mb-4">
                             <div className="dashboard__chart_reward">
                                 <label className="chart__label">Token reward statistic</label>
                                 <div className="mb-4" style={{position: 'relative', width:'100%', display: 'flex', justifyContent: 'center', padding: '0 24px'}}>
-                                <BarChart chartData={this.state.newUserData}></BarChart>
+                                <BarChart chartData={this.state.tokenRewardRangeChart}></BarChart>
                                 </div>
                             </div>
                             <div className="dashboard__chart_reward">
                                 <label className="chart__label">NFT reward statistic</label>
                                 <div className="mb-4" style={{position: 'relative', width:'100%', display: 'flex', justifyContent: 'center', padding: '0 24px'}}>
-                                <LineChart chartData={this.state.totalUserData}></LineChart>
+                                <LineChart chartData={this.state.nftRewardDistChart}></LineChart>
                                 </div>
                             </div>
                         </div> 
-                            : null
-                            */
-                        }      
+                           
                     </Modal.Body>
                 </Modal>
                 <Modal show={this.state.showDelete} onHide={this.handleCloseDelete} centered>
