@@ -23,6 +23,7 @@ import errors from "../../errors";
 import { ethers } from "ethers";
 import ProgressModal from "../common/modals/progress";
 import DatePicker from "../DatePicker";
+import { subDays } from "date-fns";
 
 let propertiesElementsLength = 0
 let statsElementsLength = 0
@@ -84,7 +85,7 @@ class Users extends Component {
                     backgroundColor: ['rgba(255, 159, 67, 0.85)'],
                 }]
             },
-            totalUserData: {
+            nftRewardDistChart: {
                 labels: newUser.map(data => data.time),
                 datasets: [{
                     data: newUser.map(data => data.amount),
@@ -623,12 +624,57 @@ class Users extends Component {
             editStatsElements: statsElements
         })
     }
-    handleShowStats = (user) => {
-        this.getTokenRewards()
-        this.setState({
-            showStats: true,
-            edit_user: {...user} 
-        })
+    handleShowStats = async (user) => {
+        try {
+            const now = new Date()
+            const nowSub7 = subDays(new Date(), 7)
+            const isTodayOrYesterday = nowSub7.getDate() === now.getDate() && nowSub7.getMonth() === now.getMonth()
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+            let queryWithDate = new URLSearchParams()
+            queryWithDate.append('id', user.id)
+            queryWithDate.append("startDate", nowSub7.toString())
+            queryWithDate.append("endDate", now.toString())
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const promises = [
+                fetch(`${config.api}/stat/rewards_distribution/erc721/user?` + queryWithDate.toString(), requestOptions),
+                // fetch(`${config.api}/stat/rewards_range/${reward.nft_id ? 'erc721' : 'erc20'}?` + queryWithDate.toString(), requestOptions),
+            ]
+            const responses = await Promise.all(promises)
+            const promisesJson = [
+                responses[0].json(),
+                // responses[1].json()
+            ]
+            const jsons = await Promise.all(promisesJson)
+            const jsonDist = jsons[0]
+            // const jsonRange = jsons[1]
+            // const range = {
+            //     labels: jsonRange.body.data.map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "") : new Date(v.date_interval_end).toLocaleDateString()}`),
+            //     datasets: [{
+            //         data: jsonRange.body.data.map(v => parseInt(v.count)),
+            //         backgroundColor: ['rgba(255, 159, 67, 0.85)']
+            //     }]
+            // }
+            const dist = {
+                labels: jsonDist.body.data.map(v => `${isTodayOrYesterday ? new Date(v.end_date).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "") : new Date(v.end_date).toLocaleDateString()} `),
+                datasets: [{
+                    data: jsonDist.body.data.map(v => parseInt(v.count)),
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                }]
+            }
+            this.getTokenRewards()
+            this.setState({
+                showStats: true,
+                edit_user: {...user},
+                nftRewardDistChart: dist
+            })
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     handleCloseEdit = () => this.setState({
@@ -1530,7 +1576,7 @@ class Users extends Component {
                             <div className="dashboard__chart_reward">
                                 <label className="chart__label">NFT reward statistic</label>
                                 <div className="mb-4" style={{position: 'relative', width:'100%', display: 'flex', justifyContent: 'center', padding: '0 24px'}}>
-                                <LineChart chartData={this.state.totalUserData}></LineChart>
+                                <LineChart chartData={this.state.nftRewardDistChart}></LineChart>
                                 </div>
                             </div>
                         </div> 
