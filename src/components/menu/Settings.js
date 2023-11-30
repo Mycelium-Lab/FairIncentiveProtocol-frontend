@@ -56,8 +56,13 @@ class Settings extends Component {
             showAddPaymentMethod: false,
             showDeletePaymentMethods: false,
             chosen_payment_method: null,
-            paymentMethods
+            paymentMethods,
+            apiKeys: []
         }
+    }
+
+    async componentDidMount() {
+        await this.getApiKeys()
     }
 
     onChangeName(event) {
@@ -94,6 +99,71 @@ class Settings extends Component {
         this.setState({
             repname: event.target.value
         })
+    }
+
+    async getApiKeys() {
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/api_keys`, requestOptions)
+            const json = await res.json()
+            this.setState({
+                apiKeys: json.body.data
+            })
+        } catch (error) {
+            
+        }
+    }
+
+    async createApiKey() {
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/api_keys/create`, requestOptions)
+            const json = await res.json()
+            const apiKeys = [...this.state.apiKeys, {key: json.body.data}]
+            this.setState({
+                apiKeys
+            })
+        } catch (error) {
+            
+        }
+    }
+
+    async revokeApiKey(key) {
+        try {
+            const headers = new Headers();
+            headers.append("Content-Type", "application/json");
+            headers.append("Authorization", getBearerHeader())
+            const raw = JSON.stringify({key})
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                body: raw,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/api_keys/delete`, requestOptions)
+            if (res.status == 200) {
+                const apiKeys = this.state.apiKeys.filter(v => v.key !== key)
+                this.setState({
+                    apiKeys
+                })
+            }
+        } catch (error) {
+            
+        }
     }
 
     async changeProfile () {
@@ -355,6 +425,9 @@ class Settings extends Component {
     deletePaymentMethods = this.deletePaymentMethods.bind(this)
     handleInvite = this.handleInvite.bind(this)
 
+    revokeApiKey = this.revokeApiKey.bind(this)
+    getApiKeys = this.getApiKeys.bind(this)
+    createApiKey = this.createApiKey.bind(this)
     handleCopy = this.handleCopy.bind(this)
     handleOutTooltip = this.handleOutTooltip.bind(this)
     handleAddNewPayment  = this.handleAddNewPayment.bind(this)
@@ -496,24 +569,29 @@ class Settings extends Component {
                                                                 </div>
                                         </div>
                                     </div>
-                                    <button className="btn btn_primary btn_orange">Create</button>
+                                    <button className="btn btn_primary btn_orange" onClick={this.createApiKey}>Create</button>
                             </div>
-                            <div className="form__groups_adaptive_secondary form__groups_adaptive form_row mb-4">
-                                <div className="form_col_last form_col">
-                                    <label className="form__label">API key #1: </label>
-                                    <div className="input-group">
-                                        <input type="text" value={'0xE8D562606F35CB14dA3E8faB1174F9B5AE8319c4'}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
-                                        <div className="tooltip-fp">
-                                            <button onClick={this.handleCopy} onMouseOut={this.handleOutTooltip} className="btn btn__copy btn_primary btn_orange ms-3">
-                                            <span class="tooltiptext">Copy to clipboard</span>
-                                            Copy
-                                            </button>
+                            {
+                                this.state.apiKeys.map(
+                                    (v, i) =>  
+                                    <div className="form__groups_adaptive_secondary form__groups_adaptive form_row mb-4">
+                                        <div className="form_col_last form_col">
+                                            <label className="form__label">API key #{i+1}: </label>
+                                            <div className="input-group">
+                                                <input type="text" value={v.key}  className="form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                                <div className="tooltip-fp">
+                                                    <button onClick={this.handleCopy} onMouseOut={this.handleOutTooltip} className="btn btn__copy btn_primary btn_orange ms-3">
+                                                    <span class="tooltiptext">Copy to clipboard</span>
+                                                    Copy
+                                                    </button>
+                                                </div>
+                                                <button className="btn btn__copy btn_primary btn_orange ms-3" onClick={() => this.revokeApiKey(v.key)}>Revoke</button>
+                                            </div>
                                         </div>
-                                        <button className="btn btn__copy btn_primary btn_orange ms-3">Revoke</button>
                                     </div>
-                                </div>
-                            </div>
-                            <div className="form__groups_adaptive_secondary form__groups_adaptive form_row mb-4">
+                                )
+                            }
+                            {/* <div className="form__groups_adaptive_secondary form__groups_adaptive form_row mb-4">
                                 <div className="form_col_last form_col">
                                     <label className="form__label">API key #2: </label>
                                     <div className="input-group">
@@ -549,7 +627,7 @@ class Settings extends Component {
                                     Save
                                 </button>
                             </div>
-                         </div>
+                            </div> */}
                         </div>
                         </div> 
                         </Tab>
