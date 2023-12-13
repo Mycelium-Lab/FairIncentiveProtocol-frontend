@@ -1235,7 +1235,7 @@ class Tokens extends Component {
                             </li>
                             <li className="walletl__list-item">
                                 <div>
-                                    <img src={walletconnect}></img>
+                                    {/* <img src={walletconnect}></img> */}
                                 </div>
                                 <p className="walletl__list-item-name">WalletConnect</p>
                             </li>
