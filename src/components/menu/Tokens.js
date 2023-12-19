@@ -1,6 +1,7 @@
 /* global BigInt */
 import { Component } from "react";
 import { ethers, ContractFactory } from "ethers";
+import { EthereumProvider } from "@walletconnect/ethereum-provider";
 import { Contract, Provider } from 'ethers-multicall';
 import { createLongStrView } from "../../utils/longStrView";
 import ERC20Mintable from "../../contracts/erc20/ERC20Mintable.json";
@@ -320,6 +321,39 @@ class Tokens extends Component {
                 }
               }
               this.handleCloseConfirm()
+    }
+
+    async connectWalletConnect() {
+        try {
+            const network = this.state.network
+            const provider = await EthereumProvider.init({
+                projectId: config.projectIdWalletConnect,
+                chains: [1, 97, 80001],
+                methods: ["personal_sign", "eth_sendTransaction"],
+                showQrModal: true,
+                qrModalOptions: {
+                    themeMode: "light",
+                },
+            });
+            
+            provider.on("display_uri", (uri) => {
+                console.log("display_uri", uri);
+            });
+
+            await provider.connect()
+    
+            const ethersWeb3Provider = new ethers.providers.Web3Provider(provider);
+            const signer = await ethersWeb3Provider.getSigner()
+            const address = await signer.getAddress()
+            this.setState({
+                provider: ethersWeb3Provider,
+                signer,
+                address,
+                stageOfCreateToken: 3
+            })
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     async changeNetwork(id) {
@@ -966,6 +1000,7 @@ class Tokens extends Component {
     onChangeSymbol = this.onChangeSymbol.bind(this)
     onChangeEmissionType = this.onChangeEmissionType.bind(this)
     connect = this.connect.bind(this)
+    connectWalletConnect = this.connectWalletConnect.bind(this)
     createToken = this.createToken.bind(this)
     getTokens = this.getTokens.bind(this)
     getToken = this.getToken.bind(this)
@@ -1233,9 +1268,9 @@ class Tokens extends Component {
                                 </div>
                                 <p  className="walletl__list-item-name">MetaMask</p>
                             </li>
-                            <li className="walletl__list-item">
+                            <li className="walletl__list-item" onClick={this.connectWalletConnect}>
                                 <div>
-                                    {/* <img src={walletconnect}></img> */}
+                                    <img src={walletconnect}></img>
                                 </div>
                                 <p className="walletl__list-item-name">WalletConnect</p>
                             </li>
