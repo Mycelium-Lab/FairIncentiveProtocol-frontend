@@ -33,6 +33,7 @@ import loader from '../../media/common/loader.svg';
 import metamask from '../../media/common/metamask.svg'
 import walletconnect from '../../media/common/walletconnect.svg'
 import Select from "react-select";
+import { EthereumProvider } from "@walletconnect/ethereum-provider";
 
 const beneficialTypes = {
     company: "company",
@@ -301,6 +302,48 @@ class NFTCollections extends Component {
                 }
               }
               this.handleCloseConfirm()
+    }
+
+    async connectWalletConnect() {
+        try {
+            const network = this.state.network
+            const provider = await EthereumProvider.init({
+                projectId: config.projectIdWalletConnect,
+                chains: [1],
+                optionalChains: [97, 80001],
+                rpcMap: {
+                    '97': 'https://bsc-testnet.publicnode.com',
+                    '80001': 'https://rpc-mumbai.maticvigil.com',
+                },
+                methods: ["personal_sign", "eth_sendTransaction"],
+                showQrModal: true,
+                qrModalOptions: {
+                    themeMode: "light",
+                },
+            });
+            
+            provider.on("display_uri", (uri) => {
+                console.log("display_uri", uri);
+            });
+
+            await provider.connect()
+            await provider.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
+            })
+    
+            const ethersWeb3Provider = new ethers.providers.Web3Provider(provider);
+            const signer = await ethersWeb3Provider.getSigner()
+            const address = await signer.getAddress()
+            this.setState({
+                provider: ethersWeb3Provider,
+                signer,
+                address,
+                stageOfCreateNftCollection: 3
+            })
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     nextStage () {
@@ -729,6 +772,7 @@ class NFTCollections extends Component {
     onChangeName = this.onChangeName.bind(this)
     onChangeSymbol = this.onChangeSymbol.bind(this)
     connect = this.connect.bind(this)
+    connectWalletConnect = this.connectWalletConnect.bind(this)
     createNFTCollection = this.createNFTCollection.bind(this)
     createNFT = this.createNFT.bind(this)
     getNFTCollections = this.getNFTCollections.bind(this)
@@ -917,7 +961,7 @@ class NFTCollections extends Component {
                                 </div>
                                 <p  className="walletl__list-item-name">MetaMask</p>
                             </li>
-                            <li className="walletl__list-item">
+                            <li className="walletl__list-item" onClick={this.connectWalletConnect}>
                                 <div>
                                     <img src={walletconnect}></img>
                                 </div>

@@ -219,3 +219,27 @@ export const networksNames = {
         justCallSigner: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
     }
 } 
+
+export const networkForWalletConnect = [
+    {
+        chainId: 1,
+        name: 'Ethereum',
+        currency: 'ETH',
+        explorerUrl: 'https://etherscan.io',
+        rpcUrl: 'https://mainnet.infura.io/v3/'
+    },
+    {
+        chainId: 97,
+        name: 'BNB Test',
+        currency: 'tBNB',
+        explorerUrl: 'https://testnet.bscscan.com',
+        rpcUrl: 'https://bsc-testnet.publicnode.com'
+    },
+    {
+        chainId: 80001,
+        name: 'Mumbai',
+        currency: 'tMATIC',
+        explorerUrl: 'https://mumbai.polygonscan.com',
+        rpcUrl: 'https://rpc-mumbai.maticvigil.com'
+    }
+]
