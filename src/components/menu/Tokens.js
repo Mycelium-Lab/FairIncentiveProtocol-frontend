@@ -328,7 +328,13 @@ class Tokens extends Component {
             const network = this.state.network
             const provider = await EthereumProvider.init({
                 projectId: config.projectIdWalletConnect,
-                chains: [1, 97, 80001],
+                chains: [1],
+                optionalChains: [97, 80001],
+                rpcMap: {
+                    '1': 'https://mainnet.infura.io/v3/',
+                    '97': 'https://bsc-testnet.publicnode.com',
+                    '80001': 'https://rpc-mumbai.maticvigil.com',
+                },
                 methods: ["personal_sign", "eth_sendTransaction"],
                 showQrModal: true,
                 qrModalOptions: {
@@ -341,6 +347,10 @@ class Tokens extends Component {
             });
 
             await provider.connect()
+            await provider.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
+            })
     
             const ethersWeb3Provider = new ethers.providers.Web3Provider(provider);
             const signer = await ethersWeb3Provider.getSigner()
