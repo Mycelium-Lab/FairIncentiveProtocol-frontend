@@ -331,7 +331,6 @@ class Tokens extends Component {
                 chains: [1],
                 optionalChains: [97, 80001],
                 rpcMap: {
-                    '1': 'https://mainnet.infura.io/v3/',
                     '97': 'https://bsc-testnet.publicnode.com',
                     '80001': 'https://rpc-mumbai.maticvigil.com',
                 },
