@@ -482,7 +482,11 @@ class Tokens extends Component {
             let provider = new ethers.providers.Web3Provider(window.ethereum)
             let chainid = (await provider.getNetwork()).chainId
             if (chainid.toString() !== currentTokenChainid) {
-                await this.changeNetwork(currentTokenChainid)
+                this.handleShowConfirm('Connect', 'Confirm the network change', 'Please, confirm the network change in your wallet')
+                await window.ethereum.request({
+                  method: 'wallet_switchEthereumChain',
+                  params: [{ chainId: ethers.utils.hexValue(parseInt(currentTokenChainid)) }]
+                })
                 provider = new ethers.providers.Web3Provider(window.ethereum)
             }
             await provider.send("eth_requestAccounts", [])
