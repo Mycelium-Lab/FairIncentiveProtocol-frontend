@@ -4,12 +4,13 @@
     gap: 24px;
 }
 
-.profile__cover{
+.profile__head{
     position: relative;
-    background-image: url('../media/collectionDetail/default-profile-head.png');
+}
+.profile__cover{
+    object-fit: cover;
     height: 200px;
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
+    width: 100%;
 }
 
 .profile__photo{

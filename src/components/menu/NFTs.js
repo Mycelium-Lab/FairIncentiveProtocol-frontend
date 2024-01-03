@@ -119,8 +119,8 @@ class NFTs extends Component {
                 <div className="content__wrap">
                   <div className="collection-detail__wrap">
                     <div className="profile__head">
-                        <img src={this.state.nftCollection ? this.state.nftCollection.banner_image : ''}/>
-                        <img src={this.state.nftCollection ? this.state.nftCollection.logo_image : ''}/>
+                        <img className="profile__cover" src={this.state.nftCollection ? this.state.nftCollection.banner_image : ''}/>
+                        <img className="profile__photo" src={this.state.nftCollection ? this.state.nftCollection.logo_image : ''}/>
                     </div>
                     <div className="profile__social">
                         <ul className="profile__social-list unlist">

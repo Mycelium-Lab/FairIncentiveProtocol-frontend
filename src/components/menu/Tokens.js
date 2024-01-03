@@ -135,7 +135,8 @@ class Tokens extends Component {
                     borderColor: ['rgba(255, 159, 67, 0.85)'],
                 }]
             },
-            file: null
+            file: null,
+            imgSrc: ''
         }
     }
 
@@ -959,6 +960,13 @@ class Tokens extends Component {
     }
     handleCloseBurn = () => this.setState({showBurn: false, currentTokenSymbol: null, currentTokenAddress: null, currentTokenChainid: null, currentToken: null})
     handleImage = (file) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onloadend = function (e) {
+            this.setState({
+                imgSrc: reader.result
+            })
+        }.bind(this);
         this.setState({file})
     }
     handleImage = this.handleImage.bind(this)
@@ -1145,8 +1153,17 @@ class Tokens extends Component {
 
                             <div className="form_row mb-4">
                                 <div className="form_col_last form_col">
-                                <label className="form__label_disbaled form__label">Upload a picture of the token </label>
+                                <label className="form__label">Upload a picture of the token </label>
                                     <FileUpload handleImage={this.handleImage}></FileUpload>
+                                    <div className="mt-4">
+                                    <img src={this.state.imgSrc} />
+                                        {
+                                            this.state.file &&
+                                            <p>
+                                                {this.state.file.name}
+                                            </p>
+                                        }
+                                    </div>
                                 </div>
                             </div>
                         </div>

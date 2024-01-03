@@ -21,7 +21,12 @@
     align-items: center;
     gap: 8px;
 }
-
+.nft__collection-name img {
+    width: 50px;
+    height: auto;
+    object-fit: cover;
+    object-position: 50% 50%;
+}
 .website-icon, .instagram-icon, .telegram-icon, 
 .medium-icon, .facebook-icon, .discord-icon,
 .other-icon{
