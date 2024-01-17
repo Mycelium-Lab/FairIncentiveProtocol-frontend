@@ -114,6 +114,16 @@ class MainScreen extends Component {
         }
     }
 
+    removeProvider() {
+        console.log('disconnect')
+        this.setState({
+            provider: null,
+            signer: null,
+            address: null,
+            chainid: null
+        })
+    } 
+
     getProvider(provider, signer, address, chainid) {
         this.setState({
             provider,
@@ -148,6 +158,7 @@ class MainScreen extends Component {
     setAddress = this.setAddress.bind(this)
     setChainid = this.setChainid.bind(this)
     sendProvider = this.sendProvider.bind(this)
+    removeProvider = this.removeProvider.bind(this)
 
     render() {
         return (
@@ -160,6 +171,12 @@ class MainScreen extends Component {
                     settings={switcher.settings} 
                     onSwitch={this.onSwitch}
                     getProvider={this.getProvider}
+                    sendProvider={this.sendProvider}
+                    removeProvider={this.removeProvider}
+                    setChainid={this.setChainid} 
+                    setProvider={this.setProvider} 
+                    setSigner={this.setSigner} 
+                    setAddress={this.setAddress}
                     >
                     </Header>
                 <div className="middle">

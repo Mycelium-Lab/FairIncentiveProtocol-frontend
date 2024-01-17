@@ -45,6 +45,19 @@ class Header extends Component {
     handleShowSidebar() {
         this.props.changeShowSidebar(!this.props.showSidebar)
     }
+
+    addProvider() {
+        const providerData = this.props.sendProvider()
+        if (providerData.provider) {
+            this.setState({
+                provider: providerData.provider,
+                signer: providerData.signer,
+                address: providerData.address,
+                chainid: providerData.chainid
+            })
+        } 
+    }
+
     handleNotifications() {
         this.props.onSwitch(this.props.notifications)
     }
@@ -92,6 +105,7 @@ class Header extends Component {
             signer: null,
             address: null
         })
+        this.props.removeProvider()
     }
 
     async connect() {
@@ -149,6 +163,7 @@ class Header extends Component {
     changeNetwork = this.changeNetwork.bind(this)
     handleShowConfirm = this.handleShowConfirm.bind(this)
     handleCloseConfirm = this.handleCloseConfirm.bind(this)
+    addProvider = this.addProvider.bind(this)
 
     render() {
         const {userName, showSidebar} = this.props
@@ -199,7 +214,7 @@ class Header extends Component {
                             </FPDropdown>
                         </div>
                         <span className="devider"></span>
-                        <div className="header-right__user">
+                        <div onClick={this.addProvider} className="header-right__user">
                             <img className="header-right__user_avatar" src={user}></img>
                             <FPDropdown label={window.innerWidth < 769 ? null : userName} icon={window.innerWidth < 769 ? more  : chevron} isTransformIcon={true}>
                                 <Dropdown.Item className="dropdown__menu-item_profile dropdown__menu-iten">                                
