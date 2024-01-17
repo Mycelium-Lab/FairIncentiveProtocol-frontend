@@ -50,6 +50,30 @@ class MainScreen extends Component {
         }
     }
 
+    setProvider(provider) {
+        this.setState({
+            provider
+        })
+    }
+
+    setSigner(signer) {
+        this.setState({
+            signer
+        })
+    }
+
+    setAddress(address) {
+        this.setState({
+            address
+        })
+    }
+
+    setChainid(chainid) {
+        this.setState({
+            chainid
+        })
+    }
+
     onSwitch(value) {
         this.setState({
             switcher: value
@@ -60,9 +84,9 @@ class MainScreen extends Component {
         if (this.state.switcher === switcher.dashboard) return <Dashboard/>
         if (this.state.switcher === switcher.rewards) return <Rewards switcher={switcher} onSwitch={this.onSwitch} goToCreationPage={this.goToCreationPage} isGoToCreationPage={this.state.isGoToCreationPage}/>
         if (this.state.switcher === switcher.reward_events) return <RewardEvents switcher={switcher} onSwitch={this.onSwitch}/>
-        if (this.state.switcher === switcher.tokens) return <Tokens isGoToCreationPage={this.state.isGoToCreationPage} wallet={{provider: this.state.provider,signer: this.state.signer,address: this.state.address,chainid: this.state.chainid}}/>
+        if (this.state.switcher === switcher.tokens) return <Tokens sendProvider={this.sendProvider} setChainid={this.setChainid} setProvider={this.setProvider} setSigner={this.setSigner} setAddress={this.setAddress} isGoToCreationPage={this.state.isGoToCreationPage} wallet={{provider: this.state.provider,signer: this.state.signer,address: this.state.address,chainid: this.state.chainid}}/>
         if (this.state.switcher === switcher.users) return <Users switcher={switcher} onSwitch={this.onSwitch} goToCreationPage={this.goToCreationPage} isGoToCreationPage={this.state.isGoToCreationPage}/>
-        if (this.state.switcher === switcher.nftcollection) return <NFTCollections auth={this.state.auth} switcher={switcher} onSwitch={this.onSwitch} isGoToCreationPage={this.state.isGoToCreationPage} creationPagePayload={this.state.creationPagePayload} getNeftCollection={this.getNeftCollection} wallet={{provider: this.state.provider,signer: this.state.signer,address: this.state.address,chainid: this.state.chainid}}/>
+        if (this.state.switcher === switcher.nftcollection) return <NFTCollections sendProvider={this.sendProvider} setChainid={this.setChainid} setProvider={this.setProvider} setSigner={this.setSigner} setAddress={this.setAddress} auth={this.state.auth} switcher={switcher} onSwitch={this.onSwitch} isGoToCreationPage={this.state.isGoToCreationPage} creationPagePayload={this.state.creationPagePayload} getNeftCollection={this.getNeftCollection} wallet={{provider: this.state.provider,signer: this.state.signer,address: this.state.address,chainid: this.state.chainid}}/>
         if (this.state.switcher === switcher.nft) return <NFTs switcher={switcher} onSwitch={this.onSwitch} collection={this.state.nftcollection}/>
         if (this.state.switcher === switcher.settings) return <Settings auth={this.state.auth}/>
         if (this.state.switcher === switcher.notifications) return <Notifications />
@@ -79,6 +103,15 @@ class MainScreen extends Component {
             isGoToCreationPage: page,
             creationPagePayload: payload
         })
+    }
+
+    sendProvider() {
+        return {
+            provider: this.state.provider,
+            signer: this.state.signer,
+            address: this.state.address,
+            chainid: this.state.chainid
+        }
     }
 
     getProvider(provider, signer, address, chainid) {
@@ -110,6 +143,11 @@ class MainScreen extends Component {
     changeShowSidebar = this.changeShowSidebar.bind(this)
     getProvider = this.getProvider.bind(this)
     getNeftCollection = this.getNeftCollection.bind(this)
+    setProvider = this.setProvider.bind(this)
+    setSigner = this.setSigner.bind(this)
+    setAddress = this.setAddress.bind(this)
+    setChainid = this.setChainid.bind(this)
+    sendProvider = this.sendProvider.bind(this)
 
     render() {
         return (

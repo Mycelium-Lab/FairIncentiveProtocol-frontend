@@ -291,6 +291,10 @@ class Tokens extends Component {
             await provider.send("eth_requestAccounts", [])
             const signer = await provider.getSigner()
             const address = await signer.getAddress()
+        this.props.setProvider(provider)
+        this.props.setSigner(signer)
+        this.props.setAddress(address)
+        this.props.setChainid(network.chainid)
             try {
                 this.handleShowConfirm('Connect', 'Confirm the network change', 'Please, confirm the network change in your wallet')
                 await window.ethereum.request({
@@ -324,6 +328,24 @@ class Tokens extends Component {
               this.handleCloseConfirm()
     }
 
+    stayOnPreviousWallet() {
+        try {
+            const providerData = this.props.sendProvider()
+            if (providerData.provider) {
+                this.setState({
+                    provider: providerData.provider,
+                    signer: providerData.signer,
+                    address: providerData.address,
+                    chainid: providerData.chainid
+                })
+            } else {
+                alert('No setted provider')
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     async connectWalletConnect() {
         try {
             const network = this.state.network
@@ -355,6 +377,11 @@ class Tokens extends Component {
             const ethersWeb3Provider = new ethers.providers.Web3Provider(provider);
             const signer = await ethersWeb3Provider.getSigner()
             const address = await signer.getAddress()
+            this.props.setProvider(ethersWeb3Provider)
+            this.props.setSigner(signer)
+            this.props.setAddress(address)
+            this.props.setChainid(network.chainid)
+            
             this.setState({
                 provider: ethersWeb3Provider,
                 signer,
@@ -1075,6 +1102,7 @@ class Tokens extends Component {
     deleteFinancelManagerInput = this.deleteFinancelManagerInput.bind(this)
     changeFinancelValue = this.changeFinancelValue.bind(this)
     changeMintinglValue = this.changeMintinglValue.bind(this)
+    stayOnPreviousWallet = this.stayOnPreviousWallet.bind(this)
 
     render() {
         return (
@@ -1288,6 +1316,12 @@ class Tokens extends Component {
                          <h4 className="menu__title-secondary">Choose a wallet connection method</h4>
                          <span className="menu__subtitle">To create a token, you need to complete a transaction using a cryptocurrency wallet</span>
                          <ul className="walletl__list unlist">
+                            <li className="walletl__list-item">
+                                <div onClick={this.stayOnPreviousWallet}>
+                                     <img src="#"></img>
+                                </div>
+                                <p  className="walletl__list-item-name">Stay on previously used wallet</p>
+                            </li>
                             <li className="walletl__list-item" onClick={this.connect}>
                                 <div>
                                      <img src={metamask}></img>
