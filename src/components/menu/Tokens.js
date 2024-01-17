@@ -274,6 +274,15 @@ class Tokens extends Component {
 
     nextStage () {
         this.setState({stageOfCreateToken: this.state.stageOfCreateToken + 1 })
+        const providerData = this.props.sendProvider()
+        if (providerData.provider) {
+            this.setState({
+                provider: providerData.provider,
+                signer: providerData.signer,
+                address: providerData.address,
+                chainid: providerData.chainid
+            })
+        }
     }
     prevStage () {
         if(this.state.stageOfCreateToken === 1) {
@@ -1316,12 +1325,12 @@ class Tokens extends Component {
                          <h4 className="menu__title-secondary">Choose a wallet connection method</h4>
                          <span className="menu__subtitle">To create a token, you need to complete a transaction using a cryptocurrency wallet</span>
                          <ul className="walletl__list unlist">
-                            <li className="walletl__list-item">
+                            {/* <li className="walletl__list-item">
                                 <div onClick={this.stayOnPreviousWallet}>
                                      <img src="#"></img>
                                 </div>
                                 <p  className="walletl__list-item-name">Stay on previously used wallet</p>
-                            </li>
+                            </li> */}
                             <li className="walletl__list-item" onClick={this.connect}>
                                 <div>
                                      <img src={metamask}></img>

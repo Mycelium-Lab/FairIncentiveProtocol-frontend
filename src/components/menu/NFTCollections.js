@@ -268,40 +268,44 @@ class NFTCollections extends Component {
     async connect() {
         const network = this.state.network
         const provider = new ethers.providers.Web3Provider(window.ethereum, "any")
-            await provider.send("eth_requestAccounts", [])
-            const signer = await provider.getSigner()
-            const address = await signer.getAddress()
-            try {
-                this.handleShowConfirm('Connect', 'Confirm the network change', 'Please, confirm the network change in your wallet')
+        await provider.send("eth_requestAccounts", [])
+        const signer = await provider.getSigner()
+        const address = await signer.getAddress()
+        this.props.setProvider(provider)
+        this.props.setSigner(signer)
+        this.props.setAddress(address)
+        this.props.setChainid(network.chainid)
+        try {
+            this.handleShowConfirm('Connect', 'Confirm the network change', 'Please, confirm the network change in your wallet')
+            await window.ethereum.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
+            })
+            // .then(() => window.location.reload())
+            this.setState({
+                provider,
+                signer,
+                address,
+                stageOfCreateNftCollection: 3
+            })
+        } catch (err) {
+            console.log(err)
+            if (err.code === 4902) {
                 await window.ethereum.request({
-                  method: 'wallet_switchEthereumChain',
-                  params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
+                method: 'wallet_addEthereumChain',
+                params: [
+                    {
+                    chainName: network.name,
+                    chainId: ethers.utils.hexValue(parseInt(network.chainid)),
+                    nativeCurrency: { name: network.currency_symbol, decimals: 18, symbol: network.currency_symbol},
+                    rpcUrls: [network.rpc]
+                    }
+                ]
                 })
-                // .then(() => window.location.reload())
-                this.setState({
-                    provider,
-                    signer,
-                    address,
-                    stageOfCreateNftCollection: 3
-                })
-              } catch (err) {
-                console.log(err)
-                if (err.code === 4902) {
-                  await window.ethereum.request({
-                    method: 'wallet_addEthereumChain',
-                    params: [
-                      {
-                        chainName: network.name,
-                        chainId: ethers.utils.hexValue(parseInt(network.chainid)),
-                        nativeCurrency: { name: network.currency_symbol, decimals: 18, symbol: network.currency_symbol},
-                        rpcUrls: [network.rpc]
-                      }
-                    ]
-                  })
-                //   .then(() => window.location.reload())
-                }
-              }
-              this.handleCloseConfirm()
+            //   .then(() => window.location.reload())
+            }
+        }
+        this.handleCloseConfirm()
     }
 
     async connectWalletConnect() {
@@ -335,6 +339,10 @@ class NFTCollections extends Component {
             const ethersWeb3Provider = new ethers.providers.Web3Provider(provider);
             const signer = await ethersWeb3Provider.getSigner()
             const address = await signer.getAddress()
+            this.props.setProvider(ethersWeb3Provider)
+            this.props.setSigner(signer)
+            this.props.setAddress(address)
+            this.props.setChainid(network.chainid)
             this.setState({
                 provider: ethersWeb3Provider,
                 signer,
@@ -348,6 +356,15 @@ class NFTCollections extends Component {
 
     nextStage () {
         this.setState({stageOfCreateNftCollection: this.state.stageOfCreateNftCollection + 1 })
+        const providerData = this.props.sendProvider()
+        if (providerData.provider) {
+            this.setState({
+                provider: providerData.provider,
+                signer: providerData.signer,
+                address: providerData.address,
+                chainid: providerData.chainid
+            })
+        }
     }
     prevStage () {
         if(this.state.stageOfCreateNftCollection === 1) {
@@ -1264,7 +1281,7 @@ class NFTCollections extends Component {
                             <button className="btn btn_pre-sm  btn_primary btn_gray" onClick={this.prevStage}>
                                     Back
                                 </button>
-                                <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.createNFTCollection}>
+                                <button className="btn btn_pre-sm  btn_primary btn_orange" onClick={this.nextStage}>
                                     Create
                                 </button>
                             </div>
