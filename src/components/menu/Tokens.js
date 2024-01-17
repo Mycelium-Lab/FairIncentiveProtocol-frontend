@@ -483,7 +483,11 @@ class Tokens extends Component {
             let provider = new ethers.providers.Web3Provider(window.ethereum)
             let chainid = (await provider.getNetwork()).chainId
             if (chainid.toString() !== currentTokenChainid) {
-                await this.changeNetwork(currentTokenChainid)
+                this.handleShowConfirm('Connect', 'Confirm the network change', 'Please, confirm the network change in your wallet')
+                await window.ethereum.request({
+                  method: 'wallet_switchEthereumChain',
+                  params: [{ chainId: ethers.utils.hexValue(parseInt(currentTokenChainid)) }]
+                })
                 provider = new ethers.providers.Web3Provider(window.ethereum)
             }
             await provider.send("eth_requestAccounts", [])
@@ -726,33 +730,29 @@ class Tokens extends Component {
         this.setState({showCreate: true, stageOfCreateToken: 1})
     }
     handleShowMint = async (currentTokenSymbol, currentTokenAddress, currentTokenChainid) => {
-        this.setState({showMint: true, showLoading: true})
-        let provider = new ethers.providers.Web3Provider(window.ethereum)
-        const chainid = (await provider.getNetwork()).chainId
-        if (chainid.toString() !== currentTokenChainid) {
-            await this.changeNetwork(currentTokenChainid)
-            provider = new ethers.providers.Web3Provider(window.ethereum)
-        }
-        await provider.send("eth_requestAccounts", [])
-        const signer = await provider.getSigner()
-        const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
-        const tokenUsual = Token.attach(currentTokenAddress)  
-        const totalSupply = BigInt((await tokenUsual.totalSupply()).toString())
-        let cap;
-        let mintTokenAvailableToMint = BigInt(0);
         try {
-            cap = await tokenUsual.cap()
-            cap = BigInt(cap.toString())
-            mintTokenAvailableToMint = cap - totalSupply
+            this.setState({showMint: true, showLoading: true})
+            let provider = new ethers.providers.JsonRpcProvider(networks[`${currentTokenChainid}`].rpc)
+            const token = new ethers.Contract(currentTokenAddress, ERC20Universal.abi, provider)
+            const totalSupply = BigInt((await token.totalSupply()).toString())
+            let cap;
+            let mintTokenAvailableToMint = BigInt(0);
+            try {
+                cap = await token.cap()
+                cap = BigInt(cap.toString())
+                mintTokenAvailableToMint = cap - totalSupply
+            } catch (error) {
+                cap = BigInt(0)
+            }
+            this.setState({
+                currentTokenSymbol, currentTokenAddress, currentTokenChainid, 
+                mintTokenTotalSupply: ethers.utils.formatEther(totalSupply.toString()), mintTokenMaxSupply: ethers.utils.formatEther(cap.toString()),
+                showLoading: false, mintTokenAvailableToMint: ethers.utils.formatEther(mintTokenAvailableToMint.toString())
+            })
         } catch (error) {
-            cap = BigInt(0)
+            console.log(error)
+            this.setState({showMint: false, showLoading: false})
         }
-        // const 
-        this.setState({
-            currentTokenSymbol, currentTokenAddress, currentTokenChainid, 
-            mintTokenTotalSupply: ethers.utils.formatEther(totalSupply.toString()), mintTokenMaxSupply: ethers.utils.formatEther(cap.toString()),
-            showLoading: false, mintTokenAvailableToMint: ethers.utils.formatEther(mintTokenAvailableToMint.toString())
-        })
     }
     handleCloseMint = () => this.setState({showMint: false, mintTokenAmount: null, chosen_mint_type: null, destinationAddress: null, isInvalidAddress: false})
 
