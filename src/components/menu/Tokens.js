@@ -381,7 +381,7 @@ class Tokens extends Component {
             this.props.setSigner(signer)
             this.props.setAddress(address)
             this.props.setChainid(network.chainid)
-            
+
             this.setState({
                 provider: ethersWeb3Provider,
                 signer,
@@ -1246,7 +1246,7 @@ class Tokens extends Component {
                                 <div className="form_col_last form_col">
                                     <label className="form__label_disbaled form__label">Decimals <img src={infoDisabled} className="form__icon-info"/></label>
                                         <div className="input-group">
-                                        <input onChange={this.onChangeMaxSupply} disabled type="number" placeholder="1 000 000" className="form-control_disabled form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        <input onChange={this.onChangeMaxSupply} disabled type="number" placeholder="18" className="form-control_disabled form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                         </div>
                                     <div className="form__prompt_disabled form__prompt" id="basic-addon4">Insert the decimals precision of your token</div>
                                 </div>
