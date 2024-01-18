@@ -128,6 +128,7 @@ class Header extends Component {
 
     async connectWalletConnect() {
         try {
+            this.handleCloseConnect()
             const provider = await EthereumProvider.init({
                 projectId: config.projectIdWalletConnect,
                 chains: [1],
@@ -160,7 +161,6 @@ class Header extends Component {
                 signer,
                 address
             })
-            this.handleCloseConnect()
         } catch (error) {
             console.log(error)
         }
