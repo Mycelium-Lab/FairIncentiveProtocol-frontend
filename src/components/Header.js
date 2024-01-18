@@ -15,6 +15,9 @@ import Modal from 'react-bootstrap/Modal';
 import { networks } from "../utils/networks";
 import info from '../media/common/info-small.svg'
 import ConfirmModal from "./common/modals/confirm";
+import metamask from '../media/common/metamask.svg'
+import walletconnect from '../media/common/walletconnect.svg'
+import { EthereumProvider } from "@walletconnect/ethereum-provider";
 
 class Header extends Component {
     constructor(props) {
@@ -109,45 +112,58 @@ class Header extends Component {
     }
 
     async connect() {
-        const network = this.state.network
-        const provider = new ethers.providers.Web3Provider(window.ethereum, "any")
+        try {
+            const provider = new ethers.providers.Web3Provider(window.ethereum, "any")
             await provider.send("eth_requestAccounts", [])
             const signer = await provider.getSigner()
             const address = await signer.getAddress()
-            const chainid = network.chainid
-            try {
-                this.handleShowConfirm('Connect', 'Confirm the network change', 'Please, confirm the network change in your wallet')
-                await window.ethereum.request({
-                  method: 'wallet_switchEthereumChain',
-                  params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
-                })
-                // .then(() => window.location.reload())
-                localStorage.setItem('account',address )
-                this.setState({
-                    provider,
-                    signer,
-                    address,
-                    chainid,
-                }, () => this.props.getProvider(provider, signer, address, chainid))
-              } catch (err) {
-                console.log(err)
-                if (err.code === 4902) {
-                  await window.ethereum.request({
-                    method: 'wallet_addEthereumChain',
-                    params: [
-                      {
-                        chainName: network.name,
-                        chainId: ethers.utils.hexValue(parseInt(network.chainid)),
-                        nativeCurrency: { name: network.currency_symbol, decimals: 18, symbol: network.currency_symbol},
-                        rpcUrls: [network.rpc]
-                      }
-                    ]
-                  })
-                //   .then(() => window.location.reload())
-                }
-              }
-              this.handleCloseConfirm()
-              this.handleCloseConnect()
+            this.props.setProvider(provider)
+            this.props.setSigner(signer)
+            this.props.setAddress(address)
+            this.handleCloseConnect()
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async connectWalletConnect() {
+        try {
+            const provider = await EthereumProvider.init({
+                projectId: config.projectIdWalletConnect,
+                chains: [1],
+                optionalChains: [97, 80001],
+                rpcMap: {
+                    '97': 'https://bsc-testnet.publicnode.com',
+                    '80001': 'https://rpc-mumbai.maticvigil.com',
+                },
+                methods: ["personal_sign", "eth_sendTransaction"],
+                showQrModal: true,
+                qrModalOptions: {
+                    themeMode: "light",
+                },
+            });
+            
+            provider.on("display_uri", (uri) => {
+                console.log("display_uri", uri);
+            });
+
+            await provider.connect()
+    
+            const ethersWeb3Provider = new ethers.providers.Web3Provider(provider);
+            const signer = await ethersWeb3Provider.getSigner()
+            const address = await signer.getAddress()
+            this.props.setProvider(ethersWeb3Provider)
+            this.props.setSigner(signer)
+            this.props.setAddress(address)
+            this.setState({
+                provider: ethersWeb3Provider,
+                signer,
+                address
+            })
+            this.handleCloseConnect()
+        } catch (error) {
+            console.log(error)
+        }
     }
 
 
@@ -157,6 +173,7 @@ class Header extends Component {
     handleSettings = this.handleSettings.bind(this)
     clearAll = this.clearAll.bind(this)
     connect = this.connect.bind(this)
+    connectWalletConnect = this.connectWalletConnect.bind(this)
     disconnect = this.disconnect.bind(this)
     handleShowConnet = this.handleShowConnet.bind(this)
     handleCloseConnect = this.handleCloseConnect.bind(this)
@@ -241,11 +258,28 @@ class Header extends Component {
 
                     <Modal show={this.state.showConnect} onHide={this.handleCloseConnect} centered>
                         <Modal.Header  className="modal-newuser__title modal-title" closeButton>
-                                Connect
+                                Connect wallet
                         </Modal.Header>
                         <Modal.Body className="mb-4">
                         <div className="form_col_last form_col">
-                                    <label className="form__label">Blockchain * <img src={info} className="form__icon-info" /></label>
+                            {/* <div className="content__wrap"> */}
+                                <h5 className="menu__title-secondary">Choose a wallet connection method</h5>
+                                <ul className="walletl__list unlist">
+                                    <li className="walletl__list-item" onClick={this.connect}>
+                                        <div>
+                                            <img src={metamask}></img>
+                                        </div>
+                                        <p  className="walletl__list-item-name">MetaMask</p>
+                                    </li>
+                                    <li className="walletl__list-item" onClick={this.connectWalletConnect}>
+                                        <div>
+                                            <img src={walletconnect}></img>
+                                        </div>
+                                        <p className="walletl__list-item-name">WalletConnect</p>
+                                    </li>
+                                </ul>
+                            {/* </div> */}
+                                    {/* <label className="form__label">Blockchain * <img src={info} className="form__icon-info" /></label>
                                     <div className="input-group">
                                         <select onChange={e => this.changeNetwork(e.target.value)} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
                                         <option value={config.status === "test" ? '80001' : '137'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '80001' : '137')) : false}>{networks[config.status === "test" ? '80001' : '137'].name}</option>
@@ -255,7 +289,7 @@ class Header extends Component {
                                             <option value={config.status === "test" ? '43113' : '43114'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '43113' : '43114')) : false}>{networks[config.status === "test" ? '43113' : '43114'].name}</option>
                                             <option value={config.status === "test" ? '421613' : '42161'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '421613' : '42161')) : false}>{networks[config.status === "test" ? '421613' : '42161'].name}</option>
                                         </select>
-                                    </div>
+                                    </div> */}
                                 </div>
                         </Modal.Body>
                     </Modal>
