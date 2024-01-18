@@ -274,15 +274,6 @@ class Tokens extends Component {
 
     nextStage () {
         this.setState({stageOfCreateToken: this.state.stageOfCreateToken + 1 })
-        const providerData = this.props.sendProvider()
-        if (providerData.provider) {
-            this.setState({
-                provider: providerData.provider,
-                signer: providerData.signer,
-                address: providerData.address,
-                chainid: providerData.chainid
-            })
-        }
     }
     prevStage () {
         if(this.state.stageOfCreateToken === 1) {
@@ -358,6 +349,11 @@ class Tokens extends Component {
     async connectWalletConnect() {
         try {
             const network = this.state.network
+            const providerData = this.props.sendProvider()
+            let showQrModal = true
+            if (providerData.provider) {
+                showQrModal = false
+            }
             const provider = await EthereumProvider.init({
                 projectId: config.projectIdWalletConnect,
                 chains: [1],
@@ -367,17 +363,20 @@ class Tokens extends Component {
                     '80001': 'https://rpc-mumbai.maticvigil.com',
                 },
                 methods: ["personal_sign", "eth_sendTransaction"],
-                showQrModal: true,
+                showQrModal,
                 qrModalOptions: {
                     themeMode: "light",
                 },
             });
-            
-            provider.on("display_uri", (uri) => {
-                console.log("display_uri", uri);
-            });
+            // provider.on("display_uri", (uri) => {
+            //     console.log("display_uri", uri);
+            // });
 
-            await provider.connect()
+            if (showQrModal) {
+                await provider.connect()
+            } else {
+                await provider.enable()
+            }
             await provider.request({
                 method: 'wallet_switchEthereumChain',
                 params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
