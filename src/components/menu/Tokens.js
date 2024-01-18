@@ -288,10 +288,10 @@ class Tokens extends Component {
         const network = this.state.network
         // https://github.com/ethers-io/ethers.js/issues/866
         const provider = new ethers.providers.Web3Provider(window.ethereum, "any")
-            await provider.send("eth_requestAccounts", [])
-            const signer = await provider.getSigner()
-            const address = await signer.getAddress()
-        this.props.setProvider(provider)
+        await provider.send("eth_requestAccounts", [])
+        const signer = await provider.getSigner()
+        const address = await signer.getAddress()
+        this.props.setProvider(provider, true)
         this.props.setSigner(signer)
         this.props.setAddress(address)
         this.props.setChainid(network.chainid)

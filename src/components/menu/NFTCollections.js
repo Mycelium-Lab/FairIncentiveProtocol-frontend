@@ -271,7 +271,7 @@ class NFTCollections extends Component {
         await provider.send("eth_requestAccounts", [])
         const signer = await provider.getSigner()
         const address = await signer.getAddress()
-        this.props.setProvider(provider)
+        this.props.setProvider(provider, true)
         this.props.setSigner(signer)
         this.props.setAddress(address)
         this.props.setChainid(network.chainid)

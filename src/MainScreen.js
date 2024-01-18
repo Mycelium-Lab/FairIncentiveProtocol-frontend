@@ -11,6 +11,10 @@ import NFTs from "./components/menu/NFTs";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Notifications from "./components/Notifications";
+import { getIsWalletInjectedLS, getWalletAddressLS, removeIsWalletInjectedLS, removeWalletAddressLS, setIsWalletInjectedLS, setWalletAddressLS } from "./utils/localStorageFuncs";
+import { EthereumProvider } from "@walletconnect/ethereum-provider";
+import { config } from "./utils/config";
+import { ethers } from "ethers";
 
 const switcher = {
     dashboard: 'dashboard',
@@ -42,7 +46,42 @@ class MainScreen extends Component {
         }
     }
 
-    componentDidMount() {
+    async componentDidMount() {
+        const walletAddressAlreadyExist = getWalletAddressLS()
+        const isInjected = getIsWalletInjectedLS()
+        if (walletAddressAlreadyExist && isInjected) {
+            if (isInjected === 'false') {
+                const provider = await EthereumProvider.init({
+                    projectId: config.projectIdWalletConnect,
+                    chains: [1],
+                    optionalChains: [97, 80001],
+                    rpcMap: {
+                        '97': 'https://bsc-testnet.publicnode.com',
+                        '80001': 'https://rpc-mumbai.maticvigil.com',
+                    },
+                    methods: ["personal_sign", "eth_sendTransaction"],
+                    showQrModal: false,
+                    qrModalOptions: {
+                        themeMode: "light",
+                    },
+                });
+                await provider.enable()
+                const ethersWeb3Provider = new ethers.providers.Web3Provider(provider)
+                const signer = await ethersWeb3Provider.getSigner()
+                const address = await signer.getAddress()
+                this.setProvider(ethersWeb3Provider)
+                this.setSigner(signer)
+                this.setAddress(address)
+            } else {
+                const provider = new ethers.providers.Web3Provider(window.ethereum, "any")
+                await provider.send("eth_requestAccounts", [])
+                const signer = await provider.getSigner()
+                const address = await signer.getAddress()
+                this.setProvider(provider, true)
+                this.setSigner(signer)
+                this.setAddress(address)
+            }
+        }
         if(window.innerWidth < 769) {
             this.setState({
                 showSidebar: false
@@ -50,7 +89,8 @@ class MainScreen extends Component {
         }
     }
 
-    setProvider(provider) {
+    setProvider(provider, isInjected = false) {
+        setIsWalletInjectedLS(isInjected)
         this.setState({
             provider
         })
@@ -63,6 +103,7 @@ class MainScreen extends Component {
     }
 
     setAddress(address) {
+        setWalletAddressLS(address)
         this.setState({
             address
         })
@@ -116,6 +157,8 @@ class MainScreen extends Component {
 
     removeProvider() {
         console.log('disconnect')
+        removeIsWalletInjectedLS()
+        removeWalletAddressLS()
         this.setState({
             provider: null,
             signer: null,
