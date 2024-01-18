@@ -281,7 +281,6 @@ class NFTCollections extends Component {
                 method: 'wallet_switchEthereumChain',
                 params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
             })
-            // .then(() => window.location.reload())
             this.setState({
                 provider,
                 signer,
@@ -295,14 +294,13 @@ class NFTCollections extends Component {
                 method: 'wallet_addEthereumChain',
                 params: [
                     {
-                    chainName: network.name,
-                    chainId: ethers.utils.hexValue(parseInt(network.chainid)),
-                    nativeCurrency: { name: network.currency_symbol, decimals: 18, symbol: network.currency_symbol},
-                    rpcUrls: [network.rpc]
+                        chainName: network.name,
+                        chainId: ethers.utils.hexValue(parseInt(network.chainid)),
+                        nativeCurrency: { name: network.currency_symbol, decimals: 18, symbol: network.currency_symbol},
+                        rpcUrls: [network.rpc]
                     }
                 ]
                 })
-            //   .then(() => window.location.reload())
             }
         }
         this.handleCloseConfirm()
@@ -311,6 +309,11 @@ class NFTCollections extends Component {
     async connectWalletConnect() {
         try {
             const network = this.state.network
+            const providerData = this.props.sendProvider()
+            let showQrModal = true
+            if (providerData.provider) {
+                showQrModal = false
+            }
             const provider = await EthereumProvider.init({
                 projectId: config.projectIdWalletConnect,
                 chains: [1],
@@ -320,17 +323,16 @@ class NFTCollections extends Component {
                     '80001': 'https://rpc-mumbai.maticvigil.com',
                 },
                 methods: ["personal_sign", "eth_sendTransaction"],
-                showQrModal: true,
+                showQrModal,
                 qrModalOptions: {
                     themeMode: "light",
                 },
             });
-            
-            provider.on("display_uri", (uri) => {
-                console.log("display_uri", uri);
-            });
-
-            await provider.connect()
+            if (showQrModal) {
+                await provider.connect()
+            } else {
+                await provider.enable()
+            }
             await provider.request({
                 method: 'wallet_switchEthereumChain',
                 params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]

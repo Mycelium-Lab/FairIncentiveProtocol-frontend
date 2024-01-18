@@ -295,37 +295,35 @@ class Tokens extends Component {
         this.props.setSigner(signer)
         this.props.setAddress(address)
         this.props.setChainid(network.chainid)
-            try {
-                this.handleShowConfirm('Connect', 'Confirm the network change', 'Please, confirm the network change in your wallet')
+        try {
+            this.handleShowConfirm('Connect', 'Confirm the network change', 'Please, confirm the network change in your wallet')
+            await window.ethereum.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
+            })
+            this.setState({
+                provider,
+                signer,
+                address,
+                stageOfCreateToken: 3
+            })
+        } catch (err) {
+            console.log(err)
+            if (err.code === 4902) {
                 await window.ethereum.request({
-                  method: 'wallet_switchEthereumChain',
-                  params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
-                })
-                // .then(() => window.location.reload())
-                this.setState({
-                    provider,
-                    signer,
-                    address,
-                    stageOfCreateToken: 3
-                })
-              } catch (err) {
-                console.log(err)
-                if (err.code === 4902) {
-                  await window.ethereum.request({
                     method: 'wallet_addEthereumChain',
                     params: [
-                      {
-                        chainName: network.name,
-                        chainId: ethers.utils.hexValue(parseInt(network.chainid)),
-                        nativeCurrency: { name: network.currency_symbol, decimals: 18, symbol: network.currency_symbol},
-                        rpcUrls: [network.rpc]
-                      }
+                        {
+                            chainName: network.name,
+                            chainId: ethers.utils.hexValue(parseInt(network.chainid)),
+                            nativeCurrency: { name: network.currency_symbol, decimals: 18, symbol: network.currency_symbol},
+                            rpcUrls: [network.rpc]
+                        }
                     ]
-                  })
-                //   .then(() => window.location.reload())
-                }
-              }
-              this.handleCloseConfirm()
+                })
+            }
+        }
+        this.handleCloseConfirm()
     }
 
     stayOnPreviousWallet() {
@@ -368,10 +366,6 @@ class Tokens extends Component {
                     themeMode: "light",
                 },
             });
-            // provider.on("display_uri", (uri) => {
-            //     console.log("display_uri", uri);
-            // });
-
             if (showQrModal) {
                 await provider.connect()
             } else {
