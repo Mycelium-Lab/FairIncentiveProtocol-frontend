@@ -727,6 +727,9 @@ class Tokens extends Component {
         if (error.message.includes('Wallet is not connected')) {
             this.handleShowError('Wallet is not connected. Connect in top right corner.')
         }
+        if (error.message.includes('Not allowed wallet')) {
+            this.handleShowError('Not allowed wallet. Try owner of token.')
+        }
         console.log(error)
     } 
 
