@@ -348,7 +348,6 @@ class Dashboard extends Component {
               };
             const res = await fetch(`${config.api}/stat/nfts_dist_range?` + query.toString(), requestOptions)
             const json = await res.json()
-            console.log(json)
             const range = {
                 labels: json.body.data.map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "") : new Date(v.date_interval_end).toLocaleDateString()}`),
                 datasets: [{

@@ -288,45 +288,70 @@ class Tokens extends Component {
         const network = this.state.network
         // https://github.com/ethers-io/ethers.js/issues/866
         const provider = new ethers.providers.Web3Provider(window.ethereum, "any")
-            await provider.send("eth_requestAccounts", [])
-            const signer = await provider.getSigner()
-            const address = await signer.getAddress()
-            try {
-                this.handleShowConfirm('Connect', 'Confirm the network change', 'Please, confirm the network change in your wallet')
+        await provider.send("eth_requestAccounts", [])
+        const signer = await provider.getSigner()
+        const address = await signer.getAddress()
+        this.props.setProvider(provider, true)
+        this.props.setSigner(signer)
+        this.props.setAddress(address)
+        this.props.setChainid(network.chainid)
+        try {
+            this.handleShowConfirm('Connect', 'Confirm the network change', 'Please, confirm the network change in your wallet')
+            await window.ethereum.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
+            })
+            this.setState({
+                provider,
+                signer,
+                address,
+                stageOfCreateToken: 3
+            })
+        } catch (err) {
+            console.log(err)
+            if (err.code === 4902) {
                 await window.ethereum.request({
-                  method: 'wallet_switchEthereumChain',
-                  params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
-                })
-                // .then(() => window.location.reload())
-                this.setState({
-                    provider,
-                    signer,
-                    address,
-                    stageOfCreateToken: 3
-                })
-              } catch (err) {
-                console.log(err)
-                if (err.code === 4902) {
-                  await window.ethereum.request({
                     method: 'wallet_addEthereumChain',
                     params: [
-                      {
-                        chainName: network.name,
-                        chainId: ethers.utils.hexValue(parseInt(network.chainid)),
-                        nativeCurrency: { name: network.currency_symbol, decimals: 18, symbol: network.currency_symbol},
-                        rpcUrls: [network.rpc]
-                      }
+                        {
+                            chainName: network.name,
+                            chainId: ethers.utils.hexValue(parseInt(network.chainid)),
+                            nativeCurrency: { name: network.currency_symbol, decimals: 18, symbol: network.currency_symbol},
+                            rpcUrls: [network.rpc]
+                        }
                     ]
-                  })
-                //   .then(() => window.location.reload())
-                }
-              }
-              this.handleCloseConfirm()
+                })
+            }
+        }
+        this.handleCloseConfirm()
+    }
+
+    stayOnPreviousWallet() {
+        try {
+            const providerData = this.props.sendProvider()
+            if (providerData.provider) {
+                this.setState({
+                    provider: providerData.provider,
+                    signer: providerData.signer,
+                    address: providerData.address,
+                    chainid: providerData.chainid
+                })
+            } else {
+                alert('No setted provider')
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     async connectWalletConnect() {
         try {
             const network = this.state.network
+            const providerData = this.props.sendProvider()
+            let showQrModal = true
+            if (providerData.provider) {
+                showQrModal = false
+            }
             const provider = await EthereumProvider.init({
                 projectId: config.projectIdWalletConnect,
                 chains: [1],
@@ -336,17 +361,16 @@ class Tokens extends Component {
                     '80001': 'https://rpc-mumbai.maticvigil.com',
                 },
                 methods: ["personal_sign", "eth_sendTransaction"],
-                showQrModal: true,
+                showQrModal,
                 qrModalOptions: {
                     themeMode: "light",
                 },
             });
-            
-            provider.on("display_uri", (uri) => {
-                console.log("display_uri", uri);
-            });
-
-            await provider.connect()
+            if (showQrModal) {
+                await provider.connect()
+            } else {
+                await provider.enable()
+            }
             await provider.request({
                 method: 'wallet_switchEthereumChain',
                 params: [{ chainId: ethers.utils.hexValue(parseInt(network.chainid)) }]
@@ -355,6 +379,11 @@ class Tokens extends Component {
             const ethersWeb3Provider = new ethers.providers.Web3Provider(provider);
             const signer = await ethersWeb3Provider.getSigner()
             const address = await signer.getAddress()
+            this.props.setProvider(ethersWeb3Provider)
+            this.props.setSigner(signer)
+            this.props.setAddress(address)
+            this.props.setChainid(network.chainid)
+
             this.setState({
                 provider: ethersWeb3Provider,
                 signer,
@@ -480,32 +509,34 @@ class Tokens extends Component {
                 mintTokenAmount,
                 currentTokenChainid
             } = this.state
-            let provider = new ethers.providers.Web3Provider(window.ethereum)
-            let chainid = (await provider.getNetwork()).chainId
-            if (chainid.toString() !== currentTokenChainid) {
-                this.handleShowConfirm('Connect', 'Confirm the network change', 'Please, confirm the network change in your wallet')
-                await window.ethereum.request({
-                  method: 'wallet_switchEthereumChain',
-                  params: [{ chainId: ethers.utils.hexValue(parseInt(currentTokenChainid)) }]
-                })
-                provider = new ethers.providers.Web3Provider(window.ethereum)
-            }
-            await provider.send("eth_requestAccounts", [])
-            const signer = await provider.getSigner()
-            const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
-            const token = Token.attach(currentTokenAddress)
-            this.handleShowConfirm(`Mint ${currentTokenSymbol} tokens`, `Confirm the minting of ${mintTokenAmount} ${currentTokenSymbol} tokens`, `Please, confirm transaction in your wallet`)
-            const tx = await token.mint(ethers.utils.parseEther(mintTokenAmount))
-            this.handleCloseConfirm()
-            this.handleShowProgress(`Mint ${currentTokenSymbol} tokens`)
-            tx.wait()
-                .then(() => {
-                    this.handleCloseProgress()
-                    this.handleShowSuccess(`Mint ${currentTokenSymbol} tokens`, `Token minted`, `You have successfully minted ${mintTokenAmount} ${currentTokenSymbol} tokens`)
-                    this.setState({
-                        mintTokenAmount: null
+            const providerData = this.props.sendProvider()
+            if (!providerData.provider) {
+                throw Error('Wallet is not connected')
+            } else {
+                const chainid = (await providerData.provider.getNetwork()).chainId
+                if (chainid.toString() !== currentTokenChainid) {
+                    this.handleShowConfirm('Connect', 'Confirm the network change', 'Please, confirm the network change in your wallet')
+                    await providerData.provider.provider.request({
+                      method: 'wallet_switchEthereumChain',
+                      params: [{ chainId: ethers.utils.hexValue(parseInt(currentTokenChainid)) }]
                     })
-                })
+                }
+                const signer = await providerData.provider.getSigner()
+                const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
+                const token = Token.attach(currentTokenAddress)
+                this.handleShowConfirm(`Mint ${currentTokenSymbol} tokens`, `Confirm the minting of ${mintTokenAmount} ${currentTokenSymbol} tokens`, `Please, confirm transaction in your wallet`)
+                const tx = await token.mint(ethers.utils.parseEther(mintTokenAmount))
+                this.handleCloseConfirm()
+                this.handleShowProgress(`Mint ${currentTokenSymbol} tokens`)
+                tx.wait()
+                    .then(() => {
+                        this.handleCloseProgress()
+                        this.handleShowSuccess(`Mint ${currentTokenSymbol} tokens`, `Token minted`, `You have successfully minted ${mintTokenAmount} ${currentTokenSymbol} tokens`)
+                        this.setState({
+                            mintTokenAmount: null
+                        })
+                    })
+            }
         } catch (error) {
             this.customError(error)
         }
@@ -519,31 +550,37 @@ class Tokens extends Component {
                 isCurrentTokenPaused,
                 currentTokenChainid
             } = this.state
-            let provider = new ethers.providers.Web3Provider(window.ethereum)
-            const chainid = (await provider.getNetwork()).chainId
-            if (chainid.toString() !== currentTokenChainid) {
-                await this.changeNetwork(currentTokenChainid)
-                provider = new ethers.providers.Web3Provider(window.ethereum)
-            }
-            await provider.send("eth_requestAccounts", [])
-            const signer = await provider.getSigner()
-            const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
-            const token = Token.attach(currentTokenAddress)
-            let tx;
-            this.handleShowConfirm('Pause', `Confirm ${!isCurrentTokenPaused ? 'pausing' : 'unpausing'} ${currentTokenSymbol} token`, `Please, confirm transaction in your wallet`)
-            if (!isCurrentTokenPaused) {
-                tx = await token.pause()
+            const providerData = this.props.sendProvider()
+            if (!providerData.provider) {
+                throw Error('Wallet is not connected')
             } else {
-                tx = await token.unpause()
+                const chainid = (await providerData.provider.getNetwork()).chainId
+                if (chainid.toString() !== currentTokenChainid) {
+                    this.handleShowConfirm('Connect', 'Confirm the network change', 'Please, confirm the network change in your wallet')
+                    await providerData.provider.provider.request({
+                      method: 'wallet_switchEthereumChain',
+                      params: [{ chainId: ethers.utils.hexValue(parseInt(currentTokenChainid)) }]
+                    })    
+                }
+                const signer = await providerData.provider.getSigner()
+                const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
+                const token = Token.attach(currentTokenAddress)
+                let tx;
+                this.handleShowConfirm('Pause', `Confirm ${!isCurrentTokenPaused ? 'pausing' : 'unpausing'} ${currentTokenSymbol} token`, `Please, confirm transaction in your wallet`)
+                if (!isCurrentTokenPaused) {
+                    tx = await token.pause()
+                } else {
+                    tx = await token.unpause()
+                }
+                this.handleCloseConfirm()
+                this.handleShowProgress()
+                tx.wait()
+                    .then(() => {
+                        this.handleCloseProgress()
+                        this.handleShowSuccess(`Token ${!isCurrentTokenPaused ? 'paused' : 'unpaused'}`, `You have successfully ${!isCurrentTokenPaused ? 'paused' : 'unpaused'} ${currentTokenSymbol} token`)
+                        this.setState({isCurrentTokenPaused: isCurrentTokenPaused ? false : true})
+                    })
             }
-            this.handleCloseConfirm()
-            this.handleShowProgress()
-            tx.wait()
-                .then(() => {
-                    this.handleCloseProgress()
-                    this.handleShowSuccess(`Token ${!isCurrentTokenPaused ? 'paused' : 'unpaused'}`, `You have successfully ${!isCurrentTokenPaused ? 'paused' : 'unpaused'} ${currentTokenSymbol} token`)
-                    this.setState({isCurrentTokenPaused: isCurrentTokenPaused ? false : true})
-                })
         } catch (error) {
             this.customError(error)
         }
@@ -693,6 +730,12 @@ class Tokens extends Component {
         if (error.message.includes('invalid address')) {
             this.handleShowError("Invalid chief administrator's address")
         }
+        if (error.message.includes('Wallet is not connected')) {
+            this.handleShowError('Wallet is not connected. Connect in top right corner.')
+        }
+        if (error.message.includes('Not allowed wallet')) {
+            this.handleShowError('Not allowed wallet. Try owner of token.')
+        }
         console.log(error)
     } 
 
@@ -759,48 +802,55 @@ class Tokens extends Component {
     handleShowBlacklist = async (currentTokenSymbol, currentTokenAddress, currentTokenChainid) => {
         try {
             this.setState({showBlacklist: true, currentTokenSymbol, currentTokenAddress, showLoading: true})
-            let provider = new ethers.providers.Web3Provider(window.ethereum)
-            const chainid = (await provider.getNetwork()).chainId
-            if (chainid.toString() !== currentTokenChainid) {
-                await this.changeNetwork(currentTokenChainid)
-                provider = new ethers.providers.Web3Provider(window.ethereum)
-            }
-            const ethcallProvider = new Provider(provider);
-            await ethcallProvider.init();
-            await provider.send("eth_requestAccounts", [])
-            const signer = await provider.getSigner()
-            const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
-            const tokenUsual = Token.attach(currentTokenAddress)
-            const tokenMulticall = new Contract(currentTokenAddress, ERC20Universal.abi)
-            const lastBlacklistID = await tokenUsual.blacklistLastID()
-            const usersPromises = [];
-            for (let i = 0; i <= parseInt(lastBlacklistID); i++) {
-                usersPromises.push(tokenMulticall.blacklistUsers(i));
-            }
-            const users = await ethcallProvider.all(usersPromises)
-            const timesPromises = []
-            for (let i = 0; i < users.length; i++) {
-                timesPromises.push(tokenMulticall.blacklistTime(users[i]));
-            }
-            const times = await ethcallProvider.all(timesPromises)
-            let currentTokenBlacklist = []
-            for (let i = 0; i < users.length; i++) {
-                if (users[i] !== ethers.constants.AddressZero) {
-                    currentTokenBlacklist.push({
-                        address: users[i],
-                        time: new Date(parseInt(times[i])*1000)
-                    })
+            const providerData = this.props.sendProvider()
+            if (!providerData.provider) {
+                throw Error('Wallet is not connected')
+            } else {
+                const chainid = (await providerData.provider.getNetwork()).chainId
+                if (chainid.toString() !== currentTokenChainid) {
+                    this.handleShowConfirm('Connect', 'Confirm the network change', 'Please, confirm the network change in your wallet')
+                    await providerData.provider.provider.request({
+                      method: 'wallet_switchEthereumChain',
+                      params: [{ chainId: ethers.utils.hexValue(parseInt(currentTokenChainid)) }]
+                    })   
                 }
+                const ethcallProvider = new Provider(providerData.provider);
+                await ethcallProvider.init();
+                const signer = await providerData.provider.getSigner()
+                const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
+                const tokenUsual = Token.attach(currentTokenAddress)
+                const tokenMulticall = new Contract(currentTokenAddress, ERC20Universal.abi)
+                const lastBlacklistID = await tokenUsual.blacklistLastID()
+                const usersPromises = [];
+                for (let i = 0; i <= parseInt(lastBlacklistID); i++) {
+                    usersPromises.push(tokenMulticall.blacklistUsers(i));
+                }
+                const users = await ethcallProvider.all(usersPromises)
+                const timesPromises = []
+                for (let i = 0; i < users.length; i++) {
+                    timesPromises.push(tokenMulticall.blacklistTime(users[i]));
+                }
+                const times = await ethcallProvider.all(timesPromises)
+                let currentTokenBlacklist = []
+                for (let i = 0; i < users.length; i++) {
+                    if (users[i] !== ethers.constants.AddressZero) {
+                        currentTokenBlacklist.push({
+                            address: users[i],
+                            time: new Date(parseInt(times[i])*1000)
+                        })
+                    }
+                }
+                this.setState({
+                    currentTokenBlacklist, showLoading: false, provider: providerData.provider,
+                    signer, currentToken: tokenUsual
+                })
             }
-            this.setState({
-                currentTokenBlacklist, showLoading: false, provider,
-                signer, currentToken: tokenUsual
-            })
         } catch (error) {
             this.setState({
                 currentTokenBlacklist: [], showLoading: false
             })
             console.log(error)
+            this.customError(error)
         }
     }
     handleCloseBlacklist = () => this.setState({showBlacklist: false, currentTokenSymbol: null, currentTokenAddress: null, currentTokenChainid: null, currentTokenBlacklistRemove: []})
@@ -1075,6 +1125,7 @@ class Tokens extends Component {
     deleteFinancelManagerInput = this.deleteFinancelManagerInput.bind(this)
     changeFinancelValue = this.changeFinancelValue.bind(this)
     changeMintinglValue = this.changeMintinglValue.bind(this)
+    stayOnPreviousWallet = this.stayOnPreviousWallet.bind(this)
 
     render() {
         return (
@@ -1218,7 +1269,7 @@ class Tokens extends Component {
                                 <div className="form_col_last form_col">
                                     <label className="form__label_disbaled form__label">Decimals <img src={infoDisabled} className="form__icon-info"/></label>
                                         <div className="input-group">
-                                        <input onChange={this.onChangeMaxSupply} disabled type="number" placeholder="1 000 000" className="form-control_disabled form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
+                                        <input onChange={this.onChangeMaxSupply} disabled type="number" placeholder="18" className="form-control_disabled form-control" id="basic-url" aria-describedby="basic-addon3 basic-addon4"/>
                                         </div>
                                     <div className="form__prompt_disabled form__prompt" id="basic-addon4">Insert the decimals precision of your token</div>
                                 </div>
@@ -1288,6 +1339,12 @@ class Tokens extends Component {
                          <h4 className="menu__title-secondary">Choose a wallet connection method</h4>
                          <span className="menu__subtitle">To create a token, you need to complete a transaction using a cryptocurrency wallet</span>
                          <ul className="walletl__list unlist">
+                            {/* <li className="walletl__list-item">
+                                <div onClick={this.stayOnPreviousWallet}>
+                                     <img src="#"></img>
+                                </div>
+                                <p  className="walletl__list-item-name">Stay on previously used wallet</p>
+                            </li> */}
                             <li className="walletl__list-item" onClick={this.connect}>
                                 <div>
                                      <img src={metamask}></img>
@@ -1461,7 +1518,7 @@ class Tokens extends Component {
                                             <FPDropdown icon={more}>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowMint(v.symbol, v.address, v.chainid)} disabled={v.supply_type == 1 ? true : false}>Mint</Dropdown.Item>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowPause(v.symbol, v.address, v.chainid)} disabled={!v.pausable}>Pause</Dropdown.Item>
-                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowRoles(v.symbol, v.address, v.chainid)}>Roles control</Dropdown.Item>
+                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowRoles(v.symbol, v.address, v.chainid)} disabled>Roles control</Dropdown.Item>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowBlacklist(v.symbol, v.address, v.chainid)} disabled={!v.blacklist}>Blacklist</Dropdown.Item>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowInfo(v)}>Token info</Dropdown.Item>
                                             </FPDropdown>
@@ -1535,7 +1592,7 @@ class Tokens extends Component {
                                 <div className="form_row mb-4">
                                     <div className="form_col_flex form_col">
                                         <div className="form-check custom-control custom-radio custom-control-inline">
-                                                <input checked={this.state.chosen_mint_type === destinationToSend.contract ? true : false}
+                                                <input disabled checked={this.state.chosen_mint_type === destinationToSend.contract ? true : false}
                                                   onChange={this.changeType}  type="radio" id="rd_1" name="rd" value="contract"/>
                                                 <label className="form-check-label custom-control-label green" for="rd_1">
                                                     Contract balance <img src={info} className="form__icon-info"/>
