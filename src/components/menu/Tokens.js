@@ -509,32 +509,34 @@ class Tokens extends Component {
                 mintTokenAmount,
                 currentTokenChainid
             } = this.state
-            let provider = new ethers.providers.Web3Provider(window.ethereum)
-            let chainid = (await provider.getNetwork()).chainId
-            if (chainid.toString() !== currentTokenChainid) {
-                this.handleShowConfirm('Connect', 'Confirm the network change', 'Please, confirm the network change in your wallet')
-                await window.ethereum.request({
-                  method: 'wallet_switchEthereumChain',
-                  params: [{ chainId: ethers.utils.hexValue(parseInt(currentTokenChainid)) }]
-                })
-                provider = new ethers.providers.Web3Provider(window.ethereum)
-            }
-            await provider.send("eth_requestAccounts", [])
-            const signer = await provider.getSigner()
-            const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
-            const token = Token.attach(currentTokenAddress)
-            this.handleShowConfirm(`Mint ${currentTokenSymbol} tokens`, `Confirm the minting of ${mintTokenAmount} ${currentTokenSymbol} tokens`, `Please, confirm transaction in your wallet`)
-            const tx = await token.mint(ethers.utils.parseEther(mintTokenAmount))
-            this.handleCloseConfirm()
-            this.handleShowProgress(`Mint ${currentTokenSymbol} tokens`)
-            tx.wait()
-                .then(() => {
-                    this.handleCloseProgress()
-                    this.handleShowSuccess(`Mint ${currentTokenSymbol} tokens`, `Token minted`, `You have successfully minted ${mintTokenAmount} ${currentTokenSymbol} tokens`)
-                    this.setState({
-                        mintTokenAmount: null
+            const providerData = this.props.sendProvider()
+            if (!providerData.provider) {
+                throw Error('Wallet is not connected')
+            } else {
+                const chainid = (await providerData.provider.getNetwork()).chainId
+                if (chainid.toString() !== currentTokenChainid) {
+                    this.handleShowConfirm('Connect', 'Confirm the network change', 'Please, confirm the network change in your wallet')
+                    await providerData.provider.provider.request({
+                      method: 'wallet_switchEthereumChain',
+                      params: [{ chainId: ethers.utils.hexValue(parseInt(currentTokenChainid)) }]
                     })
-                })
+                }
+                const signer = await providerData.provider.getSigner()
+                const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
+                const token = Token.attach(currentTokenAddress)
+                this.handleShowConfirm(`Mint ${currentTokenSymbol} tokens`, `Confirm the minting of ${mintTokenAmount} ${currentTokenSymbol} tokens`, `Please, confirm transaction in your wallet`)
+                const tx = await token.mint(ethers.utils.parseEther(mintTokenAmount))
+                this.handleCloseConfirm()
+                this.handleShowProgress(`Mint ${currentTokenSymbol} tokens`)
+                tx.wait()
+                    .then(() => {
+                        this.handleCloseProgress()
+                        this.handleShowSuccess(`Mint ${currentTokenSymbol} tokens`, `Token minted`, `You have successfully minted ${mintTokenAmount} ${currentTokenSymbol} tokens`)
+                        this.setState({
+                            mintTokenAmount: null
+                        })
+                    })
+            }
         } catch (error) {
             this.customError(error)
         }
@@ -721,6 +723,9 @@ class Tokens extends Component {
         }
         if (error.message.includes('invalid address')) {
             this.handleShowError("Invalid chief administrator's address")
+        }
+        if (error.message.includes('Wallet is not connected')) {
+            this.handleShowError('Wallet is not connected. Connect in top right corner.')
         }
         console.log(error)
     } 
@@ -1497,7 +1502,7 @@ class Tokens extends Component {
                                             <FPDropdown icon={more}>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowMint(v.symbol, v.address, v.chainid)} disabled={v.supply_type == 1 ? true : false}>Mint</Dropdown.Item>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowPause(v.symbol, v.address, v.chainid)} disabled={!v.pausable}>Pause</Dropdown.Item>
-                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowRoles(v.symbol, v.address, v.chainid)}>Roles control</Dropdown.Item>
+                                                <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowRoles(v.symbol, v.address, v.chainid)} disabled>Roles control</Dropdown.Item>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowBlacklist(v.symbol, v.address, v.chainid)} disabled={!v.blacklist}>Blacklist</Dropdown.Item>
                                                 <Dropdown.Item className="dropdown__menu-item" onClick={() => this.handleShowInfo(v)}>Token info</Dropdown.Item>
                                             </FPDropdown>
@@ -1571,7 +1576,7 @@ class Tokens extends Component {
                                 <div className="form_row mb-4">
                                     <div className="form_col_flex form_col">
                                         <div className="form-check custom-control custom-radio custom-control-inline">
-                                                <input checked={this.state.chosen_mint_type === destinationToSend.contract ? true : false}
+                                                <input disabled checked={this.state.chosen_mint_type === destinationToSend.contract ? true : false}
                                                   onChange={this.changeType}  type="radio" id="rd_1" name="rd" value="contract"/>
                                                 <label className="form-check-label custom-control-label green" for="rd_1">
                                                     Contract balance <img src={info} className="form__icon-info"/>
