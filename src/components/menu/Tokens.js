@@ -802,48 +802,55 @@ class Tokens extends Component {
     handleShowBlacklist = async (currentTokenSymbol, currentTokenAddress, currentTokenChainid) => {
         try {
             this.setState({showBlacklist: true, currentTokenSymbol, currentTokenAddress, showLoading: true})
-            let provider = new ethers.providers.Web3Provider(window.ethereum)
-            const chainid = (await provider.getNetwork()).chainId
-            if (chainid.toString() !== currentTokenChainid) {
-                await this.changeNetwork(currentTokenChainid)
-                provider = new ethers.providers.Web3Provider(window.ethereum)
-            }
-            const ethcallProvider = new Provider(provider);
-            await ethcallProvider.init();
-            await provider.send("eth_requestAccounts", [])
-            const signer = await provider.getSigner()
-            const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
-            const tokenUsual = Token.attach(currentTokenAddress)
-            const tokenMulticall = new Contract(currentTokenAddress, ERC20Universal.abi)
-            const lastBlacklistID = await tokenUsual.blacklistLastID()
-            const usersPromises = [];
-            for (let i = 0; i <= parseInt(lastBlacklistID); i++) {
-                usersPromises.push(tokenMulticall.blacklistUsers(i));
-            }
-            const users = await ethcallProvider.all(usersPromises)
-            const timesPromises = []
-            for (let i = 0; i < users.length; i++) {
-                timesPromises.push(tokenMulticall.blacklistTime(users[i]));
-            }
-            const times = await ethcallProvider.all(timesPromises)
-            let currentTokenBlacklist = []
-            for (let i = 0; i < users.length; i++) {
-                if (users[i] !== ethers.constants.AddressZero) {
-                    currentTokenBlacklist.push({
-                        address: users[i],
-                        time: new Date(parseInt(times[i])*1000)
-                    })
+            const providerData = this.props.sendProvider()
+            if (!providerData.provider) {
+                throw Error('Wallet is not connected')
+            } else {
+                const chainid = (await providerData.provider.getNetwork()).chainId
+                if (chainid.toString() !== currentTokenChainid) {
+                    this.handleShowConfirm('Connect', 'Confirm the network change', 'Please, confirm the network change in your wallet')
+                    await providerData.provider.provider.request({
+                      method: 'wallet_switchEthereumChain',
+                      params: [{ chainId: ethers.utils.hexValue(parseInt(currentTokenChainid)) }]
+                    })   
                 }
+                const ethcallProvider = new Provider(providerData.provider);
+                await ethcallProvider.init();
+                const signer = await providerData.provider.getSigner()
+                const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
+                const tokenUsual = Token.attach(currentTokenAddress)
+                const tokenMulticall = new Contract(currentTokenAddress, ERC20Universal.abi)
+                const lastBlacklistID = await tokenUsual.blacklistLastID()
+                const usersPromises = [];
+                for (let i = 0; i <= parseInt(lastBlacklistID); i++) {
+                    usersPromises.push(tokenMulticall.blacklistUsers(i));
+                }
+                const users = await ethcallProvider.all(usersPromises)
+                const timesPromises = []
+                for (let i = 0; i < users.length; i++) {
+                    timesPromises.push(tokenMulticall.blacklistTime(users[i]));
+                }
+                const times = await ethcallProvider.all(timesPromises)
+                let currentTokenBlacklist = []
+                for (let i = 0; i < users.length; i++) {
+                    if (users[i] !== ethers.constants.AddressZero) {
+                        currentTokenBlacklist.push({
+                            address: users[i],
+                            time: new Date(parseInt(times[i])*1000)
+                        })
+                    }
+                }
+                this.setState({
+                    currentTokenBlacklist, showLoading: false, provider: providerData.provider,
+                    signer, currentToken: tokenUsual
+                })
             }
-            this.setState({
-                currentTokenBlacklist, showLoading: false, provider,
-                signer, currentToken: tokenUsual
-            })
         } catch (error) {
             this.setState({
                 currentTokenBlacklist: [], showLoading: false
             })
             console.log(error)
+            this.customError(error)
         }
     }
     handleCloseBlacklist = () => this.setState({showBlacklist: false, currentTokenSymbol: null, currentTokenAddress: null, currentTokenChainid: null, currentTokenBlacklistRemove: []})
