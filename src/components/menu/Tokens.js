@@ -550,31 +550,37 @@ class Tokens extends Component {
                 isCurrentTokenPaused,
                 currentTokenChainid
             } = this.state
-            let provider = new ethers.providers.Web3Provider(window.ethereum)
-            const chainid = (await provider.getNetwork()).chainId
-            if (chainid.toString() !== currentTokenChainid) {
-                await this.changeNetwork(currentTokenChainid)
-                provider = new ethers.providers.Web3Provider(window.ethereum)
-            }
-            await provider.send("eth_requestAccounts", [])
-            const signer = await provider.getSigner()
-            const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
-            const token = Token.attach(currentTokenAddress)
-            let tx;
-            this.handleShowConfirm('Pause', `Confirm ${!isCurrentTokenPaused ? 'pausing' : 'unpausing'} ${currentTokenSymbol} token`, `Please, confirm transaction in your wallet`)
-            if (!isCurrentTokenPaused) {
-                tx = await token.pause()
+            const providerData = this.props.sendProvider()
+            if (!providerData.provider) {
+                throw Error('Wallet is not connected')
             } else {
-                tx = await token.unpause()
+                const chainid = (await providerData.provider.getNetwork()).chainId
+                if (chainid.toString() !== currentTokenChainid) {
+                    this.handleShowConfirm('Connect', 'Confirm the network change', 'Please, confirm the network change in your wallet')
+                    await providerData.provider.provider.request({
+                      method: 'wallet_switchEthereumChain',
+                      params: [{ chainId: ethers.utils.hexValue(parseInt(currentTokenChainid)) }]
+                    })    
+                }
+                const signer = await providerData.provider.getSigner()
+                const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, signer)
+                const token = Token.attach(currentTokenAddress)
+                let tx;
+                this.handleShowConfirm('Pause', `Confirm ${!isCurrentTokenPaused ? 'pausing' : 'unpausing'} ${currentTokenSymbol} token`, `Please, confirm transaction in your wallet`)
+                if (!isCurrentTokenPaused) {
+                    tx = await token.pause()
+                } else {
+                    tx = await token.unpause()
+                }
+                this.handleCloseConfirm()
+                this.handleShowProgress()
+                tx.wait()
+                    .then(() => {
+                        this.handleCloseProgress()
+                        this.handleShowSuccess(`Token ${!isCurrentTokenPaused ? 'paused' : 'unpaused'}`, `You have successfully ${!isCurrentTokenPaused ? 'paused' : 'unpaused'} ${currentTokenSymbol} token`)
+                        this.setState({isCurrentTokenPaused: isCurrentTokenPaused ? false : true})
+                    })
             }
-            this.handleCloseConfirm()
-            this.handleShowProgress()
-            tx.wait()
-                .then(() => {
-                    this.handleCloseProgress()
-                    this.handleShowSuccess(`Token ${!isCurrentTokenPaused ? 'paused' : 'unpaused'}`, `You have successfully ${!isCurrentTokenPaused ? 'paused' : 'unpaused'} ${currentTokenSymbol} token`)
-                    this.setState({isCurrentTokenPaused: isCurrentTokenPaused ? false : true})
-                })
         } catch (error) {
             this.customError(error)
         }
