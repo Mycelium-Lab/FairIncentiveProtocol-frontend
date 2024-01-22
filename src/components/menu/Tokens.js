@@ -34,6 +34,7 @@ import loader from '../../media/common/loader.svg'
 import LineChart from "../charts/LineChart";
 import { newUser } from "../../data/data";
 import errors from "../../errors";
+import { subDays } from "date-fns";
 
 //TODO: Как-то добавлять провайдера и signer сразу
 
@@ -129,7 +130,7 @@ class Tokens extends Component {
             chosen_mint_type: null,
             destinationAddress: null,
             isInvalidAddress: false,
-            totalUserData: {
+            tokenInfoRange: {
                 labels: newUser.map(data => data.time),
                 datasets: [{
                     data: newUser.map(data => data.amount),
@@ -976,6 +977,37 @@ class Tokens extends Component {
         this.setState({showInfo: true, tokenInfo: info,  showLoading: true})
         let provider = new ethers.providers.JsonRpcProvider(networks[`${info.chainid}`].rpc)
         let justCallWallet = new ethers.Wallet(networks[`${info.chainid}`].justCallSigner, provider)
+        const endDate = new Date()
+        const startDate = subDays(new Date(), 7)
+        const isTodayOrYesterday = startDate.getDate() === endDate.getDate() && startDate.getMonth() === endDate.getMonth()
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+            let query = new URLSearchParams();
+            query.append("address", info.address)
+            query.append("chainid", info.chainid)
+            query.append("startDate", startDate.toString())
+            query.append("endDate", endDate.toString())
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/stat/one_token_dist_range?` + query.toString(), requestOptions)
+            const json = await res.json()
+            const range = {
+                labels: json.body.data.map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "") : new Date(v.date_interval_end).toLocaleDateString()}`),
+                datasets: [{
+                    data: json.body.data.map(v => parseFloat(ethers.utils.formatEther(v.count))),
+                    borderColor: ['rgba(255, 159, 67, 0.85)'],
+                }]
+            }
+            this.setState({
+                tokenInfoRange: range
+            })
+        } catch (error) {
+            
+        }
         const Token = new ContractFactory(ERC20Universal.abi, ERC20Universal.bytecode, justCallWallet)
         const tokenUsual = Token.attach(info.address)  
         const owner = await tokenUsual.owner()
@@ -1893,7 +1925,7 @@ class Tokens extends Component {
                             <div className="dashboard__chart_reward">
                                 <label className="chart__label">Token distribution <br/> statistic</label>
                                 <div className="mb-4" style={{position: 'relative', width:'100%', display: 'flex', justifyContent: 'center', padding: '0 24px'}}>
-                                <LineChart chartData={this.state.totalUserData}></LineChart>
+                                <LineChart chartData={this.state.tokenInfoRange}></LineChart>
                                 </div>
                             </div>
                            
