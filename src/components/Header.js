@@ -132,10 +132,11 @@ class Header extends Component {
             const provider = await EthereumProvider.init({
                 projectId: config.projectIdWalletConnect,
                 chains: [1],
-                optionalChains: [97, 80001],
+                optionalChains: [97, 80001, 23295],
                 rpcMap: {
                     '97': 'https://bsc-testnet.publicnode.com',
                     '80001': 'https://rpc-mumbai.maticvigil.com',
+                    '23295': 'https://testnet.sapphire.oasis.dev' 
                 },
                 methods: ["personal_sign", "eth_sendTransaction"],
                 showQrModal: true,

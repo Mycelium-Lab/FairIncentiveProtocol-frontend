@@ -106,6 +106,15 @@ export const networks = {
         explorer: "https://goerli.arbiscan.io",
         fpmanager: "0xe435Cf187A6479DeA943651c7710f042e079Cdcb",
         justCallSigner: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+    },
+    23295: {
+        name: 'Sapphire Test',
+        rpc: 'https://testnet.sapphire.oasis.dev',
+        chainid: '23295',
+        currency_symbol: 'tROSE',
+        explorer: 'https://testnet.explorer.sapphire.oasis.dev',
+        fpmanager: '0xFc8fBB0D8Ecd4D7de814818162909944831637c7',
+        justCallSigner: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
     }
 }
 
@@ -216,6 +225,15 @@ export const networksNames = {
         currency_symbol: "tETH",
         explorer: "https://goerli.arbiscan.io",
         fpmanager: "0xe435Cf187A6479DeA943651c7710f042e079Cdcb",
+        justCallSigner: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+    },
+    'Sapphire Test': {
+        name: 'Sapphire Test',
+        rpc: 'https://testnet.sapphire.oasis.dev',
+        chainid: '23295',
+        currency_symbol: 'tROSE',
+        explorer: 'https://testnet.explorer.sapphire.oasis.dev',
+        fpmanager: '0xFc8fBB0D8Ecd4D7de814818162909944831637c7',
         justCallSigner: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
     }
 } 

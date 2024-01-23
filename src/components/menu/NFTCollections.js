@@ -317,10 +317,11 @@ class NFTCollections extends Component {
             const provider = await EthereumProvider.init({
                 projectId: config.projectIdWalletConnect,
                 chains: [1],
-                optionalChains: [97, 80001],
+                optionalChains: [97, 80001, 23295],
                 rpcMap: {
                     '97': 'https://bsc-testnet.publicnode.com',
                     '80001': 'https://rpc-mumbai.maticvigil.com',
+                    '23295': 'https://testnet.sapphire.oasis.dev'
                 },
                 methods: ["personal_sign", "eth_sendTransaction"],
                 showQrModal,
@@ -904,6 +905,7 @@ class NFTCollections extends Component {
                                          <select onChange={this.changeNetwork} className="form-select" id="floatingSelectDisabled" aria-label="Floating label select example">
                                              <option value={config.status === "test" ? '80001' : '137'} selected={this.state.network.chainid === (config.status === "test" ? '80001' : '137')}>{networks[config.status === "test" ? '80001' : '137'].name}</option>
                                              <option value={config.status === "test" ? '97' : '56'} selected={this.state.network.chainid === (config.status === "test" ? '97' : '56')}>{networks[config.status === "test" ? '97' : '56'].name}</option>
+                                             <option value={config.status === "test" ? '23295' : '23295'} selected={this.state.network ? (this.state.network.chainid === (config.status === "test" ? '23295' : '23295')) : false}>{networks[config.status === "test" ? '23295' : '23295'].name}</option>
                                              <option value={config.status === "test" ? '5' : '1'} selected={this.state.network.chainid === (config.status === "test" ? '5' : '1')}>{networks[config.status === "test" ? '5' : '1'].name}</option>
                                              <option value={config.status === "test" ? '420' : '10'} selected={this.state.network.chainid === (config.status === "test" ? '420' : '10')} disabled={config.status === "test" ? true : false} >{networks[config.status === "test" ? '420' : '10'].name}</option>
                                              <option value={config.status === "test" ? '43113' : '43114'} selected={this.state.network.chainid === (config.status === "test" ? '43113' : '43114')}>{networks[config.status === "test" ? '43113' : '43114'].name}</option>
