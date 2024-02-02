@@ -54,11 +54,12 @@ class MainScreen extends Component {
                 const provider = await EthereumProvider.init({
                     projectId: config.projectIdWalletConnect,
                     chains: [1],
-                    optionalChains: [97, 80001, 23295],
+                    optionalChains: [97, 80001, 23295,421614],
                     rpcMap: {
                         '97': 'https://bsc-testnet.publicnode.com',
                         '80001': 'https://rpc-mumbai.maticvigil.com',
-                        '23295': 'https://testnet.sapphire.oasis.dev'
+                        '23295': 'https://testnet.sapphire.oasis.dev',
+                        '421614': 'https://sepolia-rollup.arbitrum.io/rpc'
                     },
                     methods: ["personal_sign", "eth_sendTransaction"],
                     showQrModal: false,
