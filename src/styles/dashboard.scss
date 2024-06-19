@@ -1,10 +1,57 @@
+.tab__panel {
+    display: flex;
+}
+.dashboard__tab {
+    position: relative;
+}
+@media (max-width: 1000px) {
+    .period_picker {
+        position: static !important;
+        margin: 25px auto;
+    }
+    .nav.nav-tabs {
+        margin-bottom: 0 !important;
+    }
+}
+.period_picker {
+    right: 0; top: -5px;
+    position: absolute;
+    display: flex;
+    justify-content: space-between;
+    gap: 2px;
+    border-radius: 4px;
+    background-color: map-get($theme-colors, "ulLightBack");
+    padding: 5px;
+    max-width: 250px;
+}
+.period_picker .period {
+    color: map-get($theme-colors, "primary");
+    padding: 6px 8px;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.period_picker .period:not(.period_active):hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+.period_picker .period.period_active {
+    background-color: map-get($theme-colors, "white");
+}
+
+.menu__title {
+    font-size: map-get($theme-fontSize, "preLgTitile");
+    color: map-get($theme-colors, "back")
+}
+
 .dashboard .nav-link{ 
-    color: rgba(136, 136, 136, 1);
+    color: rgba(99, 115, 129, 1);
     line-height: 21px;
-    font-weight: 400;
-    font-size: map-get($theme-fontSize, "primary");
-    padding: 10px 24px 10px 40px;
-    height: 42px;
+    font-weight: 700;
+    font-size: map-get($theme-fontSize, "secondary");
+    padding: 5px 24px 25px 40px;
+    height: 27px;
+    border-bottom: 2px solid map-get($theme-colors, "warning" ) !important;
 }
 
 .dashboard .nav-tabs .nav-link{
@@ -24,16 +71,16 @@
 }
 
 .dashboard .nav-tabs{
-    margin: 24px 0px;
+    margin: 24px 0px 34px 0px;
     flex-wrap: nowrap;
     overflow-x: auto;
     overflow-y: hidden;
+    border-bottom: none;
 }
 
 .dashboard .nav-item{
     margin-bottom: 0px;
 }
-
 
 .dashboard .nav-item:first-child button, .dashboard .nav-item:first-child .nav-link.active{
     background-image: url('../media/sidebar/user.svg');
@@ -79,57 +126,189 @@
     background-image: url('../media/sidebar/active/nfts.svg');
 }
 
-.dashboard__chart{
-    //background: map-get($theme-colors, "white");
-    //border-radius: 20px;
-    //box-shadow: 5px 5px 30px 0px rgba(0, 0, 0, 0.05);
-    //padding: 0px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-
-.dashboard__chart_dashboard-info{
-    background: map-get($theme-colors, "white");
+.dashboard__chart {
+    padding: 20px 25px;
+    border: 2px solid rgba(232, 235, 237, 1);
     border-radius: 20px;
-    box-shadow: 5px 5px 30px 0px rgba(0, 0, 0, 0.05);
-    padding: 0px;
+    background-color: #fff;
+    margin-bottom: 30px;
+}
+.dashboard__chart-title {
+    color: map-get($theme-colors, "back");
+    font-size: map-get($theme-fontSize, "smTitile");
+    font-weight: 700;
+}
+.dashboard__chart-graph {
+    margin-top: 20px;
+}
+.dashboard__chart-graph canvas {
+    height: 287px !important;
+}
+.dashboard__chart-sub_graph {
     display: flex;
-    flex-direction: column;
-    gap: 24px;
-    flex: 1;
+    justify-content: flex-end;
+}
+.dashboard__chart-sub_graph canvas {
+    // max-width: calc(100% - 60px);
+    height: 100px !important;
+}
+@media (max-width: 720px) {
+    .dashboard__chart {
+        padding: 20px 10px;
+    }
+}
+body {overflow-x: hidden;} // Tooltip goes out of block and creates X-scroll
+
+
+.dashboard__progress {
+    
 }
 
-.chart__label{
-    font-size: 14px;
-    color: rgba(33, 43, 54, 1);
+.dashboard__progress-wrapper {
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+}
+@media (max-width: 992px) {
+    .dashboard__progress-wrapper {
+        flex-direction: column;
+    }
+    .progress__bars_wrapper {
+        display: flex;
+        flex-direction: column;
+        max-width: 100% !important;
+        align-items: center;
+    }
+    .progress_circle_wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .progress_circle_block {
+        display: flex;
+        justify-content: center;
+    }
+}
+
+.progress__bars_wrapper {
+    max-width: 358px;
+    width: 100%;
+}
+
+.progress__bars {
+    padding: 40px 35px;
+    border: 2px solid rgba(232, 235, 237, 1);
+    border-radius: 20px;
+    background-color: #fff;
+    margin-bottom: 30px;
+    width: 100%;
+}
+
+.progress__bars-title, .progress__circle-title {
+    color: map-get($theme-colors, "back");
+    font-size: map-get($theme-fontSize, "smTitile");
+    font-weight: 700;
+    margin-bottom: 30px;
+}
+
+.progress_bar {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    color: map-get($theme-colors, "back");
+    font-size: map-get($theme-fontSize, "primary");
+}
+
+.progress_bar__text {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.progress_bar__bar {
+    width: 100%;
+    height: 8px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.progress_bar__bar-done {
+    height: 8px;
+    border-radius: 8px;
+}
+
+.progress_circle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 194px;
+    height: 194px;
+    border-radius: 50%;   
+}
+
+.circle__value {
+    height: 86px;
+    width: 86px;
+    border-radius: 50px;
+    background-color: rgba(255, 58, 41, 1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: map-get($theme-fontSize, "mdTitile");
+    font-weight: 700;
+    color: #fff;
+}
+
+.progress_circle_wrapper {
+    width: 100%;
+}
+.progress_circle_block {
+    padding: 40px 35px;
+    border: 2px solid rgba(232, 235, 237, 1);
+    border-radius: 20px;
+    background-color: #fff;
+    margin-bottom: 30px;
+    width: 100%;
+}
+  
+
+.chart__label {
+    font-size: map-get($theme-fontSize, "smTitile");
+    color: map-get($theme-colors, "back");
     font-weight: 700;
     line-height: 27px;
-   padding: 20px 0px 0px 24px;
+    padding: 20px 0px 0px 24px;
 }
 
 .chart__group{
     display: flex;
     gap: 24px;
-
 }
-
-.chart__group .dashboard__chart{
-    flex: 1;
-}
-
-.dashboard__chart_wrapper{
-    padding: 0 40px;
-}
-
 .tab-content>.active{
     display: flex;
     flex-direction: column;
 }
 
-/*.dashboard__chart canvas{
-    margin: 0 auto;
-    height: 286px;
-    width: 80%;
-}*/
+.label_window {
+    padding: 12px 20px !important;
+    background-color: #fff;
+    color: #000;
+    border: 1px solid rgba(232, 235, 237, 1);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-weight: bold;
+}
+.tooltip_info { 
+    color: map-get($theme-colors, "hoverBack");
+    font-weight: 700;
+}
+.tooltip_info::before {
+    content: ""
+}
+.tooltip_info b {
+    color: map-get($theme-colors, "secondBlack");
+    font-weight: 700;
+}

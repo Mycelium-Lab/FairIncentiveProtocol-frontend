@@ -14,7 +14,10 @@ $theme-colors: (
   "hoverWarning": rgba(254, 177, 105, 1),
   "hoverBack": rgba(99, 115, 129, 0.7),
   "subtitle": rgba(85, 85, 85, 1),
-  'disabled': rgba(206, 212, 218, 1)
+  'disabled': rgba(206, 212, 218, 1),
+  'softBack': rgba(236, 236, 236, 1),
+  'ulLightBack': rgba(236, 239, 243, 1),
+  'green': rgba(40, 199, 111, 1)
 ); 
 
 $theme-family: (
@@ -33,6 +36,7 @@ $theme-fontSize: (
   "mdTitile": 22px,
   "preLgTitile": 24px,
   "lgTitle": 30.34px,
+  "xLgTitle": 32px
 );
 $theme-fontSize-mobile: (
   "subtitle": 14px,
