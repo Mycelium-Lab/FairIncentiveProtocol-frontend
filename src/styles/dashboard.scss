@@ -244,21 +244,87 @@ body {overflow-x: hidden;} // Tooltip goes out of block and creates X-scroll
     align-items: center;
     width: 194px;
     height: 194px;
-    border-radius: 50%;   
+    border-radius: 50%;
+    position: relative;
 }
-
-.circle__value {
-    height: 86px;
+.progress_circle-outer {
+    height: 194px;
+    width: 194px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.5s ease;
+}
+.progress_circle-inner {
+    height: 166px;
+    width: 166px;
+    background-color: #fff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.progress_circle-value {
     width: 86px;
-    border-radius: 50px;
-    background-color: rgba(255, 58, 41, 1);
+    height: 86px;
+    border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: map-get($theme-fontSize, "mdTitile");
     font-weight: 700;
     color: #fff;
+    transition: all 0.5s ease;
+    cursor: pointer;
+    user-select: none;
 }
+.prg_round {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: rotate(-90deg);
+    transition: all 0.5s ease;
+}
+.prg_fill {
+    fill: none;
+    // stroke: rgba(255, 58, 41, 1);
+    stroke-width: 14px;
+    stroke-dasharray: 565;
+    stroke-dashoffset: 310.75;
+    transition: all 0.5s ease;
+}
+.progress__legend {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 30px;
+    padding-left: 30px;
+    color: map-get($theme-colors, "back");
+}
+.progress__legend-name {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.progress__legend-marker {
+    height: 14px;
+    width: 14px;
+    border-radius: 10px;
+}
+
+// .circle__value {
+//     height: 86px;
+//     width: 86px;
+//     border-radius: 50px;
+//     background-color: rgba(255, 58, 41, 1);
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+//     font-size: map-get($theme-fontSize, "mdTitile");
+//     font-weight: 700;
+//     color: #fff;
+// }
 
 .progress_circle_wrapper {
     width: 100%;

@@ -124,7 +124,13 @@ class Dashboard extends Component {
                     data: collectionSupply.map(data => data.value),
                     backgroundColor: collectionSupply.map(data => data.color)
                 }]
-            }
+            },
+            progressData: [
+                {name: "Reward #1", max: 100000, val: 65376, backgroundColor: "rgba(255, 245, 204, 1)", color: "rgba(255, 178, 0, 1)"},
+                {name: "Reward #2", max: 20000, val: 12109, backgroundColor: "rgba(218, 215, 254, 1)", color: "rgba(67, 57, 242, 1)"},
+                {name: "Reward #3", max: 160000, val: 132645, backgroundColor: "rgba(204, 248, 254, 1)", color: "rgba(2, 160, 252, 1) "},
+                {name: "Reward #4", max: 200000, val: 100429, backgroundColor: "rgba(255, 229, 211, 1)", color: "rgba(255, 58, 41, 1)"}
+            ]
         }
     }
     render() {
@@ -132,7 +138,7 @@ class Dashboard extends Component {
             <div className="dashboard">
                 <h3 className="menu__title">Dashboard</h3>
                 <div className="dashboard__tab">
-                    <Tabs defaultActiveKey="users">
+                    <Tabs defaultActiveKey="rewards">
                         <Tab eventKey="users" title="Users">
                             <PeriodPicker></PeriodPicker>
                             <UserInfo></UserInfo>
@@ -175,16 +181,31 @@ class Dashboard extends Component {
                                     <div className="progress__bars_wrapper">
                                         <h2 className="progress__bars-title">Distribution of rewards</h2>
                                         <div className="progress__bars">
-                                            <ProgressBar progressData={{name: "Reward #1", max: 100000, val: 65376, backgroundColor: "rgba(255, 245, 204, 1)", color: "rgba(255, 178, 0, 1)"}}></ProgressBar>
-                                            <ProgressBar progressData={{name: "Reward #1", max: 20000, val: 12109, backgroundColor: "rgba(218, 215, 254, 1)", color: "rgba(67, 57, 242, 1)"}}></ProgressBar>
-                                            <ProgressBar progressData={{name: "Reward #1", max: 160000, val: 132645, backgroundColor: "rgba(204, 248, 254, 1)", color: "rgba(2, 160, 252, 1) "}}></ProgressBar>
-                                            <ProgressBar progressData={{name: "Reward #1", max: 200000, val: 100429, backgroundColor: "rgba(255, 229, 211, 1)", color: "rgba(255, 58, 41, 1)"}}></ProgressBar>
+                                            <ProgressBar progressData={this.state.progressData[0]}></ProgressBar>
+                                            <ProgressBar progressData={this.state.progressData[1]}></ProgressBar>
+                                            <ProgressBar progressData={this.state.progressData[2]}></ProgressBar>
+                                            <ProgressBar progressData={this.state.progressData[3]}></ProgressBar>
                                         </div>
                                     </div>
                                     <div className="progress_circle_wrapper">
                                         <h2 className="progress__circle-title">Type of rewards</h2>
                                         <div className="progress_circle_block">
-                                            <ProgressCircle progressData={{max: 100, val: 47}}></ProgressCircle>
+                                        <div className="progress__legend">
+                                            {this.state.progressData.map((i, i_index) => {
+                                                return (
+                                                    <div class="progress__legend-name">
+                                                        <div className="progress__legend-marker" style={{backgroundColor: i.color}}></div>
+                                                        {i.name}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                            <ProgressCircle progressData={[
+                                                this.state.progressData[0], 
+                                                this.state.progressData[1], 
+                                                this.state.progressData[2], 
+                                                this.state.progressData[3]
+                                            ]}></ProgressCircle>
                                         </div>
                                     </div>
                                 </div>
@@ -218,7 +239,22 @@ class Dashboard extends Component {
                                     <div className="progress_circle_wrapper">
                                         <h2 className="progress__circle-title">Type of rewards</h2>
                                         <div className="progress_circle_block">
-                                            <ProgressCircle progressData={{max: 100, val: 47}}></ProgressCircle>
+                                        <div className="progress__legend">
+                                            {this.state.progressData.map((i, i_index) => {
+                                                return (
+                                                    <div class="progress__legend-name">
+                                                        <div className="progress__legend-marker" style={{backgroundColor: i.color}}></div>
+                                                        {i.name}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                            <ProgressCircle progressData={[
+                                                this.state.progressData[0], 
+                                                this.state.progressData[1], 
+                                                this.state.progressData[2], 
+                                                this.state.progressData[3]
+                                            ]}></ProgressCircle>
                                         </div>
                                     </div>
                                 </div>
@@ -252,7 +288,22 @@ class Dashboard extends Component {
                                     <div className="progress_circle_wrapper">
                                         <h2 className="progress__circle-title">Type of rewards</h2>
                                         <div className="progress_circle_block">
-                                            <ProgressCircle progressData={{max: 100, val: 47}}></ProgressCircle>
+                                        <div className="progress__legend">
+                                            {this.state.progressData.map((i, i_index) => {
+                                                return (
+                                                    <div class="progress__legend-name">
+                                                        <div className="progress__legend-marker" style={{backgroundColor: i.color}}></div>
+                                                        {i.name}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                            <ProgressCircle progressData={[
+                                                this.state.progressData[0], 
+                                                this.state.progressData[1], 
+                                                this.state.progressData[2], 
+                                                this.state.progressData[3]
+                                            ]}></ProgressCircle>
                                         </div>
                                     </div>
                                 </div>
