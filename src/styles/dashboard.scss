@@ -301,6 +301,7 @@ body {overflow-x: hidden;} // Tooltip goes out of block and creates X-scroll
     margin-bottom: 30px;
     padding-left: 30px;
     color: map-get($theme-colors, "back");
+    font-weight: 700;
 }
 .progress__legend-name {
     display: flex;

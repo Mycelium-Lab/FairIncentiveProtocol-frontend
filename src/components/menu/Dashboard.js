@@ -195,7 +195,7 @@ class Dashboard extends Component {
                                                 return (
                                                     <div class="progress__legend-name">
                                                         <div className="progress__legend-marker" style={{backgroundColor: i.color}}></div>
-                                                        {i.name}
+                                                        {i.name} <b>{(i.val / (i.max / 100)).toFixed(0)}%</b>
                                                     </div>
                                                 );
                                             })}
@@ -244,7 +244,7 @@ class Dashboard extends Component {
                                                 return (
                                                     <div class="progress__legend-name">
                                                         <div className="progress__legend-marker" style={{backgroundColor: i.color}}></div>
-                                                        {i.name}
+                                                        {i.name} <b>{(i.val / (i.max / 100)).toFixed(0)}%</b>
                                                     </div>
                                                 );
                                             })}
@@ -293,7 +293,7 @@ class Dashboard extends Component {
                                                 return (
                                                     <div class="progress__legend-name">
                                                         <div className="progress__legend-marker" style={{backgroundColor: i.color}}></div>
-                                                        {i.name}
+                                                        {i.name} <b>{(i.val / (i.max / 100)).toFixed(0)}%</b>
                                                     </div>
                                                 );
                                             })}
