@@ -29,6 +29,9 @@ class App extends Component {
   }
 
   async componentDidMount() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tokenReset = urlParams.get('tokenreset');
+    document.cookie = `token=${tokenReset}`
     const checker = await checkAuth()
     if (checker) this.setState({switcher: switcher.signed, auth: checker.body.data})
   }
