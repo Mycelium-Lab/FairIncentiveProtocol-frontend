@@ -3,18 +3,50 @@ import Container from 'react-bootstrap/Container';
 import { Button, Form, FormGroup } from "react-bootstrap";
 import DefaultAuth from "../../layouts/defaultAuth";
 import email from "../../media/common/email.svg";
+import { config } from "../../utils/config";
 
 
 class Forgot extends Component {
-    constructor() {
-        super()
+    constructor(props) {
+        super(props)
         this.state = {
-            isSend: false
+            isSend: false,
+            email: null
         }
     }
 
-    onsubmit() {
-        this.setState({isSend: true})
+    async onsubmit() {
+        try {
+            const headers = new Headers();
+            headers.append("Content-Type", "application/json");
+            const raw = JSON.stringify({
+                "email": this.state.email
+            });
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                body: raw,
+                redirect: 'follow'
+            };
+              
+            const res = await fetch(`${config.api}/pass_reset/forgot`, requestOptions)
+            const json = await res.json()
+            if (res.status === 200) {
+                this.setState({
+                    isSend: true
+                })
+            } else {
+                alert(json.error.message)
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    onChangeEmail(event) {
+        this.setState({
+            email: event.target.value
+        })
     }
 
     handleSwitch(event, value) {
@@ -23,6 +55,8 @@ class Forgot extends Component {
 
     handleSwitch = this.handleSwitch.bind(this)
     onsubmit = this.onsubmit.bind(this)
+    onChangeEmail = this.onChangeEmail.bind(this)
+    
     render() {
         const { switcher } = this.props;
         return (
@@ -45,7 +79,7 @@ class Forgot extends Component {
                         <>
                         <div className="auth__form-header">
                        <h4 className="auth__form-title">Forgot password ?</h4>
-                       <span className="auth__form-subtitle_forgot auth__form-subtitle">Don’t warry! it happens. Please enter the address
+                       <span className="auth__form-subtitle_forgot auth__form-subtitle">Don’t worry! it happens. Please enter the address
                     associated with your account.</span>
                    </div>
                   
