@@ -10,12 +10,14 @@ import MainScreen from './MainScreen';
 import splitText from './utils/textFormatting/splitText';
 import capitalize from './utils/textFormatting/capitalize';
 import Forgot from './components/auth/forgot';
+import PassReset from './components/auth/passReset';
 
 const switcher = {
   signup: 'signup',
   signin: 'signin',
   signed: 'signed',
-  forgot: 'forgot'
+  forgot: 'forgot',
+  passReset: 'passReset'
 }
 
 class App extends Component {
@@ -29,11 +31,16 @@ class App extends Component {
   }
 
   async componentDidMount() {
+    const checker = await checkAuth()
     const urlParams = new URLSearchParams(window.location.search);
     const tokenReset = urlParams.get('tokenreset');
-    document.cookie = `token=${tokenReset}`
-    const checker = await checkAuth()
-    if (checker) this.setState({switcher: switcher.signed, auth: checker.body.data})
+    if (checker) {
+      this.setState({switcher: switcher.signed, auth: checker.body.data})
+    } else if (tokenReset) {
+      document.cookie = `tokenreset=${tokenReset}`
+      this.setState({switcher: switcher.passReset})
+    }
+    
   }
 
   switch(event, value) {
@@ -45,15 +52,16 @@ class App extends Component {
 
   switch = this.switch.bind(this)
 
-      formatText(text) {
-        const splited = splitText(text, 'sign')
-        return capitalize(splited)
-      }
-      getWindow() {
-      if (this.state.switcher === switcher.signin) return <SignIn switcher={{signup: switcher.signup, forgot: switcher.forgot}} switcherText={this.formatText(switcher.signup)} switch={this.switch}/>
-      if (this.state.switcher === switcher.signup) return <SignUp switcher={switcher.signin} switcherText={this.formatText(switcher.signin)} switch={this.switch}/>
-      if (this.state.switcher === switcher.forgot) return <Forgot switcher={switcher.signin} switch={this.switch}/>
-      return <MainScreen auth={this.state.auth}/>
+  formatText(text) {
+    const splited = splitText(text, 'sign')
+    return capitalize(splited)
+  }
+  getWindow() {
+    if (this.state.switcher === switcher.passReset) return <PassReset/>
+    if (this.state.switcher === switcher.signin) return <SignIn switcher={{signup: switcher.signup, forgot: switcher.forgot}} switcherText={this.formatText(switcher.signup)} switch={this.switch}/>
+    if (this.state.switcher === switcher.signup) return <SignUp switcher={switcher.signin} switcherText={this.formatText(switcher.signin)} switch={this.switch}/>
+    if (this.state.switcher === switcher.forgot) return <Forgot switcher={switcher.signin} switch={this.switch}/>
+    return <MainScreen auth={this.state.auth}/>
   }
 
   render() {
