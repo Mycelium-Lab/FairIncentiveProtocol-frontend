@@ -27,6 +27,10 @@ class PassReset extends Component {
         }
     }
 
+    componentDidMount() {
+        // this.handleShowSuccess('Successfull changing', 'You have successfully changed your password', 'Now you will be redirected to the signin page')
+    }
+
     onChangePassword(event) {
         this.setState({
             password: event.target.value
