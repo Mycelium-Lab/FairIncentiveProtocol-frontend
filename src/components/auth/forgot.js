@@ -101,7 +101,7 @@ class Forgot extends Component {
                     <div className="auth__form-header">
                         <h4 className="auth__form-title_sent auth__form-title">Password reset message sent</h4>
                         <span className="auth__form-subtitle_forgot auth__form-subtitle mb-4">The message has been sent to your address <b>j***@gmail.com</b>. Follow the instructions in the message to reset your password.</span>
-                        <span className="auth__form-subtitle_forgot auth__form-subtitle mb-4">If you didn't receive the email, please check your spam folder or <a className="auth__form-subtitle_forgot_warning">try again</a>.</span>
+                        <span className="auth__form-subtitle_forgot auth__form-subtitle mb-4">If you didn't receive the email, please check your spam folder or <a onClick={(e) => this.setState({isSend: false})} className="auth__form-subtitle_forgot_warning">try again</a>.</span>
                     <span className="auth__form-subtitle_forgot auth__form-subtitle">Something does not work? Contact <a className="auth__form-subtitle_forgot_warning">Support</a>.</span>
                     </div>
                     </>
