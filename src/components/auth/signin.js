@@ -39,7 +39,7 @@ class SignIn extends Component {
             const json = await res.json()
             if (res.status === 200) {
                 document.cookie = `token=${json.body.data.token}`
-                window.location.reload()
+                window.location.href = '/'
             } else {
                 if(json.error.message === 'Wrong <password>') {
                     this.setState(({
