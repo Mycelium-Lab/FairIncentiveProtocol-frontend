@@ -5,6 +5,34 @@ import success from '../../../media/common/success.svg'
 class SuccessModal extends Component {
     constructor(props) {
         super(props)
+        this.state = {
+            countdown: this.props.timer || 0,
+        }
+    }
+
+    componentWillUnmount() {
+        if (this.countdownInterval) {
+            clearInterval(this.countdownInterval);
+        }
+    }
+
+    startCountdown() {
+        this.countdownInterval = setInterval(() => {
+            this.setState(prevState => {
+                if (prevState.countdown === 1) {
+                    clearInterval(this.countdownInterval);
+                    this.handleRedirect();
+                }
+                return { countdown: prevState.countdown - 1 };
+            });
+        }, 1000);
+    }
+
+    handleRedirect() {
+        // Redirect logic here, e.g., using window.location or react-router
+        if (this.props.redirectTo) {
+            window.location.href = this.props.redirectTo;
+        }
     }
 
     entering() {
@@ -20,6 +48,9 @@ class SuccessModal extends Component {
         || rewardFromReward?.parentElement || rewarding?.parentElement
         if(modal) {
             modal.style.zIndex = '1049'
+        }
+        if (this.props.timer && this.props.showSuccess) {
+            this.startCountdown();
         }
     }
 
@@ -52,7 +83,10 @@ class SuccessModal extends Component {
                     <img src={success}></img>
                     <div>
                         <div className="confirm__name">{this.props.successName}</div>
-                        <div className="confirm__text">{this.props.successText}</div>
+                        <div className="confirm__text">
+                            {this.props.successText}
+                            {this.props.timer && ` in ${this.state.countdown} seconds`}
+                        </div>
                     </div>
                 </div>
             </Modal.Body>

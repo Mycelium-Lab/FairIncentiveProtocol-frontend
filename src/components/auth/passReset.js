@@ -27,10 +27,6 @@ class PassReset extends Component {
         }
     }
 
-    componentDidMount() {
-        // this.handleShowSuccess('Successfull changing', 'You have successfully changed your password', 'Now you will be redirected to the signin page')
-    }
-
     onChangePassword(event) {
         this.setState({
             password: event.target.value
@@ -88,7 +84,7 @@ class PassReset extends Component {
 
     handleShowSuccess = (successTitle, successName, successText) => {
         this.setState({showSuccess: true, successTitle, successName, successText})
-        window.location.href = '/'
+        // window.location.href = '/'
     }
     handleCloseSuccess = () => this.setState({showSuccess: false, successName: null, successText: null})
     handleShowError = (errorText) => this.setState({showError: true, errorText})
@@ -201,6 +197,8 @@ class PassReset extends Component {
                     successTitle={this.state.successTitle}
                     successName={this.state.successName} 
                     successText={this.state.successText}
+                    timer={10}
+                    redirectTo={'/'}
             />
             <ErrorModal
                 showError={this.state.showError}
