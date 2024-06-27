@@ -84,7 +84,7 @@ class PassReset extends Component {
 
     handleShowSuccess = (successTitle, successName, successText) => {
         this.setState({showSuccess: true, successTitle, successName, successText})
-        window.location.href = '/'
+        // window.location.href = '/'
     }
     handleCloseSuccess = () => this.setState({showSuccess: false, successName: null, successText: null})
     handleShowError = (errorText) => this.setState({showError: true, errorText})
@@ -197,6 +197,8 @@ class PassReset extends Component {
                     successTitle={this.state.successTitle}
                     successName={this.state.successName} 
                     successText={this.state.successText}
+                    timer={10}
+                    redirectTo={'/'}
             />
             <ErrorModal
                 showError={this.state.showError}
