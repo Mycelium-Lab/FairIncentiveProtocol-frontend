@@ -97,8 +97,8 @@
     gap: 20.26px
 }
 .auth__form-action-btn.auth__form-action-btn_update {
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 12px;
+    padding-bottom: 12px;
 }
 .reset_auth__form-action {
     gap: 5px;
@@ -114,14 +114,21 @@
 
 
 // Added some special classes for updated reset screen elements, because idk if we need changing style on other ones
+
+.auth__form-action-group-btn .auth__form-action-btn {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    font-size: 16px;
+}
+
 .auth__form-action-btn.auth__form-action-btn__update_sign_in {
-    padding-top: 20px !important;
-    padding-bottom: 20px !important;
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
 }
 
 .reset_auth__form-action .auth__form-action-btn {
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 12px;
+    padding-bottom: 12px;
 }
 
 .reset_auth__form-action .auth__form-action-btn_reset_back:hover{
@@ -187,5 +194,5 @@
 .form__signin-icon-representative {
     position: absolute;
     top: 62%;
-    right: 10px;
+    right: 15px;
 }
