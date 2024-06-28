@@ -6,6 +6,7 @@ import DefaultAuth from "../../layouts/defaultAuth";
 import email from "../../media/common/email.svg";
 import passwordHide from "../../media/common/password_hide.svg";
 import passwordShow from "../../media/common/password_show.svg";
+import manPhone from "../../media/auth/man-phone.svg";
 
 class SignIn extends Component {
     constructor() {
@@ -118,10 +119,16 @@ class SignIn extends Component {
            <img className="auth-logo w-100" src={require('../../media/auth/logo.png')}/>
            <div className="auth">
                 <div className="auth__form">
-                   <div className="auth__form-header">
-                       <h4 className="auth__form-title">Sign In</h4>
-                       <span className="auth__form-subtitle">Please login to your account</span>
-                   </div>
+
+                    <div className="auth__man_phone-wrapper">
+                        <img class="auth__man_phone" src={manPhone} />
+                    </div>
+                    <img className="auth-logo__update w-100" src={require('../../media/auth/logo.png')}/>
+
+                    <div className="auth__form-header">
+                        <h4 className="auth__form-title">Sign In</h4>
+                        <span className="auth__form-subtitle">Please login to your account</span>
+                    </div>
                   
                    <Form className='auth__form-fields'>
                        <FormGroup className="form__signin">
@@ -188,8 +195,8 @@ class SignIn extends Component {
 
                    <div className='auth__form-action'>
                     {
-                        this.state.isInvalidEmail || this.state.isInvalidPassword  || !this.state.email.length || !this.state.password.length ? <Button disabled onClick={this.signin} className='auth__form-action-btn_disabled auth__form-action-btn w-100'>Sign In</Button>
-                        : <Button onClick={this.signin} className='auth__form-action-btn auth__form-action-btn w-100'>Sign In</Button>
+                        this.state.isInvalidEmail || this.state.isInvalidPassword  || !this.state.email.length || !this.state.password.length ? <Button disabled onClick={this.signin} className='auth__form-action-btn_disabled auth__form-action-btn__update_sign_in auth__form-action-btn w-100'>Sign In</Button>
+                        : <Button onClick={this.signin} className='auth__form-action-btn_update auth__form-action-btn auth__form-action-btn w-100'>Sign In</Button>
 
                     }
                        

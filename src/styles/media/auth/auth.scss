@@ -24,8 +24,15 @@
 
 @media (max-width: map-get($breakpoints, "md")) {
     .auth-decore_right-people, .auth-decore_left-people,
-    .auth-decore_left, .auth-decore_right{
+    .auth-decore_left
+    {
         display: none;
+    }
+    .auth__man_phone-wrapper {
+        display: flex;
+    }
+    .auth-decore_right {
+        width: 100%;
     }
     .auth{
         border: none !important;
@@ -38,6 +45,25 @@
     .auth-logo{
         margin: 0 auto;
         width: 70% !important;
+        display: none;
+    }
+    .auth-logo__update {
+        margin: 0 auto;
+        width: 90% !important;
+        display: block;
+    }
+    .auth {
+        margin-top: 150px;
+    }
+    .auth__form {
+        border-radius: 20px;
+        border: 1px solid rgba(232, 235, 237, 1);
+        padding: 40px 20px;
+        box-shadow: 0px 4px 8px 0 rgba(0, 0, 0, 0.1);
+    }
+    .auth__form-title {
+        text-align: center;
+        line-height: 120%;
     }
 }
 
@@ -49,8 +75,13 @@
     .auth-logo{
         margin-top: 45.47px !important;
     }
+    .auth-logo__update {
+        margin: 0 auto;
+        width: 100% !important;
+        display: block;
+    }
     .auth__form-title{
-        font-size: map-get($theme-fontSize-mobile, "lgTitle") !important;
+        // font-size: map-get($theme-fontSize-mobile, "preMdTitile") !important;
         margin-bottom: 6px !important;
     }
     .auth__form-subtitle, .auth__form-fields-label, .auth__form-forgotpassword{
