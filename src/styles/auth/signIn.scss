@@ -1,4 +1,4 @@
-.auth{
+.auth {
     display: flex;
     justify-content: center;
     padding: 48px;
@@ -15,7 +15,7 @@
     flex-direction: column;
     gap: 30px;
     width: 100%;
-    font-family: "HelveticaNeueCyr";
+    font-family: "Nunito";
     z-index: 100;
 }
 
@@ -26,10 +26,9 @@
 }
 
 .auth__form-title{
-    font-family: "HelveticaNeueCyr";
+    font-family: "Nunito";
     font-size: map-get($theme-fontSize, "mdTitile");
     font-weight: 500;
-    letter-spacing: 1px;
     line-height: 45.51px;
     font-weight: 700;
     margin-bottom: 16px;
@@ -56,14 +55,14 @@
     gap: 19px;
 }
 .auth__form-fields ::placeholder {
-    color: map-get($theme-colors, "text");
+    color: map-get($theme-colors, "placeholder");
 
 }
 
 .auth__form-fields-label {
-    font-weight: 500;
+    font-weight: 600;
     font-size: map-get($theme-fontSize, "secondary");
-    font-family: "HelveticaNeueCyr";
+    font-family: "Nunito";
     color: map-get($theme-colors, "primary");
     margin-bottom: 14px;
 }
@@ -104,7 +103,7 @@
     gap: 5px;
 }
 .auth__form-action-btn{
-    font-family: "HelveticaNeueCyr";
+    font-family: "Nunito";
     font-weight: 500;
     background-color: map-get($theme-colors, "warning") !important;
     border: none;
