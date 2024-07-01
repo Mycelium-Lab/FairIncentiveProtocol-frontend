@@ -107,10 +107,14 @@ class PassReset extends Component {
            <Container className="auth-warapp">
            <img className="auth-logo w-100" src={require('../../media/auth/logo.png')}/>
            <div className="auth">
+            
                 <div className="auth__form">
-                   <div className="auth__form-header">
-                       <h5 className="auth__form-title">Create a new password</h5>
-                   </div>
+
+                    <img className="auth-logo__update w-100" src={require('../../media/auth/logo.png')}/>
+
+                    <div className="auth__form-header">
+                        <h5 className="auth__form-title">Create a new password</h5>
+                    </div>
                   
                    <Form className='auth__form-fields'>
                         <FormGroup className="form__signin">
@@ -178,13 +182,12 @@ class PassReset extends Component {
                    </Form>
 
 
-                   <div className='auth__form-action'>
+                   <div className='auth__form-action reset_auth__form-action'>
                     {
                         this.state.isInvalidPassword  || !this.state.password.length ? <Button disabled onClick={this.submit} className='auth__form-action-btn_disabled auth__form-action-btn w-100'>Submit</Button>
                         : <Button onClick={this.submit} className='auth__form-action-btn auth__form-action-btn w-100'>Submit</Button>
 
                     }
-                       
                    </div>
                </div>
            </div>

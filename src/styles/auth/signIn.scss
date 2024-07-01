@@ -1,4 +1,4 @@
-.auth{
+.auth {
     display: flex;
     justify-content: center;
     padding: 48px;
@@ -9,11 +9,14 @@
     background: map-get($theme-colors, "white");
 }
 
-.auth__form{
+.auth__form {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 30px;
     width: 100%;
+    font-family: "Nunito";
+    z-index: 100;
 }
 
 .auth__form-header{
@@ -23,7 +26,9 @@
 }
 
 .auth__form-title{
-    font-size: map-get($theme-fontSize, "lgTitle");
+    font-family: "Nunito";
+    font-size: map-get($theme-fontSize, "mdTitile");
+    font-weight: 500;
     line-height: 45.51px;
     font-weight: 700;
     margin-bottom: 16px;
@@ -49,10 +54,16 @@
     flex-direction: column;
     gap: 19px;
 }
+.auth__form-fields ::placeholder {
+    color: map-get($theme-colors, "placeholder");
+
+}
 
 .auth__form-fields-label {
-    font-weight: 500;
-    font-size: map-get($theme-fontSize, "subtitle");
+    font-weight: 600;
+    font-size: map-get($theme-fontSize, "secondary");
+    font-family: "Nunito";
+    color: map-get($theme-colors, "primary");
     margin-bottom: 14px;
 }
 
@@ -67,7 +78,7 @@
 }
 
 .auth__form-forgotpassword{
-    font-weight: 600;
+    font-weight: 500;
     color: map-get($theme-colors, "warning");
     font-size: map-get($theme-fontSize, "subtitle");
     text-decoration: none;
@@ -84,12 +95,49 @@
     flex-direction: column;
     gap: 20.26px
 }
+.auth__form-action-btn.auth__form-action-btn_update {
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+.reset_auth__form-action {
+    gap: 5px;
+}
 .auth__form-action-btn{
-    font-weight: 700;
+    font-family: "Nunito";
+    font-weight: 500;
     background-color: map-get($theme-colors, "warning") !important;
     border: none;
     font-size: map-get($theme-fontSize, "preMdTitile");
     line-height: 30.34px;
+}
+
+
+// Added some special classes for updated reset screen elements, because idk if we need changing style on other ones
+
+.auth__form-action-group-btn .auth__form-action-btn {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    font-size: 16px;
+}
+
+.auth__form-action-btn.auth__form-action-btn__update_sign_in {
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+}
+
+.reset_auth__form-action .auth__form-action-btn {
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+.reset_auth__form-action .auth__form-action-btn_reset_back:hover{
+    background-color: #fff !important;
+    color: map-get($theme-colors, "text");
+    opacity: 80%;
+}
+
+.auth-logo__update {
+    display: none;
 }
 
 .auth__form-action-btn:hover{
@@ -127,11 +175,23 @@
 
 .form__signin-icon-email, .form__signin-icon-password{
     position: absolute;
-    top: calc(66%);
+    top: 66%;
     right: 1rem;
     cursor: pointer;
 }
 
 .form__signin-icon-password_error, .form__signin-icon-email_error{
-    top: calc(51%);
+    top: 51%
+}
+
+.form__signin-icon-company {
+    position: absolute;
+    top: 63%;
+    right: 10px;
+}
+
+.form__signin-icon-representative {
+    position: absolute;
+    top: 62%;
+    right: 15px;
 }
