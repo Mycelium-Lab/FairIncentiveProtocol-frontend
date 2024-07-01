@@ -5,11 +5,15 @@ import Select from "react-select";
 import DefaultAuth from "../../layouts/defaultAuth";
 import { config } from "../../utils/config"
 import email from "../../media/common/email.svg";
+import companyBadge from "../../media/common/company-bag.svg";
+import representative from "../../media/common/representative.svg";
+import phone_icon from "../../media/common/phone_icon.svg";
 import ErrorModal from "../common/modals/error";
 import errors from "../../errors";
 import passwordHide from "../../media/common/password_hide.svg";
 import passwordShow from "../../media/common/password_show.svg";
 import { countries } from "../../utils/countries";
+import manPhone from "../../media/auth/man-phone.svg";
 
 const steps = {
     step1: "1",
@@ -204,6 +208,12 @@ class SignUp extends Component {
                 <img className="auth-logo w-100" src={require('../../media/auth/logo.png')}/>
                 <div className="auth">
                     <div className="auth__form">
+
+                        <div className="auth__man_phone-wrapper">
+                            <img class="auth__man_phone" src={manPhone} />
+                        </div>
+                        <img className="auth-logo__update w-100" src={require('../../media/auth/logo.png')}/>
+
                         <div className="auth__form-header">
                             <h4 className="auth__form-title">Create an Account</h4>
                             <div className="auth__form-subtitle">Step {this.state.current_step}/2</div>
@@ -215,8 +225,11 @@ class SignUp extends Component {
                             <>
                             <Form className='auth__form-fields'>
                                 <FormGroup>
-                                    <Form.Label className='auth__form-fields-label'>Company name</Form.Label>
-                                    <Form.Control className='auth__form-fields-input' value={this.state.companyName} onChange={this.onChangeCompanyName} type="text" placeholder="Enter your company name" />
+                                    <div className="form__signin">
+                                        <Form.Label className='auth__form-fields-label'>Company name</Form.Label>
+                                        <img className="form__signin-icon-company" src={companyBadge}></img>
+                                        <Form.Control className='auth__form-fields-input auth__form-fields-input_company' value={this.state.companyName} onChange={this.onChangeCompanyName} type="text" placeholder="Enter your company name" />
+                                    </div>
                                 </FormGroup>
 
                                 <FormGroup>
@@ -232,8 +245,11 @@ class SignUp extends Component {
                                 </FormGroup>
 
                                 <FormGroup>
-                                    <Form.Label className="auth__form-fields-label">Representative's name and surname</Form.Label>
-                                    <Form.Control className='auth__form-fields-input'   value={this.state.repname} id="companyrepname-input-signup" onChange={this.onChangeRepname} placeholder="Enter your name and surname"/>
+                                    <div className="form__signin">
+                                        <Form.Label className="auth__form-fields-label">Representative's name and surname</Form.Label>
+                                        <img className="form__signin-icon-representative" src={representative}></img>
+                                        <Form.Control className='auth__form-fields-input'   value={this.state.repname} id="companyrepname-input-signup" onChange={this.onChangeRepname} placeholder="Enter your name and surname"/>
+                                    </div>
                                 </FormGroup>
                             </Form>
                             </>
@@ -242,8 +258,11 @@ class SignUp extends Component {
                                 <Form className='auth__form-fields'>
 
                                 <FormGroup>
-                                    <Form.Label className='auth__form-fields-label'>Phone number</Form.Label>
-                                    <Form.Control className='auth__form-fields-input' value={this.state.phone} id="companyphone-input-signup" onChange={this.onChangePhone} placeholder="Enter your phone number" />
+                                    <div className="form__signin">
+                                        <Form.Label className='auth__form-fields-label'>Phone number</Form.Label>
+                                        <img className="form__signin-icon-representative" src={phone_icon}></img>
+                                        <Form.Control className='auth__form-fields-input' value={this.state.phone} id="companyphone-input-signup" onChange={this.onChangePhone} placeholder="Enter your phone number" />
+                                    </div>
                                 </FormGroup>
 
                                 <FormGroup className="form__signin">
