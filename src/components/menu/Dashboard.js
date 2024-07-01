@@ -12,6 +12,11 @@ import PeriodPicker from "../PeriodPicker";
 import MiniBarChart from "../charts/MiniBarChart";
 import ProgressBar from "../charts/ProgressBar";
 import ProgressCircle from "../charts/ProgressCircle";
+import { getBearerHeader } from "../../utils/getBearerHeader";
+import { config } from "../../utils/config";
+import { addDays, subDays } from "date-fns";
+import { formated, isWithin, isWithin7Days } from "../../utils/time";
+import { getRandomRGBAColor } from "../../utils/color";
 
 class Dashboard extends Component {
     constructor(props) {
@@ -133,6 +138,140 @@ class Dashboard extends Component {
             ]
         }
     }
+
+    async componentDidMount() {
+        const now = new Date()
+        const nowSub = subDays(new Date(), 1)
+        await this.changeNewUsersRange(nowSub, now)
+        await this.changeRewardsRange(nowSub, now)
+        await this.getRewardDistribution()
+    }
+
+    async changeNewUsersRange(startDate, endDate) {
+        const isTodayOrYesterday = isWithin(startDate, endDate)
+        const is7Days = isWithin7Days(startDate, endDate)
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+            let query = new URLSearchParams();
+            query.append("startDate", startDate.toString())
+            query.append("endDate", endDate.toString())
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/stat/new_users_range?` + query.toString(), requestOptions)
+            const json = await res.json()
+            const range = {
+                chartTooltip: "New users",
+                labels: json.body.data.map(v => `${formated(new Date(v.date_interval_end), isTodayOrYesterday, is7Days)} `),
+                datasets: [{
+                    data: json.body.data.map(v => parseInt(v.count)),
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                }]
+            }
+            const resTotal = await fetch(`${config.api}/stat/total_users_range?` + query.toString(), requestOptions)
+            const jsonTotal = await resTotal.json()
+            const rangeTotal = {
+                chartTooltip: "Total users",
+                labels: jsonTotal.body.data.map(v => `${formated(new Date(v.end_date), isTodayOrYesterday, is7Days)} `),
+                datasets: [{
+                    data: jsonTotal.body.data.map(v => parseInt(v.count)),
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                }]
+            }
+            this.setState({
+                newUserData: range,
+                tokenDistributionMockDdata: {
+                    labels: json.body.data.map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "")  : new Date(v.date_interval_end).toLocaleDateString()} `),
+                    datasets: [{
+                        data: [],
+                        backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                    }]
+                },
+                nftsDistributionMockDdata : {
+                    labels: json.body.data.map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "")  : new Date(v.date_interval_end).toLocaleDateString()} `),
+                    datasets: [{
+                        data: [],
+                        backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                    }]
+                },
+                totalUserData: rangeTotal
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async getRewardDistribution() {
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/stat/rewards_distribution`, requestOptions)
+            const json = await res.json()
+            json.body.data = json.body.data.filter(row => row.event_count != 0)
+            const total = json.body.data.reduce((total, row) => total + parseInt(row.event_count), 0);
+            const distributionOfRewards = json.body.data.map((v, i) => {
+                return {
+                    id: (i + 1).toString(),
+                    name: v.name,
+                    max: parseInt(total),
+                    val: parseInt(v.event_count),
+                    backgroundColor: getRandomRGBAColor(),
+                    color: getRandomRGBAColor()
+                }
+            })
+            this.setState({
+                progressData: distributionOfRewards
+            })
+        } catch (error) {
+            alert(error)
+        }
+    }
+
+    async changeRewardsRange(startDate, endDate) {
+        const isTodayOrYesterday = isWithin(startDate, endDate)
+        const is7Days = isWithin7Days(startDate, endDate)
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+            let query = new URLSearchParams();
+            query.append("startDate", startDate.toString())
+            query.append("endDate", endDate.toString())
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/stat/rewards_range?` + query.toString(), requestOptions)
+            const json = await res.json()
+            const range = {
+                chartTooltip: "Rewards",
+                labels: json.body.data.map(v => `${formated(new Date(v.date_interval_end), isTodayOrYesterday, is7Days)} `),
+                datasets: [{
+                    data: json.body.data.map(v => parseInt(v.count)),
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                }]
+            }
+            this.setState({
+                rewardsData: range
+            })
+        } catch (error) {
+            
+        }
+    }
+
+    changeNewUsersRange = this.changeNewUsersRange.bind(this)
+    getRewardDistribution = this.getRewardDistribution.bind(this)
+    changeRewardsRange = this.changeRewardsRange.bind(this)
+
     render() {
         return (
             <div className="dashboard">
@@ -140,7 +279,7 @@ class Dashboard extends Component {
                 <div className="dashboard__tab">
                     <Tabs defaultActiveKey="rewards">
                         <Tab eventKey="users" title="Users">
-                            <PeriodPicker></PeriodPicker>
+                            <PeriodPicker changeNewUsersRange={this.changeNewUsersRange}></PeriodPicker>
                             <UserInfo></UserInfo>
                             <div className="dashboard__chart">
                                 <h2 className="dashboard__chart-title">
@@ -149,9 +288,9 @@ class Dashboard extends Component {
                                 <div className="dashboard__chart-graph">
                                     <BarChart chartTooltip="New users" chartData={this.state.newUserData}></BarChart>
                                 </div>
-                                <div className="dashboard__chart-sub_graph">
+                                {/* <div className="dashboard__chart-sub_graph">
                                     <MiniBarChart chartTooltip="New users" chartData={this.state.newUser24Data}></MiniBarChart>
-                                </div>
+                                </div> */}
                             </div>
                             <div className="dashboard__chart">
                                 <h2 className="dashboard__chart-title">
@@ -163,7 +302,7 @@ class Dashboard extends Component {
                             </div>
                         </Tab>
                         <Tab eventKey="rewards" title="Rewards">
-                            <PeriodPicker></PeriodPicker>
+                            <PeriodPicker changeRewardsRange={this.changeRewardsRange}></PeriodPicker>
                             <RewardsInfo></RewardsInfo>
                             <div className="dashboard__chart">
                                 <h2 className="dashboard__chart-title">
@@ -172,22 +311,23 @@ class Dashboard extends Component {
                                 <div className="dashboard__chart-graph">
                                     <BarChart chartTooltip="Rewards" chartData={this.state.rewardsData}></BarChart>
                                 </div>
-                                <div className="dashboard__chart-sub_graph">
+                                {/* <div className="dashboard__chart-sub_graph">
                                     <MiniBarChart chartTooltip="Rewards" chartData={this.state.rewards24Data}></MiniBarChart>
-                                </div>
+                                </div> */}
                             </div>
                             <div className="dashboard__progress">
                                 <div className="dashboard__progress-wrapper">
                                     <div className="progress__bars_wrapper">
                                         <h2 className="progress__bars-title">Distribution of rewards</h2>
                                         <div className="progress__bars">
-                                            <ProgressBar progressData={this.state.progressData[0]}></ProgressBar>
-                                            <ProgressBar progressData={this.state.progressData[1]}></ProgressBar>
-                                            <ProgressBar progressData={this.state.progressData[2]}></ProgressBar>
-                                            <ProgressBar progressData={this.state.progressData[3]}></ProgressBar>
+                                            {
+                                                this.state.progressData.map((v) => {
+                                                    return <ProgressBar progressData={v}></ProgressBar>
+                                                })
+                                            }
                                         </div>
                                     </div>
-                                    <div className="progress_circle_wrapper">
+                                    {/* <div className="progress_circle_wrapper">
                                         <h2 className="progress__circle-title">Type of rewards</h2>
                                         <div className="progress_circle_block">
                                         <div className="progress__legend">
@@ -207,7 +347,7 @@ class Dashboard extends Component {
                                                 this.state.progressData[3]
                                             ]}></ProgressCircle>
                                         </div>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         </Tab>
@@ -221,9 +361,9 @@ class Dashboard extends Component {
                                 <div className="dashboard__chart-graph">
                                     <BarChart chartTooltip="Rewards" chartData={this.state.rewardsData}></BarChart>
                                 </div>
-                                <div className="dashboard__chart-sub_graph">
+                                {/* <div className="dashboard__chart-sub_graph">
                                     <MiniBarChart chartTooltip="Rewards" chartData={this.state.rewards24Data}></MiniBarChart>
-                                </div>
+                                </div> */}
                             </div>
                             <div className="dashboard__progress">
                                 <div className="dashboard__progress-wrapper">
@@ -270,9 +410,9 @@ class Dashboard extends Component {
                                 <div className="dashboard__chart-graph">
                                     <BarChart chartTooltip="Rewards" chartData={this.state.rewardsData}></BarChart>
                                 </div>
-                                <div className="dashboard__chart-sub_graph">
+                                {/* <div className="dashboard__chart-sub_graph">
                                     <MiniBarChart chartTooltip="Rewards" chartData={this.state.rewards24Data}></MiniBarChart>
-                                </div>
+                                </div> */}
                             </div>
                             <div className="dashboard__progress">
                                 <div className="dashboard__progress-wrapper">
