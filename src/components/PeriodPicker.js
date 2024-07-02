@@ -19,6 +19,12 @@ export default class PeriodPicker extends Component {
     if (this.props.changeRewardsRange) {
         this.props.changeRewardsRange(nowSub, now)
     }
+    if (this.props.changeTokensRange) {
+        this.props.changeTokensRange(nowSub, now)
+    }
+    if (this.props.changeNftsRange) {
+        this.props.changeNftsRange(nowSub, now)
+    }
   };
 
   setActiveIndex = this.setActiveIndex.bind(this)

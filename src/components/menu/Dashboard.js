@@ -17,11 +17,13 @@ import { config } from "../../utils/config";
 import { addDays, subDays } from "date-fns";
 import { formated, isWithin, isWithin7Days } from "../../utils/time";
 import { getRandomRGBAColor } from "../../utils/color";
+import { ethers } from "ethers";
 
 class Dashboard extends Component {
     constructor(props) {
         super(props)
         this.state = {
+            rewards_total_count: 0,
             newUserData: {
                 chartTooltip: "New users",
                 labels: newUser.map(data => data.time).concat(newUser.map(data => data.time)).concat(newUser.map(data => data.time)),
@@ -135,7 +137,17 @@ class Dashboard extends Component {
                 {name: "Reward #2", max: 20000, val: 12109, backgroundColor: "rgba(218, 215, 254, 1)", color: "rgba(67, 57, 242, 1)"},
                 {name: "Reward #3", max: 160000, val: 132645, backgroundColor: "rgba(204, 248, 254, 1)", color: "rgba(2, 160, 252, 1) "},
                 {name: "Reward #4", max: 200000, val: 100429, backgroundColor: "rgba(255, 229, 211, 1)", color: "rgba(255, 58, 41, 1)"}
-            ]
+            ],
+            tokenDistributionData: {
+                chartTooltip: "Tokens",
+                labels: [],
+                datasets: []
+            },
+            nftsDistributionData: {
+                chartTooltip: "NFTs",
+                labels: [],
+                datasets: []
+            }
         }
     }
 
@@ -144,7 +156,10 @@ class Dashboard extends Component {
         const nowSub = subDays(new Date(), 1)
         await this.changeNewUsersRange(nowSub, now)
         await this.changeRewardsRange(nowSub, now)
+        await this.changeTokensRange(nowSub, now)
+        await this.changeNftsRange(nowSub, now)
         await this.getRewardDistribution()
+        await this.getTypeOfRewards()
     }
 
     async changeNewUsersRange(startDate, endDate) {
@@ -183,20 +198,20 @@ class Dashboard extends Component {
             }
             this.setState({
                 newUserData: range,
-                tokenDistributionMockDdata: {
-                    labels: json.body.data.map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "")  : new Date(v.date_interval_end).toLocaleDateString()} `),
-                    datasets: [{
-                        data: [],
-                        backgroundColor: ['rgba(255, 159, 67, 0.85)']
-                    }]
-                },
-                nftsDistributionMockDdata : {
-                    labels: json.body.data.map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "")  : new Date(v.date_interval_end).toLocaleDateString()} `),
-                    datasets: [{
-                        data: [],
-                        backgroundColor: ['rgba(255, 159, 67, 0.85)']
-                    }]
-                },
+                // tokenDistributionMockDdata: {
+                //     labels: json.body.data.map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "")  : new Date(v.date_interval_end).toLocaleDateString()} `),
+                //     datasets: [{
+                //         data: [],
+                //         backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                //     }]
+                // },
+                // nftsDistributionMockDdata : {
+                //     labels: json.body.data.map(v => `${isTodayOrYesterday ? new Date(v.date_interval_end).toLocaleTimeString().replace(/(:\d{2}| [AP]M)$/, "")  : new Date(v.date_interval_end).toLocaleDateString()} `),
+                //     datasets: [{
+                //         data: [],
+                //         backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                //     }]
+                // },
                 totalUserData: rangeTotal
             })
         } catch (error) {
@@ -236,6 +251,48 @@ class Dashboard extends Component {
         }
     }
 
+    async getTypeOfRewards() {
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/stat/total_rewards`, requestOptions)
+            const json = await res.json()
+            const total = +json.body.data.erc20 + +json.body.data.erc721
+            const typeOfRewards = [
+                {
+                    id: '1',
+                    name: 'Tokens',
+                    value: json.body.data.erc20 * 100 / total,
+                    color: 'rgba(244, 190, 55, 1)',
+                },
+                {
+                    id: '2',
+                    name: 'NFTs',
+                    value: json.body.data.erc721 * 100 / total,
+                    color: 'rgba(255, 159, 64, 1)'
+                },
+            ]
+            this.setState({
+                typeOfRewardsData: {
+                    labels: typeOfRewards.map(data => data.name),
+                    datasets: [{
+                        data: typeOfRewards.map(data => data.value),
+                        backgroundColor: typeOfRewards.map(data => data.color)
+                    }]
+                },
+                rewards_total_count: total
+            })
+        } catch (error) {
+            alert(error)
+        }
+    }
+
     async changeRewardsRange(startDate, endDate) {
         const isTodayOrYesterday = isWithin(startDate, endDate)
         const is7Days = isWithin7Days(startDate, endDate)
@@ -268,9 +325,78 @@ class Dashboard extends Component {
         }
     }
 
+    async changeTokensRange(startDate, endDate) {
+        const isTodayOrYesterday = isWithin(startDate, endDate)
+        const is7Days = isWithin7Days(startDate, endDate)
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+            let query = new URLSearchParams();
+            query.append("startDate", startDate.toString())
+            query.append("endDate", endDate.toString())
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/stat/tokens_dist_range?` + query.toString(), requestOptions)
+            const json = await res.json()
+            const range = {
+                chartTooltip: "Tokens",
+                labels: json.body.data.map(v => {
+                    v.count = ethers.utils.formatEther(v.count)
+                    return v
+                }).map(v => `${formated(new Date(v.date_interval_end), isTodayOrYesterday, is7Days)} `),
+                datasets: [{
+                    data: json.body.data.map(v => parseInt(v.count)),
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                }]
+            }
+            this.setState({
+                tokenDistributionData: range
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async changeNftsRange(startDate, endDate) {
+        const isTodayOrYesterday = isWithin(startDate, endDate)
+        const is7Days = isWithin7Days(startDate, endDate)
+        try {
+            const headers = new Headers();
+            headers.append("Authorization", getBearerHeader())
+            let query = new URLSearchParams();
+            query.append("startDate", startDate.toString())
+            query.append("endDate", endDate.toString())
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+                redirect: 'follow'
+              };
+            const res = await fetch(`${config.api}/stat/nfts_dist_range?` + query.toString(), requestOptions)
+            const json = await res.json()
+            const range = {
+                chartTooltip: "NFTs",
+                labels: json.body.data.map(v => `${formated(new Date(v.date_interval_end), isTodayOrYesterday, is7Days)} `),
+                datasets: [{
+                    data: json.body.data.map(v => parseInt(v.count)),
+                    backgroundColor: ['rgba(255, 159, 67, 0.85)']
+                }]
+            }
+            this.setState({
+                nftsDistributionData: range
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     changeNewUsersRange = this.changeNewUsersRange.bind(this)
     getRewardDistribution = this.getRewardDistribution.bind(this)
     changeRewardsRange = this.changeRewardsRange.bind(this)
+    changeTokensRange = this.changeTokensRange.bind(this)
+    changeNftsRange = this.changeNftsRange.bind(this)
 
     render() {
         return (
@@ -303,7 +429,7 @@ class Dashboard extends Component {
                         </Tab>
                         <Tab eventKey="rewards" title="Rewards">
                             <PeriodPicker changeRewardsRange={this.changeRewardsRange}></PeriodPicker>
-                            <RewardsInfo></RewardsInfo>
+                            <RewardsInfo rewards_total_count={this.state.rewards_total_count}></RewardsInfo>
                             <div className="dashboard__chart">
                                 <h2 className="dashboard__chart-title">
                                     Rewards
@@ -352,20 +478,20 @@ class Dashboard extends Component {
                             </div>
                         </Tab>
                         <Tab eventKey="tokens" title="Tokens">
-                            <PeriodPicker></PeriodPicker>
+                            <PeriodPicker changeTokensRange={this.changeTokensRange}></PeriodPicker>
                             <TokensInfo></TokensInfo>
                             <div className="dashboard__chart">
                                 <h2 className="dashboard__chart-title">
-                                    Rewards
+                                    Token distribution
                                 </h2>
                                 <div className="dashboard__chart-graph">
-                                    <BarChart chartTooltip="Rewards" chartData={this.state.rewardsData}></BarChart>
+                                    <BarChart chartTooltip="Rewards" chartData={this.state.tokenDistributionData}></BarChart>
                                 </div>
                                 {/* <div className="dashboard__chart-sub_graph">
                                     <MiniBarChart chartTooltip="Rewards" chartData={this.state.rewards24Data}></MiniBarChart>
                                 </div> */}
                             </div>
-                            <div className="dashboard__progress">
+                            {/* <div className="dashboard__progress">
                                 <div className="dashboard__progress-wrapper">
                                     <div className="progress__bars_wrapper">
                                         <h2 className="progress__bars-title">Distribution of rewards</h2>
@@ -398,23 +524,23 @@ class Dashboard extends Component {
                                         </div>
                                     </div>
                                 </div>
-                            </div> 
+                            </div>  */}
                         </Tab>
                         <Tab eventKey="NFTs" title="NFTs">
-                            <PeriodPicker></PeriodPicker>
+                            <PeriodPicker changeNftsRange={this.changeNftsRange}></PeriodPicker>
                             <NftsInfo></NftsInfo>
                             <div className="dashboard__chart">
                                 <h2 className="dashboard__chart-title">
-                                    Rewards
+                                    NFT distribution
                                 </h2>
                                 <div className="dashboard__chart-graph">
-                                    <BarChart chartTooltip="Rewards" chartData={this.state.rewardsData}></BarChart>
+                                    <BarChart chartTooltip="Rewards" chartData={this.state.nftsDistributionData}></BarChart>
                                 </div>
                                 {/* <div className="dashboard__chart-sub_graph">
                                     <MiniBarChart chartTooltip="Rewards" chartData={this.state.rewards24Data}></MiniBarChart>
                                 </div> */}
                             </div>
-                            <div className="dashboard__progress">
+                            {/* <div className="dashboard__progress">
                                 <div className="dashboard__progress-wrapper">
                                     <div className="progress__bars_wrapper">
                                         <h2 className="progress__bars-title">Distribution of rewards</h2>
@@ -447,7 +573,7 @@ class Dashboard extends Component {
                                         </div>
                                     </div>
                                 </div>
-                            </div>                            
+                            </div>                             */}
                         </Tab>
                     </Tabs>
                 </div>

@@ -85,8 +85,8 @@ class TokensInfo extends Component {
                 <li className="info__list-item_white info__list-item">
                     <div className="info__content_left">
                         <div className="info__content-amount-info">
-                            <span className="info__content-amount">1 000 500</span>
-                            <a className="info__content-mint">[mint]</a>
+                            <span className="info__content-amount">∞</span>
+                            {/* <a className="info__content-mint">[mint]</a> */}
                         </div>
                         <span className="info__content-desc">Available to distribute</span>
                     </div>

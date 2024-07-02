@@ -66,7 +66,7 @@ class RewardsInfo extends Component {
              <ul className="info__list unlist">
                 <li className="info__list-item_white info__list-item">
                     <div className="info__content_left">
-                        <span className="info__content-amount">{this.state.total}</span>
+                        <span className="info__content-amount">{this.props.rewards_total_count}</span>
                         <span className="info__content-desc">The total number of rewards</span>
                     </div>
                     <div className="info__content_right">
