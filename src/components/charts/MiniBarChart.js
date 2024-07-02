@@ -3,7 +3,7 @@ import {Bar} from "react-chartjs-2"
 import { Chart as Chart } from "chart.js/auto";
 
 
-class BarChart extends Component {
+class MiniBarChart extends Component {
     constructor(props) {
         super(props)
     }
@@ -96,7 +96,7 @@ class BarChart extends Component {
                         `<div class="tooltip_info"> 
                           <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g filter="url(#filter0_d_1_14860)">
-                            <circle cx="9" cy="7" r="5" fill="#FF9F43"/>
+                            <circle cx="9" cy="7" r="5" fill="rgba(211, 225, 243, 1)"/>
                             <circle cx="9" cy="7" r="6" stroke="white" stroke-width="2"/>
                             </g>
                             <defs>
@@ -121,44 +121,39 @@ class BarChart extends Component {
                 },
                 maintainAspectRatio : false,
                 responsive: true,
-                aspectRatio: 1,
+                aspectRatio: 1, 
                 scales: {
                   x: {
-                    max: window.innerWidth > 720 ? 80 : 20,
+                    max: window.innerWidth > 720 ? 100 : 20,
                     grid: {
-                      display: false
+                      display: false,
                     },
                     ticks: {
-                      padding: 5,
                       stepSize: 1,
                       autoSkip: true,
                       maxTicksLimit: 7,
-                      maxRotation: 0,
-                      font: {
-                        family: "HelveticaNeueCyr",
-                        size: 12
-                      }
+                      maxRotation: 0
                     }
                   },
                   y: {
+                    display: true,
+                    grid: {
+                        display: false
+                    },
                     ticks: {
-                      stepSize: 200,
-                      padding: window.innerWidth > 720 ? 30 : 10,
-                      font: {
-                        family: "HelveticaNeueCyr",
-                        size: 12
-                      }
+                        padding: window.innerWidth > 720 ? 30 : 10,
+                        color: "rgba(0, 0, 0, 0)"
                     }
                   },
                   y1: {
+                    display: true,
                     position: "right",
+                    grid: {
+                        display: false
+                    },
                     ticks: {
-                      padding: window.innerWidth > 720 ? 30 : 10,
-                      stepSize: 10,
-                      font: {
-                        family: "HelveticaNeueCyr",
-                        size: 12
-                      }
+                        padding: window.innerWidth > 720 ? 30 : 10,
+                        color: "rgba(0, 0, 0, 0)"
                     }
                   }
                 }
@@ -169,4 +164,4 @@ class BarChart extends Component {
     }
 }
 
-export default BarChart
+export default MiniBarChart

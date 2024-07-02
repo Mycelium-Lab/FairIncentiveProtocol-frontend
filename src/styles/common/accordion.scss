@@ -1,52 +1,38 @@
 .accordion-item{
-    border: none;
-  }
-  .accordion-button:not(.collapsed){
-    background: none;
-    box-shadow: none;
-    color: map-get($theme-colors, "back");  
-  }
+  border: none;
+}
+.accordion-button:not(.collapsed){
+background: none;
+box-shadow: none;
+color: map-get($theme-colors, "back") !important;
+}
 
-  .accordion-button{
-    height: 48.1px;
-  }
-  .accrordion__header_active .accordion-button{
-    background: map-get($theme-colors, "activeTab");
-    color: map-get($theme-colors, "white");
-    border-radius: 8px !important;
-  }
-
-  .accrordion__header_active svg path{
-    fill: map-get($theme-colors, "white") !important;
-  }
-
-  .accrordion__header_active .menu-list__item-name{
-    color: map-get($theme-colors, "white") !important;   
+.accordion-button{
+height: 48.1px;
+}
+.accrordion__header_active .accordion-button{
+background-color: map-get($theme-colors, "softBack");
+border-radius: 8px !important;
+}
+.accordion-button {
+font-weight: 700;
 }
 
 .accordion-body{
-  padding-bottom: 0px;
+padding-bottom: 0px;
 }
-  
-  .accordion-button:focus{
-    border: none;
-    box-shadow: none;
+
+.accordion-button:focus{
+  border: none;
+  box-shadow: none;
 }
 
 .sidebar__accordion-item button{
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.sidebar__accordion-item button:hover path{
-    fill: map-get($theme-colors, "activeTab");   
-}
-
-.sidebar__accordion-item button:hover .menu-list__item-name{
-    color: map-get($theme-colors, "activeTab");   
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
 .sidebar__accordion-item .accordion-body {
-  padding-right: 0px;
+padding-right: 0px;
 }
