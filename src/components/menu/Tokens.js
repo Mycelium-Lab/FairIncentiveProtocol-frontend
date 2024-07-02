@@ -1239,7 +1239,7 @@ class Tokens extends Component {
                                             }
                                         </select>
                                     </div>
-                                    <div className="form__prompt" id="basic-addon4">Choose a symbol for your token</div>
+                                    <div className="form__prompt" id="basic-addon4">Choose what emission limit your token will have</div>
                                 </div>
                                 <div className="form_col_last form_col">
                                     <label className="form__label">Initial supply {this.state.emissionType === "1" ? " *" : null} <img src={info} className="form__icon-info" /></label>
@@ -1351,18 +1351,18 @@ class Tokens extends Component {
                                         Back
                                     </button>
                                     {
-                                    this.state.symbol && this.state.name && this.state.emissionType !=='2' && this.state.maxSupply ? 
-                                    <button className="btn btn_pre-sm btn_primary btn_orange" onClick={this.nextStage}>
-                                        Next
-                                    </button>
-                                    :  this.state.symbol && this.state.name && this.state.emissionType ==='2' ? 
-                                    <button className="btn btn_pre-sm btn_primary btn_orange" onClick={this.nextStage}>
-                                        Next
-                                    </button>
-                                    :   <button disabled className="btn btn_pre-sm  btn_primary btn_orange btn_disabled">
-                                        Next
+                                        (this.state.symbol && this.state.name && 
+                                        ((this.state.emissionType === '2') || 
+                                        (this.state.emissionType === '1' && this.state.initialSupply) || 
+                                        (this.state.emissionType === '0' && this.state.maxSupply))) ? 
+                                        <button className="btn btn_pre-sm btn_primary btn_orange" onClick={this.nextStage}>
+                                            Next
                                         </button>
-                                }
+                                        : 
+                                        <button disabled className="btn btn_pre-sm btn_primary btn_orange btn_disabled">
+                                            Next
+                                        </button>
+                                    }
                                 </div>
                         </div>
                     </div> : null
